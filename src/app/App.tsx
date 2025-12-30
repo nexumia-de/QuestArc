@@ -10,9 +10,11 @@ const sendMessage = async (type: string, payload?: any) => {
 
     const handler = (event: MessageEvent) => {
       console.log('QuestArc UI: Received response:', event.data);
-      if (event.data.messageId === messageId) {
+      // Check for both MESSAGE_RESPONSE and PLUGIN_MESSAGE_RESPONSE
+      if (event.data.type === 'PLUGIN_MESSAGE_RESPONSE' && event.data.messageId === messageId) {
         window.removeEventListener('message', handler);
-        resolve(event.data.response);
+        clearTimeout(timeout);
+        resolve(event.data.result);
       }
     };
 
@@ -24,7 +26,12 @@ const sendMessage = async (type: string, payload?: any) => {
     }, 5000);
 
     window.addEventListener('message', handler);
-    window.parent.postMessage({ type, payload, messageId }, '*');
+    // Super Productivity expects type: 'PLUGIN_MESSAGE' with message inside
+    window.parent.postMessage({
+      type: 'PLUGIN_MESSAGE',
+      message: { type, payload },
+      messageId
+    }, '*');
   });
 };
 
