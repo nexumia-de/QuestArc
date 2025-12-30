@@ -1,0 +1,35 @@
+{
+  "id": "story_productivity_mastery",
+  "title": "Productivity Mastery",
+  "steps": [
+    {
+      "id": 1,
+      "title": "The First Step",
+      "condition": {
+        "type": "streak",
+        "target": 3
+      },
+      "xpReward": 50,
+      "nextStepId": 2
+    },
+    {
+      "id": 2,
+      "title": "Boss Fight: Procrastination Monster",
+      "type": "boss",
+      "boss": {
+        "hp": 100,
+        "maxHp": 100,
+        "damageModifiers": [
+          {
+            "trigger": {
+              "type": "tag",
+              "value": "deep-work"
+            },
+            "multiplier": 2.0
+          }
+        ]
+      },
+      "xpReward": 200
+    }
+  ]
+}

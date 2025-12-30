@@ -1,4 +1,5 @@
 export interface QuestArcState {
+  version: number; // Schema version for migrations
   profile: {
     level: number;
     xp: number;
@@ -32,6 +33,7 @@ export interface BossConfig {
   hp: number;
   maxHp: number;
   damageModifiers: Modifier[];
+  isDead?: boolean;
 }
 
 export type StoryStepType = 'simple' | 'boss';

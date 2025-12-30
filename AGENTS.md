@@ -19,8 +19,10 @@ QuestArc is built on the `super-productivity/boilerplate-solid-js`, which enforc
 * **Runtime:** Runs in an isolated `iframe`. **Ephemeral** (dies when tab closes).
 * **Responsibilities:**
     * **Visualization:** Displays story text, progress bars, and animations.
-    * **Command Sender:** Sends user intents (e.g., "Start Quest") to the Brain via `postMessage`.
+    * **State Polling:** Polls the Brain every 2 seconds for state updates via `postMessage`.
+    * **Command Sender:** Sends user intents (e.g., "Reset Progress") to the Brain via `postMessage`.
 * **Rule:** Never calculate game state here. Always request it from the Brain.
+* **Important:** The Brain cannot push updates to the UI. The UI must poll for changes.
 
 ---
 
@@ -36,7 +38,8 @@ Every task requires a specific documentation trail. **Do not write code without 
 ### Step 2: Planning
 Create `docs/<ID>/plan.md` using the template (`docs/templates/plan.md`).
 * **Analyze:** Does this feature require persistence? If yes, design the `plugin.ts` logic first.
-* **Define Protocol:** If the UI needs to show new data, define the message type (e.g., `BOSS_UPDATE`) in `src/types/messages.ts`.
+* **Define Protocol:** If the UI needs to send commands or request data, define the message type in `src/types/messages.ts`.
+* **Note:** The UI polls for state updates every 2 seconds. Real-time push updates from plugin.ts are not possible.
 
 ### Step 3: Implementation
 1.  **Brain First:** Implement logic in `plugin.ts`. Ensure it works without the UI open (verify via logs or header updates).
@@ -53,12 +56,12 @@ Create `docs/<ID>/plan.md` using the template (`docs/templates/plan.md`).
 
 ### Persistence
 * **Never** use `localStorage` in SolidJS.
-* **Always** use `plugin.saveData(JSON.stringify(state))` in `plugin.ts`.
+* **Always** use `plugin.persistDataSynced(JSON.stringify(state))` in `plugin.ts`.
 
 ### Mobile Compatibility
-* Use `plugin.registerHeaderListItem` for persistent status indicators (Boss HP).
+* Use `plugin.registerHeaderButton` for status indicators (limited to initial state, can't update dynamically).
 * Ensure the SolidJS UI is responsive.
-* **Build Command:** Use `npm run deploy` to ensure assets are inlined for Data URL loading.
+* **Build Command:** Use `npm run build` (asset inlining happens automatically via vite-plugin).
 
 ### Code Quality
 * **Strict Types:** Use the `HeroStory` and `QuestArcState` interfaces shared between Brain and Face (located in `src/types/`).

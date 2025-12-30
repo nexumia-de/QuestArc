@@ -1,299 +1,116 @@
-# Solid.js Boilerplate Plugin for Super Productivity
+# QuestArc
 
-A modern, TypeScript-based boilerplate for creating Super Productivity plugins using Solid.js.
+> Gamify your productivity with epic stories and boss battles
+
+QuestArc is a plugin for [Super Productivity](https://super-productivity.com) that transforms your task completion into an RPG-style adventure. Complete tasks to deal damage to bosses, earn XP, level up, and progress through story-driven productivity quests.
 
 ## Features
 
-- 🚀 **Solid.js** - Fast, reactive UI framework
-- 📘 **TypeScript** - Full type safety with Super Productivity Plugin API
-- 🎨 **Modern UI** - Clean, responsive design with dark mode support
-- 🔧 **Vite** - Lightning-fast development and build tooling
-- 📦 **Ready to Use** - Complete setup with examples for all plugin features
+- **Boss Battles**: Fight procrastination monsters by completing tasks
+- **XP & Leveling**: Gain experience points and level up your productivity hero
+- **Story Progression**: Follow narrative-driven productivity journeys
+- **Streak Tracking**: Build momentum with consecutive task completions
+- **Damage Modifiers**: Bonus damage for tasks with specific tags (e.g., "deep-work")
+- **Persistent Progress**: Your adventure syncs across devices with Super Productivity
 
-## Getting Started
+## Installation
 
-### Prerequisites
+1. Download the latest `quest-arc-v1.0.0.zip` from [Releases](https://github.com/questarc/quest-arc/releases)
+2. Open Super Productivity
+3. Navigate to Settings → Plugins
+4. Click "Upload Plugin"
+5. Select the downloaded ZIP file
 
-- Node.js 16+
-- npm or yarn
-- Super Productivity 8.0.0+
+## Quick Start
 
-### Installation
+1. After installation, click the QuestArc button in the Super Productivity header
+2. Start completing tasks to damage the boss and earn XP
+3. Tag tasks with "deep-work" for 2x damage multiplier
+4. Complete story steps to progress through the adventure
 
-1. Clone this boilerplate:
+## How It Works
 
-```bash
-cd packages/plugin-dev
-cp -r boilerplate-solid-js my-plugin
-cd my-plugin
-```
+### The Split-Brain Architecture
 
-2. Install dependencies:
+QuestArc uses a "Split-Brain" design to work seamlessly on mobile and desktop:
 
-```bash
-npm install
-```
+- **The Brain** (`plugin.ts`): Runs in the main app, handles all game logic, tracks state, and persists data
+- **The Face** (`App.tsx`): The SolidJS UI that displays your progress and polls for updates every 2 seconds
 
-3. Update plugin metadata in `src/manifest.json`:
-   - Change `id` to a unique identifier
-   - Update `name`, `description`, and `author`
-   - Modify `permissions` and `hooks` as needed
+This ensures your progress is tracked even when the plugin UI is closed.
 
-### Development
+### Game Mechanics
 
-Run the development server:
+**Boss Battles:**
+- Each boss has HP (hit points)
+- Completing tasks deals damage based on task duration and tags
+- Defeat the boss to earn XP and move to the next story step
 
-```bash
-npm run dev
-```
+**XP & Leveling:**
+- Earn XP by completing story steps
+- Level up when you accumulate enough XP
+- XP requirement increases with each level (Level × 100)
 
-This starts Vite in watch mode. Your plugin will rebuild automatically when you make changes.
+**Story Steps:**
+- **Streak Steps**: Complete N tasks in a row
+- **Boss Steps**: Deal enough damage to defeat the boss
 
-### Building
+## Development
 
-Build the plugin for production:
+See [DEVELOPMENT.md](DEVELOPMENT.md) for setup instructions and [AGENTS.md](AGENTS.md) for architectural guidelines.
 
-```bash
-npm run build
-```
-
-This creates optimized files in the `dist/` directory.
-
-### Packaging
-
-Create a ZIP file for distribution:
+### Quick Commands
 
 ```bash
-npm run package
+npm install          # Install dependencies
+npm run dev          # Development mode (UI only)
+npm run build        # Build the plugin
+npm run package      # Build and create ZIP for distribution
+npm run test         # Run tests
+npm run typecheck    # TypeScript type checking
 ```
-
-This will:
-
-1. Build the plugin
-2. Create a ZIP file containing all necessary files
-3. Place the ZIP in the root directory
-
-### Deployment (for Plugins with HTML UI)
-
-If your plugin has an `index.html` file (for UI components, side panels, etc.), use the deploy command instead:
-
-```bash
-npm run deploy
-```
-
-This will:
-
-1. Build the plugin
-2. Inline all CSS and JavaScript assets into the HTML file
-3. Create a ZIP file for distribution
-
-**Note**: The `deploy` command is necessary for any plugin with HTML UI because Super Productivity loads plugin HTML as data URLs, which cannot access external files. The inline-assets script ensures all assets are embedded directly in the HTML.
 
 ## Project Structure
 
 ```
 src/
-├── assets/          # Static assets (icons, images)
-│   └── icon.svg     # Plugin icon
-├── app/             # Solid.js application
-│   ├── App.tsx      # Main app component
-│   └── App.css      # App styles
-├── index.html       # Plugin UI entry point
-├── index.ts         # UI initialization
-├── plugin.ts        # Plugin logic and API integration
-└── manifest.json    # Plugin metadata
-
-scripts/            # Build and utility scripts
-└── build-plugin.js  # Plugin packaging script
-
-dist/               # Build output (gitignored)
-├── assets/
-├── index.html
-├── index.js
-├── plugin.js
-└── manifest.json
+├── plugin.ts            # Background logic (The Brain)
+├── app/App.tsx          # UI (The Face)
+├── types/
+│   ├── state.ts         # Data models
+│   └── messages.ts      # Communication protocol
+├── lib/
+│   ├── game-logic.ts    # Boss damage & progression
+│   └── state-manager.ts # State initialization & migration
+└── assets/
+    └── stories/         # Story JSON files
 ```
 
-## Plugin API Usage
+## Roadmap
 
-### Basic Setup
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the full development roadmap.
 
-The plugin API is exposed through the global `plugin` object in `plugin.ts`:
+**Current Status:** Phase 1 - Core Engine (MVP 1)
 
-```typescript
-import { PluginInterface } from '@super-productivity/plugin-api';
+**Upcoming Features:**
+- Story Editor (create custom quests)
+- Template Library (pre-built productivity journeys)
+- Import/Export (share stories)
+- Co-op Mode (collaborative boss battles)
 
-declare const plugin: PluginInterface;
-```
+## Contributing
 
-### Common API Methods
-
-#### UI Registration
-
-```typescript
-// Register header button
-plugin.registerHeaderButton({
-  icon: 'rocket',
-  tooltip: 'Open Plugin',
-  action: () => plugin.showIndexHtmlAsView(),
-});
-
-// Register menu entry
-plugin.registerMenuEntry({
-  label: 'My Plugin',
-  icon: 'rocket',
-  action: () => plugin.showIndexHtmlAsView(),
-});
-
-// Register keyboard shortcut
-plugin.registerShortcut({
-  keys: 'ctrl+shift+m',
-  label: 'Open My Plugin',
-  action: () => plugin.showIndexHtmlAsView(),
-});
-```
-
-#### Data Operations
-
-```typescript
-// Get tasks
-const tasks = await plugin.getTasks();
-const archivedTasks = await plugin.getArchivedTasks();
-
-// Create task
-const newTask = await plugin.addTask({
-  title: 'New Task',
-  projectId: 'project-id',
-});
-
-// Update task
-await plugin.updateTask('task-id', {
-  title: 'Updated Title',
-  isDone: true,
-});
-
-// Get projects and tags
-const projects = await plugin.getAllProjects();
-const tags = await plugin.getAllTags();
-```
-
-#### Event Hooks
-
-```typescript
-// Task completion
-plugin.on('taskComplete', (task) => {
-  console.log('Task completed:', task.title);
-});
-
-// Task updates
-plugin.on('taskUpdate', (task) => {
-  console.log('Task updated:', task);
-});
-
-// Context changes
-plugin.on('contextChange', (context) => {
-  console.log('Context changed:', context);
-});
-```
-
-#### Communication with UI
-
-In `plugin.ts`:
-
-```typescript
-plugin.onMessage('myCommand', async (data) => {
-  // Handle message from UI
-  return { result: 'success' };
-});
-```
-
-In your Solid.js component:
-
-```typescript
-const sendMessage = async (type: string, payload?: any) => {
-  return new Promise((resolve) => {
-    const messageId = Math.random().toString(36).substr(2, 9);
-
-    const handler = (event: MessageEvent) => {
-      if (event.data.messageId === messageId) {
-        window.removeEventListener('message', handler);
-        resolve(event.data.response);
-      }
-    };
-
-    window.addEventListener('message', handler);
-    window.parent.postMessage({ type, payload, messageId }, '*');
-  });
-};
-
-// Usage
-const result = await sendMessage('myCommand', { foo: 'bar' });
-```
-
-## Customization
-
-### Styling
-
-The boilerplate includes:
-
-- CSS custom properties for theming
-- Dark mode support
-- Responsive design
-- Minimal, clean styling
-
-Modify `src/app/App.css` to customize the appearance.
-
-### Adding Features
-
-1. **New UI Components**: Add them in `src/app/` as `.tsx` files
-2. **New API Endpoints**: Add handlers in `src/plugin.ts` using `plugin.onMessage()`
-3. **New Hooks**: Register them in `manifest.json` and handle in `plugin.ts`
-4. **Permissions**: Add required permissions to `manifest.json`
-
-## Best Practices
-
-1. **Type Safety**: Always use TypeScript types from `@super-productivity/plugin-api`
-2. **Error Handling**: Wrap async operations in try-catch blocks
-3. **Performance**: Use Solid.js signals and effects efficiently
-4. **Security**: Never expose sensitive data or operations
-5. **User Experience**: Provide loading states and error feedback
-
-## Deployment
-
-1. Build the plugin: `npm run build`
-2. Package it: `npm run package`
-3. Upload the ZIP file to Super Productivity:
-   - Open Super Productivity
-   - Go to Settings → Plugins
-   - Click "Upload Plugin"
-   - Select your ZIP file
-
-## Troubleshooting
-
-### Plugin not loading
-
-- Check browser console for errors
-- Verify `manifest.json` is valid JSON
-- Ensure `minSupVersion` matches your Super Productivity version
-
-### API calls failing
-
-- Check if you have required permissions in `manifest.json`
-- Verify Super Productivity is running the correct version
-- Look for error messages in the console
-
-### Build errors
-
-- Run `npm run typecheck` to check for TypeScript errors
-- Ensure all dependencies are installed
-- Clear `node_modules` and reinstall if needed
-
-## Resources
-
-- [Super Productivity Plugin API Documentation](https://github.com/johannesjo/super-productivity)
-- [Solid.js Documentation](https://www.solidjs.com/docs/latest)
-- [Vite Documentation](https://vitejs.dev/)
+We follow a document-first workflow. See [AGENTS.md](AGENTS.md) for contribution guidelines.
 
 ## License
 
-This boilerplate is provided as-is for creating Super Productivity plugins. Feel free to modify and distribute your plugins as you see fit.
+MIT
+
+## Support
+
+- Report bugs: [GitHub Issues](https://github.com/questarc/quest-arc/issues)
+- Super Productivity: [super-productivity.com](https://super-productivity.com)
+
+---
+
+**Made with** ⚔️ **for productivity heroes everywhere**

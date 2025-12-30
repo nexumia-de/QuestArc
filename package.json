@@ -1,7 +1,7 @@
 {
-  "name": "boilerplate-solid-js",
+  "name": "quest-arc",
   "version": "1.0.0",
-  "description": "Solid.js Boilerplate Plugin for Super Productivity",
+  "description": "Gamify your productivity with epic stories and boss battles - A Super Productivity Plugin",
   "type": "module",
   "scripts": {
     "dev": "vite",

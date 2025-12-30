@@ -1,6 +1,9 @@
 import { QuestArcState } from '../types/state';
 
+export const CURRENT_STATE_VERSION = 1;
+
 export const INITIAL_STATE: QuestArcState = {
+  version: CURRENT_STATE_VERSION,
   profile: {
     level: 1,
     xp: 0,
@@ -16,6 +19,43 @@ export const INITIAL_STATE: QuestArcState = {
 
 export function createInitialState(): QuestArcState {
   return JSON.parse(JSON.stringify(INITIAL_STATE));
+}
+
+/**
+ * Migrate state from older versions to current version
+ */
+export function migrateState(state: any): QuestArcState {
+  // If no version, it's version 0 (legacy)
+  const version = state.version || 0;
+
+  if (version === CURRENT_STATE_VERSION) {
+    return state as QuestArcState;
+  }
+
+  // Migration from version 0 to 1
+  if (version === 0) {
+    state.version = 1;
+    // Add any migrations needed for v1
+  }
+
+  // Future migrations would go here
+  // if (version === 1) { state.version = 2; ... }
+
+  return state as QuestArcState;
+}
+
+/**
+ * Validate that state has required structure
+ */
+export function validateState(state: any): boolean {
+  return (
+    state &&
+    typeof state === 'object' &&
+    state.profile &&
+    state.activeStory &&
+    typeof state.profile.level === 'number' &&
+    typeof state.profile.xp === 'number'
+  );
 }
 
 export function updateXp(state: QuestArcState, amount: number): { state: QuestArcState; leveledUp: boolean } {
