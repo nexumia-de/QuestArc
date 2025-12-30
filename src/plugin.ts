@@ -1,6 +1,7 @@
 import type {
   PluginAPI,
   TaskCompletePayload,
+  PluginHooks,
 } from '@super-productivity/plugin-api';
 import { QuestArcState, HeroStory, StoryStep } from './types/state';
 import { createInitialState, updateXp, migrateState, validateState } from './lib/state-manager';
@@ -85,7 +86,7 @@ function getCurrentStep(): StoryStep | undefined {
 }
 
 // Hooks
-PluginAPI.registerHook('taskComplete', async (payload: TaskCompletePayload) => {
+PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayload) => {
   console.log('QuestArc: Task completed!', payload);
   const currentStep = getCurrentStep();
   if (!currentStep) {

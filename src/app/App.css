@@ -7,7 +7,9 @@
   --card-bg: #ffffff;
   --border: #e2e8f0;
   --xp-color: #fbbf24;
+  --xp-gradient: linear-gradient(90deg, #fbbf24, #f59e0b);
   --hp-color: #ef4444;
+  --hp-gradient: linear-gradient(90deg, #ef4444, #dc2626);
   --hp-empty: #fee2e2;
   --xp-empty: #fef3c7;
 }
@@ -54,9 +56,10 @@
 }
 
 .level-badge {
-  font-weight: bold;
+  font-weight: 800;
   font-size: 1.1rem;
   color: var(--primary);
+  letter-spacing: -0.02em;
 }
 
 .xp-bar-container,
@@ -70,13 +73,17 @@
 .xp-bar-fill {
   height: 100%;
   background: var(--xp-color);
-  transition: width 0.3s ease;
+  background: var(--xp-gradient);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
 .hp-bar-fill {
   height: 100%;
   background: var(--hp-color);
-  transition: width 0.3s ease;
+  background: var(--hp-gradient);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
 .xp-text,
@@ -91,7 +98,13 @@
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme='dark'] .step-card {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .step-card h3 {
@@ -140,13 +153,20 @@
 
 .reset-btn {
   margin-top: 2rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background: transparent;
   color: var(--text-muted);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   width: 100%;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: 48px;
+  /* Touch target size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .reset-btn:hover {

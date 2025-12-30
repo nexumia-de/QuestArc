@@ -62,11 +62,20 @@ function App() {
     }, 2000);
   });
 
+  const [isResetConfirming, setIsResetConfirming] = createSignal(false);
+
   const resetGame = async () => {
-    if (confirm('Are you sure you want to reset all progress?')) {
-      const newState = await sendMessage(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
-      setState(newState);
+    if (!isResetConfirming()) {
+      setIsResetConfirming(true);
+      // Reset confirmation state after 3 seconds if not clicked
+      setTimeout(() => setIsResetConfirming(false), 3000);
+      return;
     }
+
+    // Actually reset
+    const newState = await sendMessage(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
+    setState(newState);
+    setIsResetConfirming(false);
   };
 
   return (
@@ -79,8 +88,8 @@ function App() {
               <div class="profile-summary">
                 <span class="level-badge">Lvl {s().profile.level}</span>
                 <div class="xp-bar-container">
-                  <div 
-                    class="xp-bar-fill" 
+                  <div
+                    class="xp-bar-fill"
                     style={{ width: `${(s().profile.xp / s().profile.xpToNextLevel) * 100}%` }}
                   ></div>
                 </div>
@@ -93,7 +102,7 @@ function App() {
               <div class="step-card">
                 <h3>{s().activeStory.id.replace(/_/g, ' ').toUpperCase()}</h3>
                 <p>Step ID: {s().activeStory.currentStepId}</p>
-                
+
                 <Show when={s().activeBoss}>
                   <div class="boss-battle">
                     <h4>👹 BOSS BATTLE</h4>
@@ -116,7 +125,13 @@ function App() {
             </section>
 
             <footer class="app-footer">
-              <button class="reset-btn" onClick={resetGame}>Reset Progress</button>
+              <button
+                class={`reset-btn ${isResetConfirming() ? 'confirming' : ''}`}
+                onClick={resetGame}
+                style={isResetConfirming() ? { 'border-color': 'var(--hp-color)', color: 'var(--hp-color)' } : {}}
+              >
+                {isResetConfirming() ? '⚠️ Tap again to confirm reset' : 'Reset Progress'}
+              </button>
             </footer>
           </main>
         )}
