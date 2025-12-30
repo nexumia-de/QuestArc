@@ -1,0 +1,58 @@
+export interface QuestArcState {
+  profile: {
+    level: number;
+    xp: number;
+    xpToNextLevel: number; // e.g., level * 100
+  };
+  activeStory: {
+    id: string; // e.g., 'story_productivity_mastery'
+    currentStepId: number;
+    streakProgress: number; // Current counter for 'streak' steps
+  };
+  activeBoss: {
+    hp: number;
+    maxHp: number;
+    isDead: boolean;
+  } | null;
+}
+
+export type ModifierTriggerType = 'tag' | 'project';
+
+export interface ModifierTrigger {
+  type: ModifierTriggerType;
+  value: string;
+}
+
+export interface Modifier {
+  trigger: ModifierTrigger;
+  multiplier: number;
+}
+
+export interface BossConfig {
+  hp: number;
+  maxHp: number;
+  damageModifiers: Modifier[];
+}
+
+export type StoryStepType = 'simple' | 'boss';
+
+export interface StepCondition {
+  type: 'streak' | 'count';
+  target: number;
+}
+
+export interface StoryStep {
+  id: number;
+  title: string;
+  type?: StoryStepType; // Default to 'simple' if undefined
+  condition?: StepCondition;
+  boss?: BossConfig;
+  xpReward: number;
+  nextStepId?: number;
+}
+
+export interface HeroStory {
+  id: string;
+  title: string;
+  steps: StoryStep[];
+}
