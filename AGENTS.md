@@ -44,7 +44,9 @@ Create `docs/<ID>/plan.md` using the template (`docs/templates/plan.md`).
 ### Step 3: Implementation
 1.  **Brain First:** Implement logic in `plugin.ts`. Ensure it works without the UI open (verify via logs or header updates).
 2.  **Face Second:** Implement the SolidJS UI to reflect the new state.
-3.  **Verify:** Run `npm run deploy` (or `build`) and test the feature.
+3.  **Build & Test:**
+    - Run `npm run build` to build the plugin
+    - Run `npm run package` to create the installable `.zip` file
 
 ### Step 4: Logging & History
 1.  Create `docs/<ID>/worklog.md` detailing what was actually done.

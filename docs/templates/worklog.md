@@ -1,15 +1,20 @@
 # Worklog - Task <ID>
 
-## 📝 Changes Implemented
-* Modified `src/plugin.ts` to handle...
-* Created `src/app/components/NewFeature.tsx`...
+## 📝 Summary
+<One sentence summary of what was actually accomplished.
+
+## 🛠 Changes Implemented
+*   **Brain:** <Changes to `plugin.ts` or `types.ts`>
+*   **Face:** <Changes to `App.tsx` or `App.css`>
+*   **Protocol:** <New messages added to `messages.ts` (if any)>
 
 ## 🔧 Technical Decisions
-* *Explain why a specific approach was chosen (e.g., "Moved calculation to background because...")*
+*   *Why we chose solution X over Y.*
+*   *Any deviations from the original plan?*
 
 ## 🐛 Challenges & Fixes
-* *Note any bugs encountered and how they were solved.*
+*   *Bug: <Description>* -> *Fix: <Solution>*
 
-## ✅ Verification Results
-* [ ] Background logic verified.
-* [ ] UI state sync verified.
+## ✅ Verification
+- [ ] **Automated:** `npm run build` passed.
+- [ ] [Docs] Updated `docs/history.md`.

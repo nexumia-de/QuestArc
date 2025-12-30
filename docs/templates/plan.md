@@ -2,14 +2,33 @@
 
 **Goal:** <One sentence summary of the objective>
 
-## 🧠 Brain (`plugin.ts`)
-* [ ] **State Changes:** What new properties need to be added to `QuestArcState`?
-* [ ] **Hooks:** Which Super Productivity hooks (`TASK_DONE`, etc.) are needed?
-* [ ] **Logic:** How is the new mechanic calculated?
+## ⚠️ User Review Required
+> [!IMPORTANT]
+> List critical design decisions, breaking changes, or "points of no return" that the user must approve.
+> *Example: "This changes the save format and is not backward compatible."*
 
-## 🎨 Face (`src/app/`)
-* [ ] **Components:** New SolidJS components needed.
-* [ ] **Events:** What messages will be sent/received?
+## 🧠 Brain (`src/plugin.ts`)
+* **State Changes:** <Does `QuestArcState` need new fields?>
+* **Persistence:** <Does this data need to survive a reload? If yes, it goes here.>
+* **Logic:** <How is the new mechanic calculated? (Level ups, damage, etc.)>
+
+## 🎨 Face (`src/app/` & SolidJS)
+* **Visuals:** <Color palette, typography, or animation changes.>
+* **Components:** <New components or modifications to existing ones.>
+* **Protocol:** <What new `MESSAGE_TYPES` are needed to talk to the Brain?>
+
+## 📋 Step-by-Step Implementation
+*Break down the work into atomic file changes.*
+
+### 1. Brain (Logic)
+- [ ] [MODIFY] `src/plugin.ts`: <Description>
+- [ ] [NEW] `src/types/messages.ts`: <Description>
+
+### 2. Face (UI)
+- [ ] [MODIFY] `src/app/App.tsx`: <Description>
+- [ ] [NEW] `src/app/components/NewWidget.tsx`: <Description>
 
 ## 🧪 Verification
-* How will we verify this works on mobile/background?
+* **Automated:** `npm run typecheck`, `npm run lint`
+* **Mobile/Background:** <How will we verify this works when the plugin tab is closed?>
+* **Visual:** <What should the user look for?>
