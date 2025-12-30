@@ -60,6 +60,11 @@ Create `docs/<ID>/plan.md` using the template (`docs/templates/plan.md`).
 * **Never** use `localStorage` in SolidJS.
 * **Always** use `plugin.persistDataSynced(JSON.stringify(state))` in `plugin.ts`.
 
+### UI & Design
+* **Primary Reference:** Follow `docs/UI_GUIDELINES.md` for all UI/UX decisions.
+* **Design System:** Use the CSS variables defined in `docs/UI_GUIDELINES.md` (e.g., `--primary`, `--hp-color`).
+* **Mobile First:** Ensure all touch targets are accessible (min 44px).
+
 ### Mobile Compatibility
 * Use `plugin.registerHeaderButton` for status indicators (limited to initial state, can't update dynamically).
 * Ensure the SolidJS UI is responsive.
