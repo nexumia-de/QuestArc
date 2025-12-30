@@ -4,6 +4,8 @@ export interface QuestArcState {
     level: number;
     xp: number;
     xpToNextLevel: number; // e.g., level * 100
+    hp: number;
+    maxHp: number;
   };
   activeStory: {
     id: string; // e.g., 'story_productivity_mastery'

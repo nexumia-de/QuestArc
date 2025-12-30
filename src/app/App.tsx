@@ -2,6 +2,7 @@ import { createSignal, onMount, Show } from 'solid-js';
 import { QuestArcState } from '../types/state';
 import { MESSAGE_TYPES, PluginMessage } from '../types/messages';
 import './App.css';
+import avatarImg from '../assets/avatar.svg';
 
 const sendMessage = async (type: string, payload?: any) => {
   return new Promise((resolve, reject) => {
@@ -84,16 +85,35 @@ function App() {
         {(s) => (
           <main class="app-main">
             <header class="quest-header">
-              <h1>⚔️ QuestArc</h1>
-              <div class="profile-summary">
-                <span class="level-badge">Lvl {s().profile.level}</span>
-                <div class="xp-bar-container">
-                  <div
-                    class="xp-bar-fill"
-                    style={{ width: `${(s().profile.xp / s().profile.xpToNextLevel) * 100}%` }}
-                  ></div>
+              <div class="header-content">
+                <div class="avatar-container">
+                  <img src={avatarImg} alt={`Level ${s().profile.level} Hero`} class="avatar" />
                 </div>
-                <span class="xp-text">{s().profile.xp} / {s().profile.xpToNextLevel} XP</span>
+                <div class="stats-container">
+                  <h1 class="level-headline">Lvl {s().profile.level}</h1>
+
+                  {/* User HP Bar */}
+                  <div class="bar-row">
+                    <div class="hp-bar-container user-hp">
+                      <div
+                        class="hp-bar-fill user-hp-fill"
+                        style={{ width: `${(s().profile.hp / s().profile.maxHp) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span class="bar-text">{s().profile.hp}/{s().profile.maxHp} HP</span>
+                  </div>
+
+                  {/* XP Bar */}
+                  <div class="bar-row">
+                    <div class="xp-bar-container">
+                      <div
+                        class="xp-bar-fill"
+                        style={{ width: `${(s().profile.xp / s().profile.xpToNextLevel) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span class="bar-text">{s().profile.xp}/{s().profile.xpToNextLevel} XP</span>
+                  </div>
+                </div>
               </div>
             </header>
 

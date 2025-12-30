@@ -37,60 +37,107 @@
 
 .quest-header {
   margin-bottom: 2rem;
-  text-align: center;
-}
-
-.quest-header h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.profile-summary {
   background: var(--card-bg);
-  padding: 1rem;
-  border-radius: 12px;
+  padding: 1.5rem;
+  border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid var(--border);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.avatar-container {
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  background: var(--card-bg);
+  /* Match card bg to avoid white box if transparent */
+  padding: 4px;
+  object-fit: cover;
+  display: block;
+  /* Ensure it respects dimensions */
+}
+
+.stats-container {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.level-badge {
+.level-headline {
+  font-size: 2rem;
   font-weight: 800;
-  font-size: 1.1rem;
+  margin: 0;
+  line-height: 1;
   color: var(--primary);
-  letter-spacing: -0.02em;
+  /* Use primary color for pop */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure readability in dark mode if --text variable is failing */
+@media (prefers-color-scheme: dark) {
+  .level-headline {
+    color: #818cf8;
+    /* Lighter indigo for better contrast on dark */
+  }
+}
+
+[data-theme='dark'] .level-headline {
+  color: #818cf8;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .xp-bar-container,
 .hp-bar-container {
-  height: 12px;
+  flex-grow: 1;
+  height: 10px;
   background: var(--border);
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
+}
+
+.bar-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 80px;
+  text-align: right;
+  font-family: monospace;
 }
 
 .xp-bar-fill {
   height: 100%;
-  background: var(--xp-color);
   background: var(--xp-gradient);
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
 .hp-bar-fill {
   height: 100%;
-  background: var(--hp-color);
   background: var(--hp-gradient);
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
-.xp-text,
-.hp-text {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-align: right;
+.user-hp-fill {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.hp-bar-container.user-hp {
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .step-card {

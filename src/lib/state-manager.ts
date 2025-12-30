@@ -8,6 +8,8 @@ export const INITIAL_STATE: QuestArcState = {
     level: 1,
     xp: 0,
     xpToNextLevel: 100,
+    hp: 100,
+    maxHp: 100,
   },
   activeStory: {
     id: 'story_productivity_mastery',
@@ -41,6 +43,18 @@ export function migrateState(state: any): QuestArcState {
   // Future migrations would go here
   // if (version === 1) { state.version = 2; ... }
 
+  return state as QuestArcState;
+}
+
+/**
+ * Ensures compatibility for runtime state
+ */
+export function ensureState(state: any): QuestArcState {
+  if (!state.profile) {
+    state.profile = { level: 1, xp: 0, xpToNextLevel: 100, hp: 100, maxHp: 100 };
+  }
+  if (!state.profile.hp) state.profile.hp = 100;
+  if (!state.profile.maxHp) state.profile.maxHp = 100;
   return state as QuestArcState;
 }
 

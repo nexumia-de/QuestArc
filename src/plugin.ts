@@ -4,7 +4,7 @@ import type {
   PluginHooks,
 } from '@super-productivity/plugin-api';
 import { QuestArcState, HeroStory, StoryStep } from './types/state';
-import { createInitialState, updateXp, migrateState, validateState } from './lib/state-manager';
+import { createInitialState, updateXp, migrateState, validateState, ensureState } from './lib/state-manager';
 import { processTaskCompletion } from './lib/game-logic';
 import storyDataRaw from './assets/stories/productivity-mastery.json';
 
@@ -39,6 +39,7 @@ async function init() {
         } else {
           // Migrate if needed
           state = migrateState(parsed);
+          state = ensureState(state); // Ensure new fields like HP exist
           PluginAPI.log.info('State loaded and migrated successfully');
         }
       } catch (parseError) {
