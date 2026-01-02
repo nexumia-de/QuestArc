@@ -15,6 +15,7 @@ console.log('QuestArc: Plugin loading...', typeof PluginAPI);
 const MESSAGE_TYPES = {
   REQUEST_SYNC: 'REQUEST_SYNC',
   DEV_RESET: 'DEV_RESET',
+  SAVE_STORY: 'SAVE_STORY',
 } as const;
 
 let state: QuestArcState;
@@ -141,6 +142,30 @@ if (PluginAPI.onMessage) {
         await saveState();
         PluginAPI.log.info('Progress reset');
         return state;
+      case MESSAGE_TYPES.SAVE_STORY:
+        const newStory = message.payload as HeroStory;
+        console.log('QuestArc: Saving story:', newStory);
+
+        // Validation
+        if (!newStory.id || !newStory.steps || newStory.steps.length === 0) {
+          console.error('QuestArc: Invalid story format', newStory);
+          return { error: 'Invalid Story Format' };
+        }
+
+        // Initialize stories if needed
+        if (!state.stories) state.stories = [];
+
+        // Update or Add
+        const existingIdx = state.stories.findIndex(s => s.id === newStory.id);
+        if (existingIdx > -1) {
+          state.stories[existingIdx] = newStory;
+        } else {
+          state.stories.push(newStory);
+        }
+
+        await saveState();
+        PluginAPI.log.info(`Story saved: ${newStory.title}`);
+        return { success: true, stories: state.stories };
       default:
         console.log('QuestArc: Unknown message type:', message.type);
         return { error: 'Unknown message type' };

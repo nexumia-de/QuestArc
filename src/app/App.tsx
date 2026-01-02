@@ -1,5 +1,5 @@
 import { createSignal, onMount, Show } from 'solid-js';
-import { QuestArcState } from '../types/state';
+import { QuestArcState, HeroStory } from '../types/state';
 import { MESSAGE_TYPES, PluginMessage } from '../types/messages';
 import { getCurrentStepTitle } from '../lib/state-manager';
 import './App.css';
@@ -63,6 +63,40 @@ function App() {
       }
     }, 2000);
   });
+
+  const [view, setView] = createSignal<'dashboard' | 'editor'>('dashboard');
+  const [newStep, setNewStep] = createSignal({
+    title: '',
+    target: 3,
+    xp: 100
+  });
+
+  const saveStory = async () => {
+    const s = newStep();
+    if (!s.title) return;
+
+    const storyToSave: HeroStory = {
+      id: `story_${Date.now()}`,
+      title: s.title, // Use task title as story title for this simple editor
+      steps: [{
+        id: 1,
+        title: s.title,
+        condition: { type: 'streak', target: s.target },
+        xpReward: s.xp,
+        nextStepId: undefined // Single step for now
+      }]
+    };
+
+    const response: any = await sendMessage(MESSAGE_TYPES.SAVE_STORY, storyToSave);
+    if (response && response.success) {
+      setView('dashboard');
+      // Reset form
+      setNewStep({ title: '', target: 3, xp: 100 });
+      // Force sync
+      const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
+      setState(newState);
+    }
+  };
 
   const [isResetConfirming, setIsResetConfirming] = createSignal(false);
 
@@ -134,32 +168,82 @@ function App() {
               </div>
             </header>
 
-            <section class="active-quest">
-              <h2>Current Story Step</h2>
-              <div class="step-card">
-                <h3>{getCurrentStepTitle(s())}</h3>
-                <p>Step ID: {s().activeStory.currentStepId}</p>
+            <div class="view-content">
+              <Show when={view() === 'dashboard'}>
+                <section class="active-quest">
+                  <h2>Current Story Step</h2>
+                  <div class="step-card">
+                    <h3>{getCurrentStepTitle(s())}</h3>
+                    <p>Step ID: {s().activeStory.currentStepId}</p>
 
-                <Show when={s().activeBoss}>
-                  <div class="boss-battle">
-                    <h4>👹 BOSS BATTLE</h4>
-                    <div class="hp-bar-container">
-                      <div
-                        class="hp-bar-fill"
-                        style={{ width: `${(s().activeBoss!.hp / s().activeBoss!.maxHp) * 100}%` }}
-                      ></div>
-                    </div>
-                    <p class="hp-text">{s().activeBoss!.hp} / {s().activeBoss!.maxHp} HP</p>
-                  </div>
-                </Show>
+                    <Show when={s().activeBoss}>
+                      <div class="boss-battle">
+                        <h4>👹 BOSS BATTLE</h4>
+                        <div class="hp-bar-container">
+                          <div
+                            class="hp-bar-fill"
+                            style={{ width: `${(s().activeBoss!.hp / s().activeBoss!.maxHp) * 100}%` }}
+                          ></div>
+                        </div>
+                        <p class="hp-text">{s().activeBoss!.hp} / {s().activeBoss!.maxHp} HP</p>
+                      </div>
+                    </Show>
 
-                <Show when={!s().activeBoss && s().activeStory.streakProgress >= 0}>
-                  <div class="streak-progress">
-                    <p>Streak Progress: {s().activeStory.streakProgress}</p>
+                    <Show when={!s().activeBoss && s().activeStory.streakProgress >= 0}>
+                      <div class="streak-progress">
+                        <p>Streak Progress: {s().activeStory.streakProgress}</p>
+                      </div>
+                    </Show>
                   </div>
-                </Show>
-              </div>
-            </section>
+                  <button class="primary-btn new-quest-btn" onClick={() => setView('editor')}>
+                    ➕ New Quest
+                  </button>
+                </section>
+              </Show>
+
+              <Show when={view() === 'editor'}>
+                <section class="editor-view">
+                  <h2>Create New Habit Quest</h2>
+                  <div class="form-group">
+                    <label>Task Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Meditate for 5 mins"
+                      value={newStep().title}
+                      onInput={(e) => setNewStep({ ...newStep(), title: e.currentTarget.value })}
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Streak Goal (Days)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={newStep().target}
+                      onInput={(e) => setNewStep({ ...newStep(), target: parseInt(e.currentTarget.value) })}
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label>XP Reward</label>
+                    <input
+                      type="number"
+                      value={newStep().xp}
+                      onInput={(e) => setNewStep({ ...newStep(), xp: parseInt(e.currentTarget.value) })}
+                    />
+                  </div>
+
+                  <div class="button-row">
+                    <button class="primary-btn" onClick={saveStory} disabled={!newStep().title}>
+                      Save Quest
+                    </button>
+                    <button class="secondary-btn" onClick={() => setView('dashboard')}>
+                      Cancel
+                    </button>
+                  </div>
+                </section>
+              </Show>
+            </div>
 
             <footer class="app-footer">
               <button

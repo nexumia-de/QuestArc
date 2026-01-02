@@ -4,6 +4,8 @@ export const MESSAGE_TYPES = {
   // UI -> Brain (Brain cannot push to UI, only respond)
   REQUEST_SYNC: 'REQUEST_SYNC',
   DEV_RESET: 'DEV_RESET',
+  // UI -> Brain: Save a new story
+  SAVE_STORY: 'SAVE_STORY',
 } as const;
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -22,4 +24,9 @@ export interface DevResetMessage extends BaseMessage {
   payload?: null;
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage;
+export interface SaveStoryMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.SAVE_STORY;
+  payload: any; // Using any for now to avoid circular deps, or import HeroStory
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage;
