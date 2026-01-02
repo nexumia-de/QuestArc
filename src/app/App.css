@@ -140,6 +140,7 @@ body[class*='dark'] {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  position: relative;
 }
 
 .compact-bar {
@@ -560,4 +561,64 @@ body[class*='dark'] {
 [data-theme='dark'] .active-badge {
   background: rgba(34, 197, 94, 0.2);
   color: #4ade80;
+}
+
+/* Step Builder Styles */
+.step-builder-card {
+  position: relative;
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.step-builder-card h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  padding: 0.5rem;
+  /* Larger touch target */
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.remove-btn:hover {
+  opacity: 1;
+  background-color: var(--hp-empty);
+  transform: scale(1.1);
+}
+
+.add-step-btn {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-style: dashed;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-group.half {
+  flex: 1;
 }

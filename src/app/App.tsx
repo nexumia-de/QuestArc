@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { createSignal, onMount, Show, For } from 'solid-js';
 import { QuestArcState, HeroStory } from '../types/state';
 import { MESSAGE_TYPES, PluginMessage } from '../types/messages';
 import { getCurrentStepTitle } from '../lib/state-manager';
@@ -65,33 +65,53 @@ function App() {
   });
 
   const [view, setView] = createSignal<'dashboard' | 'editor' | 'story-list'>('dashboard');
-  const [newStep, setNewStep] = createSignal({
-    title: '',
-    target: 3,
-    xp: 100
-  });
+
+  // Editor State
+  const [storyTitle, setStoryTitle] = createSignal('');
+  const [steps, setSteps] = createSignal<{ title: string; target: number; xp: number }[]>([
+    { title: '', target: 3, xp: 50 }
+  ]);
+
+  const addStep = () => {
+    setSteps([...steps(), { title: '', target: 3, xp: 50 }]);
+  };
+
+  const updateStep = (index: number, field: string, value: any) => {
+    const newSteps = [...steps()];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setSteps(newSteps);
+  };
+
+  const removeStep = (index: number) => {
+    const newSteps = [...steps()];
+    newSteps.splice(index, 1);
+    setSteps(newSteps);
+  };
 
   const saveStory = async () => {
-    const s = newStep();
-    if (!s.title) return;
+    if (!storyTitle() || steps().length === 0) return;
+
+    // Auto-link steps
+    const finalSteps = steps().map((step, index) => ({
+      id: index + 1,
+      title: step.title,
+      condition: { type: 'streak' as const, target: step.target },
+      xpReward: step.xp,
+      nextStepId: index < steps().length - 1 ? index + 2 : undefined
+    }));
 
     const storyToSave: HeroStory = {
       id: `story_${Date.now()}`,
-      title: s.title, // Use task title as story title for this simple editor
-      steps: [{
-        id: 1,
-        title: s.title,
-        condition: { type: 'streak', target: s.target },
-        xpReward: s.xp,
-        nextStepId: undefined // Single step for now
-      }]
+      title: storyTitle(),
+      steps: finalSteps
     };
 
     const response: any = await sendMessage(MESSAGE_TYPES.SAVE_STORY, storyToSave);
     if (response && response.success) {
       setView('dashboard');
       // Reset form
-      setNewStep({ title: '', target: 3, xp: 100 });
+      setStoryTitle('');
+      setSteps([{ title: '', target: 3, xp: 50 }]);
       // Force sync
       const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
       setState(newState);
@@ -242,40 +262,69 @@ function App() {
               <Show when={view() === 'editor'}>
                 <section class="editor-view">
                   <h2>Create New Habit Quest</h2>
+
                   <div class="form-group">
-                    <label>Task Name</label>
+                    <label>Story Name</label>
                     <input
                       type="text"
-                      placeholder="e.g., Meditate for 5 mins"
-                      value={newStep().title}
-                      onInput={(e) => setNewStep({ ...newStep(), title: e.currentTarget.value })}
+                      placeholder="e.g. Marathon Prep"
+                      value={storyTitle()}
+                      onInput={(e) => setStoryTitle(e.currentTarget.value)}
                     />
                   </div>
 
-                  <div class="form-group">
-                    <label>Streak Goal (Days)</label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={newStep().target}
-                      onInput={(e) => setNewStep({ ...newStep(), target: parseInt(e.currentTarget.value) })}
-                    />
+                  <div class="steps-list">
+                    <For each={steps()}>
+                      {(step, index) => (
+                        <div class="step-builder-card">
+                          <h4>Step {index() + 1}</h4>
+                          <div class="form-group">
+                            <label>Habit</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. Put on shoes"
+                              value={step.title}
+                              onInput={(e) => updateStep(index(), 'title', e.currentTarget.value)}
+                            />
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group half">
+                              <label>Days Streak</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={step.target}
+                                onInput={(e) => updateStep(index(), 'target', parseInt(e.currentTarget.value))}
+                              />
+                            </div>
+                            <div class="form-group half">
+                              <label>XP Reward</label>
+                              <input
+                                type="number"
+                                value={step.xp}
+                                onInput={(e) => updateStep(index(), 'xp', parseInt(e.currentTarget.value))}
+                              />
+                            </div>
+                          </div>
+                          {steps().length > 1 && (
+                            <button class="remove-btn" onClick={() => removeStep(index())}>
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </For>
                   </div>
 
-                  <div class="form-group">
-                    <label>XP Reward</label>
-                    <input
-                      type="number"
-                      value={newStep().xp}
-                      onInput={(e) => setNewStep({ ...newStep(), xp: parseInt(e.currentTarget.value) })}
-                    />
-                  </div>
+                  <button class="secondary-btn add-step-btn" onClick={addStep}>
+                    + Add Next Habit Step
+                  </button>
 
                   <div class="button-row">
-                    <button class="primary-btn" onClick={saveStory} disabled={!newStep().title}>
-                      Save Quest
+                    <button class="primary-btn" onClick={saveStory} disabled={!storyTitle() || steps().some(s => !s.title)}>
+                      Forge Story
                     </button>
-                    <button class="secondary-btn" onClick={() => setView('dashboard')}>
+                    <button class="secondary-btn cancel-btn" onClick={() => setView('dashboard')}>
                       Cancel
                     </button>
                   </div>
@@ -295,7 +344,7 @@ function App() {
           </main>
         )}
       </Show>
-    </div>
+    </div >
   );
 }
 
