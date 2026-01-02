@@ -127,24 +127,33 @@ export function validateState(state: any): boolean {
   );
 }
 
-export function updateXp(state: QuestArcState, amount: number): { state: QuestArcState; leveledUp: boolean } {
-  state.profile.xp += amount;
+export function updateXp(currentState: QuestArcState, amount: number): { state: QuestArcState; leveledUp: boolean } {
+  // Create a copy of the state to ensure immutability
+  const newState = {
+    ...currentState,
+    profile: {
+      ...currentState.profile,
+      pet: { ...currentState.profile.pet }
+    }
+  };
+
+  newState.profile.xp += amount;
   let leveledUp = false;
 
-  while (state.profile.xp >= state.profile.xpToNextLevel) {
-    state.profile.xp -= state.profile.xpToNextLevel;
-    state.profile.level += 1;
-    state.profile.xpToNextLevel = state.profile.level * 100;
+  while (newState.profile.xp >= newState.profile.xpToNextLevel) {
+    newState.profile.xp -= newState.profile.xpToNextLevel;
+    newState.profile.level += 1;
+    newState.profile.xpToNextLevel = newState.profile.level * 100;
 
     // Pet evolution check
-    if (state.profile.level % 5 === 0) {
-      if (state.profile.pet.stage < 3) {
-        state.profile.pet.stage += 1;
+    if (newState.profile.level % 5 === 0) {
+      if (newState.profile.pet.stage < 3) {
+        newState.profile.pet.stage += 1;
       }
     }
 
     leveledUp = true;
   }
 
-  return { state, leveledUp };
+  return { state: newState, leveledUp };
 }

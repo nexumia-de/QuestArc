@@ -19,28 +19,37 @@ export function calculateDamage(task: TaskStub, modifiers: Modifier[] = []): num
 }
 
 export function processTaskCompletion(
-  state: QuestArcState,
+  currentState: QuestArcState,
   task: TaskStub,
   currentStep: StoryStep
 ): { newState: QuestArcState; damageDealt: number; stepCompleted: boolean } {
   let damageDealt = 0;
   let stepCompleted = false;
 
+  // Create a shallow copy of the state
+  const newState = { ...currentState };
+
   // Handle Boss logic
-  if (currentStep.type === 'boss' && state.activeBoss) {
+  if (currentStep.type === 'boss' && newState.activeBoss) {
+    // Clone activeBoss before mutation
+    newState.activeBoss = { ...newState.activeBoss };
+
     damageDealt = calculateDamage(task, currentStep.boss?.damageModifiers);
-    state.activeBoss.hp -= damageDealt;
+    newState.activeBoss.hp -= damageDealt;
     
-    if (state.activeBoss.hp <= 0) {
-      state.activeBoss.hp = 0;
-      state.activeBoss.isDead = true;
+    if (newState.activeBoss.hp <= 0) {
+      newState.activeBoss.hp = 0;
+      newState.activeBoss.isDead = true;
       stepCompleted = true;
     }
   } 
   // Handle Streak logic
   else if (currentStep.condition?.type === 'streak') {
-    state.activeStory.streakProgress += 1;
-    if (state.activeStory.streakProgress >= currentStep.condition.target) {
+    // Clone activeStory before mutation
+    newState.activeStory = { ...newState.activeStory };
+
+    newState.activeStory.streakProgress += 1;
+    if (newState.activeStory.streakProgress >= currentStep.condition.target) {
       stepCompleted = true;
     }
   }
@@ -49,5 +58,5 @@ export function processTaskCompletion(
     stepCompleted = true;
   }
 
-  return { newState: state, damageDealt, stepCompleted };
+  return { newState, damageDealt, stepCompleted };
 }

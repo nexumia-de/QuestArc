@@ -86,13 +86,20 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayloa
 
   // Initialize boss if needed
   if (currentStep.type === 'boss' && !state.activeBoss) {
-    state.activeBoss = { ...currentStep.boss!, isDead: false };
+    state = {
+      ...state,
+      activeBoss: { ...currentStep.boss!, isDead: false }
+    };
   }
 
-  const { damageDealt, stepCompleted } = processTaskCompletion(state, payload.task, currentStep);
+  const result = processTaskCompletion(state, payload.task, currentStep);
+  state = result.newState;
+  const { damageDealt, stepCompleted } = result;
 
   if (stepCompleted) {
-    const { leveledUp } = updateXp(state, currentStep.xpReward);
+    const xpResult = updateXp(state, currentStep.xpReward);
+    state = xpResult.state;
+    const leveledUp = xpResult.leveledUp;
 
     let snackMessage = `Quest Step Completed: ${currentStep.title}! +${currentStep.xpReward} XP`;
     if (leveledUp) {
@@ -101,9 +108,15 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayloa
 
     // Move to next step
     if (currentStep.nextStepId) {
-      state.activeStory.currentStepId = currentStep.nextStepId;
-      state.activeStory.streakProgress = 0;
-      state.activeBoss = null;
+      state = {
+        ...state,
+        activeStory: {
+          ...state.activeStory,
+          currentStepId: currentStep.nextStepId,
+          streakProgress: 0
+        },
+        activeBoss: null
+      };
     }
 
     PluginAPI.showSnack({
@@ -149,15 +162,17 @@ if (PluginAPI.onMessage) {
         }
 
         // Initialize stories if needed
-        if (!state.stories) state.stories = [];
+        const currentStories = state.stories ? [...state.stories] : [];
 
         // Update or Add
-        const existingIdx = state.stories.findIndex(s => s.id === newStory.id);
+        const existingIdx = currentStories.findIndex(s => s.id === newStory.id);
         if (existingIdx > -1) {
-          state.stories[existingIdx] = newStory;
+          currentStories[existingIdx] = newStory;
         } else {
-          state.stories.push(newStory);
+          currentStories.push(newStory);
         }
+
+        state = { ...state, stories: currentStories };
 
         await saveState();
         PluginAPI.log.info(`Story saved: ${newStory.title}`);

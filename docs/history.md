@@ -17,3 +17,4 @@
 | 012 | 2026-01-02 | Fix Dark Mode Contrast. | [./012/](./012/) | Antigravity |
 | 013 | 2026-01-02 | Robust Dark Mode Fix. | [./013/](./013/) | Antigravity |
 | 014 | 2026-01-02 | Design Alignment: Material Theme. | [./014/](./014/) | Antigravity |
+| 015 | 2026-01-02 | Code Review & Refactoring: Immutability and DRY fixes. | [./015/](./015/) | Gemini |
