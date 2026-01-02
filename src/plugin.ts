@@ -6,8 +6,6 @@ import type {
 import { QuestArcState, HeroStory, StoryStep } from './types/state';
 import { createInitialState, updateXp, migrateState, validateState, ensureState } from './lib/state-manager';
 import { processTaskCompletion } from './lib/game-logic';
-import storyDataRaw from './assets/stories/productivity-mastery.json';
-
 // Super Productivity provides 'PluginAPI' as a global variable
 declare const PluginAPI: PluginAPI;
 
@@ -18,9 +16,6 @@ const MESSAGE_TYPES = {
   REQUEST_SYNC: 'REQUEST_SYNC',
   DEV_RESET: 'DEV_RESET',
 } as const;
-
-// Type assertion for imported JSON
-const STORY_DATA = storyDataRaw as HeroStory;
 
 let state: QuestArcState;
 
@@ -83,7 +78,7 @@ async function saveState() {
 }
 
 function getCurrentStep(): StoryStep | undefined {
-  return STORY_DATA.steps.find(s => s.id === state.activeStory.currentStepId);
+  return state.activeStory.steps.find(s => s.id === state.activeStory.currentStepId);
 }
 
 // Hooks

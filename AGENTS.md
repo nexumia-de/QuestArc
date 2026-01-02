@@ -2,6 +2,16 @@
 
 This document defines the strict operating procedures for developing the **QuestArc** plugin for Super Productivity.
 
+## General Guidelines
+
+1. Prefer functional programming patterns: Use pure functions, immutability, and avoid side effects where possible.
+2. KISS (Keep It Simple, Stupid): Aim for simplicity and clarity in code. Avoid unnecessary complexity and abstractions.
+3. DRY (Don't Repeat Yourself): Reuse code where possible. Create utility functions or services for common logic, but avoid unnecessary abstractions.
+4. Confirm understanding before making changes: If you're unsure about the purpose of a piece of code, ask for clarification rather than making assumptions.
+5. **ALWAYS** use `npm run checkFile <filepath>` on each file you modify to ensure proper formatting and linting. This runs both prettier and lint checks on individual files. Unless you want to lint and format multiple files, then use `npm run prettier` and `npm run lint` instead.
+6. When creating html templates, prefer plain html like `<table>` and `<div>`. Keep CSS styles to a minimum. Keep nesting to a minimum. Keep css classes to a minimum. Use Angular Material components where appropriate, but avoid overusing them.
+
+
 ## 📂 Project Architecture: The "Split-Brain" Rule
 
 QuestArc is built on the `super-productivity/boilerplate-solid-js`, which enforces a strict separation of concerns. **You must respect this split to ensure the plugin works on mobile devices.**
@@ -31,9 +41,8 @@ QuestArc is built on the `super-productivity/boilerplate-solid-js`, which enforc
 Every task requires a specific documentation trail. **Do not write code without a plan.**
 
 ### Step 1: Initialization
-1.  Check `docs/IMPROVEMENTS.md` for the next priority.
-2.  Open `docs/history.md` to find the next available **Task ID** (e.g., `001`).
-3.  Create a directory: `docs/<ID>/`.
+1.  Open `docs/history.md` to find the next available **Task ID** (e.g., `001`).
+2.  Create a directory: `docs/<ID>/`.
 
 ### Step 2: Planning
 Create `docs/<ID>/plan.md` using the template (`docs/templates/plan.md`).

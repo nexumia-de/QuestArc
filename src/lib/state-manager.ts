@@ -1,4 +1,7 @@
-import { QuestArcState } from '../types/state';
+import { QuestArcState, HeroStory } from '../types/state';
+import storyDataRaw from '../assets/stories/productivity-mastery.json';
+
+const STORY_DATA = storyDataRaw as HeroStory;
 
 export const CURRENT_STATE_VERSION = 1;
 
@@ -12,9 +15,11 @@ export const INITIAL_STATE: QuestArcState = {
     maxHp: 100,
   },
   activeStory: {
-    id: 'story_productivity_mastery',
+    id: STORY_DATA.id,
+    title: STORY_DATA.title,
     currentStepId: 1,
     streakProgress: 0,
+    steps: STORY_DATA.steps,
   },
   activeBoss: null,
 };
@@ -55,6 +60,12 @@ export function ensureState(state: any): QuestArcState {
   }
   if (!state.profile.hp) state.profile.hp = 100;
   if (!state.profile.maxHp) state.profile.maxHp = 100;
+
+  if (state.activeStory && !state.activeStory.steps) {
+    state.activeStory.title = STORY_DATA.title;
+    state.activeStory.steps = STORY_DATA.steps;
+  }
+
   return state as QuestArcState;
 }
 

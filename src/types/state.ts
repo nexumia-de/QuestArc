@@ -9,8 +9,10 @@ export interface QuestArcState {
   };
   activeStory: {
     id: string; // e.g., 'story_productivity_mastery'
+    title: string;
     currentStepId: number;
     streakProgress: number; // Current counter for 'streak' steps
+    steps: StoryStep[];
   };
   activeBoss: {
     hp: number;
