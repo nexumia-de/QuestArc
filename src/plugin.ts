@@ -78,7 +78,8 @@ async function saveState() {
 }
 
 function getCurrentStep(): StoryStep | undefined {
-  return state.activeStory.steps.find(s => s.id === state.activeStory.currentStepId);
+  const activeStoryDef = state.stories.find(s => s.id === state.activeStory.id);
+  return activeStoryDef?.steps.find(s => s.id === state.activeStory.currentStepId);
 }
 
 // Hooks

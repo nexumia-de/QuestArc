@@ -3,18 +3,24 @@
 ## Changes Made
 
 ### src/types/state.ts
-- Modified `activeStory` in `QuestArcState` to include `title: string` and `steps: StoryStep[]`.
+- Added `stories: HeroStory[]` to `QuestArcState`.
+- Removed `title` and `steps` from `activeStory`, keeping only `id`, `currentStepId`, and `streakProgress`.
 
 ### src/lib/state-manager.ts
-- Updated `INITIAL_STATE` to import and use the default story data from `productivity-mastery.json`.
-- Updated `ensureState` to automatically add `steps` and `title` to `activeStory` if they are missing, ensuring backward compatibility for existing users.
+- Updated `INITIAL_STATE` to initialize `stories` with the default story from `productivity-mastery.json`.
+- Updated `ensureState` to guarantee `stories` exists and populates it if missing.
 
 ### src/plugin.ts
-- Removed static `STORY_DATA` constant and its import from `productivity-mastery.json`.
-- Refactored `getCurrentStep()` to pull story steps directly from the runtime `state`.
-- Cleaned up unused imports and constants.
+- Refactored `getCurrentStep()` to find the active story in `state.stories` and then retrieve the current step.
+
+### src/app/App.tsx
+- Updated the UI to derive the current step's title dynamically by looking it up in `state.stories`.
+
+### Build System
+- **Fixed Build Error:** Restored `packages/vite-plugin` (local package) which was missing.
+- **Dependency Update:** Switched `@super-productivity/plugin-api` to use the npm registry version (`^1.0.1`) instead of a local file reference.
 
 ## Verification Results
-- `npm run typecheck` passed successfully.
+- `npm run typecheck` passed successfully (after fixing dependencies).
 - `npm run build` completed without errors.
-- Verified that `plugin.ts` no longer relies on the external JSON constant after initialization, as the data is now fully integrated into the `state` object.
+- Verified that the UI displays the correct step title.

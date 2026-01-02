@@ -6,24 +6,30 @@ Move the story steps from a hardcoded/static constant into the persistent plugin
 ## Analysis
 - Currently, `plugin.ts` imports `productivity-mastery.json` and uses it as `STORY_DATA`.
 - `QuestArcState` only tracks `currentStepId` and `streakProgress`.
-- To make stories dynamic or modifiable, the full `StoryStep[]` array should be part of the state.
-- Persistence is already handled in `plugin.ts` via `saveState()`.
+- To make stories dynamic or modifiable, the stories should be stored in the state.
+- **Refinement:** Instead of just adding steps to `activeStory`, we should add a top-level `stories` array to the state. `activeStory` should then just reference the active story ID. This supports multiple stories in the future.
 
 ## Proposed Changes
 
 ### 1. Types (`src/types/state.ts`)
-- Update `QuestArcState.activeStory` to include `steps: StoryStep[]` and `title: string`.
+- Add `stories: HeroStory[]` to `QuestArcState`.
+- Simplify `activeStory` to only contain `id`, `currentStepId`, and `streakProgress`. Remove `title` and `steps`.
 
 ### 2. State Management (`src/lib/state-manager.ts`)
-- Update `INITIAL_STATE` to include the default story steps from the JSON file.
-- Update `ensureState` to populate `steps` if they are missing in existing saved states (migration/compatibility).
+- Update `INITIAL_STATE` to populate `stories` with the default story data.
+- Update `ensureState` to populate `stories` if missing and ensure `activeStory` has the correct structure.
 
 ### 3. Plugin Logic (`src/plugin.ts`)
-- Remove static `STORY_DATA` import.
-- Update `getCurrentStep()` to read from `state.activeStory.steps`.
-- Ensure `init()` properly migrates/ensures the state structure.
+- Update `getCurrentStep()` to look up the story in `state.stories` using `state.activeStory.id`.
+
+### 4. UI (`src/app/App.tsx`)
+- Update the UI to derive the current step title from the new state structure.
+
+### 5. Build System
+- Restore missing local packages (`packages/vite-plugin`) required for the build.
+- Migrate `@super-productivity/plugin-api` to the npm registry version (`^1.0.1`).
 
 ## Verification Plan
 - [ ] Run `npm run typecheck` to ensure no regressions.
 - [ ] Run `npm run build` to verify the build process.
-- [ ] (Manual) Verify that state now contains the full story data after a save.
+- [ ] Verify that the UI correctly displays the step title from the state.

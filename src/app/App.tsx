@@ -120,7 +120,13 @@ function App() {
             <section class="active-quest">
               <h2>Current Story Step</h2>
               <div class="step-card">
-                <h3>{s().activeStory.id.replace(/_/g, ' ').toUpperCase()}</h3>
+                <h3>{
+                  (() => {
+                    const activeStory = s().stories.find(story => story.id === s().activeStory.id);
+                    const currentStep = activeStory?.steps.find(step => step.id === s().activeStory.currentStepId);
+                    return currentStep ? currentStep.title : s().activeStory.id.replace(/_/g, ' ').toUpperCase();
+                  })()
+                }</h3>
                 <p>Step ID: {s().activeStory.currentStepId}</p>
 
                 <Show when={s().activeBoss}>

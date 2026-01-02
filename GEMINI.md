@@ -41,6 +41,14 @@ QuestArc is built on the `super-productivity/boilerplate-solid-js`, which enforc
 
 Every task requires a specific documentation trail. **Do not write code without a plan.**
 
+**🚨 CRITICAL PRE-WORK CHECKLIST:**
+Before writing or modifying **ANY** code, you **MUST**:
+1.  **Identify** the Task ID from `docs/history.md`.
+2.  **READ** the corresponding `docs/<ID>/plan.md`.
+3.  **VERIFY** that the plan matches the current user request.
+4.  If the plan is missing, empty, or outdated, **YOU MUST CREATE OR UPDATE IT FIRST**.
+5.  Only *then* proceed to code.
+
 ### Step 1: Initialization
 1.  Open `docs/history.md` to find the next available **Task ID** (e.g., `001`).
 2.  Create a directory: `docs/<ID>/`.

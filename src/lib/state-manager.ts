@@ -14,12 +14,11 @@ export const INITIAL_STATE: QuestArcState = {
     hp: 100,
     maxHp: 100,
   },
+  stories: [STORY_DATA],
   activeStory: {
     id: STORY_DATA.id,
-    title: STORY_DATA.title,
     currentStepId: 1,
     streakProgress: 0,
-    steps: STORY_DATA.steps,
   },
   activeBoss: null,
 };
@@ -61,10 +60,21 @@ export function ensureState(state: any): QuestArcState {
   if (!state.profile.hp) state.profile.hp = 100;
   if (!state.profile.maxHp) state.profile.maxHp = 100;
 
-  if (state.activeStory && !state.activeStory.steps) {
-    state.activeStory.title = STORY_DATA.title;
-    state.activeStory.steps = STORY_DATA.steps;
+  if (!state.stories || !Array.isArray(state.stories)) {
+    state.stories = [STORY_DATA];
   }
+
+  // Ensure activeStory exists
+  if (!state.activeStory) {
+     state.activeStory = {
+        id: STORY_DATA.id,
+        currentStepId: 1,
+        streakProgress: 0
+     };
+  }
+
+  // If activeStory still has old fields (title, steps), we can leave them or clean them up.
+  // For safety, let's just ensure id/currentStepId exist.
 
   return state as QuestArcState;
 }
