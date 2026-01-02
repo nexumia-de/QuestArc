@@ -29,7 +29,13 @@ Move the story steps from a hardcoded/static constant into the persistent plugin
 - Restore missing local packages (`packages/vite-plugin`) required for the build.
 - Migrate `@super-productivity/plugin-api` to the npm registry version (`^1.0.1`).
 
+### 6. Code Quality Improvements
+- Create shared utility functions to eliminate code duplication.
+- Ensure proper state migration by cleaning up deprecated fields.
+- Simplify UI code by extracting complex inline logic into reusable functions.
+
 ## Verification Plan
-- [ ] Run `npm run typecheck` to ensure no regressions.
-- [ ] Run `npm run build` to verify the build process.
-- [ ] Verify that the UI correctly displays the step title from the state.
+- [x] Run `npm run typecheck` to ensure no regressions.
+- [x] Run `npm run build` to verify the build process.
+- [x] Verify that the UI correctly displays the step title from the state.
+- [x] Ensure no code duplication between plugin.ts and App.tsx.

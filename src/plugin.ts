@@ -4,7 +4,7 @@ import type {
   PluginHooks,
 } from '@super-productivity/plugin-api';
 import { QuestArcState, HeroStory, StoryStep } from './types/state';
-import { createInitialState, updateXp, migrateState, validateState, ensureState } from './lib/state-manager';
+import { createInitialState, updateXp, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
 import { processTaskCompletion } from './lib/game-logic';
 // Super Productivity provides 'PluginAPI' as a global variable
 declare const PluginAPI: PluginAPI;
@@ -77,15 +77,10 @@ async function saveState() {
   await PluginAPI.persistDataSynced(JSON.stringify(state));
 }
 
-function getCurrentStep(): StoryStep | undefined {
-  const activeStoryDef = state.stories.find(s => s.id === state.activeStory.id);
-  return activeStoryDef?.steps.find(s => s.id === state.activeStory.currentStepId);
-}
-
 // Hooks
 PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayload) => {
   console.log('QuestArc: Task completed!', payload);
-  const currentStep = getCurrentStep();
+  const currentStep = getCurrentStep(state);
   if (!currentStep) {
     console.log('QuestArc: No current step found');
     return;

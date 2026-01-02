@@ -1,4 +1,4 @@
-import { QuestArcState, HeroStory } from '../types/state';
+import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import storyDataRaw from '../assets/stories/productivity-mastery.json';
 
 const STORY_DATA = storyDataRaw as HeroStory;
@@ -73,10 +73,36 @@ export function ensureState(state: any): QuestArcState {
      };
   }
 
-  // If activeStory still has old fields (title, steps), we can leave them or clean them up.
-  // For safety, let's just ensure id/currentStepId exist.
+  // Clean up old fields from previous state structure
+  if (state.activeStory) {
+    delete (state.activeStory as any).title;
+    delete (state.activeStory as any).steps;
+  }
 
   return state as QuestArcState;
+}
+
+/**
+ * Get the active story definition from state
+ */
+export function getActiveStory(state: QuestArcState): HeroStory | undefined {
+  return state.stories.find(story => story.id === state.activeStory.id);
+}
+
+/**
+ * Get the current step of the active story
+ */
+export function getCurrentStep(state: QuestArcState): StoryStep | undefined {
+  const activeStory = getActiveStory(state);
+  return activeStory?.steps.find(step => step.id === state.activeStory.currentStepId);
+}
+
+/**
+ * Get the title of the current step, with fallback
+ */
+export function getCurrentStepTitle(state: QuestArcState): string {
+  const currentStep = getCurrentStep(state);
+  return currentStep?.title ?? state.activeStory.id.replace(/_/g, ' ').toUpperCase();
 }
 
 /**
