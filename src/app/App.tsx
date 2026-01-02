@@ -64,7 +64,7 @@ function App() {
     }, 2000);
   });
 
-  const [view, setView] = createSignal<'dashboard' | 'editor'>('dashboard');
+  const [view, setView] = createSignal<'dashboard' | 'editor' | 'story-list'>('dashboard');
   const [newStep, setNewStep] = createSignal({
     title: '',
     target: 3,
@@ -195,9 +195,45 @@ function App() {
                       </div>
                     </Show>
                   </div>
-                  <button class="primary-btn new-quest-btn" onClick={() => setView('editor')}>
-                    ➕ New Quest
-                  </button>
+                  <div class="dashboard-actions">
+                    <button class="secondary-btn" onClick={() => setView('story-list')}>
+                      📜 My Quests
+                    </button>
+                    <button class="primary-btn" onClick={() => setView('editor')}>
+                      ➕ New Quest
+                    </button>
+                  </div>
+                </section>
+              </Show>
+
+              <Show when={view() === 'story-list'}>
+                <section class="story-list-view">
+                  <h2>My Quests</h2>
+                  <div class="story-grid">
+                    <Show when={s().stories && s().stories.length > 0} fallback={<div class="empty-state">No quests found. Create one to get started!</div>}>
+                      {(s().stories || []).map((story) => (
+                        <div class="story-card">
+                          <div class="story-info">
+                            <h3>{story.title}</h3>
+                            <div class="story-meta">
+                              <span>👣 {story.steps.length} Steps</span>
+                              <span>✨ {story.steps.reduce((acc, step) => acc + step.xpReward, 0)} XP</span>
+                            </div>
+                          </div>
+                          {s().activeStory.id === story.id && <div class="active-badge">Active</div>}
+                        </div>
+                      ))}
+                    </Show>
+                  </div>
+
+                  <div class="button-row">
+                    <button class="primary-btn" onClick={() => setView('editor')}>
+                      ➕ Create New Quest
+                    </button>
+                    <button class="secondary-btn" onClick={() => setView('dashboard')}>
+                      Back to Dashboard
+                    </button>
+                  </div>
                 </section>
               </Show>
 

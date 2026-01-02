@@ -12,3 +12,4 @@
 | 007 | 2026-01-02 | Fix Black Screen & Import Error: Inline shared chunks in plugin build. | [./007/](./007/) | Antigravity |
 | 008 | 2026-01-02 | Implement Pet & Avatar Data Model. | [./008/](./008/) | Antigravity |
 | 009 | 2026-01-02 | Implement "Habit Stacker" Story Editor. | [./009/](./009/) | Antigravity |
+| 010 | 2026-01-02 | Add Story List View. | [./010/](./010/) | Antigravity |
