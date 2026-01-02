@@ -20,3 +20,4 @@
 | 015 | 2026-01-02 | Code Review & Refactoring: Immutability and DRY fixes. | [./015/](./015/) | Gemini |
 | 016 | 2026-01-02 | Multi-Step "Heroic Story" Editor. | [./016/](./016/) | Antigravity |
 | 017 | 2026-01-02 | Logic Update: Sync Task Title on Step Complete | [./017/](./017/) | Antigravity |
+| 018 | 2026-01-02 | Refactor StoryCard Component | [./018/](./018/) | Antigravity |
