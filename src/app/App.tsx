@@ -1,5 +1,5 @@
 import { createSignal, onMount, Show } from 'solid-js';
-import { QuestArcState, HeroStory } from '../types/state';
+import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import { MESSAGE_TYPES } from '../types/messages';
 import { STATE_POLL_INTERVAL_MS, MESSAGE_TIMEOUT_MS, RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
 import { logger } from '../lib/logger';
@@ -99,15 +99,13 @@ function App() {
     setView('editor');
   };
 
-  const handleSaveStory = async (title: string, steps: { title: string; target: number; xp: number }[]) => {
+  const handleSaveStory = async (title: string, steps: Omit<StoryStep, 'id' | 'nextStepId'>[]) => {
     setErrorMessage(null);
 
     try {
       const finalSteps = steps.map((step, index) => ({
+        ...step,
         id: index + 1,
-        title: step.title,
-        condition: { type: 'streak' as const, target: step.target },
-        xpReward: step.xp,
         nextStepId: index < steps.length - 1 ? index + 2 : null
       }));
 

@@ -44,19 +44,39 @@ export interface BossConfig {
   isDead?: boolean;
 }
 
-export type StoryStepType = 'simple' | 'boss';
+export interface TaskDefinition {
+  title: string;
+  isAutoCreate: boolean;
+  notes?: string;
 
-export interface StepCondition {
-  type: 'streak' | 'count';
-  target: number;
+  // Recurring Task Fields
+  isRepeating?: boolean;
+  repeatCfg?: {
+    repeatEvery: number;
+    repeatType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  };
+
+  // Requirement Fields
+  isRequired?: boolean;
+  requiredCount?: number;
+}
+
+export type CompletionType = 'tasks_completed' | 'boss_defeat';
+
+export interface CompletionRequirement {
+  type: CompletionType;
+  config?: {
+    boss?: BossConfig;
+  };
 }
 
 export interface StoryStep {
   id: number;
   title: string;
-  type?: StoryStepType; // Default to 'simple' if undefined
-  condition?: StepCondition;
-  boss?: BossConfig;
+
+  tasksToCreate?: TaskDefinition[];
+  completion: CompletionRequirement;
+
   xpReward: number;
   nextStepId?: number | null;
 }

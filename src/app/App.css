@@ -621,28 +621,281 @@ body[class*='dark'] {
 
 .form-group.half {
   flex: 1;
-}.edit-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
+}
+
+.edit-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
 }
 
 .edit-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    opacity: 1;
-    transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 [data-theme='light'] .edit-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Clean Editor Enhancements */
+
+/* Task Card - visually distinct block */
+.task-card {
+  background: var(--bg);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.task-card:hover {
+  border-color: var(--border);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.task-info-line {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.task-name-input {
+  flex: 1;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid var(--border);
+  border-radius: 0;
+  padding: 4px 0;
+  transition: border-color 0.2s;
+  color: var(--text);
+}
+
+.task-name-input::placeholder {
+  color: var(--text-muted);
+}
+
+.task-name-input:focus {
+  outline: none;
+  border-bottom-color: var(--primary);
+  background: transparent;
+  box-shadow: none;
+}
+
+.remove-task-mini-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s;
+  opacity: 0.5;
+}
+
+.remove-task-mini-btn:hover {
+  background: var(--hp-empty);
+  color: var(--hp-color);
+  opacity: 1;
+}
+
+/* Options Row */
+.task-options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Checkbox Pills */
+.checkbox-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.checkbox-pill:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.checkbox-pill input[type="checkbox"] {
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.required-pill {
+  border-color: transparent;
+  background: rgba(239, 68, 68, 0.05);
+  color: var(--text-muted);
+}
+
+.required-pill:hover {
+  border-color: var(--hp-color);
+}
+
+.required-pill:has(input:checked) {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--hp-color);
+  border-color: var(--hp-color);
+  font-weight: 600;
+}
+
+/* Repeat Panel */
+.repeat-settings-panel {
+  background: var(--bg);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  border: 1px solid var(--border);
+}
+
+.setting-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.compact-select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.compact-input {
+  width: 60px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Global Select and Number Input Styles */
+select,
+input[type="number"] {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+}
+
+select:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Small Button (e.g., + Add Task) */
+.small-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.small-btn:hover {
+  background: var(--card-bg);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+/* Step Header Layout */
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.step-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.step-meta label {
+  margin: 0;
+}
+
+.small-input {
+  width: 70px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+/* Tasks Section */
+.tasks-section h5,
+.requirements-section h5 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+}
+
+/* Info Box */
+.info-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.info-box p {
+  margin: 0;
 }

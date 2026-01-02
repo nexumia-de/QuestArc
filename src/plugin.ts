@@ -128,7 +128,8 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
         activeStory: {
           ...state.activeStory,
           currentStepId: currentStep.nextStepId,
-          streakProgress: 0
+          streakProgress: 0,
+          taskProgress: {}
         },
         activeBoss: null
       };
@@ -144,8 +145,38 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
             PluginAPI.updateTask(taskPayload.task.id, { title: nextStep.title });
             log.info(`Updated task title to: ${nextStep.title}`);
           }
+
+          // Auto-create tasks for the new step
+          if (nextStep.tasksToCreate) {
+            nextStep.tasksToCreate.forEach(async (taskDef) => {
+              if (taskDef.isAutoCreate && PluginAPI.addTask) {
+                try {
+                  const additionalFields: any = {
+                    notes: taskDef.notes || `Quest Sub-task for: ${nextStep.title}`
+                  };
+
+                  if (taskDef.isRepeating && taskDef.repeatCfg) {
+                    additionalFields.taskRepeatCfg = {
+                      repeatEvery: 1, // Default to 1
+                      repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
+                      startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
+                    };
+                  }
+
+                  await PluginAPI.addTask({
+                    title: taskDef.title,
+                    ...additionalFields
+                  });
+                  log.info(`Auto-created task: ${taskDef.title} (Repeat: ${taskDef.isRepeating})`);
+                } catch (e) {
+                  log.error(`Failed to auto-create task: ${taskDef.title}`, e);
+                }
+              }
+            });
+          }
+
         } catch (err) {
-          log.error('Failed to update task title', err);
+          log.error('Failed to update task title/create subtasks', err);
         }
       }
     }

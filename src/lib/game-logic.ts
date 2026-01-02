@@ -36,10 +36,14 @@ export function initializeBossIfNeeded(
   state: QuestArcState,
   currentStep: StoryStep
 ): QuestArcState {
-  if (currentStep.type === 'boss' && !state.activeBoss && currentStep.boss) {
+  if (
+    currentStep.completion.type === 'boss_defeat' &&
+    !state.activeBoss &&
+    currentStep.completion.config?.boss
+  ) {
     return {
       ...state,
-      activeBoss: { ...currentStep.boss, isDead: false }
+      activeBoss: { ...currentStep.completion.config.boss, isDead: false }
     };
   }
   return state;
@@ -55,37 +59,64 @@ export function initializeBossIfNeeded(
  * Creates a deep copy of state to avoid mutations.
  */
 export function processTaskCompletion(
-  currentState: QuestArcState,
-  task: TaskStub,
+  state: QuestArcState,
+  _task: TaskStub, // Changed from Task to TaskStub to match existing definition
   currentStep: StoryStep
 ): { newState: QuestArcState; damageDealt: number; stepCompleted: boolean } {
   let damageDealt = 0;
   let stepCompleted = false;
+  let newState = { ...state };
 
-  // Create a deep copy of the state to avoid any mutations affecting the original
-  const newState = JSON.parse(JSON.stringify(currentState)) as QuestArcState;
+  const requirement = currentStep.completion;
 
-  // Handle Boss logic
-  if (currentStep.type === 'boss' && newState.activeBoss) {
-    damageDealt = calculateDamage(task, currentStep.boss?.damageModifiers);
-    newState.activeBoss.hp -= damageDealt;
+  // 1. Update Progress for this specific task
+  // Find which task definition matches the completed task (by title for now)
+  const matchingDef = currentStep.tasksToCreate?.find(t => t.title === _task.title);
 
-    if (newState.activeBoss.hp <= 0) {
-      newState.activeBoss.hp = 0;
-      newState.activeBoss.isDead = true;
+  if (matchingDef) {
+    const currentCount = newState.activeStory.taskProgress[_task.title] || 0;
+    newState.activeStory.taskProgress = {
+      ...newState.activeStory.taskProgress,
+      [_task.title]: currentCount + 1
+    };
+  }
+
+  // 2. Check Step Completion
+  if (requirement.type === 'boss_defeat') {
+    // Boss Logic
+    if (newState.activeBoss && !newState.activeBoss.isDead) {
+      const baseDamage = 10;
+      const isCrit = Math.random() > 0.8;
+      damageDealt = isCrit ? baseDamage * 2 : baseDamage;
+
+      newState.activeBoss = {
+        ...newState.activeBoss,
+        hp: Math.max(0, newState.activeBoss.hp - damageDealt),
+      };
+
+      if (newState.activeBoss.hp === 0) {
+        newState.activeBoss.isDead = true;
+        stepCompleted = true;
+      }
+    }
+  } else if (requirement.type === 'tasks_completed') {
+    // Check if ALL required tasks meet their targets
+    const tasks = currentStep.tasksToCreate || [];
+    const requiredTasks = tasks.filter(t => t.isRequired !== false); // Default to true if undefined
+
+    const allMet = requiredTasks.every(def => {
+      const progress = newState.activeStory.taskProgress[def.title] || 0;
+      const target = def.requiredCount || 1;
+      return progress >= target;
+    });
+
+    if (requiredTasks.length > 0 && allMet) {
+      stepCompleted = true;
+    } else if (requiredTasks.length === 0) {
+      // If no tasks are explicitly required, we might fallback to "Any Task" logic or auto-complete?
+      // For now, let's assume if you have 0 required tasks, you just need to do 1 thing to pass.
       stepCompleted = true;
     }
-  }
-  // Handle Streak logic
-  else if (currentStep.condition?.type === 'streak') {
-    newState.activeStory.streakProgress += 1;
-    if (newState.activeStory.streakProgress >= currentStep.condition.target) {
-      stepCompleted = true;
-    }
-  }
-  // Handle Simple logic (count or just completion)
-  else {
-    stepCompleted = true;
   }
 
   return { newState, damageDealt, stepCompleted };

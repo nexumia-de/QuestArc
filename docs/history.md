@@ -22,3 +22,8 @@
 | 017 | 2026-01-02 | Logic Update: Sync Task Title on Step Complete | [./017/](./017/) | Antigravity |
 | 018 | 2026-01-02 | Refactor StoryCard Component | [./018/](./018/) | Antigravity |
 | 019 | 2026-01-02 | Refactor App.tsx: Split into sub-components. | [./019/](./019/) | Antigravity |
+
+| 020 | 2026-01-02 | Story Editor: Decoupled Task Creation & Requirements. | [./020/](./020/) | Antigravity |
+| 021 | 2026-01-02 | Story Editor: Repeat/Routine Task Support. | [./021/](./021/) | Antigravity |
+| 022 | 2026-01-02 | Logic Update: Shift to Specific Task Requirements. | [./022/](./022/) | Antigravity |
+| 023 | 2026-01-02 | UI Polish: Clean Story Creator Layout. | [./023/](./023/) | Antigravity |

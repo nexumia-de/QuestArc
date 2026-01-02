@@ -35,6 +35,7 @@ export const INITIAL_STATE: QuestArcState = {
     id: STORY_DATA.id,
     currentStepId: 1,
     streakProgress: 0,
+    taskProgress: {}
   },
   activeBoss: null,
 };
@@ -110,7 +111,8 @@ export function ensureState(state: any): QuestArcState {
     newState.activeStory = {
       id: STORY_DATA.id,
       currentStepId: 1,
-      streakProgress: 0
+      streakProgress: 0,
+      taskProgress: {}
     };
   }
 
