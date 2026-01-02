@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, For } from 'solid-js';
+import { createSignal, onMount, Show, For, Index } from 'solid-js';
 import { QuestArcState, HeroStory } from '../types/state';
 import { MESSAGE_TYPES, PluginMessage } from '../types/messages';
 import { getCurrentStepTitle } from '../lib/state-manager';
@@ -68,9 +68,28 @@ function App() {
 
   // Editor State
   const [storyTitle, setStoryTitle] = createSignal('');
+  const [editingStoryId, setEditingStoryId] = createSignal<string | null>(null);
   const [steps, setSteps] = createSignal<{ title: string; target: number; xp: number }[]>([
     { title: '', target: 3, xp: 50 }
   ]);
+
+  const loadStoryForEditing = (story: HeroStory) => {
+    setStoryTitle(story.title);
+    setEditingStoryId(story.id);
+    setSteps(story.steps.map(s => ({
+      title: s.title,
+      target: s.condition?.target || 1,
+      xp: s.xpReward
+    })));
+    setView('editor');
+  };
+
+  const createNewStory = () => {
+    setStoryTitle('');
+    setEditingStoryId(null);
+    setSteps([{ title: '', target: 3, xp: 50 }]);
+    setView('editor');
+  };
 
   const addStep = () => {
     setSteps([...steps(), { title: '', target: 3, xp: 50 }]);
@@ -97,11 +116,11 @@ function App() {
       title: step.title,
       condition: { type: 'streak' as const, target: step.target },
       xpReward: step.xp,
-      nextStepId: index < steps().length - 1 ? index + 2 : undefined
+      nextStepId: index < steps().length - 1 ? index + 2 : null
     }));
 
     const storyToSave: HeroStory = {
-      id: `story_${Date.now()}`,
+      id: editingStoryId() || `story_${Date.now()}`,
       title: storyTitle(),
       steps: finalSteps
     };
@@ -111,6 +130,7 @@ function App() {
       setView('dashboard');
       // Reset form
       setStoryTitle('');
+      setEditingStoryId(null);
       setSteps([{ title: '', target: 3, xp: 50 }]);
       // Force sync
       const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
@@ -221,7 +241,7 @@ function App() {
                     <button class="secondary-btn" onClick={() => setView('story-list')}>
                       📜 My Quests
                     </button>
-                    <button class="primary-btn" onClick={() => setView('editor')}>
+                    <button class="primary-btn" onClick={createNewStory}>
                       ➕ New Quest
                     </button>
                   </div>
@@ -243,13 +263,14 @@ function App() {
                             </div>
                           </div>
                           {s().activeStory.id === story.id && <div class="active-badge">Active</div>}
+                          <button class="edit-btn" onClick={(e) => { e.stopPropagation(); loadStoryForEditing(story); }} title="Edit Story">✏️</button>
                         </div>
                       ))}
                     </Show>
                   </div>
 
                   <div class="button-row">
-                    <button class="primary-btn" onClick={() => setView('editor')}>
+                    <button class="primary-btn" onClick={createNewStory}>
                       ➕ Create New Quest
                     </button>
                     <button class="secondary-btn" onClick={() => setView('dashboard')}>
@@ -261,7 +282,7 @@ function App() {
 
               <Show when={view() === 'editor'}>
                 <section class="editor-view">
-                  <h2>Create New Habit Quest</h2>
+                  <h2>{editingStoryId() ? 'Edit Habit Quest' : 'Create New Habit Quest'}</h2>
 
                   <div class="form-group">
                     <label>Story Name</label>
@@ -274,17 +295,17 @@ function App() {
                   </div>
 
                   <div class="steps-list">
-                    <For each={steps()}>
+                    <Index each={steps()}>
                       {(step, index) => (
                         <div class="step-builder-card">
-                          <h4>Step {index() + 1}</h4>
+                          <h4>Step {index + 1}</h4>
                           <div class="form-group">
                             <label>Habit</label>
                             <input
                               type="text"
                               placeholder="e.g. Put on shoes"
-                              value={step.title}
-                              onInput={(e) => updateStep(index(), 'title', e.currentTarget.value)}
+                              value={step().title}
+                              onInput={(e) => updateStep(index, 'title', e.currentTarget.value)}
                             />
                           </div>
                           <div class="form-row">
@@ -293,27 +314,27 @@ function App() {
                               <input
                                 type="number"
                                 min="1"
-                                value={step.target}
-                                onInput={(e) => updateStep(index(), 'target', parseInt(e.currentTarget.value))}
+                                value={step().target}
+                                onInput={(e) => updateStep(index, 'target', parseInt(e.currentTarget.value))}
                               />
                             </div>
                             <div class="form-group half">
                               <label>XP Reward</label>
                               <input
                                 type="number"
-                                value={step.xp}
-                                onInput={(e) => updateStep(index(), 'xp', parseInt(e.currentTarget.value))}
+                                value={step().xp}
+                                onInput={(e) => updateStep(index, 'xp', parseInt(e.currentTarget.value))}
                               />
                             </div>
                           </div>
                           {steps().length > 1 && (
-                            <button class="remove-btn" onClick={() => removeStep(index())}>
+                            <button class="remove-btn" onClick={() => removeStep(index)}>
                               🗑️
                             </button>
                           )}
                         </div>
                       )}
-                    </For>
+                    </Index>
                   </div>
 
                   <button class="secondary-btn add-step-btn" onClick={addStep}>
@@ -322,7 +343,7 @@ function App() {
 
                   <div class="button-row">
                     <button class="primary-btn" onClick={saveStory} disabled={!storyTitle() || steps().some(s => !s.title)}>
-                      Forge Story
+                      {editingStoryId() ? 'Update Story' : 'Forge Story'}
                     </button>
                     <button class="secondary-btn cancel-btn" onClick={() => setView('dashboard')}>
                       Cancel

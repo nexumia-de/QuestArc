@@ -117,6 +117,23 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayloa
         },
         activeBoss: null
       };
+
+      // Rename the host task to the new step title
+      const nextStep = state.activeStory && state.stories
+        ? state.stories.find(s => s.id === state.activeStory.id)?.steps.find(step => step.id === currentStep.nextStepId)
+        : null;
+
+      if (nextStep) {
+        try {
+          // @ts-ignore - updateTask might not be in the type definition yet but exists in runtime
+          if (PluginAPI.updateTask) {
+            PluginAPI.updateTask(payload.task.id, { title: nextStep.title });
+            PluginAPI.log.info(`Updated task title to: ${nextStep.title}`);
+          }
+        } catch (err) {
+          PluginAPI.log.error('Failed to update task title', err);
+        }
+      }
     }
 
     PluginAPI.showSnack({

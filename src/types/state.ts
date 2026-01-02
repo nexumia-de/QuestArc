@@ -58,7 +58,7 @@ export interface StoryStep {
   condition?: StepCondition;
   boss?: BossConfig;
   xpReward: number;
-  nextStepId?: number;
+  nextStepId?: number | null;
 }
 
 export interface HeroStory {
