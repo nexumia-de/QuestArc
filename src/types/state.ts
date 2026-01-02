@@ -22,6 +22,9 @@ export interface QuestArcState {
     hp: number;
     maxHp: number;
     isDead: boolean;
+    name?: string;
+    image?: string;
+    themeColor?: string;
   } | null;
 }
 
@@ -42,6 +45,10 @@ export interface BossConfig {
   maxHp: number;
   damageModifiers: Modifier[];
   isDead?: boolean;
+  // Rich Boss Features
+  name?: string;
+  image?: string; // URL or Asset ID
+  themeColor?: string; // Hex code
 }
 
 export interface TaskDefinition {

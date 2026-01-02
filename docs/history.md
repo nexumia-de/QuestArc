@@ -29,6 +29,7 @@
 | 023 | 2026-01-02 | UI Polish: Clean Story Creator Layout. | [./023/](./023/) | Antigravity |
 | 024 | 2026-01-02 | Code Review Fixes: Types, Migration, & Initial Task Creation. | [./024/](./024/) | Antigravity |
 | 025 | 2026-01-03 | Bug Fix: Unclickable Red X in Task Creation. | [./025/](./025/) | Antigravity |
+| 026 | 2026-01-03 | Rich Bosses: Custom Name, Image, and Theme. | [./026/](./026/) | Antigravity |
 | 027 | 2026-01-03 | Refactor EditorView: Split into sub-components. | [./027/](./027/) | Antigravity |
 | 028 | 2026-01-03 | Refactor plugin.ts: Extract services and handlers. | [./028/](./028/) | Antigravity |
 | 029 | 2026-01-03 | Refactor state-manager.ts: Split into state modules. | [./029/](./029/) | Antigravity |

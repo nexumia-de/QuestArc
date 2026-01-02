@@ -127,11 +127,20 @@ export function useStoryEditor(initialStory: HeroStory | null) {
 
         let newConfig = { ...currentConfig };
 
+
+        const currentBoss = newConfig.boss || { hp: 100, maxHp: 100, damageModifiers: [] };
+
         if (field === 'boss_hp') {
             newConfig.boss = {
+                ...currentBoss,
                 hp: value,
                 maxHp: value,
-                damageModifiers: newConfig.boss?.damageModifiers || []
+            };
+        } else if (field.startsWith('boss_')) {
+            const key = field.replace('boss_', '');
+            newConfig.boss = {
+                ...currentBoss,
+                [key]: value
             };
         } else {
             newConfig = { ...newConfig, [field]: value };

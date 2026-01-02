@@ -899,3 +899,50 @@ input[type="number"]:focus {
 .info-box p {
   margin: 0;
 }
+
+/* Rich Boss Styles */
+.boss-battle {
+  overflow: visible !important;
+  margin-top: 2.5rem;
+  /* Extra space for boss head */
+  position: relative;
+}
+
+.boss-image-container {
+  position: absolute;
+  top: -60px;
+  right: 1rem;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  animation: bossFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.boss-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.boss-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+@keyframes bossFloat {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}

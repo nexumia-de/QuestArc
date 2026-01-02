@@ -17,12 +17,32 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                 <p>Step ID: {props.state.activeStory.currentStepId}</p>
 
                 <Show when={props.state.activeBoss}>
-                    <div class="boss-battle">
-                        <h4>👹 BOSS BATTLE</h4>
+                    <div
+                        class="boss-battle"
+                        style={props.state.activeBoss!.themeColor ? { 'border-color': props.state.activeBoss!.themeColor } : {}}
+                    >
+                        <Show when={props.state.activeBoss!.image}>
+                            <div class="boss-image-container">
+                                <Show
+                                    when={props.state.activeBoss!.image!.startsWith('http')}
+                                    fallback={<span class="boss-emoji">{props.state.activeBoss!.image}</span>}
+                                >
+                                    <img src={props.state.activeBoss!.image!} class="boss-image" alt="Boss" />
+                                </Show>
+                            </div>
+                        </Show>
+
+                        <h4 style={props.state.activeBoss!.themeColor ? { color: props.state.activeBoss!.themeColor } : {}}>
+                            {props.state.activeBoss!.name || '👹 BOSS BATTLE'}
+                        </h4>
+
                         <div class="hp-bar-container">
                             <div
                                 class="hp-bar-fill"
-                                style={{ width: `${(props.state.activeBoss!.hp / props.state.activeBoss!.maxHp) * 100}%` }}
+                                style={{
+                                    width: `${(props.state.activeBoss!.hp / props.state.activeBoss!.maxHp) * 100}%`,
+                                    background: props.state.activeBoss!.themeColor ? props.state.activeBoss!.themeColor : undefined
+                                }}
                             ></div>
                         </div>
                         <p class="hp-text">{props.state.activeBoss!.hp} / {props.state.activeBoss!.maxHp} HP</p>
