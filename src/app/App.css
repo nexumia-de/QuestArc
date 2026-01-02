@@ -12,6 +12,9 @@
   --hp-gradient: linear-gradient(90deg, #ef4444, #dc2626);
   --hp-empty: #fee2e2;
   --xp-empty: #fef3c7;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 [data-theme='dark'] {
@@ -36,12 +39,12 @@
 }
 
 .quest-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   background: var(--card-bg);
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  /* Removed border for cleaner look */
 }
 
 .header-content {
@@ -56,41 +59,44 @@
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 3px solid var(--border);
+  border: 2px solid var(--border);
   background: var(--card-bg);
-  /* Match card bg to avoid white box if transparent */
-  padding: 4px;
+  padding: 2px;
   object-fit: cover;
   display: block;
-  /* Ensure it respects dimensions */
 }
 
 .stats-container {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.stats-top-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
 }
 
 .level-headline {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.25rem;
+  font-weight: 700;
   margin: 0;
   line-height: 1;
   color: var(--primary);
-  /* Use primary color for pop */
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.025em;
 }
 
-/* Ensure readability in dark mode if --text variable is failing */
-@media (prefers-color-scheme: dark) {
-  .level-headline {
-    color: #818cf8;
-    /* Lighter indigo for better contrast on dark */
-  }
+.xp-total {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-family: monospace;
 }
 
 [data-theme='dark'] .level-headline {
@@ -103,38 +109,46 @@
   gap: 0.75rem;
 }
 
+.compact-bar {
+  gap: 0.5rem;
+}
+
 .xp-bar-container,
 .hp-bar-container {
   flex-grow: 1;
-  height: 10px;
+  height: 8px;
+  /* Slimmer bars */
   background: var(--border);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
+  /* For overlays if needed */
 }
 
-.bar-text {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  min-width: 80px;
+.bar-text-overlay {
+  font-size: 0.7rem;
+  color: var(--hp-color);
+  font-weight: 600;
+  min-width: 40px;
   text-align: right;
-  font-family: monospace;
 }
 
 .xp-bar-fill {
   height: 100%;
   background: var(--xp-gradient);
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
 }
 
 .hp-bar-fill {
   height: 100%;
   background: var(--hp-gradient);
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
 }
 
 .user-hp-fill {
   background: linear-gradient(90deg, #22c55e, #16a34a);
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
 }
 
 .hp-bar-container.user-hp {
@@ -144,9 +158,9 @@
 .step-card {
   background: var(--card-bg);
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  /* Removed border for floating effect */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -155,17 +169,31 @@
   border-color: rgba(255, 255, 255, 0.05);
 }
 
+.active-quest h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
 .step-card h3 {
   margin-top: 0;
-  color: var(--primary);
+  color: var(--text);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .boss-battle {
   margin-top: 1.5rem;
   padding: 1rem;
-  background: var(--hp-empty);
-  border-radius: 8px;
+  background: var(--bg);
+  /* Softer bg than hp-empty */
+  border-radius: 12px;
   position: relative;
+  border: 1px solid var(--hp-empty);
 }
 
 [data-theme='dark'] .boss-battle {
@@ -233,8 +261,8 @@
 /* Pet Styles */
 .pet-container {
   position: absolute;
-  bottom: -5px;
-  right: -5px;
+  bottom: -4px;
+  right: -4px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -141,28 +141,30 @@ function App() {
                   </Show>
                 </div>
                 <div class="stats-container">
-                  <h1 class="level-headline">Lvl {s().profile.level}</h1>
+                  <div class="stats-top-row">
+                    <h1 class="level-headline">Lvl {s().profile.level}</h1>
+                    <span class="xp-total">{s().profile.xp}/{s().profile.xpToNextLevel} XP</span>
+                  </div>
 
-                  {/* User HP Bar */}
-                  <div class="bar-row">
+                  {/* HP Bar */}
+                  <div class="bar-row compact-bar">
                     <div class="hp-bar-container user-hp">
                       <div
                         class="hp-bar-fill user-hp-fill"
                         style={{ width: `${(s().profile.hp / s().profile.maxHp) * 100}%` }}
                       ></div>
                     </div>
-                    <span class="bar-text">{s().profile.hp}/{s().profile.maxHp} HP</span>
+                    <span class="bar-text-overlay">{s().profile.hp} HP</span>
                   </div>
 
                   {/* XP Bar */}
-                  <div class="bar-row">
+                  <div class="bar-row compact-bar">
                     <div class="xp-bar-container">
                       <div
                         class="xp-bar-fill"
                         style={{ width: `${(s().profile.xp / s().profile.xpToNextLevel) * 100}%` }}
                       ></div>
                     </div>
-                    <span class="bar-text">{s().profile.xp}/{s().profile.xpToNextLevel} XP</span>
                   </div>
                 </div>
               </div>

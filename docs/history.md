@@ -13,3 +13,4 @@
 | 008 | 2026-01-02 | Implement Pet & Avatar Data Model. | [./008/](./008/) | Antigravity |
 | 009 | 2026-01-02 | Implement "Habit Stacker" Story Editor. | [./009/](./009/) | Antigravity |
 | 010 | 2026-01-02 | Add Story List View. | [./010/](./010/) | Antigravity |
+| 011 | 2026-01-02 | UI Polish: Compact header and cleaner cards. | [./011/](./011/) | Antigravity |
