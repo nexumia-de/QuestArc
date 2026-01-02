@@ -315,7 +315,7 @@ function App() {
                                 type="number"
                                 min="1"
                                 value={step().target}
-                                onInput={(e) => updateStep(index, 'target', parseInt(e.currentTarget.value))}
+                                onInput={(e) => updateStep(index, 'target', parseInt(e.currentTarget.value, 10))}
                               />
                             </div>
                             <div class="form-group half">
@@ -323,7 +323,7 @@ function App() {
                               <input
                                 type="number"
                                 value={step().xp}
-                                onInput={(e) => updateStep(index, 'xp', parseInt(e.currentTarget.value))}
+                                onInput={(e) => updateStep(index, 'xp', parseInt(e.currentTarget.value, 10))}
                               />
                             </div>
                           </div>

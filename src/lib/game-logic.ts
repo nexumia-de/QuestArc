@@ -26,28 +26,22 @@ export function processTaskCompletion(
   let damageDealt = 0;
   let stepCompleted = false;
 
-  // Create a shallow copy of the state
-  const newState = { ...currentState };
+  // Create a deep copy of the state to avoid any mutations affecting the original
+  const newState = JSON.parse(JSON.stringify(currentState)) as QuestArcState;
 
   // Handle Boss logic
   if (currentStep.type === 'boss' && newState.activeBoss) {
-    // Clone activeBoss before mutation
-    newState.activeBoss = { ...newState.activeBoss };
-
     damageDealt = calculateDamage(task, currentStep.boss?.damageModifiers);
     newState.activeBoss.hp -= damageDealt;
-    
+
     if (newState.activeBoss.hp <= 0) {
       newState.activeBoss.hp = 0;
       newState.activeBoss.isDead = true;
       stepCompleted = true;
     }
-  } 
+  }
   // Handle Streak logic
   else if (currentStep.condition?.type === 'streak') {
-    // Clone activeStory before mutation
-    newState.activeStory = { ...newState.activeStory };
-
     newState.activeStory.streakProgress += 1;
     if (newState.activeStory.streakProgress >= currentStep.condition.target) {
       stepCompleted = true;

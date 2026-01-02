@@ -43,38 +43,44 @@ export function migrateState(state: any): QuestArcState {
     return state as QuestArcState;
   }
 
+  // Create a deep copy to avoid mutating the input
+  const newState = JSON.parse(JSON.stringify(state));
+
   // Migration from version 0 to 1
   if (version === 0) {
-    state.version = 1;
+    newState.version = 1;
     // Add any migrations needed for v1
   }
 
   // Future migrations would go here
-  // if (version === 1) { state.version = 2; ... }
+  // if (version === 1) { newState.version = 2; ... }
 
-  return state as QuestArcState;
+  return newState as QuestArcState;
 }
 
 /**
  * Ensures compatibility for runtime state
  */
 export function ensureState(state: any): QuestArcState {
-  if (!state.profile) {
-    state.profile = { level: 1, xp: 0, xpToNextLevel: 100, hp: 100, maxHp: 100 };
+  // Create a deep copy to avoid mutating the input
+  const newState = JSON.parse(JSON.stringify(state));
+
+  if (!newState.profile) {
+    newState.profile = { level: 1, xp: 0, xpToNextLevel: 100, hp: 100, maxHp: 100 };
   }
-  if (!state.profile.hp) state.profile.hp = 100;
-  if (!state.profile.maxHp) state.profile.maxHp = 100;
-  if (!state.profile.pet) {
-    state.profile.pet = { type: 'slime', stage: 1, name: 'Buddy' };
+  if (!newState.profile.hp) newState.profile.hp = 100;
+  if (!newState.profile.maxHp) newState.profile.maxHp = 100;
+  if (!newState.profile.pet) {
+    newState.profile.pet = { type: 'slime', stage: 1, name: 'Buddy' };
   }
 
-  if (!state.stories || !Array.isArray(state.stories)) {
-    state.stories = [STORY_DATA];
+  if (!newState.stories || !Array.isArray(newState.stories)) {
+    newState.stories = [STORY_DATA];
   }
 
   // Ensure activeStory exists
-  if (!state.activeStory) {
-    state.activeStory = {
+  if (!newState.activeStory) {
+    newState.activeStory = {
       id: STORY_DATA.id,
       currentStepId: 1,
       streakProgress: 0
@@ -82,12 +88,12 @@ export function ensureState(state: any): QuestArcState {
   }
 
   // Clean up old fields from previous state structure
-  if (state.activeStory) {
-    delete (state.activeStory as any).title;
-    delete (state.activeStory as any).steps;
+  if (newState.activeStory) {
+    delete (newState.activeStory as any).title;
+    delete (newState.activeStory as any).steps;
   }
 
-  return state as QuestArcState;
+  return newState as QuestArcState;
 }
 
 /**
