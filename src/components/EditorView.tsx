@@ -1,4 +1,4 @@
-import { Component, createSignal, Index, Show, onMount, For } from 'solid-js';
+import { Component, createSignal, Index, Show, onMount } from 'solid-js';
 import { HeroStory, StoryStep, TaskDefinition, CompletionType, CompletionRequirement } from '../types/state';
 
 // We manage the step without the ID/NextID until save time
@@ -52,16 +52,21 @@ const EditorView: Component<EditorViewProps> = (props) => {
 
     const updateStep = (index: number, field: keyof EditorStep, value: any) => {
         const newSteps = [...steps()];
-        newSteps[index] = { ...newSteps[index], [field]: value };
+        const step = newSteps[index];
+        if (!step) return;
+        newSteps[index] = { ...step, [field]: value };
         setSteps(newSteps);
     };
 
     // Task Management
     const addTaskToStep = (stepIndex: number) => {
         const newSteps = [...steps()];
-        const currentTasks = newSteps[stepIndex].tasksToCreate || [];
+        const step = newSteps[stepIndex];
+        if (!step) return;
+
+        const currentTasks = step.tasksToCreate || [];
         newSteps[stepIndex] = {
-            ...newSteps[stepIndex],
+            ...step,
             tasksToCreate: [...currentTasks, { title: '', isAutoCreate: true }]
         };
         setSteps(newSteps);
@@ -69,12 +74,21 @@ const EditorView: Component<EditorViewProps> = (props) => {
 
     const updateTask = (stepIndex: number, taskIndex: number, updates: Partial<TaskDefinition>) => {
         const newSteps = [...steps()];
-        const tasks = [...(newSteps[stepIndex].tasksToCreate || [])];
-        tasks[taskIndex] = { ...tasks[taskIndex], ...updates };
+        const step = newSteps[stepIndex];
+        if (!step) return;
+
+        const tasks = [...(step.tasksToCreate || [])];
+        const existingTask = tasks[taskIndex];
+        if (!existingTask) {
+            // Should not happen in normal UI flow
+            return;
+        }
+
+        tasks[taskIndex] = { ...existingTask, ...updates };
 
         // Correctly updating the step object immutably
         newSteps[stepIndex] = {
-            ...newSteps[stepIndex],
+            ...step,
             tasksToCreate: tasks
         };
 
@@ -83,15 +97,26 @@ const EditorView: Component<EditorViewProps> = (props) => {
 
     const removeTask = (stepIndex: number, taskIndex: number) => {
         const newSteps = [...steps()];
-        const tasks = [...(newSteps[stepIndex].tasksToCreate || [])];
+        const step = newSteps[stepIndex];
+        if (!step) return;
+
+        const tasks = [...(step.tasksToCreate || [])];
         tasks.splice(taskIndex, 1);
-        newSteps[stepIndex].tasksToCreate = tasks;
+
+        newSteps[stepIndex] = {
+            ...step,
+            tasksToCreate: tasks
+        };
+
         setSteps(newSteps);
     };
 
     // Completion Management
     const updateCompletionType = (stepIndex: number, type: CompletionType) => {
         const newSteps = [...steps()];
+        const step = newSteps[stepIndex];
+        if (!step) return;
+
         const newCompletion: CompletionRequirement = { type };
 
         // Set defaults based on type
@@ -103,7 +128,7 @@ const EditorView: Component<EditorViewProps> = (props) => {
         }
 
         newSteps[stepIndex] = {
-            ...newSteps[stepIndex],
+            ...step,
             completion: newCompletion
         };
         setSteps(newSteps);
@@ -111,7 +136,10 @@ const EditorView: Component<EditorViewProps> = (props) => {
 
     const updateCompletionConfig = (stepIndex: number, field: string, value: any) => {
         const newSteps = [...steps()];
-        const currentCompletion = newSteps[stepIndex].completion;
+        const step = newSteps[stepIndex];
+        if (!step) return;
+
+        const currentCompletion = step.completion;
         const currentConfig = currentCompletion.config || {};
 
         let newConfig = { ...currentConfig };
@@ -126,9 +154,12 @@ const EditorView: Component<EditorViewProps> = (props) => {
             newConfig = { ...newConfig, [field]: value };
         }
 
-        newSteps[stepIndex].completion = {
-            ...currentCompletion,
-            config: newConfig
+        newSteps[stepIndex] = {
+            ...step,
+            completion: {
+                ...currentCompletion,
+                config: newConfig
+            }
         };
         setSteps(newSteps);
     };
@@ -245,7 +276,7 @@ const EditorView: Component<EditorViewProps> = (props) => {
                                                                 value={task().repeatCfg?.repeatType || 'DAILY'}
                                                                 onChange={(e) => updateTask(index, tIndex, {
                                                                     repeatCfg: {
-                                                                        ...task().repeatCfg,
+                                                                        repeatEvery: task().repeatCfg?.repeatEvery || 1,
                                                                         repeatType: e.currentTarget.value as any
                                                                     }
                                                                 })}

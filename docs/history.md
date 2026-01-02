@@ -28,3 +28,4 @@
 | 022 | 2026-01-02 | Logic Update: Shift to Specific Task Requirements. | [./022/](./022/) | Antigravity |
 | 023 | 2026-01-02 | UI Polish: Clean Story Creator Layout. | [./023/](./023/) | Antigravity |
 | 024 | 2026-01-02 | Code Review Fixes: Types, Migration, & Initial Task Creation. | [./024/](./024/) | Antigravity |
+| 025 | 2026-01-03 | Bug Fix: Unclickable Red X in Task Creation. | [./025/](./025/) | Antigravity |
