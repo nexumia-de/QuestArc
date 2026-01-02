@@ -13,6 +13,11 @@ export const INITIAL_STATE: QuestArcState = {
     xpToNextLevel: 100,
     hp: 100,
     maxHp: 100,
+    pet: {
+      type: 'slime',
+      stage: 1,
+      name: 'Buddy',
+    },
   },
   stories: [STORY_DATA],
   activeStory: {
@@ -59,6 +64,9 @@ export function ensureState(state: any): QuestArcState {
   }
   if (!state.profile.hp) state.profile.hp = 100;
   if (!state.profile.maxHp) state.profile.maxHp = 100;
+  if (!state.profile.pet) {
+    state.profile.pet = { type: 'slime', stage: 1, name: 'Buddy' };
+  }
 
   if (!state.stories || !Array.isArray(state.stories)) {
     state.stories = [STORY_DATA];
@@ -66,11 +74,11 @@ export function ensureState(state: any): QuestArcState {
 
   // Ensure activeStory exists
   if (!state.activeStory) {
-     state.activeStory = {
-        id: STORY_DATA.id,
-        currentStepId: 1,
-        streakProgress: 0
-     };
+    state.activeStory = {
+      id: STORY_DATA.id,
+      currentStepId: 1,
+      streakProgress: 0
+    };
   }
 
   // Clean up old fields from previous state structure
@@ -127,6 +135,14 @@ export function updateXp(state: QuestArcState, amount: number): { state: QuestAr
     state.profile.xp -= state.profile.xpToNextLevel;
     state.profile.level += 1;
     state.profile.xpToNextLevel = state.profile.level * 100;
+
+    // Pet evolution check
+    if (state.profile.level % 5 === 0) {
+      if (state.profile.pet.stage < 3) {
+        state.profile.pet.stage += 1;
+      }
+    }
+
     leveledUp = true;
   }
 

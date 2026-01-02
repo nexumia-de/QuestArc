@@ -6,6 +6,11 @@ export interface QuestArcState {
     xpToNextLevel: number; // e.g., level * 100
     hp: number;
     maxHp: number;
+    pet: {
+      type: string;
+      stage: number;
+      name: string;
+    };
   };
   stories: HeroStory[];
   activeStory: {

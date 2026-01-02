@@ -89,6 +89,22 @@ function App() {
               <div class="header-content">
                 <div class="avatar-container">
                   <img src={avatarImg} alt={`Level ${s().profile.level} Hero`} class="avatar" />
+                  <Show when={s().profile.pet}>
+                    {(pet) => {
+                      const stage = pet().stage;
+                      const petClass = stage === 1 ? 'pet-egg' : stage === 2 ? 'pet-baby' : 'pet-adult';
+                      const petEmoji = stage === 1 ? '🥚' : stage === 2 ? '💧' : '🐉';
+
+                      return (
+                        <div class="pet-container">
+                          <div class="pet-name-tooltip">{pet().name} (Stage {stage})</div>
+                          <div class={`pet ${petClass}`}>
+                            {petEmoji}
+                          </div>
+                        </div>
+                      );
+                    }}
+                  </Show>
                 </div>
                 <div class="stats-container">
                   <h1 class="level-headline">Lvl {s().profile.level}</h1>
