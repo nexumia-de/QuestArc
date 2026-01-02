@@ -9,3 +9,4 @@
 | 004 | 2025-12-30 | UI Review & Improvements: Mobile polish and visual upgrades. | [./004/](./004/) | Antigravity |
 | 005 | 2025-12-30 | Refactor Header UI: Add avatar and user HP bar. | [./005/](./005/) | Antigravity |
 | 006 | 2026-01-02 | Migrate Stories to Sync State for persistence. | [./006/](./006/) | Gemini |
+| 007 | 2026-01-02 | Fix Black Screen & Import Error: Inline shared chunks in plugin build. | [./007/](./007/) | Antigravity |
