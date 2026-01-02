@@ -5,6 +5,10 @@ import { superProductivityPlugin } from '@super-productivity/vite-plugin';
 
 export default defineConfig({
   plugins: [solidPlugin(), superProductivityPlugin()],
+  build: {
+    minify: false,
+    target: 'es2020',
+  },
   test: {
     environment: 'jsdom',
     globals: true,

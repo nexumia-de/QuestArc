@@ -4,7 +4,7 @@ import fs from 'fs';
 
 // Helper to inline chunks into JS content
 const inlineJsChunks = (js: string, distDir: string): string => {
-  const importRegex = /import\{([^}]*)\}from"([^"]+)";?/g;
+  const importRegex = /import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"];?/g;
 
   // We process matches one by one. note: replacing invalidates indices if we used a loop with regex.exec
   // simple replace with callback is better if safe, or loop and update string.
@@ -14,7 +14,6 @@ const inlineJsChunks = (js: string, distDir: string): string => {
   // matchAll works on original string. `js.replace(match[0])` will replace the *first occurrence* of that import string.
   // Since imports are usually unique per file path, this is fine.
   // But if same file is imported twice (unlikely for top level static imports), replace would only replace first.
-  // We should be careful.
   // Actually, standard iteration is safer if we reconstruct the string or just use replaceAll for that specific import line.
 
   const chunkMatches = [...js.matchAll(importRegex)];
@@ -41,7 +40,7 @@ const inlineJsChunks = (js: string, distDir: string): string => {
       });
 
       // Find the export statement in the chunk
-      const exportMatch = chunkContent.match(/export\{([^}]+)\}/);
+      const exportMatch = chunkContent.match(/export\s*\{([^}]+)\}/);
       let returnObject = '{}';
 
       if (exportMatch) {
@@ -65,7 +64,7 @@ const inlineJsChunks = (js: string, distDir: string): string => {
         returnObject = `{ ${returnPairs.join(', ')} }`;
 
         // Remove the export statement from chunk
-        chunkContent = chunkContent.replace(/export\{[^}]+\};?/, '');
+        chunkContent = chunkContent.replace(/export\s*\{[^}]+\};?/, '');
       }
 
       // Generate unique safe name for the chunk exports

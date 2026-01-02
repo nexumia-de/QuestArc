@@ -5,7 +5,8 @@ import type {
 import { QuestArcState, HeroStory } from './types/state';
 import { MESSAGE_TYPES } from './types/messages';
 import { createInitialState, updateXp, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
-import { processTaskCompletion } from './lib/game-logic';
+import { processTaskCompletion, initializeBossIfNeeded } from './lib/game-logic';
+import { createPluginLogger } from './lib/logger';
 
 // Define missing types locally
 export interface TaskCompletePayload {
@@ -25,7 +26,10 @@ interface PluginAPI extends PluginAPIBase {
 // Super Productivity provides 'PluginAPI' as a global variable
 declare const PluginAPI: PluginAPI;
 
-console.log('QuestArc: Plugin loading...', typeof PluginAPI);
+// Create plugin logger that uses PluginAPI.log when available
+const log = createPluginLogger(PluginAPI);
+
+log.info('Plugin loading...', typeof PluginAPI);
 
 let state: QuestArcState;
 
@@ -39,27 +43,27 @@ async function init() {
 
         // Validate structure
         if (!validateState(parsed)) {
-          PluginAPI.log.warn('Invalid state structure, resetting to initial state');
+          log.warn('Invalid state structure, resetting to initial state');
           state = createInitialState();
         } else {
           // Migrate if needed
           state = migrateState(parsed);
           state = ensureState(state); // Ensure new fields like HP exist
-          PluginAPI.log.info('State loaded and migrated successfully');
+          log.info('State loaded and migrated successfully');
         }
       } catch (parseError) {
-        PluginAPI.log.error('Failed to parse saved state:', parseError);
+        log.error('Failed to parse saved state:', parseError);
         state = createInitialState();
       }
     } else {
       state = createInitialState();
-      PluginAPI.log.info('No saved state found, using initial state');
+      log.info('No saved state found, using initial state');
     }
 
     updateHeader();
-    PluginAPI.log.info('QuestArc initialized successfully');
+    log.info('QuestArc initialized successfully');
   } catch (error) {
-    PluginAPI.log.error('Critical error during initialization:', error);
+    log.error('Critical error during initialization:', error);
     state = createInitialState();
     updateHeader();
   }
@@ -91,22 +95,17 @@ async function saveState() {
 PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
   // Cast payload to TaskCompletePayload
   const taskPayload = payload as TaskCompletePayload;
-  
-  console.log('QuestArc: Task completed!', taskPayload);
+
+  log.info('Task completed!', taskPayload);
   const currentStep = getCurrentStep(state);
   if (!currentStep) {
-    console.log('QuestArc: No current step found');
+    log.info('No current step found');
     return;
   }
-  console.log('QuestArc: Current step:', currentStep);
+  log.info('Current step:', currentStep);
 
   // Initialize boss if needed
-  if (currentStep.type === 'boss' && !state.activeBoss) {
-    state = {
-      ...state,
-      activeBoss: { ...currentStep.boss!, isDead: false }
-    };
-  }
+  state = initializeBossIfNeeded(state, currentStep);
 
   const result = processTaskCompletion(state, taskPayload.task, currentStep);
   state = result.newState;
@@ -143,10 +142,10 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
         try {
           if (PluginAPI.updateTask) {
             PluginAPI.updateTask(taskPayload.task.id, { title: nextStep.title });
-            PluginAPI.log.info(`Updated task title to: ${nextStep.title}`);
+            log.info(`Updated task title to: ${nextStep.title}`);
           }
         } catch (err) {
-          PluginAPI.log.error('Failed to update task title', err);
+          log.error('Failed to update task title', err);
         }
       }
     }
@@ -170,26 +169,26 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
 // UI Communication - Handle messages from the iframe
 if (PluginAPI.onMessage) {
   PluginAPI.onMessage(async (message: any) => {
-    console.log('QuestArc: Received message from UI:', message);
+    log.debug('Received message from UI:', message);
     switch (message.type) {
       case MESSAGE_TYPES.REQUEST_SYNC:
-        console.log('QuestArc: Sending state to UI:', state);
+        log.debug('Sending state to UI');
         // Return current state to UI
         return state;
       case MESSAGE_TYPES.DEV_RESET:
-        console.log('QuestArc: Resetting progress');
+        log.info('Resetting progress');
         // Reset all progress
         state = createInitialState();
         await saveState();
-        PluginAPI.log.info('Progress reset');
+        log.info('Progress reset');
         return state;
       case MESSAGE_TYPES.SAVE_STORY:
         const newStory = message.payload as HeroStory;
-        console.log('QuestArc: Saving story:', newStory);
+        log.info('Saving story:', newStory.title);
 
         // Validation
         if (!newStory.id || !newStory.steps || newStory.steps.length === 0) {
-          console.error('QuestArc: Invalid story format', newStory);
+          log.error('Invalid story format', newStory);
           return { error: 'Invalid Story Format' };
         }
 
@@ -207,15 +206,15 @@ if (PluginAPI.onMessage) {
         state = { ...state, stories: currentStories };
 
         await saveState();
-        PluginAPI.log.info(`Story saved: ${newStory.title}`);
+        log.info(`Story saved: ${newStory.title}`);
         return { success: true, stories: state.stories };
       default:
-        console.log('QuestArc: Unknown message type:', message.type);
+        log.warn('Unknown message type:', message.type);
         return { error: 'Unknown message type' };
     }
   });
 } else {
-  console.log('QuestArc: onMessage not available!');
+  log.warn('onMessage not available!');
 }
 
 // Entry point

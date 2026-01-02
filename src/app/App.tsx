@@ -2,16 +2,18 @@ import { createSignal, onMount, Show, For, Index } from 'solid-js';
 import { QuestArcState, HeroStory } from '../types/state';
 import { MESSAGE_TYPES, PluginMessage } from '../types/messages';
 import { getCurrentStepTitle } from '../lib/state-manager';
+import { STATE_POLL_INTERVAL_MS, MESSAGE_TIMEOUT_MS, RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
+import { logger } from '../lib/logger';
 import './App.css';
 import avatarImg from '../assets/avatar.svg';
 
 const sendMessage = async (type: string, payload?: any) => {
   return new Promise((resolve, reject) => {
     const messageId = Math.random().toString(36).substring(2, 11);
-    console.log('QuestArc UI: Sending message:', { type, payload, messageId });
+    logger.debug('UI: Sending message:', { type, payload, messageId });
 
     const handler = (event: MessageEvent) => {
-      console.log('QuestArc UI: Received response:', event.data);
+      logger.debug('UI: Received response:', event.data);
       // Check for both MESSAGE_RESPONSE and PLUGIN_MESSAGE_RESPONSE
       if (event.data.type === 'PLUGIN_MESSAGE_RESPONSE' && event.data.messageId === messageId) {
         window.removeEventListener('message', handler);
@@ -20,12 +22,12 @@ const sendMessage = async (type: string, payload?: any) => {
       }
     };
 
-    // Timeout after 5 seconds
+    // Timeout after configured timeout
     const timeout = setTimeout(() => {
       window.removeEventListener('message', handler);
-      console.error('QuestArc UI: Message timeout for:', type);
+      logger.error('UI: Message timeout for:', type);
       reject(new Error('Message timeout'));
-    }, 5000);
+    }, MESSAGE_TIMEOUT_MS);
 
     window.addEventListener('message', handler);
     // Super Productivity expects type: 'PLUGIN_MESSAGE' with message inside
@@ -37,6 +39,37 @@ const sendMessage = async (type: string, payload?: any) => {
   });
 };
 
+/**
+ * Efficient state comparison that checks only fields likely to change
+ * instead of serializing the entire state tree
+ */
+function hasStateChanged(oldState: QuestArcState, newState: QuestArcState): boolean {
+  // Check profile changes
+  if (oldState.profile.level !== newState.profile.level) return true;
+  if (oldState.profile.xp !== newState.profile.xp) return true;
+  if (oldState.profile.hp !== newState.profile.hp) return true;
+  if (oldState.profile.pet.stage !== newState.profile.pet.stage) return true;
+
+  // Check active story changes
+  if (oldState.activeStory.id !== newState.activeStory.id) return true;
+  if (oldState.activeStory.currentStepId !== newState.activeStory.currentStepId) return true;
+  if (oldState.activeStory.streakProgress !== newState.activeStory.streakProgress) return true;
+
+  // Check boss changes
+  const oldBoss = oldState.activeBoss;
+  const newBoss = newState.activeBoss;
+  if ((oldBoss === null) !== (newBoss === null)) return true;
+  if (oldBoss && newBoss) {
+    if (oldBoss.hp !== newBoss.hp) return true;
+    if (oldBoss.isDead !== newBoss.isDead) return true;
+  }
+
+  // Check stories array length (for new stories)
+  if (oldState.stories.length !== newState.stories.length) return true;
+
+  return false;
+}
+
 function App() {
   const [state, setState] = createSignal<QuestArcState | null>(null);
   const [lastUpdate, setLastUpdate] = createSignal<number>(Date.now());
@@ -46,22 +79,22 @@ function App() {
     const initialState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
     setState(initialState);
 
-    // Poll for state updates every 2 seconds
+    // Poll for state updates at configured interval
     // This is necessary because plugin.ts can't push updates to the iframe
     setInterval(async () => {
       try {
         const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
 
-        // Check if state actually changed to avoid unnecessary re-renders
+        // Check if state actually changed by comparing key fields
         const currentState = state();
-        if (currentState && JSON.stringify(newState) !== JSON.stringify(currentState)) {
+        if (currentState && hasStateChanged(currentState, newState)) {
           setState(newState);
           setLastUpdate(Date.now());
         }
       } catch (error) {
-        console.error('Failed to sync state:', error);
+        logger.error('Failed to sync state:', error);
       }
-    }, 2000);
+    }, STATE_POLL_INTERVAL_MS);
   });
 
   const [view, setView] = createSignal<'dashboard' | 'editor' | 'story-list'>('dashboard');
@@ -72,6 +105,9 @@ function App() {
   const [steps, setSteps] = createSignal<{ title: string; target: number; xp: number }[]>([
     { title: '', target: 3, xp: 50 }
   ]);
+
+  // Error State
+  const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
 
   const loadStoryForEditing = (story: HeroStory) => {
     setStoryTitle(story.title);
@@ -110,31 +146,47 @@ function App() {
   const saveStory = async () => {
     if (!storyTitle() || steps().length === 0) return;
 
-    // Auto-link steps
-    const finalSteps = steps().map((step, index) => ({
-      id: index + 1,
-      title: step.title,
-      condition: { type: 'streak' as const, target: step.target },
-      xpReward: step.xp,
-      nextStepId: index < steps().length - 1 ? index + 2 : null
-    }));
+    // Clear any previous errors
+    setErrorMessage(null);
 
-    const storyToSave: HeroStory = {
-      id: editingStoryId() || `story_${Date.now()}`,
-      title: storyTitle(),
-      steps: finalSteps
-    };
+    try {
+      // Auto-link steps
+      const finalSteps = steps().map((step, index) => ({
+        id: index + 1,
+        title: step.title,
+        condition: { type: 'streak' as const, target: step.target },
+        xpReward: step.xp,
+        nextStepId: index < steps().length - 1 ? index + 2 : null
+      }));
 
-    const response: any = await sendMessage(MESSAGE_TYPES.SAVE_STORY, storyToSave);
-    if (response && response.success) {
-      setView('dashboard');
-      // Reset form
-      setStoryTitle('');
-      setEditingStoryId(null);
-      setSteps([{ title: '', target: 3, xp: 50 }]);
-      // Force sync
-      const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
-      setState(newState);
+      const storyToSave: HeroStory = {
+        id: editingStoryId() || `story_${Date.now()}`,
+        title: storyTitle(),
+        steps: finalSteps
+      };
+
+      const response: any = await sendMessage(MESSAGE_TYPES.SAVE_STORY, storyToSave);
+
+      if (response && response.success) {
+        setView('dashboard');
+        // Reset form
+        setStoryTitle('');
+        setEditingStoryId(null);
+        setSteps([{ title: '', target: 3, xp: 50 }]);
+        // Force sync
+        const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
+        setState(newState);
+      } else {
+        // Handle validation or server errors
+        const errorMsg = response?.error || 'Failed to save story';
+        setErrorMessage(errorMsg);
+        logger.error('Save story failed:', errorMsg);
+      }
+    } catch (error) {
+      // Handle network or timeout errors
+      const errorMsg = error instanceof Error ? error.message : 'Network error occurred';
+      setErrorMessage(`Failed to save: ${errorMsg}`);
+      logger.error('Save story error:', error);
     }
   };
 
@@ -143,8 +195,8 @@ function App() {
   const resetGame = async () => {
     if (!isResetConfirming()) {
       setIsResetConfirming(true);
-      // Reset confirmation state after 3 seconds if not clicked
-      setTimeout(() => setIsResetConfirming(false), 3000);
+      // Reset confirmation state after configured timeout if not clicked
+      setTimeout(() => setIsResetConfirming(false), RESET_CONFIRMATION_TIMEOUT_MS);
       return;
     }
 
@@ -341,11 +393,17 @@ function App() {
                     + Add Next Habit Step
                   </button>
 
+                  <Show when={errorMessage()}>
+                    <div class="error-message" style={{ color: 'var(--hp-color)', 'margin-top': '1rem', padding: '0.75rem', border: '1px solid var(--hp-color)', 'border-radius': '4px', 'background-color': 'rgba(239, 68, 68, 0.1)' }}>
+                      {errorMessage()}
+                    </div>
+                  </Show>
+
                   <div class="button-row">
                     <button class="primary-btn" onClick={saveStory} disabled={!storyTitle() || steps().some(s => !s.title)}>
                       {editingStoryId() ? 'Update Story' : 'Forge Story'}
                     </button>
-                    <button class="secondary-btn cancel-btn" onClick={() => setView('dashboard')}>
+                    <button class="secondary-btn cancel-btn" onClick={() => { setView('dashboard'); setErrorMessage(null); }}>
                       Cancel
                     </button>
                   </div>
