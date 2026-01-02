@@ -32,3 +32,4 @@
 | 027 | 2026-01-03 | Refactor EditorView: Split into sub-components. | [./027/](./027/) | Antigravity |
 | 028 | 2026-01-03 | Refactor plugin.ts: Extract services and handlers. | [./028/](./028/) | Antigravity |
 | 029 | 2026-01-03 | Refactor state-manager.ts: Split into state modules. | [./029/](./029/) | Antigravity |
+| 030 | 2026-01-03 | Refactor App.tsx: Extract hooks and services. | [./030/](./030/) | Antigravity |

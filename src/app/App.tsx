@@ -1,7 +1,7 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import { MESSAGE_TYPES } from '../types/messages';
-import { STATE_POLL_INTERVAL_MS, MESSAGE_TIMEOUT_MS, RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
+import { RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
 import { logger } from '../lib/logger';
 import './App.css';
 
@@ -11,93 +11,17 @@ import DashboardView from '../components/DashboardView';
 import StoryListView from '../components/StoryListView';
 import EditorView from '../components/EditorView';
 
-const sendMessage = async (type: string, payload?: any) => {
-  return new Promise((resolve, reject) => {
-    const messageId = Math.random().toString(36).substring(2, 11);
-    logger.debug('UI: Sending message:', { type, payload, messageId });
-
-    const handler = (event: MessageEvent) => {
-      logger.debug('UI: Received response:', event.data);
-      if (event.data.type === 'PLUGIN_MESSAGE_RESPONSE' && event.data.messageId === messageId) {
-        window.removeEventListener('message', handler);
-        clearTimeout(timeout);
-        resolve(event.data.result);
-      }
-    };
-
-    const timeout = setTimeout(() => {
-      window.removeEventListener('message', handler);
-      logger.error('UI: Message timeout for:', type);
-      reject(new Error('Message timeout'));
-    }, MESSAGE_TIMEOUT_MS);
-
-    window.addEventListener('message', handler);
-    window.parent.postMessage({
-      type: 'PLUGIN_MESSAGE',
-      message: { type, payload },
-      messageId
-    }, '*');
-  });
-};
-
-function hasStateChanged(oldState: QuestArcState, newState: QuestArcState): boolean {
-  if (oldState.profile.level !== newState.profile.level) return true;
-  if (oldState.profile.xp !== newState.profile.xp) return true;
-  if (oldState.profile.hp !== newState.profile.hp) return true;
-  if (oldState.profile.pet.stage !== newState.profile.pet.stage) return true;
-
-  if (oldState.activeStory.id !== newState.activeStory.id) return true;
-  if (oldState.activeStory.currentStepId !== newState.activeStory.currentStepId) return true;
-  if (oldState.activeStory.streakProgress !== newState.activeStory.streakProgress) return true;
-
-  const oldBoss = oldState.activeBoss;
-  const newBoss = newState.activeBoss;
-  if ((oldBoss === null) !== (newBoss === null)) return true;
-  if (oldBoss && newBoss) {
-    if (oldBoss.hp !== newBoss.hp) return true;
-    if (oldBoss.isDead !== newBoss.isDead) return true;
-  }
-
-  if (oldState.stories.length !== newState.stories.length) return true;
-
-  return false;
-}
+// Hooks & Services
+import { useStateSync } from '../hooks/useStateSync';
+import { useNavigation } from '../hooks/useNavigation';
+import { MessageService } from '../services/MessageService';
 
 function App() {
-  const [state, setState] = createSignal<QuestArcState | null>(null);
-  const [view, setView] = createSignal<'dashboard' | 'editor' | 'story-list'>('dashboard');
+  const { state, setState } = useStateSync();
+  const { view, setView, editingStory, goToDashboard, goToEditor } = useNavigation();
 
-  // Editor State managed here for navigation purposes (Edit vs New)
-  const [editingStory, setEditingStory] = createSignal<HeroStory | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
   const [isResetConfirming, setIsResetConfirming] = createSignal(false);
-
-  onMount(async () => {
-    const initialState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
-    setState(initialState);
-
-    setInterval(async () => {
-      try {
-        const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
-        const currentState = state();
-        if (currentState && hasStateChanged(currentState, newState)) {
-          setState(newState);
-        }
-      } catch (error) {
-        logger.error('Failed to sync state:', error);
-      }
-    }, STATE_POLL_INTERVAL_MS);
-  });
-
-  const loadStoryForEditing = (story: HeroStory) => {
-    setEditingStory(story);
-    setView('editor');
-  };
-
-  const createNewStory = () => {
-    setEditingStory(null);
-    setView('editor');
-  };
 
   const handleSaveStory = async (title: string, steps: Omit<StoryStep, 'id' | 'nextStepId'>[]) => {
     setErrorMessage(null);
@@ -115,14 +39,13 @@ function App() {
         steps: finalSteps
       };
 
-      const response: any = await sendMessage(MESSAGE_TYPES.SAVE_STORY, storyToSave);
+      const response: any = await MessageService.send(MESSAGE_TYPES.SAVE_STORY, storyToSave);
 
       if (response && response.success) {
-        setView('dashboard');
-        setEditingStory(null);
+        goToDashboard();
 
         // Force sync
-        const newState = await sendMessage(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
+        const newState = await MessageService.send(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
         setState(newState);
       } else {
         const errorMsg = response?.error || 'Failed to save story';
@@ -143,7 +66,7 @@ function App() {
       return;
     }
 
-    const newState = await sendMessage(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
+    const newState = await MessageService.send(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
     setState(newState);
     setIsResetConfirming(false);
   };
@@ -160,7 +83,7 @@ function App() {
                 <DashboardView
                   state={s()}
                   onNavigate={setView}
-                  onCreate={createNewStory}
+                  onCreate={() => goToEditor()}
                 />
               </Show>
 
@@ -168,9 +91,9 @@ function App() {
                 <StoryListView
                   stories={s().stories}
                   activeStoryId={s().activeStory.id}
-                  onEdit={loadStoryForEditing}
+                  onEdit={(story) => goToEditor(story)}
                   onNavigate={setView}
-                  onCreate={createNewStory}
+                  onCreate={() => goToEditor()}
                 />
               </Show>
 
@@ -179,7 +102,7 @@ function App() {
                   initialStory={editingStory()}
                   onSave={handleSaveStory}
                   onCancel={() => {
-                    setView('dashboard');
+                    goToDashboard();
                     setErrorMessage(null);
                   }}
                   errorMessage={errorMessage()}

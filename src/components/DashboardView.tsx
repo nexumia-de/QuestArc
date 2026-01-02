@@ -29,11 +29,6 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                     </div>
                 </Show>
 
-                <Show when={!props.state.activeBoss && props.state.activeStory.streakProgress >= 0}>
-                    <div class="streak-progress">
-                        <p>Streak Progress: {props.state.activeStory.streakProgress}</p>
-                    </div>
-                </Show>
             </div>
             <div class="dashboard-actions">
                 <button class="secondary-btn" onClick={() => props.onNavigate('story-list')}>
