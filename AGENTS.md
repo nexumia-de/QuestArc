@@ -10,6 +10,7 @@ This document defines the strict operating procedures for developing the **Quest
 4. Confirm understanding before making changes: If you're unsure about the purpose of a piece of code, ask for clarification rather than making assumptions.
 5. **ALWAYS** use `npm run checkFile <filepath>` on each file you modify to ensure proper formatting and linting. This runs both prettier and lint checks on individual files. Unless you want to lint and format multiple files, then use `npm run prettier` and `npm run lint` instead.
 6. When creating html templates, prefer plain html like `<table>` and `<div>`. Keep CSS styles to a minimum. Keep nesting to a minimum. Keep css classes to a minimum. Use Angular Material components where appropriate, but avoid overusing them.
+7. **READ** `docs/PLUGIN_DEVELOPMENT_GUIDE.md` for a deep dive into the "Split-Brain" architecture and technical implementation details before starting development.
 
 
 ## 📂 Project Architecture: The "Split-Brain" Rule

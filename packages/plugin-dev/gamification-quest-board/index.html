@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Board</title>
+    <style>
+        :root {
+            --primary-color: #00bcd4;
+            --accent-color: #ff4081;
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #303030;
+                --card-bg: #424242;
+                --text-color: #eee;
+            }
+        }
+
+        body {
+            font-family: Roboto, "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .board {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .story-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .story-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .current-challenge {
+            background: rgba(0, 188, 212, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .history {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quest Board</h1>
+    <div id="board" class="board">
+        <!-- Stories will be rendered here -->
+        <div class="story-card">Loading...</div>
+    </div>
+
+    <script>
+        // --- Game Design Data ---
+        const STORIES = [
+            {
+                id: 'marathon-runner',
+                title: 'Marathon Runner',
+                levels: [
+                    {
+                        id: 'shoes-ready',
+                        title: 'Preparation',
+                        description: 'Put your running shoes ready for 3 days in a row.',
+                        target: 3,
+                        unit: 'days'
+                    },
+                    {
+                        id: 'walk-5-min',
+                        title: 'First Steps',
+                        description: 'Walk for 5 minutes relaxedly for 3 days in a row.',
+                        target: 3,
+                        unit: 'days'
+                    },
+                    {
+                        id: 'jog-1-min',
+                        title: 'Getting faster',
+                        description: 'Jog for 1 minute, walk for 4 minutes. Do this 3 times.',
+                        target: 3,
+                        unit: 'sessions'
+                    }
+                ]
+            }
+        ];
+
+        // --- State Management ---
+        let gameState = {
+            stories: {} // { storyId: { currentLevelIndex: 0, currentProgress: 0, lastActionDate: null } }
+        };
+
+        const STORAGE_KEY = 'gamification-quest-board-v1';
+
+        async function loadState() {
+            try {
+                const data = await PluginAPI.loadSyncedData(STORAGE_KEY);
+                if (data) {
+                    // Deep merge or simple assign? Simple assign for now
+                    // Ensure structure integrity
+                    gameState = { ...gameState, ...data };
+                }
+            } catch (e) {
+                console.error("Failed to load state", e);
+                PluginAPI.showSnack({ msg: 'Failed to load quest progress', type: 'ERROR' });
+            }
+        }
+
+        async function saveState() {
+            try {
+                await PluginAPI.persistDataSynced(STORAGE_KEY, gameState);
+            } catch (e) {
+                console.error("Failed to save state", e);
+                PluginAPI.showSnack({ msg: 'Failed to save quest progress', type: 'ERROR' });
+            }
+        }
+
+        // --- Logic ---
+
+        function getStoryState(storyId) {
+            if (!gameState.stories[storyId]) {
+                gameState.stories[storyId] = {
+                    currentLevelIndex: 0,
+                    currentProgress: 0,
+                    lastActionDate: null
+                };
+            }
+            return gameState.stories[storyId];
+        }
+
+        function getCurrentLevel(story) {
+            const state = getStoryState(story.id);
+            if (state.currentLevelIndex >= story.levels.length) {
+                return null; // Completed
+            }
+            return story.levels[state.currentLevelIndex];
+        }
+
+        async function handleAction(storyId) {
+            const story = STORIES.find(s => s.id === storyId);
+            const state = getStoryState(storyId);
+            const level = getCurrentLevel(story);
+
+            if (!level) return;
+
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Check for duplicate action today (basic check)
+            if (state.lastActionDate === today) {
+                PluginAPI.showSnack({ msg: 'You already completed this challenge for today!', type: 'INFO' });
+                return;
+            }
+
+            // Update progress
+            state.currentProgress++;
+            state.lastActionDate = today;
+
+            // Check completion
+            if (state.currentProgress >= level.target) {
+                // Level Up!
+                state.currentLevelIndex++;
+                state.currentProgress = 0;
+                
+                PluginAPI.showSnack({ 
+                    msg: `Level Complete! Next challenge unlocked.`, 
+                    type: 'SUCCESS',
+                    ico: 'star'
+                });
+                
+                // Create a task for the user to celebrate or prepare next?
+                // Optional: PluginAPI.addTask({ title: `Completed: ${level.title}` });
+
+            } else {
+                 PluginAPI.showSnack({ 
+                    msg: `Good job! ${state.currentProgress}/${level.target} completed.`, 
+                    type: 'SUCCESS'
+                });
+            }
+
+            await saveState();
+            render();
+        }
+
+        async function createTaskForChallenge(storyId) {
+             const story = STORIES.find(s => s.id === storyId);
+             const level = getCurrentLevel(story);
+             if(level) {
+                 await PluginAPI.addTask({
+                     title: `Quest: ${level.title} - ${level.description}`,
+                     notes: `Story: ${story.title}`
+                 });
+                 PluginAPI.showSnack({ msg: 'Task added to your list!', type: 'SUCCESS' });
+             }
+        }
+
+
+        // --- Rendering ---
+
+        function render() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+
+            STORIES.forEach(story => {
+                const state = getStoryState(story.id);
+                const level = getCurrentLevel(story);
+
+                const card = document.createElement('div');
+                card.className = 'story-card';
+
+                if (!level) {
+                    // Story Completed
+                    card.innerHTML = `
+                        <div class="story-header">
+                            <h2 class="story-title">${story.title}</h2>
+                            <span>🏆 Completed</span>
+                        </div>
+                        <p>You have mastered this story!</p>
+                    `;
+                } else {
+                    const progressPercent = (state.currentProgress / level.target) * 100;
+                    
+                    // Check if already done today
+                    const today = new Date().toISOString().split('T')[0];
+                    const isDoneToday = state.lastActionDate === today;
+                    const btnDisabled = isDoneToday ? 'disabled' : '';
+                    const btnText = isDoneToday ? 'Done for today' : 'Check In / Complete';
+
+                    card.innerHTML = `
+                        <div class="story-header">
+                            <h2 class="story-title">${story.title}</h2>
+                            <span>Level ${state.currentLevelIndex + 1} / ${story.levels.length}</span>
+                        </div>
+                        
+                        <div class="current-challenge">
+                            <strong>Current Challenge: ${level.title}</strong>
+                            <p>${level.description}</p>
+                        </div>
+
+                        <div>
+                            <span>Progress: ${state.currentProgress} / ${level.target} ${level.unit}</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="handleAction('${story.id}')" ${btnDisabled}>${btnText}</button>
+                            <button onclick="createTaskForChallenge('${story.id}')" style="background:#555">Add as Task</button>
+                        </div>
+                    `;
+                }
+                boardEl.appendChild(card);
+            });
+        }
+
+        // --- Init ---
+        (async () => {
+            await loadState();
+            render();
+        })();
+
+    </script>
+</body>
+</html>
