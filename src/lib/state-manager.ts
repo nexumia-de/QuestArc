@@ -34,7 +34,6 @@ export const INITIAL_STATE: QuestArcState = {
   activeStory: {
     id: STORY_DATA.id,
     currentStepId: 1,
-    streakProgress: 0,
     taskProgress: {}
   },
   activeBoss: null,
@@ -111,9 +110,20 @@ export function ensureState(state: any): QuestArcState {
     newState.activeStory = {
       id: STORY_DATA.id,
       currentStepId: 1,
-      streakProgress: 0,
       taskProgress: {}
     };
+  }
+
+  // Ensure taskProgress exists for existing states (Migration)
+  if (newState.activeStory && !newState.activeStory.taskProgress) {
+    newState.activeStory.taskProgress = {};
+  }
+
+  // Cleanup old fields
+  if (newState.activeStory) {
+    if ('streakProgress' in newState.activeStory) {
+      delete (newState.activeStory as any).streakProgress;
+    }
   }
 
   // Clean up old fields from previous state structure

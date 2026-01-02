@@ -27,3 +27,4 @@
 | 021 | 2026-01-02 | Story Editor: Repeat/Routine Task Support. | [./021/](./021/) | Antigravity |
 | 022 | 2026-01-02 | Logic Update: Shift to Specific Task Requirements. | [./022/](./022/) | Antigravity |
 | 023 | 2026-01-02 | UI Polish: Clean Story Creator Layout. | [./023/](./023/) | Antigravity |
+| 024 | 2026-01-02 | Code Review Fixes: Types, Migration, & Initial Task Creation. | [./024/](./024/) | Antigravity |

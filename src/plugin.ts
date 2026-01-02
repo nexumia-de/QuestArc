@@ -33,6 +33,36 @@ log.info('Plugin loading...', typeof PluginAPI);
 
 let state: QuestArcState;
 
+async function createTasksForStep(step: { title: string; tasksToCreate?: any[] }) { // Using loose type for internal helper or import generic StoryStep
+  if (step.tasksToCreate) {
+    for (const taskDef of step.tasksToCreate) {
+      if (taskDef.isAutoCreate && PluginAPI.addTask) {
+        try {
+          const additionalFields: any = {
+            notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
+          };
+
+          if (taskDef.isRepeating && taskDef.repeatCfg) {
+            additionalFields.taskRepeatCfg = {
+              repeatEvery: 1, // Default to 1
+              repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
+              startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
+            };
+          }
+
+          await PluginAPI.addTask({
+            title: taskDef.title,
+            ...additionalFields
+          });
+          log.info(`Auto-created task: ${taskDef.title} (Repeat: ${taskDef.isRepeating})`);
+        } catch (e) {
+          log.error(`Failed to auto-create task: ${taskDef.title}`, e);
+        }
+      }
+    }
+  }
+}
+
 async function init() {
   try {
     const saved = await PluginAPI.loadSyncedData();
@@ -58,6 +88,10 @@ async function init() {
     } else {
       state = createInitialState();
       log.info('No saved state found, using initial state');
+      const currentStep = getCurrentStep(state);
+      if (currentStep) {
+        createTasksForStep(currentStep);
+      }
     }
 
     updateHeader();
@@ -128,7 +162,6 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
         activeStory: {
           ...state.activeStory,
           currentStepId: currentStep.nextStepId,
-          streakProgress: 0,
           taskProgress: {}
         },
         activeBoss: null
@@ -147,33 +180,7 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
           }
 
           // Auto-create tasks for the new step
-          if (nextStep.tasksToCreate) {
-            nextStep.tasksToCreate.forEach(async (taskDef) => {
-              if (taskDef.isAutoCreate && PluginAPI.addTask) {
-                try {
-                  const additionalFields: any = {
-                    notes: taskDef.notes || `Quest Sub-task for: ${nextStep.title}`
-                  };
-
-                  if (taskDef.isRepeating && taskDef.repeatCfg) {
-                    additionalFields.taskRepeatCfg = {
-                      repeatEvery: 1, // Default to 1
-                      repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
-                      startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
-                    };
-                  }
-
-                  await PluginAPI.addTask({
-                    title: taskDef.title,
-                    ...additionalFields
-                  });
-                  log.info(`Auto-created task: ${taskDef.title} (Repeat: ${taskDef.isRepeating})`);
-                } catch (e) {
-                  log.error(`Failed to auto-create task: ${taskDef.title}`, e);
-                }
-              }
-            });
-          }
+          await createTasksForStep(nextStep);
 
         } catch (err) {
           log.error('Failed to update task title/create subtasks', err);
