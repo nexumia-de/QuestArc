@@ -1,18 +1,31 @@
 import type {
-  PluginAPI,
-  TaskCompletePayload,
-  PluginHooks,
+  PluginAPI as PluginAPIBase,
+  Task,
 } from '@super-productivity/plugin-api';
-import { QuestArcState, HeroStory, StoryStep } from './types/state';
+import { QuestArcState, HeroStory } from './types/state';
 import { MESSAGE_TYPES } from './types/messages';
 import { createInitialState, updateXp, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
 import { processTaskCompletion } from './lib/game-logic';
+
+// Define missing types locally
+export interface TaskCompletePayload {
+  task: Task;
+}
+
+// Augment PluginAPI to include missing methods that exist at runtime
+interface PluginAPI extends PluginAPIBase {
+  log: {
+    info(msg: string, ...args: any[]): void;
+    warn(msg: string, ...args: any[]): void;
+    error(msg: string, ...args: any[]): void;
+  };
+  onMessage?: (handler: (message: any) => Promise<any> | any) => void;
+}
+
 // Super Productivity provides 'PluginAPI' as a global variable
 declare const PluginAPI: PluginAPI;
 
 console.log('QuestArc: Plugin loading...', typeof PluginAPI);
-
-
 
 let state: QuestArcState;
 
@@ -75,8 +88,11 @@ async function saveState() {
 }
 
 // Hooks
-PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayload) => {
-  console.log('QuestArc: Task completed!', payload);
+PluginAPI.registerHook('taskComplete' as any, async (payload: unknown) => {
+  // Cast payload to TaskCompletePayload
+  const taskPayload = payload as TaskCompletePayload;
+  
+  console.log('QuestArc: Task completed!', taskPayload);
   const currentStep = getCurrentStep(state);
   if (!currentStep) {
     console.log('QuestArc: No current step found');
@@ -92,7 +108,7 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayloa
     };
   }
 
-  const result = processTaskCompletion(state, payload.task, currentStep);
+  const result = processTaskCompletion(state, taskPayload.task, currentStep);
   state = result.newState;
   const { damageDealt, stepCompleted } = result;
 
@@ -125,9 +141,8 @@ PluginAPI.registerHook('taskComplete' as any, async (payload: TaskCompletePayloa
 
       if (nextStep) {
         try {
-          // @ts-ignore - updateTask might not be in the type definition yet but exists in runtime
           if (PluginAPI.updateTask) {
-            PluginAPI.updateTask(payload.task.id, { title: nextStep.title });
+            PluginAPI.updateTask(taskPayload.task.id, { title: nextStep.title });
             PluginAPI.log.info(`Updated task title to: ${nextStep.title}`);
           }
         } catch (err) {

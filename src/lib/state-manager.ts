@@ -1,5 +1,15 @@
 import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import storyDataRaw from '../assets/stories/productivity-mastery.json';
+import {
+  XP_PER_LEVEL_MULTIPLIER,
+  INITIAL_LEVEL,
+  INITIAL_XP,
+  INITIAL_HP,
+  INITIAL_MAX_HP,
+  PET_INITIAL_STAGE,
+  PET_EVOLUTION_LEVEL_INTERVAL,
+  PET_MAX_STAGE,
+} from './constants';
 
 const STORY_DATA = storyDataRaw as HeroStory;
 
@@ -8,14 +18,14 @@ export const CURRENT_STATE_VERSION = 1;
 export const INITIAL_STATE: QuestArcState = {
   version: CURRENT_STATE_VERSION,
   profile: {
-    level: 1,
-    xp: 0,
-    xpToNextLevel: 100,
-    hp: 100,
-    maxHp: 100,
+    level: INITIAL_LEVEL,
+    xp: INITIAL_XP,
+    xpToNextLevel: INITIAL_LEVEL * XP_PER_LEVEL_MULTIPLIER,
+    hp: INITIAL_HP,
+    maxHp: INITIAL_MAX_HP,
     pet: {
       type: 'slime',
-      stage: 1,
+      stage: PET_INITIAL_STAGE,
       name: 'Buddy',
     },
   },
@@ -66,12 +76,18 @@ export function ensureState(state: any): QuestArcState {
   const newState = JSON.parse(JSON.stringify(state));
 
   if (!newState.profile) {
-    newState.profile = { level: 1, xp: 0, xpToNextLevel: 100, hp: 100, maxHp: 100 };
+    newState.profile = {
+      level: INITIAL_LEVEL,
+      xp: INITIAL_XP,
+      xpToNextLevel: INITIAL_LEVEL * XP_PER_LEVEL_MULTIPLIER,
+      hp: INITIAL_HP,
+      maxHp: INITIAL_MAX_HP
+    };
   }
-  if (!newState.profile.hp) newState.profile.hp = 100;
-  if (!newState.profile.maxHp) newState.profile.maxHp = 100;
+  if (!newState.profile.hp) newState.profile.hp = INITIAL_HP;
+  if (!newState.profile.maxHp) newState.profile.maxHp = INITIAL_MAX_HP;
   if (!newState.profile.pet) {
-    newState.profile.pet = { type: 'slime', stage: 1, name: 'Buddy' };
+    newState.profile.pet = { type: 'slime', stage: PET_INITIAL_STAGE, name: 'Buddy' };
   }
 
   if (!newState.stories || !Array.isArray(newState.stories)) {
@@ -149,11 +165,11 @@ export function updateXp(currentState: QuestArcState, amount: number): { state: 
   while (newState.profile.xp >= newState.profile.xpToNextLevel) {
     newState.profile.xp -= newState.profile.xpToNextLevel;
     newState.profile.level += 1;
-    newState.profile.xpToNextLevel = newState.profile.level * 100;
+    newState.profile.xpToNextLevel = newState.profile.level * XP_PER_LEVEL_MULTIPLIER;
 
     // Pet evolution check
-    if (newState.profile.level % 5 === 0) {
-      if (newState.profile.pet.stage < 3) {
+    if (newState.profile.level % PET_EVOLUTION_LEVEL_INTERVAL === 0) {
+      if (newState.profile.pet.stage < PET_MAX_STAGE) {
         newState.profile.pet.stage += 1;
       }
     }
