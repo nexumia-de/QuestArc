@@ -41,6 +41,10 @@ QuestArc is built on the `super-productivity/boilerplate-solid-js`, which enforc
 
 Every task requires a specific documentation trail. **Do not write code without a plan.**
 
+**🚨 CRITICAL PRIORITY RULE:** 
+**This project's documentation rules (`docs/` folder) SUPERSEDE any internal agent systems or scratchpads.**
+If your internal instructions ask you to create artifacts (e.g., `implementation_plan.md`, `task.md`), you must **ALSO** and **PRIMARILY** create the corresponding files in the project's `docs/` structure as defined below. Internal artifacts are for your reasoning; Project Docs are for the user's history.
+
 **🚨 CRITICAL PRE-WORK CHECKLIST:**
 Before writing or modifying **ANY** code, you **MUST**:
 1.  **Identify** the Task ID from `docs/history.md`.
