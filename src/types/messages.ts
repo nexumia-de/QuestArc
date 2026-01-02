@@ -1,4 +1,4 @@
-import { QuestArcState } from './state';
+import { QuestArcState, HeroStory } from './state';
 
 export const MESSAGE_TYPES = {
   // UI -> Brain (Brain cannot push to UI, only respond)
@@ -26,7 +26,7 @@ export interface DevResetMessage extends BaseMessage {
 
 export interface SaveStoryMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.SAVE_STORY;
-  payload: any; // Using any for now to avoid circular deps, or import HeroStory
+  payload: HeroStory;
 }
 
 export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage;

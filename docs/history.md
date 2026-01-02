@@ -14,3 +14,6 @@
 | 009 | 2026-01-02 | Implement "Habit Stacker" Story Editor. | [./009/](./009/) | Antigravity |
 | 010 | 2026-01-02 | Add Story List View. | [./010/](./010/) | Antigravity |
 | 011 | 2026-01-02 | UI Polish: Compact header and cleaner cards. | [./011/](./011/) | Antigravity |
+| 012 | 2026-01-02 | Fix Dark Mode Contrast. | [./012/](./012/) | Antigravity |
+| 013 | 2026-01-02 | Robust Dark Mode Fix. | [./013/](./013/) | Antigravity |
+| 014 | 2026-01-02 | Design Alignment: Material Theme. | [./014/](./014/) | Antigravity |

@@ -4,6 +4,7 @@ import type {
   PluginHooks,
 } from '@super-productivity/plugin-api';
 import { QuestArcState, HeroStory, StoryStep } from './types/state';
+import { MESSAGE_TYPES } from './types/messages';
 import { createInitialState, updateXp, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
 import { processTaskCompletion } from './lib/game-logic';
 // Super Productivity provides 'PluginAPI' as a global variable
@@ -11,12 +12,7 @@ declare const PluginAPI: PluginAPI;
 
 console.log('QuestArc: Plugin loading...', typeof PluginAPI);
 
-// Message types - duplicated here to avoid code splitting with UI
-const MESSAGE_TYPES = {
-  REQUEST_SYNC: 'REQUEST_SYNC',
-  DEV_RESET: 'DEV_RESET',
-  SAVE_STORY: 'SAVE_STORY',
-} as const;
+
 
 let state: QuestArcState;
 
