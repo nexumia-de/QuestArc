@@ -14,9 +14,11 @@ interface StoryListViewProps {
 const StoryListView: Component<StoryListViewProps> = (props) => {
     const [showStartConfirm, setShowStartConfirm] = createSignal<string | null>(null);
 
+    const [showRestartConfirm, setShowRestartConfirm] = createSignal<string | null>(null);
+
     const handleCardClick = (storyId: string) => {
         if (storyId === props.activeStoryId) {
-            props.onNavigate('dashboard');
+            setShowRestartConfirm(storyId);
         } else {
             setShowStartConfirm(storyId);
         }
@@ -27,6 +29,14 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
         if (id) {
             props.onStart(id);
             setShowStartConfirm(null);
+        }
+    };
+
+    const confirmRestart = () => {
+        const id = showRestartConfirm();
+        if (id) {
+            props.onStart(id);
+            setShowRestartConfirm(null);
         }
     };
 
@@ -69,6 +79,22 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                         <div class="modal-actions">
                             <button class="secondary-btn" onClick={() => setShowStartConfirm(null)}>Cancel</button>
                             <button class="primary-btn" onClick={confirmStart}>Start Quest</button>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+
+            <Show when={showRestartConfirm()}>
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h3>Restrt Quest?</h3>
+                        <p>This quest is already running, do you want to restart?</p>
+                        <div class="modal-actions">
+                            <button class="secondary-btn" onClick={() => {
+                                setShowRestartConfirm(null);
+                                props.onNavigate('dashboard');
+                            }}>No</button>
+                            <button class="primary-btn" onClick={confirmRestart}>Yes</button>
                         </div>
                     </div>
                 </div>
