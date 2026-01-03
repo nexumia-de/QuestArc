@@ -36,3 +36,4 @@
 | 030 | 2026-01-03 | Refactor App.tsx: Extract hooks and services. | [./030/](./030/) | Antigravity |
 | 031 | 2026-01-03 | Improve Quest Start Flow: Confirmation popup and task addition. | [./031/](./031/) | Antigravity |
 | 032 | 2026-01-03 | Feature: Quest Completion Animation and event-driven docs. | [./032/](./032/) | Antigravity |
+| 035 | 2026-01-03 | Bug Fix: Missing Boss in Stories. | [./035/](./035/) | Antigravity |

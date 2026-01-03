@@ -65,6 +65,9 @@ export class TaskCompletionHandler {
                         // Mark tasks as created for this new step
                         newState.activeStory.tasksCreatedForStepId = nextStep.id;
 
+                        // Initialize boss for the new step if needed
+                        newState = initializeBossIfNeeded(newState, nextStep);
+
                     } catch (err) {
                         PluginService.log.error('Failed to update task title/create subtasks', err);
                     }
