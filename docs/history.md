@@ -39,3 +39,4 @@
 | 035 | 2026-01-03 | Bug Fix: Missing Boss in Stories. | [./035/](./035/) | Antigravity |
 | 037 | 2026-01-03 | Feature: Restart Quest Confirmation Popup. | [./037/](./037/) | Antigravity |
 | 038 | 2026-01-03 | Feature: clear dashboard after quest completion. | [./038/](./038/) | Antigravity |
+| 039 | 2026-01-03 | Feature: Undo task support (reverts boss damage). | [./039/](./039/) | Antigravity |

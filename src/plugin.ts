@@ -5,6 +5,7 @@ import { PluginService } from './services/PluginService';
 import { HeaderService } from './services/HeaderService';
 import { TaskService } from './services/TaskService';
 import { TaskCompletionHandler } from './handlers/TaskCompletionHandler';
+import { TaskUndoHandler } from './handlers/TaskUndoHandler';
 import { MessageHandler } from './handlers/MessageHandler';
 
 let state: QuestArcState;
@@ -67,6 +68,22 @@ async function init() {
 // Hooks
 api.registerHook('taskComplete' as any, async (payload: unknown) => {
   await TaskCompletionHandler.handle(state, payload, saveState);
+});
+
+api.registerHook('taskUpdate' as any, async (payload: unknown) => {
+  // payload: { task: Task, oldTask: Task } or just task?
+  // Docs say taskUpdate returns "taskUpdate(task, updates, isRecursive)"? No, let's check docs again if needed.
+  // Actually usually it passes the task. 
+  // We need to check if isDone changed from true to false.
+  // BUT `taskUpdate` usually triggers on ANY update.
+  const updatePayload = payload as { task: unknown };
+  const task = updatePayload.task as any; // Type casting for safety
+
+  if (task && task.isDone === false) {
+    // It *might* be an undo.
+    // We check if we have progress recorded for it.
+    await TaskUndoHandler.handle(state, task, saveState);
+  }
 });
 
 // UI Communication
