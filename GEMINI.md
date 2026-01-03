@@ -30,15 +30,27 @@ Internal scratchpads or common training data are **subordinate** to the project 
 *   **Face (`src/app/App.tsx`):** Dumb UI. Ephemeral. Polls for state.
 *   *See `docs/ARCHITECTURE.md` for details.*
 
-### 3. The "Document-First" Workflow
-1.  **Read** `docs/history.md`.
-2.  **Create/Update** `docs/<ID>/plan.md`.
-3.  **Code** (Brain first, Face second).
-4.  **Log** in `docs/<ID>/worklog.md`.
-5.  **Update** `docs/history.md`.
-*   *See `docs/CONTRIBUTING.md` for the full checklist.*
+### 3. The "Document-First" Workflow (MANDATORY)
+**You MUST follow this loop for EVERY feature or major change. NO EXCEPTIONS.**
 
-### 4. Quality Control
+1.  **Read** `docs/history.md` to get the next ID (e.g., `043`).
+2.  **Create** `docs/<ID>/plan.md`.
+    *   *Wait for User Approval if the plan is complex.*
+3.  **Code** (Brain first, Face second).
+4.  **Create** `docs/<ID>/worklog.md`.
+    *   *Document what changed, what was verified, and any deviations from the plan.*
+5.  **Update** `docs/history.md`.
+    *   *Add the new row: `| <ID> | <Date> | <Summary> | [./<ID>/](./<ID>/) | Antigravity |`*
+
+### 4. Definition of Done
+A task is NOT done until:
+*   [ ] Code is written and builds (`npm run build`).
+*   [ ] `plan.md` is updated to reflect reality.
+*   [ ] `worklog.md` is created.
+*   [ ] `docs/history.md` is updated.
+*   [ ] Linting passes.
+
+### 5. Quality Control
 *   **Type Safety:** Use strict types defined in `src/types/`. No `any`.
 *   **Linting:** Run `npm run checkFile <file>` on modified files.
 *   **Verification:** Ensure `npm run build` passes before finishing.

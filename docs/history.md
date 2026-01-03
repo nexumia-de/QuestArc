@@ -42,3 +42,4 @@
 | 039 | 2026-01-03 | Feature: Undo task support (reverts boss damage). | [./039/](./039/) | Antigravity |
 | 040 | 2026-01-03 | Feature: Story History tracking. | [./040/](./040/) | Antigravity |
 | 041 | 2026-01-03 | Documentation overhaul: New Guides, Protocol, and Data Models. | [./041/](./041/) | Antigravity |
+| 042 | 2026-01-03 | Navigation Overhaul: Bottom NavBar, Character & Inventory Views. | [./042/](./042/) | Antigravity |
