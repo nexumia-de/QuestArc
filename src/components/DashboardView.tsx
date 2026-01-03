@@ -1,20 +1,43 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show, For } from 'solid-js';
 import { QuestArcState } from '../types/state';
-import { getCurrentStepTitle } from '../lib/state-manager';
+import { getCurrentStepTitle, getCurrentStep } from '../lib/state-manager';
 
 interface DashboardViewProps {
     state: QuestArcState;
     onNavigate: (view: 'story-list' | 'editor') => void;
     onCreate: () => void;
+    onAddTasks: () => void;
 }
 
 const DashboardView: Component<DashboardViewProps> = (props) => {
+    const currentStep = () => getCurrentStep(props.state);
+
     return (
         <section class="active-quest">
             <h2>Current Story Step</h2>
             <div class="step-card">
                 <h3>{getCurrentStepTitle(props.state)}</h3>
-                <p>Step ID: {props.state.activeStory.currentStepId}</p>
+
+                <Show when={currentStep()?.tasksToCreate && currentStep()!.tasksToCreate!.length > 0}>
+                    <div class="step-tasks">
+                        <h4>Quest Tasks:</h4>
+                        <ul>
+                            <For each={currentStep()!.tasksToCreate}>
+                                {(task) => (
+                                    <li>
+                                        {task.title}
+                                        {task.isRepeating && <span class="tag">🔁 Repeating</span>}
+                                    </li>
+                                )}
+                            </For>
+                        </ul>
+                        <button class="action-btn" onClick={props.onAddTasks}>
+                            📥 Add tasks to your list
+                        </button>
+                    </div>
+                </Show>
+
+                <p class="step-id">Step ID: {props.state.activeStory.currentStepId}</p>
 
                 <Show when={props.state.activeBoss}>
                     <div

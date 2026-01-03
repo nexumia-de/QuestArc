@@ -29,6 +29,14 @@ async function init() {
           state = createInitialState();
         } else {
           state = ensureState(migrateState(parsed));
+
+          // Self-heal: Ensure boss is initialized if needed
+          const currentStep = getCurrentStep(state);
+          if (currentStep) {
+            const { initializeBossIfNeeded } = await import('./lib/game-logic');
+            state = initializeBossIfNeeded(state, currentStep);
+          }
+
           PluginService.log.info('State loaded and migrated successfully');
         }
       } catch (parseError) {
@@ -41,6 +49,8 @@ async function init() {
       const currentStep = getCurrentStep(state);
       if (currentStep) {
         await TaskService.createTasksForStep(currentStep);
+        const { initializeBossIfNeeded } = await import('./lib/game-logic');
+        state = initializeBossIfNeeded(state, currentStep);
       }
     }
 

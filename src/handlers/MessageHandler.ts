@@ -1,7 +1,8 @@
 import { MESSAGE_TYPES } from '../types/messages';
 import { QuestArcState, HeroStory } from '../types/state';
-import { createInitialState } from '../lib/state-manager';
+import { createInitialState, getCurrentStep } from '../lib/state-manager';
 import { PluginService } from '../services/PluginService';
+import { TaskService } from '../services/TaskService';
 
 export class MessageHandler {
     static async handle(
@@ -49,6 +50,58 @@ export class MessageHandler {
 
                 PluginService.log.info(`Story saved: ${newStory.title}`);
                 return { success: true, stories: currentStories };
+
+            case MESSAGE_TYPES.START_QUEST:
+                const { storyId } = message.payload;
+                PluginService.log.info('Starting quest:', storyId);
+
+                const story = state.stories.find(s => s.id === storyId);
+                if (!story) {
+                    PluginService.log.error('Story not found:', storyId);
+                    return { error: 'Story not found' };
+                }
+
+                // Activate Story
+                // Reset active story progress if switching (or maybe we keep progress?)
+                // For now, let's just switch the ID. If we want to restart, we might need more logic.
+                // The current requirement says "Start the quest", implying selection.
+
+                // If switching to a NEW story, we might want to ensure we're on step 1 or valid step
+                // But let's assume simple switch for now.
+
+                // Create base new state with switched story
+                let newState: QuestArcState = {
+                    ...state,
+                    activeStory: {
+                        ...state.activeStory,
+                        id: storyId,
+                        currentStepId: story.steps[0]?.id || 1,
+                        taskProgress: {}
+                    },
+                    activeBoss: null // Reset boss when starting new story
+                };
+
+                // Initialize boss if the new step requires it
+                const startStep = story.steps.find(s => s.id === (story.steps[0]?.id || 1));
+                if (startStep) {
+                    const { initializeBossIfNeeded } = await import('../lib/game-logic');
+                    newState = initializeBossIfNeeded(newState, startStep);
+                }
+
+                updateState(newState);
+                await saveCallback();
+                return { success: true };
+
+            case MESSAGE_TYPES.ADD_STEP_TASKS:
+                PluginService.log.info('Adding tasks for current step');
+                const currentStep = getCurrentStep(state);
+
+                if (currentStep) {
+                    await TaskService.createTasksForStep(currentStep);
+                    return { success: true };
+                } else {
+                    return { error: 'No active step found' };
+                }
 
             default:
                 PluginService.log.warn('Unknown message type:', message.type);

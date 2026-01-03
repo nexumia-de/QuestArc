@@ -34,3 +34,4 @@
 | 028 | 2026-01-03 | Refactor plugin.ts: Extract services and handlers. | [./028/](./028/) | Antigravity |
 | 029 | 2026-01-03 | Refactor state-manager.ts: Split into state modules. | [./029/](./029/) | Antigravity |
 | 030 | 2026-01-03 | Refactor App.tsx: Extract hooks and services. | [./030/](./030/) | Antigravity |
+| 031 | 2026-01-03 | Improve Quest Start Flow: Confirmation popup and task addition. | [./031/](./031/) | Antigravity |

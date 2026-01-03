@@ -1,4 +1,4 @@
-import { Component, Show } from 'solid-js';
+import { Component, Show, createSignal } from 'solid-js';
 import { HeroStory } from '../types/state';
 import StoryCard from './StoryCard';
 
@@ -8,25 +8,46 @@ interface StoryListViewProps {
     onEdit: (story: HeroStory) => void;
     onNavigate: (view: 'dashboard') => void;
     onCreate: () => void;
+    onStart: (storyId: string) => void;
 }
 
 const StoryListView: Component<StoryListViewProps> = (props) => {
+    const [showStartConfirm, setShowStartConfirm] = createSignal<string | null>(null);
+
+    const handleCardClick = (storyId: string) => {
+        if (storyId === props.activeStoryId) {
+            props.onNavigate('dashboard');
+        } else {
+            setShowStartConfirm(storyId);
+        }
+    };
+
+    const confirmStart = () => {
+        const id = showStartConfirm();
+        if (id) {
+            props.onStart(id);
+            setShowStartConfirm(null);
+        }
+    };
+
     return (
         <section class="story-list-view">
             <h2>My Quests</h2>
             <div class="story-grid">
                 <Show when={props.stories && props.stories.length > 0} fallback={<div class="empty-state">No quests found. Create one to get started!</div>}>
                     {(props.stories || []).map((story) => (
-                        <StoryCard
-                            title={story.title}
-                            stepsCount={story.steps.length}
-                            totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
-                            isActive={props.activeStoryId === story.id}
-                            onEdit={(e) => {
-                                e.stopPropagation();
-                                props.onEdit(story);
-                            }}
-                        />
+                        <div onClick={() => handleCardClick(story.id)} class="story-card-wrapper" style={{ cursor: 'pointer' }}>
+                            <StoryCard
+                                title={story.title}
+                                stepsCount={story.steps.length}
+                                totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
+                                isActive={props.activeStoryId === story.id}
+                                onEdit={(e) => {
+                                    e.stopPropagation();
+                                    props.onEdit(story);
+                                }}
+                            />
+                        </div>
                     ))}
                 </Show>
             </div>
@@ -39,6 +60,19 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                     Back to Dashboard
                 </button>
             </div>
+
+            <Show when={showStartConfirm()}>
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h3>Start this Quest?</h3>
+                        <p>Do you want to start active quest?</p>
+                        <div class="modal-actions">
+                            <button class="secondary-btn" onClick={() => setShowStartConfirm(null)}>Cancel</button>
+                            <button class="primary-btn" onClick={confirmStart}>Start Quest</button>
+                        </div>
+                    </div>
+                </div>
+            </Show>
         </section>
     );
 };

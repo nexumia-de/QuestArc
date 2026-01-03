@@ -68,7 +68,26 @@ function App() {
 
     const newState = await MessageService.send(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
     setState(newState);
+    setState(newState);
     setIsResetConfirming(false);
+  };
+
+  const startQuest = async (storyId: string) => {
+    const response: any = await MessageService.send(MESSAGE_TYPES.START_QUEST, { storyId });
+    if (response && response.success) {
+      // Refresh state
+      const newState = await MessageService.send(MESSAGE_TYPES.REQUEST_SYNC) as QuestArcState;
+      setState(newState);
+      goToDashboard();
+    } else {
+      logger.error('Failed to start quest:', response?.error);
+    }
+  };
+
+  const addStepTasks = async () => {
+    await MessageService.send(MESSAGE_TYPES.ADD_STEP_TASKS);
+    // Ideally user sees feedback. Since creating tasks is async/background, maybe just log?
+    // Or we could show a toast. For now, let's keep it simple.
   };
 
   return (
@@ -84,6 +103,7 @@ function App() {
                   state={s()}
                   onNavigate={setView}
                   onCreate={() => goToEditor()}
+                  onAddTasks={addStepTasks}
                 />
               </Show>
 
@@ -94,6 +114,7 @@ function App() {
                   onEdit={(story) => goToEditor(story)}
                   onNavigate={setView}
                   onCreate={() => goToEditor()}
+                  onStart={startQuest}
                 />
               </Show>
 
