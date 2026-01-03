@@ -15,6 +15,12 @@
     -   Updated `StoryListView.tsx` to accept and display `completedStories`.
     -   Added a "History" section to `StoryListView` to show completed quests with their completion date.
     -   Added a "**Restart**" button to completed quest cards to allow re-playing them.
+    -   **Update**: Refined Restart interaction: Removed dedicated button, added click handler to card to show restart popup.
+    -   **Update**: Removed "Edit" button from completed story cards (History items).
+    -   **Refinement**: Made "My Quests" (active stories) collapsible and collapsed by default. Made "History" section always visible.(Adjusted: Active always visible, History Collapsible).
+    -   **Logic Update**: Completed stories are no longer removed from the "My Quests" list. They remain visible but are greyed out to indicate completion.
+    -   **UI Update**: Separated active and completed stories in "My Quests" with a visual divider line.
+    -   **Logic Update**: "History" serves as a log of all completions, while "My Quests" serves as the library of available quests.
     -   Updated `App.tsx` to pass `completedStories` to `StoryListView`.
 
 ## Verification

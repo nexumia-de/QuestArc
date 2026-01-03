@@ -5,7 +5,7 @@ interface StoryCardProps {
     stepsCount: number;
     totalXp: number;
     isActive: boolean;
-    onEdit: (e: MouseEvent) => void;
+    onEdit?: (e: MouseEvent) => void;
 }
 
 const StoryCard: Component<StoryCardProps> = (props) => {
@@ -19,9 +19,11 @@ const StoryCard: Component<StoryCardProps> = (props) => {
                 </div>
             </div>
             {props.isActive && <div class="active-badge">Active</div>}
-            <button class="edit-btn" onClick={props.onEdit} title="Edit Story">
-                ✏️
-            </button>
+            {props.onEdit && (
+                <button class="edit-btn" onClick={props.onEdit} title="Edit Story">
+                    ✏️
+                </button>
+            )}
         </div>
     );
 };

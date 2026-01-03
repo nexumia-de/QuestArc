@@ -57,18 +57,21 @@ export class MessageHandler {
                 PluginService.log.info('Starting quest:', storyId);
 
                 let story = state.stories.find(s => s.id === storyId);
-                let restoredFromHistory = false;
 
+                // If story not in active list (shouldn't happen with new logic, but for safety/old states)
+                // check history and restore it.
                 if (!story && state.completedStories) {
-                    // Check history
                     const historyStory = state.completedStories.find(s => s.id === storyId);
                     if (historyStory) {
-                        PluginService.log.info('Restoring story from history:', storyId);
-                        // Restore to active stories (remove completedAt)
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        PluginService.log.info('Restoring story definition from history:', storyId);
                         const { completedAt, ...baseStory } = historyStory;
                         story = baseStory as HeroStory;
-                        restoredFromHistory = true;
+
+                        // Add it back to active stories if it was missing
+                        const currentStories = state.stories ? [...state.stories] : [];
+                        currentStories.push(story);
+                        updateState({ ...state, stories: currentStories });
+                        // We don't save yet, will save down below
                     }
                 }
 
@@ -76,19 +79,6 @@ export class MessageHandler {
                     PluginService.log.error('Story not found:', storyId);
                     return { error: 'Story not found' };
                 }
-
-                if (restoredFromHistory) {
-                    // Add back to active stories if not present (logic check)
-                    // We modify state.stories in the final updateState call
-                }
-
-                // Activate Story
-                // Reset active story progress if switching (or maybe we keep progress?)
-                // For now, let's just switch the ID. If we want to restart, we might need more logic.
-                // The current requirement says "Start the quest", implying selection.
-
-                // If switching to a NEW story, we might want to ensure we're on step 1 or valid step
-                // But let's assume simple switch for now.
 
                 // Create base new state with switched story
                 let newState: QuestArcState = {
@@ -110,34 +100,16 @@ export class MessageHandler {
                     newState = initializeBossIfNeeded(newState, startStep);
 
                     try {
-                        // Auto-create tasks for the first step if configured
                         const allCreated = await TaskService.createTasksForStep(startStep);
-                        // Only mark as created if ALL were created (i.e. no manual ones skipped)
-                        // If allCreated is false, it means there are pending manual tasks, so button should show.
                         if (allCreated) {
                             newState.activeStory.tasksCreatedForStepId = startStep.id;
                         } else {
-                            // If not all created, keep it null so button shows
                             newState.activeStory.tasksCreatedForStepId = null;
                         }
                     } catch (err) {
                         PluginService.log.error('Failed to auto-create tasks for start step', err);
                     }
                 }
-
-                // Update state
-                const updatedStories = state.stories ? [...state.stories] : [];
-                if (restoredFromHistory && story) {
-                    // Check if it's already there (defensive)
-                    if (!updatedStories.find(s => s.id === story.id)) {
-                        updatedStories.push(story);
-                    }
-                }
-
-                newState = {
-                    ...newState,
-                    stories: updatedStories
-                };
 
                 updateState(newState);
                 await saveCallback();
@@ -177,8 +149,8 @@ export class MessageHandler {
                     ];
                 }
 
-                // Remove from active stories
-                const remainingStories = state.stories.filter(s => s.id !== completedStoryId);
+                // Keep the story in active stories (so it can be restarted)
+                const remainingStories = state.stories; // Don't filter out
 
                 updateState({
                     ...state,
