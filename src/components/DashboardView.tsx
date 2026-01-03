@@ -37,13 +37,10 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                 fallback={
                     <div class="empty-quest-state">
                         <h2>Ready for Adventure?</h2>
-                        <p>Select a quest to begin your journey!</p>
+                        <p>Go to the Quest Board to select or create a quest!</p>
                         <div class="dashboard-actions">
-                            <button class="secondary-btn" onClick={() => props.onNavigate('story-list')}>
-                                📜 My Quests
-                            </button>
-                            <button class="primary-btn" onClick={props.onCreate}>
-                                ➕ New Quest
+                            <button class="primary-btn" onClick={() => props.onNavigate('story-list')}>
+                                📜 Quest Board
                             </button>
                         </div>
                     </div>
@@ -110,14 +107,6 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                         </div>
                     </Show>
 
-                </div>
-                <div class="dashboard-actions">
-                    <button class="secondary-btn" onClick={() => props.onNavigate('story-list')}>
-                        📜 My Quests
-                    </button>
-                    <button class="primary-btn" onClick={props.onCreate}>
-                        ➕ New Quest
-                    </button>
                 </div>
             </Show>
         </section>

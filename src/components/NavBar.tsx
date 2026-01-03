@@ -8,19 +8,24 @@ interface NavBarProps {
 }
 
 const NavBar: Component<NavBarProps> = (props) => {
-    // Helper to check if a tab is active
-    // Note: 'dashboard' and 'story-list' both light up the "Quests" tab
-    const isQuestsActive = () => props.currentView === 'dashboard' || props.currentView === 'story-list';
-
     return (
         <nav class="nav-bar">
             <button
-                class={`nav-item ${isQuestsActive() ? 'active' : ''}`}
+                class={`nav-item ${props.currentView === 'dashboard' ? 'active' : ''}`}
                 onClick={() => props.onNavigate('dashboard')}
-                aria-label="Quests"
+                aria-label="Adventure"
             >
                 <span class="nav-icon">⚔️</span>
-                <span class="nav-label">Quests</span>
+                <span class="nav-label">Adventure</span>
+            </button>
+
+            <button
+                class={`nav-item ${props.currentView === 'story-list' ? 'active' : ''}`}
+                onClick={() => props.onNavigate('story-list')}
+                aria-label="Quest Board"
+            >
+                <span class="nav-icon">📜</span>
+                <span class="nav-label">Quest Board</span>
             </button>
 
             <button

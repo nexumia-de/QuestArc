@@ -47,7 +47,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
 
     return (
         <section class="story-list-view">
-            <h2>My Quests</h2>
+            <h2>Quest Board</h2>
             <div class="story-grid">
                 <Show when={props.stories && props.stories.length > 0} fallback={<div class="empty-state">No quests found. Create one to get started!</div>}>
                     {(() => {
@@ -132,9 +132,6 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
             <div class="button-row">
                 <button class="primary-btn" onClick={props.onCreate}>
                     ➕ Create New Quest
-                </button>
-                <button class="secondary-btn" onClick={() => props.onNavigate('dashboard')}>
-                    Back to Dashboard
                 </button>
             </div>
 

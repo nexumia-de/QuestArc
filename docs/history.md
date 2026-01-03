@@ -46,3 +46,4 @@
 | 043 | 2026-01-03 | Header Refactor (HUD) & Modular SVG Avatar. | [./043/](./043/) | Antigravity |
 | 044 | 2026-01-03 | Profile Editor & Avatar Customization. | [./044/](./044/) | Antigravity |
 | 045 | 2026-01-03 | Fix: Initial state has no active story. | [./045/](./045/) | Antigravity |
+| 046 | 2026-01-03 | Navigation: Adventure tab & Quest Board in footer. | [./046/](./046/) | Antigravity |
