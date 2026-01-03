@@ -19,9 +19,11 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
 
     const handleCardClick = (storyId: string) => {
         if (storyId === props.activeStoryId) {
-            setShowRestartConfirm(storyId);
+            setShowRestartConfirm(storyId); // Active story click logic (already runnning)
+        } else if (props.completedStories.some(s => s.id === storyId)) {
+            setShowHistoryRestartConfirm(storyId); // Completed story click logic
         } else {
-            setShowStartConfirm(storyId);
+            setShowStartConfirm(storyId); // New story click logic
         }
     };
 
@@ -33,11 +35,15 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
         }
     };
 
-    const confirmRestart = () => {
-        const id = showRestartConfirm();
+
+
+    const [showHistoryRestartConfirm, setShowHistoryRestartConfirm] = createSignal<string | null>(null);
+
+    const confirmHistoryRestart = () => {
+        const id = showHistoryRestartConfirm();
         if (id) {
             props.onStart(id);
-            setShowRestartConfirm(null);
+            setShowHistoryRestartConfirm(null);
         }
     };
 
@@ -77,7 +83,11 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                     <h3>📜 History</h3>
                     <div class="story-grid">
                         {props.completedStories.map((story) => (
-                            <div class="story-card-wrapper completed">
+                            <div
+                                class="story-card-wrapper completed"
+                                onClick={() => handleCardClick(story.id)}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <StoryCard
                                     title={story.title}
                                     stepsCount={story.steps.length}
@@ -89,13 +99,6 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                                     <div class="completion-date">
                                         Completed: {new Date(story.completedAt).toLocaleDateString()}
                                     </div>
-                                    <button
-                                        class="restart-btn secondary-btn small"
-                                        onClick={() => props.onStart(story.id)}
-                                        title="Restart this quest"
-                                    >
-                                        Restart ↻
-                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -107,7 +110,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                 <div class="modal-overlay">
                     <div class="modal">
                         <h3>Start this Quest?</h3>
-                        <p>Do you want to start active quest?</p>
+                        <p>Do you want to start this quest?</p>
                         <div class="modal-actions">
                             <button class="secondary-btn" onClick={() => setShowStartConfirm(null)}>Cancel</button>
                             <button class="primary-btn" onClick={confirmStart}>Start Quest</button>
@@ -119,14 +122,26 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
             <Show when={showRestartConfirm()}>
                 <div class="modal-overlay">
                     <div class="modal">
-                        <h3>Restrt Quest?</h3>
-                        <p>This quest is already running, do you want to restart?</p>
+                        <h3>Quest Running</h3>
+                        <p>This quest is already running.</p>
                         <div class="modal-actions">
-                            <button class="secondary-btn" onClick={() => {
+                            <button class="primary-btn" onClick={() => {
                                 setShowRestartConfirm(null);
                                 props.onNavigate('dashboard');
-                            }}>No</button>
-                            <button class="primary-btn" onClick={confirmRestart}>Yes</button>
+                            }}>Go to Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+
+            <Show when={showHistoryRestartConfirm()}>
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h3>Restart Quest?</h3>
+                        <p>Do you want to restart this completed quest? It will be moved back to your active quests.</p>
+                        <div class="modal-actions">
+                            <button class="secondary-btn" onClick={() => setShowHistoryRestartConfirm(null)}>Cancel</button>
+                            <button class="primary-btn" onClick={confirmHistoryRestart}>Restart</button>
                         </div>
                     </div>
                 </div>
