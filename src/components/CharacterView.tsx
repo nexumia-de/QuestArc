@@ -47,10 +47,6 @@ const CharacterView: Component<CharacterViewProps> = (props) => {
                             />
                         </div>
 
-                        {!isEditing() && (
-                            <div class="edit-hint">✎</div>
-                        )}
-
                         <div class="hero-level-badge">{props.profile.level}</div>
                     </div>
 
