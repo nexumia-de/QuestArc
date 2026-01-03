@@ -2,6 +2,13 @@ export interface CompletedStory extends HeroStory {
   completedAt: number;
 }
 
+export interface AvatarConfig {
+  skinColor: string;
+  bgColor: string;
+  eyes: 'neutral' | 'happy' | 'tired' | 'focus' | 'angry';
+  mouth: 'neutral' | 'smile' | 'frown' | 'surprised';
+}
+
 export interface QuestArcState {
   version: number; // Schema version for migrations
   profile: {
@@ -10,11 +17,12 @@ export interface QuestArcState {
     xpToNextLevel: number; // e.g., level * 100
     hp: number;
     maxHp: number;
-    pet: {
+    pet?: {
       type: string;
       stage: number;
       name: string;
     };
+    avatar: AvatarConfig;
   };
   stories: HeroStory[];
   completedStories: CompletedStory[];

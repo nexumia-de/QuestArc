@@ -165,6 +165,21 @@ export class MessageHandler {
                 await saveCallback();
                 return { success: true };
 
+            case MESSAGE_TYPES.UPDATE_PROFILE: {
+                const { profile } = message.payload;
+                PluginService.log.info('Updating profile:', profile);
+
+                updateState({
+                    ...state,
+                    profile: {
+                        ...state.profile,
+                        ...profile
+                    }
+                });
+                await saveCallback();
+                return { success: true };
+            }
+
             default:
                 PluginService.log.warn('Unknown message type:', message.type);
                 return { error: 'Unknown message type' };

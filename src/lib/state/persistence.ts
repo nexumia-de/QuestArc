@@ -70,6 +70,14 @@ export function ensureState(state: any): QuestArcState {
     if (!newState.profile.pet) {
         newState.profile.pet = { type: 'slime', stage: PET_INITIAL_STAGE, name: 'Buddy' };
     }
+    if (!newState.profile.avatar) {
+        newState.profile.avatar = {
+            skinColor: '#ffe4c4',
+            bgColor: '#e0e7ff',
+            eyes: 'neutral',
+            mouth: 'neutral'
+        };
+    }
 
     if (!newState.stories || !Array.isArray(newState.stories)) {
         newState.stories = [STORY_DATA];

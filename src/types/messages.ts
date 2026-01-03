@@ -12,6 +12,8 @@ export const MESSAGE_TYPES = {
   ADD_STEP_TASKS: 'ADD_STEP_TASKS',
   // UI -> Brain: Acknowledge quest completion (close overlay)
   ACKNOWLEDGE_COMPLETION: 'ACKNOWLEDGE_COMPLETION',
+  // UI -> Brain: Update user profile (avatar, name, etc)
+  UPDATE_PROFILE: 'UPDATE_PROFILE',
 } as const;
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -50,4 +52,9 @@ export interface AcknowledgeCompletionMessage extends BaseMessage {
   payload?: null;
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage;
+export interface UpdateProfileMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.UPDATE_PROFILE;
+  payload: { profile: Partial<QuestArcState['profile']> };
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage;

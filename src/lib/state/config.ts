@@ -26,11 +26,17 @@ export const INITIAL_STATE: QuestArcState = {
             stage: PET_INITIAL_STAGE,
             name: 'Buddy',
         },
+        avatar: {
+            skinColor: '#ffe4c4',
+            bgColor: '#e0e7ff',
+            eyes: 'neutral',
+            mouth: 'neutral'
+        }
     },
     stories: [STORY_DATA],
     completedStories: [],
     activeStory: {
-        id: STORY_DATA.id,
+        id: null,
         currentStepId: 1,
         taskProgress: {}
     },

@@ -43,3 +43,6 @@
 | 040 | 2026-01-03 | Feature: Story History tracking. | [./040/](./040/) | Antigravity |
 | 041 | 2026-01-03 | Documentation overhaul: New Guides, Protocol, and Data Models. | [./041/](./041/) | Antigravity |
 | 042 | 2026-01-03 | Navigation Overhaul: Bottom NavBar, Character & Inventory Views. | [./042/](./042/) | Antigravity |
+| 043 | 2026-01-03 | Header Refactor (HUD) & Modular SVG Avatar. | [./043/](./043/) | Antigravity |
+| 044 | 2026-01-03 | Profile Editor & Avatar Customization. | [./044/](./044/) | Antigravity |
+| 045 | 2026-01-03 | Fix: Initial state has no active story. | [./045/](./045/) | Antigravity |

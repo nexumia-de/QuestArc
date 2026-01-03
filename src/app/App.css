@@ -1208,3 +1208,120 @@ input[type="number"]:focus {
     transform: translateY(0);
   }
 }
+
+/* HUD Header Enhancements */
+:root {
+  --avatar-bg-start: #e0e7ff;
+  --avatar-bg-end: #6366f1;
+  --avatar-border: #4f46e5;
+  --skin-color: #ffe4c4;
+}
+
+[data-theme='dark'] {
+  --avatar-bg-start: #1e1b4b;
+  --avatar-bg-end: #4338ca;
+  --avatar-border: #6366f1;
+  --skin-color: #fca5a5;
+  /* Slightly different tone for dark mode if desired, or keep same */
+}
+
+.hud-bar-hp {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+
+.hud-bar-xp {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+}
+
+.hud-level-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+[data-theme='dark'] .hud-level-text {
+  background: linear-gradient(135deg, #818cf8, #c7d2fe);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hud-values {
+  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Avatar Container adjustments */
+.avatar-svg-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.avatar-wrapper {
+  width: 72px;
+  height: 72px;
+  position: relative;
+}
+
+/* Animation for the glow */
+@keyframes glow-pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+  }
+
+  100% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.4);
+  }
+}
+
+.hud-bar-hp-active {
+  animation: glow-pulse 2s infinite;
+}
+
+/* Dashboard Empty State */
+.empty-quest-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.empty-quest-state h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+.empty-quest-state p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  max-width: 400px;
+}
+
+.empty-quest-state .dashboard-actions {
+  width: 100%;
+  max-width: 400px;
+  justify-content: center;
+}

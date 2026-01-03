@@ -24,7 +24,7 @@ export class TaskService {
                     }
 
                     await PluginService.api.addTask({
-                        title: taskDef.title,
+                        title: `${taskDef.title} #QuestArc`,
                         ...additionalFields
                     });
                     PluginService.log.info(`Created task: ${taskDef.title} (Auto: ${taskDef.isAutoCreate}, Force: ${force})`);
