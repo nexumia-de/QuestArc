@@ -69,31 +69,40 @@ The "Face" is the SolidJS application that gets compiled into `index.html`. It r
 ### Key Responsibilities
 
 1.  **Visualization:** Renders the rich UI (Story text, Boss animations, Progress bars).
-2.  **Polling:** Because the Brain cannot *push* messages to the Iframe (easily), the Face *pulls* data.
-    *   It sends `REQUEST_SYNC` to the Brain every 2 seconds.
-3.  **Commanding:** Sends user intents (e.g., "Start Quest", "Reset") to the Brain.
+### 2. Event-Driven Updates
+Using `BroadcastChannel`, the Brain sends an immediate signal to the Face whenever state changes. The Face listens for this signal and requests a fresh sync.
+
+**The "Brain" (plugin.ts):**
+```typescript
+const updateChannel = new BroadcastChannel('quest-arc-updates');
+
+async function saveState() {
+  await PluginService.saveState(...);
+  updateChannel.postMessage('UPDATE'); // Notify UI
+}
+```
+
+**The "Face" (App.tsx):**
+```tsx
+// src/app/App.tsx
+onMount(() => {
+  const channel = new BroadcastChannel('quest-arc-updates');
+  channel.onmessage = () => {
+    // Brain says data changed -> Fetch it!
+    const freshState = await window.PluginAPI.postMessage({ type: 'REQUEST_SYNC' });
+    setState(freshState);
+  };
+});
+```
+
+### 3. Commanding
+Sends user intents (e.g., "Start Quest", "Reset") to the Brain via `postMessage`.
 
 ### Build Process
 *   We use `vite` with `vite-plugin-singlefile` (or similar logic via `@super-productivity/vite-plugin`) to inline **ALL** CSS and JS into a single `index.html`.
 *   External resources (images, fonts) must be inlined or base64 encoded.
 
-### Code Pattern (Face)
 
-```tsx
-// src/app/App.tsx
-onMount(() => {
-  // Poll for state every 2s
-  setInterval(async () => {
-    const freshState = await window.PluginAPI.postMessage({ type: 'REQUEST_SYNC' });
-    setState(freshState);
-  }, 2000);
-});
-
-const handleReset = () => {
-  // Send command to Brain
-  window.PluginAPI.postMessage({ type: 'DEV_RESET' });
-};
-```
 
 ---
 
