@@ -75,13 +75,14 @@ export function ensureState(state: any): QuestArcState {
         newState.stories = [STORY_DATA];
     }
 
-    // Ensure activeStory exists
-    if (!newState.activeStory) {
-        newState.activeStory = {
-            id: STORY_DATA.id,
-            currentStepId: 1,
-            taskProgress: {}
-        };
+    // Ensure activeStory exists or is explicitly null (if not present in old state)
+    if (newState.activeStory === undefined) {
+        // If we have stories but no active story, set it to null (user has no active quest)
+        // For new users, we might want to default to the first story, but "No Active Quest" is valid now.
+        // Let's default to null to respect the new nullable type.
+        // EXCEPT: unique new user onboarding case?
+        // Let's stick to the plan: No forced active story.
+        newState.activeStory = null;
     }
 
     // Ensure taskProgress exists for existing states (Migration)

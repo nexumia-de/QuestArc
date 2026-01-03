@@ -1,6 +1,6 @@
 import { MESSAGE_TYPES } from '../types/messages';
 import { QuestArcState, HeroStory } from '../types/state';
-import { createInitialState, getCurrentStep } from '../lib/state-manager';
+import { createInitialState } from '../lib/state-manager';
 import { initializeBossIfNeeded } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';
@@ -77,6 +77,8 @@ export class MessageHandler {
                         ...state.activeStory,
                         id: storyId,
                         currentStepId: story.steps[0]?.id || 1,
+                        tasksCreatedForStepId: null, // Reset this too
+                        isCompleted: false,
                         taskProgress: {}
                     },
                     activeBoss: null // Reset boss when starting new story
@@ -90,7 +92,7 @@ export class MessageHandler {
                     try {
                         // Auto-create tasks for the first step if configured
                         await TaskService.createTasksForStep(startStep);
-                        newState.activeStory.tasksCreatedForStepId = startStep.id;
+                        newState.activeStory!.tasksCreatedForStepId = startStep.id;
                     } catch (err) {
                         PluginService.log.error('Failed to auto-create tasks for start step', err);
                     }
@@ -101,23 +103,52 @@ export class MessageHandler {
                 return { success: true };
 
             case MESSAGE_TYPES.ADD_STEP_TASKS:
-                PluginService.log.info('Adding tasks for current step');
-                const currentStep = getCurrentStep(state);
+                if (state.activeStory) { // Check if story exists first
+                    const currentStep = state.stories.find(s => s.id === state.activeStory!.id)
+                        ?.steps.find(step => step.id === state.activeStory!.currentStepId);
 
-                if (currentStep) {
-                    await TaskService.createTasksForStep(currentStep);
+                    if (currentStep) {
+                        await TaskService.createTasksForStep(currentStep);
+                        updateState({
+                            ...state,
+                            activeStory: {
+                                ...state.activeStory!,
+                                tasksCreatedForStepId: currentStep.id
+                            }
+                        });
+                        await saveCallback();
+                        return { success: true };
+                    } else {
+                        return { error: 'No active step found' };
+                    }
+                } else {
+                    return { error: 'No active story' };
+                }
+
+            case MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION:
+                if (state.activeStory) {
+                    PluginService.log.info('Acknowledging quest completion');
                     updateState({
                         ...state,
                         activeStory: {
                             ...state.activeStory,
-                            tasksCreatedForStepId: currentStep.id
+                            isCompleted: false
                         }
                     });
                     await saveCallback();
                     return { success: true };
-                } else {
-                    return { error: 'No active step found' };
                 }
+                return { success: false };
+
+            case MESSAGE_TYPES.STOP_QUEST:
+                PluginService.log.info('Stopping quest');
+                updateState({
+                    ...state,
+                    activeStory: null,
+                    activeBoss: null
+                });
+                await saveCallback();
+                return { success: true };
 
             default:
                 PluginService.log.warn('Unknown message type:', message.type);

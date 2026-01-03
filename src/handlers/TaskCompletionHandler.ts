@@ -69,6 +69,10 @@ export class TaskCompletionHandler {
                         PluginService.log.error('Failed to update task title/create subtasks', err);
                     }
                 }
+            } else {
+                // No next step -> Quest Completed!
+                newState.activeStory.isCompleted = true;
+                snackMessage += " 🏆 QUEST COMPLETED!";
             }
 
             PluginService.showSnack(snackMessage, 'SUCCESS');

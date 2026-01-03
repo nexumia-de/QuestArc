@@ -31,6 +31,7 @@
   - Added visible task progress counters (0/1) to Dashboard for better feedback.
   - Styled "Add tasks" button and added logic to hide it if tasks are already created for the step.
   - Implemented auto-creation of tasks for Step 1 when a quest is started (if `auto add` is enabled).
+  - Added "Quest Complete" animation overlay for the final step.
 
 ## Verification
 - Reference: `src/types/messages.ts`, `src/handlers/MessageHandler.ts`, `src/app/App.tsx`, `src/components/StoryListView.tsx`, `src/components/DashboardView.tsx`, `src/app/App.css`

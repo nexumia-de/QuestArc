@@ -35,3 +35,6 @@
 | 029 | 2026-01-03 | Refactor state-manager.ts: Split into state modules. | [./029/](./029/) | Antigravity |
 | 030 | 2026-01-03 | Refactor App.tsx: Extract hooks and services. | [./030/](./030/) | Antigravity |
 | 031 | 2026-01-03 | Improve Quest Start Flow: Confirmation popup and task addition. | [./031/](./031/) | Antigravity |
+| 032 | 2026-01-03 | Feature: Quest Completion Animation. | [./032/](./032/) | Antigravity |
+| 033 | 2026-01-03 | UI Polish: Completion Overlay and Close Button. | [./033/](./033/) | Antigravity |
+| 034 | 2026-01-03 | Feature: Allow No Active Story & "Stop Quest" Functionality. | [./034/](./034/) | Antigravity |
