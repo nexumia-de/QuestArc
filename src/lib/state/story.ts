@@ -8,6 +8,8 @@ import { logger } from '../logger';
  * @remarks Logs a warning if the active story ID doesn't exist in the stories array
  */
 export function getActiveStory(state: QuestArcState): HeroStory | undefined {
+    if (!state.activeStory.id) return undefined;
+
     const story = state.stories.find(s => s.id === state.activeStory.id);
 
     if (!story) {
@@ -27,7 +29,7 @@ export function getCurrentStep(state: QuestArcState): StoryStep | undefined {
     const activeStory = getActiveStory(state);
 
     if (!activeStory) {
-        logger.warn('No active story found');
+        // No active story is not a warning condition anymore, just return undefined
         return undefined;
     }
 
@@ -60,5 +62,10 @@ export function getCurrentStepTitle(state: QuestArcState): string {
     if (currentStep?.title) {
         return currentStep.title;
     }
-    return state.activeStory.id.replace(/_/g, ' ').toUpperCase();
+
+    if (state.activeStory.id) {
+        return state.activeStory.id.replace(/_/g, ' ').toUpperCase();
+    }
+
+    return "NO ACTIVE QUEST";
 }

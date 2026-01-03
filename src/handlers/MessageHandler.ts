@@ -134,6 +134,7 @@ export class MessageHandler {
                     ...state,
                     activeStory: {
                         ...state.activeStory,
+                        id: null,
                         isCompleted: false
                     }
                 });

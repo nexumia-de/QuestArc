@@ -14,7 +14,7 @@ export interface QuestArcState {
   };
   stories: HeroStory[];
   activeStory: {
-    id: string; // e.g., 'story_productivity_mastery'
+    id: string | null; // e.g., 'story_productivity_mastery' or null if no active story
     currentStepId: number;
     tasksCreatedForStepId?: number | null;
     isCompleted?: boolean;

@@ -94,13 +94,17 @@ function App() {
     const response: any = await MessageService.send(MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION);
     if (response && response.success) {
       // Optimistic update
-      setState({
-        ...state(),
-        activeStory: {
-          ...state().activeStory,
-          isCompleted: false
-        }
-      });
+      const currentState = state();
+      if (currentState) {
+        setState({
+          ...currentState,
+          activeStory: {
+            ...currentState.activeStory,
+            id: null,
+            isCompleted: false
+          }
+        });
+      }
     }
   };
 
@@ -125,7 +129,7 @@ function App() {
               <Show when={view() === 'story-list'}>
                 <StoryListView
                   stories={s().stories}
-                  activeStoryId={s().activeStory.id}
+                  activeStoryId={s().activeStory.id || ''}
                   onEdit={(story) => goToEditor(story)}
                   onNavigate={setView}
                   onCreate={() => goToEditor()}

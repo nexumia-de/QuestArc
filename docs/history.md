@@ -38,3 +38,4 @@
 | 032 | 2026-01-03 | Feature: Quest Completion Animation and event-driven docs. | [./032/](./032/) | Antigravity |
 | 035 | 2026-01-03 | Bug Fix: Missing Boss in Stories. | [./035/](./035/) | Antigravity |
 | 037 | 2026-01-03 | Feature: Restart Quest Confirmation Popup. | [./037/](./037/) | Antigravity |
+| 038 | 2026-01-03 | Feature: clear dashboard after quest completion. | [./038/](./038/) | Antigravity |
