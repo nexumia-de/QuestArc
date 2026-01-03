@@ -48,7 +48,7 @@ export interface HeroStory {
 
 export interface StoryStep {
   id: number;        // Step sequence ID (1, 2, 3...)
-  title: string;
+  title?: string;
   xpReward: number;
   nextStepId?: number | null; // ID of the next step, or null if end of story
 

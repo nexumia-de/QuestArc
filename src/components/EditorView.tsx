@@ -76,7 +76,7 @@ const EditorView: Component<EditorViewProps> = (props) => {
                 <button
                     class="primary-btn"
                     onClick={handleSave}
-                    disabled={!storyTitle() || steps().some(s => !s.title)}
+                    disabled={!storyTitle()}
                 >
                     {props.initialStory ? 'Update Story' : 'Forge Story'}
                 </button>

@@ -94,7 +94,7 @@ export interface CompletionRequirement {
 
 export interface StoryStep {
   id: number;
-  title: string;
+  title?: string;
 
   tasksToCreate?: TaskDefinition[];
   completion: CompletionRequirement;

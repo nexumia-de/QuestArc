@@ -67,17 +67,18 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                     class={`step-card ${currentStep()?.environment_theme ? 'themed-step' : ''}`}
                     style={currentStep()?.environment_theme ? { '--theme-color': currentStep()!.environment_theme } : {}}
                 >
-                    <div class="step-card-header">
-                        <h3>{getCurrentStepTitle(props.state)}</h3>
-                    </div>
+                    <Show when={getCurrentStepTitle(props.state)}>
+                        <div class="step-card-header">
+                            <h3>{getCurrentStepTitle(props.state)}</h3>
+                        </div>
+                    </Show>
 
-                    {/* Flavor Text Section with Progressive Disclosure */}
                     <Show when={currentStep()?.flavor_text}>
                         <div class={`story-block-container mode-${currentStep()?.display_mode || 'visible'}`}>
                             <Switch>
                                 <Match when={currentStep()?.display_mode === 'collapsed'}>
                                     <details class="story-details">
-                                        <summary class="story-summary">{currentStep()?.story_icon || '📜'} {currentStep()?.summary_text || 'The Story so far...'}</summary>
+                                        <summary class="story-summary">{currentStep()?.summary_text || '📜 The Story so far...'}</summary>
                                         <div class="story-flavor-text">
                                             {currentStep()?.flavor_text}
                                         </div>
@@ -99,20 +100,30 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                         </div>
                     </Show>
 
+                    <hr class="story-divider" />
+
                     <Show when={currentStep()?.tasksToCreate && currentStep()!.tasksToCreate!.length > 0}>
                         <div class="step-tasks">
                             <h4>Complete Tasks:</h4>
                             <ul>
                                 <For each={currentStep()!.tasksToCreate}>
-                                    {(task) => (
-                                        <li class="task-item">
-                                            <span class="task-title">{task.title}</span>
-                                            <span class="task-progress">
-                                                ({props.state.activeStory.taskProgress?.[task.title] || 0}/{task.requiredCount || 1})
-                                            </span>
-                                            {task.isRepeating && <span class="tag">🔁 Repeating</span>}
-                                        </li>
-                                    )}
+                                    {(task) => {
+                                        const progress = props.state.activeStory.taskProgress?.[task.title] || 0;
+                                        const required = task.requiredCount || 1;
+                                        const isCompleted = progress >= required;
+
+                                        return (
+                                            <li class={`task-item ${isCompleted ? 'completed' : ''}`}>
+                                                <div class="task-checkbox-indicator"></div>
+                                                <span class="task-title">{task.title}</span>
+                                                <span class="task-spacer"></span>
+                                                <span class="task-progress">
+                                                    {progress}/{required}
+                                                </span>
+                                                {task.isRepeating && <span class="tag" style={{ 'margin-left': '0.5rem' }}>🔁</span>}
+                                            </li>
+                                        );
+                                    }}
                                 </For>
                             </ul>
                             <Show when={props.state.activeStory.tasksCreatedForStepId !== props.state.activeStory.currentStepId}>

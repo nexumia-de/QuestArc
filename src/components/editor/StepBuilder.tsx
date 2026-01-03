@@ -73,18 +73,20 @@ const StepBuilder: Component<StepBuilderProps> = (props) => {
                         <option value="tooltip">Tooltip (Subtle Icon)</option>
                     </select>
                 </div>
-                <Show when={props.step.display_mode !== 'visible'}>
+                <Show when={props.step.display_mode === 'tooltip'}>
                     <div class="form-group" style={{ flex: '0 0 80px' }}>
                         <label>Icon</label>
                         <input
                             type="text"
-                            placeholder={props.step.display_mode === 'collapsed' ? '📜' : '📖'}
+                            placeholder="📖"
                             value={props.step.story_icon || ''}
                             onInput={(e) => props.onUpdate('story_icon', e.currentTarget.value)}
                             style={{ 'text-align': 'center' }}
                         />
                     </div>
                 </Show>
+            </div>
+            <div class="form-row">
                 <Show when={props.step.display_mode === 'collapsed'}>
                     <div class="form-group half-width">
                         <label>Summary Text</label>
@@ -97,6 +99,7 @@ const StepBuilder: Component<StepBuilderProps> = (props) => {
                     </div>
                 </Show>
             </div>
+
             <div class="form-row">
                 <div class="form-group half-width">
                     <label>Environment Theme</label>

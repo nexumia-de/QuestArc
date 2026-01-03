@@ -1421,6 +1421,25 @@ input[type="number"]:focus {
   /* Hide default triangle in some browsers */
   background: rgba(0, 0, 0, 0.02);
   transition: background 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.story-summary::-webkit-details-marker {
+  display: none;
+}
+
+.story-summary::after {
+  content: "›";
+  /* Chevron */
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+  margin-left: 0.5rem;
+  display: inline-block;
+  line-height: 1;
 }
 
 .story-summary:hover {
@@ -1429,6 +1448,10 @@ input[type="number"]:focus {
 
 .story-details[open] .story-summary {
   border-bottom: 1px solid var(--border);
+}
+
+.story-details[open] .story-summary::after {
+  transform: rotate(90deg);
 }
 
 .story-details[open] .story-flavor-text {
@@ -1572,4 +1595,118 @@ input[type="number"]:focus {
   font-family: inherit;
   resize: vertical;
   min-height: 80px;
+}
+
+/* =========================================
+   LAYOUT REFINEMENTS (USER REQUEST 049)
+   ========================================= */
+
+/* Story Content Scroll */
+.story-flavor-text {
+  max-height: 300px;
+  overflow-y: auto;
+  /* Nice scrollbar for Webkit */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.story-flavor-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.story-flavor-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.story-flavor-text::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 3px;
+}
+
+/* Divider */
+.story-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+  border: none;
+}
+
+/* Task List Layout */
+.step-tasks ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+/* Completed Task State */
+.task-item.completed {
+  opacity: 0.6;
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-item.completed .task-checkbox-indicator {
+  background-color: var(--text-muted);
+  border-color: var(--text-muted);
+  position: relative;
+}
+
+/* Checkmark approximation */
+.task-item.completed .task-checkbox-indicator::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--card-bg);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Checkbox (Visual Only for Requirement List) */
+.task-checkbox-indicator {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-muted);
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  opacity: 0.5;
+}
+
+.task-title {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.task-spacer {
+  flex-grow: 1;
+  min-width: 1rem;
+}
+
+.task-progress {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .task-progress {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
 }

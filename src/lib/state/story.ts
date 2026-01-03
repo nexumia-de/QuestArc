@@ -57,9 +57,9 @@ export function getCurrentStep(state: QuestArcState): StoryStep | undefined {
  * @param state - The game state
  * @returns The current step title, or a formatted version of the story ID if step not found
  */
-export function getCurrentStepTitle(state: QuestArcState): string {
+export function getCurrentStepTitle(state: QuestArcState): string | undefined {
     const currentStep = getCurrentStep(state);
-    if (currentStep?.title) {
+    if (currentStep) {
         return currentStep.title;
     }
 

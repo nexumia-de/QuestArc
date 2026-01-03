@@ -37,9 +37,13 @@ The goal was to improve the visual storytelling of QuestArc by separating narrat
 ## 4. Refinements (User Feedback)
 - **Tooltip**: Changed from "Lore" text to a customizable Book Icon (`📖`).
     - Implemented a CSS-only custom tooltip styling to fix overflow and layout issues ("custom icon instead of text", "doesn't fit into space").
-- **Customization**:
-    - Added `summary_text`: Users can now edit the "Story so far..." toggle text.
-    - Added `story_icon`: Users can customize the icon used for the scroll/tooltip (e.g., replace 📜 or 📖 with any emoji).
+- **Layout & Visuals**:
+    - **Separate Sections**: Added a subtle divider line (`story-divider`) between the narrative block and the task list.
+    - **Header Logic**: Only renders the header block if a title is set, making the UI cleaner for simple steps.
+    - **Scrollable Content**: Added `max-height: 300px` and custom scrollbar styling to the narrative block to prevent long texts from overwhelming the card.
+    - **Task List UI**: Refactored to a cleaner list style with right-aligned progress badges.
+    - **Completed Tasks**: Added visual feedback (opacity reduction + strikethrough) for completed tasks to focus attention on remaining work.
+    - **Rotating Chevron**: Added a smooth rotating arrow to the collapsed story summary to indicate expandability.
 
 ## 5. Next Steps
-- User to test creating a story with flavor text and verifying the visual output.
+- User to verify the new "Clean Layout" and check if the completed task visualization provides better focus.
