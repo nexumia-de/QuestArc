@@ -49,3 +49,5 @@
 | 046 | 2026-01-03 | Navigation: Adventure tab & Quest Board in footer. | [./046/](./046/) | Antigravity |
 | 048 | 2026-01-03 | Story Visual Overhaul: Progressive Disclosure & Boss FX. | [./048/](./048/) | Antigravity |
 | 049 | 2026-01-03 | Make Step Title optional in stories. | [./049/](./049/) | Antigravity |
+| 050 | 2026-01-04 | Bug Fix: Task creation button only adds manual tasks. | [./050/](./050/) | Antigravity |
+| 051 | 2026-01-04 | UI Tweak: Align story summary to left (standard accordion). | [./051/](./051/) | Antigravity |

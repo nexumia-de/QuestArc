@@ -8,8 +8,12 @@ export class TaskService {
         let allCreated = true;
 
         for (const taskDef of step.tasksToCreate) {
-            // Create if it's auto-create OR if forced
-            if ((taskDef.isAutoCreate || force) && PluginService.api.addTask) {
+            // Logic:
+            // 1. Initial load (force=false): Create only Auto tasks.
+            // 2. Button click (force=true): Create only Manual tasks.
+            const shouldCreate = (taskDef.isAutoCreate && !force) || (!taskDef.isAutoCreate && force);
+
+            if (shouldCreate && PluginService.api.addTask) {
                 try {
                     const additionalFields: any = {
                         notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
@@ -30,13 +34,9 @@ export class TaskService {
                     PluginService.log.info(`Created task: ${taskDef.title} (Auto: ${taskDef.isAutoCreate}, Force: ${force})`);
                 } catch (e) {
                     PluginService.log.error(`Failed to create task: ${taskDef.title}`, e);
-                    // If creation fails, we might still want to consider it "handled" to avoid loop, 
-                    // but for now let's say allCreated is preserved as true if it was an error vs skip?
-                    // actually, if it errors, we probably want to try again? 
-                    // But for the purpose of the UI button, if we skipped it because it wasn't auto-create, that's false.
                 }
-            } else if (!taskDef.isAutoCreate) {
-                // If we skipped it because it wasn't auto-create (and not forced), then we haven't created everything
+            } else if (!taskDef.isAutoCreate && !force) {
+                // If we skipped a manual task during initial load, we haven't created everything
                 allCreated = false;
             }
         }
