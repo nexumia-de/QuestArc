@@ -8,39 +8,19 @@ interface DashboardViewProps {
     onCreate: () => void;
     onAddTasks: () => void;
     onAcknowledge: () => void;
-    onStopQuest: () => void;
 }
 
 const DashboardView: Component<DashboardViewProps> = (props) => {
-    // If no active story, show empty state
-    if (!props.state.activeStory) {
-        return (
-            <section class="active-quest empty-state">
-                <h2>No Active Quest</h2>
-                <p>You are not currently on a quest. Start one to begin your journey!</p>
-                <div class="dashboard-actions">
-                    <button class="secondary-btn" onClick={() => props.onNavigate('story-list')}>
-                        📜 My Quests
-                    </button>
-                    <button class="primary-btn" onClick={props.onCreate}>
-                        ➕ New Quest
-                    </button>
-                </div>
-            </section>
-        );
-    }
-
     const currentStep = () => getCurrentStep(props.state);
 
     const getStoryTitle = () => {
-        if (!props.state.activeStory) return '';
-        const story = props.state.stories?.find(s => s.id === props.state.activeStory!.id);
-        return story ? story.title : props.state.activeStory!.id.replace(/_/g, ' ');
+        const story = props.state.stories?.find(s => s.id === props.state.activeStory.id);
+        return story ? story.title : props.state.activeStory.id.replace(/_/g, ' ');
     };
 
     return (
         <section class="active-quest">
-            <Show when={props.state.activeStory!.isCompleted}>
+            <Show when={props.state.activeStory.isCompleted}>
                 <div class="quest-complete-overlay">
                     <div class="quest-complete-content">
                         <h2>🏆 QUEST COMPLETE! 🏆</h2>
@@ -64,14 +44,14 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                                     <li class="task-item">
                                         <span class="task-title">{task.title}</span>
                                         <span class="task-progress">
-                                            ({props.state.activeStory!.taskProgress?.[task.title] || 0}/{task.requiredCount || 1})
+                                            ({props.state.activeStory.taskProgress?.[task.title] || 0}/{task.requiredCount || 1})
                                         </span>
                                         {task.isRepeating && <span class="tag">🔁 Repeating</span>}
                                     </li>
                                 )}
                             </For>
                         </ul>
-                        <Show when={props.state.activeStory!.tasksCreatedForStepId !== props.state.activeStory!.currentStepId}>
+                        <Show when={props.state.activeStory.tasksCreatedForStepId !== props.state.activeStory.currentStepId}>
                             <button class="action-btn" onClick={props.onAddTasks}>
                                 📥 Add tasks to your list
                             </button>
@@ -79,7 +59,7 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                     </div>
                 </Show>
 
-                <p class="step-id">Step ID: {props.state.activeStory!.currentStepId}</p>
+                <p class="step-id">Step ID: {props.state.activeStory.currentStepId}</p>
 
                 <Show when={props.state.activeBoss}>
                     <div
@@ -116,12 +96,11 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
 
             </div>
             <div class="dashboard-actions">
-                <button class="text-btn danger" onClick={props.onStopQuest}>
-                    ⛔ Stop Quest
-                </button>
-                <div class="spacer" style={{ flex: 1 }}></div>
                 <button class="secondary-btn" onClick={() => props.onNavigate('story-list')}>
                     📜 My Quests
+                </button>
+                <button class="primary-btn" onClick={props.onCreate}>
+                    ➕ New Quest
                 </button>
             </div>
         </section>

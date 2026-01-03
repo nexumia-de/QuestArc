@@ -19,7 +19,7 @@ export interface QuestArcState {
     tasksCreatedForStepId?: number | null;
     isCompleted?: boolean;
     taskProgress: Record<string, number>;
-  } | null;
+  };
   activeBoss: {
     hp: number;
     maxHp: number;

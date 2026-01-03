@@ -12,8 +12,6 @@ export const MESSAGE_TYPES = {
   ADD_STEP_TASKS: 'ADD_STEP_TASKS',
   // UI -> Brain: Acknowledge quest completion (close overlay)
   ACKNOWLEDGE_COMPLETION: 'ACKNOWLEDGE_COMPLETION',
-  // UI -> Brain: Stop the current quest
-  STOP_QUEST: 'STOP_QUEST',
 } as const;
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -52,9 +50,4 @@ export interface AcknowledgeCompletionMessage extends BaseMessage {
   payload?: null;
 }
 
-export interface StopQuestMessage extends BaseMessage {
-  type: typeof MESSAGE_TYPES.STOP_QUEST;
-  payload?: null;
-}
-
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | StopQuestMessage;
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage;

@@ -4,7 +4,7 @@ import StoryCard from './StoryCard';
 
 interface StoryListViewProps {
     stories: HeroStory[];
-    activeStoryId: string | null;
+    activeStoryId: string;
     onEdit: (story: HeroStory) => void;
     onNavigate: (view: 'dashboard') => void;
     onCreate: () => void;

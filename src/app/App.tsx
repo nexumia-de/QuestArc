@@ -1,4 +1,4 @@
-import { createSignal, Show, Switch, Match } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import { MESSAGE_TYPES } from '../types/messages';
 import { RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
@@ -68,6 +68,7 @@ function App() {
 
     const newState = await MessageService.send(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
     setState(newState);
+    setState(newState);
     setIsResetConfirming(false);
   };
 
@@ -93,31 +94,13 @@ function App() {
     const response: any = await MessageService.send(MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION);
     if (response && response.success) {
       // Optimistic update
-      const currentState = state();
-      if (currentState && currentState.activeStory) {
-        setState({
-          ...currentState,
-          activeStory: {
-            ...currentState.activeStory,
-            isCompleted: false
-          }
-        });
-      }
-    }
-  };
-
-  const handleStopQuest = async () => {
-    const response: any = await MessageService.send(MESSAGE_TYPES.STOP_QUEST);
-    if (response && response.success) {
-      // Optimistic update
-      const currentState = state();
-      if (currentState) {
-        setState({
-          ...currentState,
-          activeStory: null,
-          activeBoss: null
-        });
-      }
+      setState({
+        ...state(),
+        activeStory: {
+          ...state().activeStory,
+          isCompleted: false
+        }
+      });
     }
   };
 
@@ -125,60 +108,54 @@ function App() {
     <div class="app">
       <Show when={state()} fallback={<div class="loading">Loading QuestArc...</div>}>
         {(s) => (
-          <div class="app-container">
-            <Header
-              profile={s().profile}
-              activeBoss={s().activeBoss}
-            />
+          <main class="app-main">
+            <Header profile={s().profile} activeBoss={s().activeBoss} />
 
-            <main class="content-area">
-              <Switch>
-                <Match when={view() === 'dashboard'}>
-                  <DashboardView
-                    state={s()}
-                    onNavigate={setView}
-                    onCreate={() => goToEditor()}
-                    onAddTasks={addStepTasks}
-                    onAcknowledge={handleAcknowledgeCompletion}
-                    onStopQuest={handleStopQuest}
-                  />
-                </Match>
+            <div class="view-content">
+              <Show when={view() === 'dashboard'}>
+                <DashboardView
+                  state={s()}
+                  onNavigate={setView}
+                  onCreate={() => goToEditor()}
+                  onAddTasks={addStepTasks}
+                  onAcknowledge={handleAcknowledgeCompletion}
+                />
+              </Show>
 
-                <Match when={view() === 'story-list'}>
-                  <StoryListView
-                    stories={s().stories}
-                    activeStoryId={s().activeStory?.id || null}
-                    onEdit={(story) => goToEditor(story)}
-                    onNavigate={setView}
-                    onCreate={() => goToEditor()}
-                    onStart={startQuest}
-                  />
-                </Match>
+              <Show when={view() === 'story-list'}>
+                <StoryListView
+                  stories={s().stories}
+                  activeStoryId={s().activeStory.id}
+                  onEdit={(story) => goToEditor(story)}
+                  onNavigate={setView}
+                  onCreate={() => goToEditor()}
+                  onStart={startQuest}
+                />
+              </Show>
 
-                <Match when={view() === 'editor'}>
-                  <EditorView
-                    initialStory={editingStory()}
-                    onSave={handleSaveStory}
-                    onCancel={() => {
-                      goToDashboard();
-                      setErrorMessage(null);
-                    }}
-                    errorMessage={errorMessage()}
-                  />
-                </Match>
-              </Switch>
+              <Show when={view() === 'editor'}>
+                <EditorView
+                  initialStory={editingStory()}
+                  onSave={handleSaveStory}
+                  onCancel={() => {
+                    goToDashboard();
+                    setErrorMessage(null);
+                  }}
+                  errorMessage={errorMessage()}
+                />
+              </Show>
+            </div>
 
-              <footer class="app-footer">
-                <button
-                  class={`reset-btn ${isResetConfirming() ? 'confirming' : ''}`}
-                  onClick={resetGame}
-                  style={isResetConfirming() ? { 'border-color': 'var(--hp-color)', color: 'var(--hp-color)' } : {}}
-                >
-                  {isResetConfirming() ? '⚠️ Tap again to confirm reset' : 'Reset Progress'}
-                </button>
-              </footer>
-            </main>
-          </div>
+            <footer class="app-footer">
+              <button
+                class={`reset-btn ${isResetConfirming() ? 'confirming' : ''}`}
+                onClick={resetGame}
+                style={isResetConfirming() ? { 'border-color': 'var(--hp-color)', color: 'var(--hp-color)' } : {}}
+              >
+                {isResetConfirming() ? '⚠️ Tap again to confirm reset' : 'Reset Progress'}
+              </button>
+            </footer>
+          </main>
         )}
       </Show>
     </div>
