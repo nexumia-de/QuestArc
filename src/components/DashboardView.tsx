@@ -1,4 +1,4 @@
-import { Component, Show, For } from 'solid-js';
+import { Component, Show, For, Switch, Match } from 'solid-js';
 import { QuestArcState } from '../types/state';
 import { getCurrentStepTitle, getCurrentStep } from '../lib/state-manager';
 
@@ -17,6 +17,18 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
         if (!props.state.activeStory.id) return '';
         const story = props.state.stories?.find(s => s.id === props.state.activeStory.id);
         return story ? story.title : props.state.activeStory.id.replace(/_/g, ' ');
+    };
+
+    // Calculate progress
+    const getProgressText = () => {
+        if (!props.state.activeStory.id) return '';
+        const story = props.state.stories?.find(s => s.id === props.state.activeStory.id);
+        if (!story) return '';
+        const currentId = props.state.activeStory.currentStepId;
+        const totalSteps = story.steps.length;
+        // Find index of current step
+        const currentIndex = story.steps.findIndex(s => s.id === currentId);
+        return currentIndex >= 0 ? `Step ${currentIndex + 1}/${totalSteps}` : '';
     };
 
     return (
@@ -46,9 +58,46 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                     </div>
                 }
             >
-                <h2>Current Story Step</h2>
-                <div class="step-card">
-                    <h3>{getCurrentStepTitle(props.state)}</h3>
+                <div class="story-header-row">
+                    <h2>Current Story Step</h2>
+                    <span class="story-progress-indicator">{getProgressText()}</span>
+                </div>
+
+                <div
+                    class={`step-card ${currentStep()?.environment_theme ? 'themed-step' : ''}`}
+                    style={currentStep()?.environment_theme ? { '--theme-color': currentStep()!.environment_theme } : {}}
+                >
+                    <div class="step-card-header">
+                        <h3>{getCurrentStepTitle(props.state)}</h3>
+                    </div>
+
+                    {/* Flavor Text Section with Progressive Disclosure */}
+                    <Show when={currentStep()?.flavor_text}>
+                        <div class={`story-block-container mode-${currentStep()?.display_mode || 'visible'}`}>
+                            <Switch>
+                                <Match when={currentStep()?.display_mode === 'collapsed'}>
+                                    <details class="story-details">
+                                        <summary class="story-summary">{currentStep()?.story_icon || '📜'} {currentStep()?.summary_text || 'The Story so far...'}</summary>
+                                        <div class="story-flavor-text">
+                                            {currentStep()?.flavor_text}
+                                        </div>
+                                    </details>
+                                </Match>
+                                <Match when={currentStep()?.display_mode === 'tooltip'}>
+                                    <div class="story-tooltip-container">
+                                        <span class="story-info-icon" aria-label="Story Lore">{currentStep()?.story_icon || '📖'}</span>
+                                        <div class="story-tooltip-content">{currentStep()?.flavor_text}</div>
+                                    </div>
+                                </Match>
+                                <Match when={true}>
+                                    {/* Default Visible */}
+                                    <div class="story-flavor-text visible">
+                                        {currentStep()?.flavor_text}
+                                    </div>
+                                </Match>
+                            </Switch>
+                        </div>
+                    </Show>
 
                     <Show when={currentStep()?.tasksToCreate && currentStep()!.tasksToCreate!.length > 0}>
                         <div class="step-tasks">
@@ -76,8 +125,8 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
 
                     <Show when={props.state.activeBoss}>
                         <div
-                            class="boss-battle"
-                            style={props.state.activeBoss!.themeColor ? { 'border-color': props.state.activeBoss!.themeColor } : {}}
+                            class={`boss-battle ${props.state.activeBoss!.hp < props.state.activeBoss!.maxHp ? 'boss-shake' : ''}`}
+                            style={props.state.activeBoss!.themeColor ? { 'border-color': props.state.activeBoss!.themeColor, '--boss-theme': props.state.activeBoss!.themeColor } : {}}
                         >
                             <Show when={props.state.activeBoss!.image}>
                                 <div class="boss-image-container">
@@ -94,7 +143,7 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                                 {props.state.activeBoss!.name || '👹 BOSS BATTLE'}
                             </h4>
 
-                            <div class="hp-bar-container">
+                            <div class="hp-bar-container boss-hp-container">
                                 <div
                                     class="hp-bar-fill"
                                     style={{

@@ -13,13 +13,23 @@ export function useStoryEditor(initialStory: HeroStory | null) {
             title: s.title || '',
             tasksToCreate: s.tasksToCreate || [],
             completion: s.completion || { type: 'tasks_completed' },
-            xpReward: s.xpReward || 0
+            xpReward: s.xpReward || 0,
+            flavor_text: s.flavor_text || '',
+            summary_text: s.summary_text || '',
+            story_icon: s.story_icon || '',
+            display_mode: s.display_mode || 'visible',
+            environment_theme: s.environment_theme || ''
         }))
         : [{
             title: '',
             xpReward: 50,
             tasksToCreate: [{ title: '', isAutoCreate: true }],
-            completion: { type: 'tasks_completed' }
+            completion: { type: 'tasks_completed' },
+            flavor_text: '',
+            summary_text: '',
+            story_icon: '',
+            display_mode: 'visible',
+            environment_theme: ''
         }];
 
     const [steps, setSteps] = createSignal<EditorStep[]>(initialStepsState);

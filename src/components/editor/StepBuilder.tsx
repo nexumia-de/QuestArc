@@ -50,6 +50,65 @@ const StepBuilder: Component<StepBuilderProps> = (props) => {
                 />
             </div>
 
+            <div class="form-group">
+                <label>Flavor Text (Narrative)</label>
+                <textarea
+                    class="story-textarea"
+                    placeholder="Describe the scene or story event..."
+                    value={props.step.flavor_text || ''}
+                    onInput={(e) => props.onUpdate('flavor_text', e.currentTarget.value)}
+                    rows={3}
+                />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>Display Mode</label>
+                    <select
+                        value={props.step.display_mode || 'visible'}
+                        onChange={(e) => props.onUpdate('display_mode', e.currentTarget.value)}
+                    >
+                        <option value="visible">Visible (Always Open)</option>
+                        <option value="collapsed">Collapsed (Story Scroll)</option>
+                        <option value="tooltip">Tooltip (Subtle Icon)</option>
+                    </select>
+                </div>
+                <Show when={props.step.display_mode !== 'visible'}>
+                    <div class="form-group" style={{ flex: '0 0 80px' }}>
+                        <label>Icon</label>
+                        <input
+                            type="text"
+                            placeholder={props.step.display_mode === 'collapsed' ? '📜' : '📖'}
+                            value={props.step.story_icon || ''}
+                            onInput={(e) => props.onUpdate('story_icon', e.currentTarget.value)}
+                            style={{ 'text-align': 'center' }}
+                        />
+                    </div>
+                </Show>
+                <Show when={props.step.display_mode === 'collapsed'}>
+                    <div class="form-group half-width">
+                        <label>Summary Text</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. The Story so far..."
+                            value={props.step.summary_text || ''}
+                            onInput={(e) => props.onUpdate('summary_text', e.currentTarget.value)}
+                        />
+                    </div>
+                </Show>
+            </div>
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>Environment Theme</label>
+                    <input
+                        type="text"
+                        placeholder="e.g. #2e7d32 or forest"
+                        value={props.step.environment_theme || ''}
+                        onInput={(e) => props.onUpdate('environment_theme', e.currentTarget.value)}
+                    />
+                </div>
+            </div>
+
             <TaskEditor
                 tasks={props.step.tasksToCreate || []}
                 onAdd={props.onAddTask}

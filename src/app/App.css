@@ -1356,3 +1356,220 @@ input[type="number"]:focus {
   max-width: 400px;
   justify-content: center;
 }
+
+/* =========================================
+   STORY ENHANCEMENTS & PROGRESSIVE DISCLOSURE
+   ========================================= */
+
+/* Story Header Row */
+.story-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.story-progress-indicator {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Themed Step Card */
+.step-card.themed-step {
+  border-left: 4px solid var(--theme-color);
+  background: linear-gradient(to right, color-mix(in srgb, var(--theme-color) 10%, transparent), transparent);
+}
+
+/* Story Block Container */
+.story-block-container {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--primary);
+  /* Fallback accent */
+}
+
+.story-block-container.mode-collapsed {
+  border-left: none;
+  /* Collapsed handles its own styling */
+}
+
+/* Flavor Text Typography */
+.story-flavor-text {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* Details/Summary (Scroll Style) */
+.story-details {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.story-summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--text);
+  list-style: none;
+  /* Hide default triangle in some browsers */
+  background: rgba(0, 0, 0, 0.02);
+  transition: background 0.2s ease;
+}
+
+.story-summary:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.story-details[open] .story-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.story-details[open] .story-flavor-text {
+  padding: 1rem;
+}
+
+/* Dark Mode Adjustments for Details */
+[data-theme='dark'] .story-details {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .story-summary {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .story-summary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltip Mode */
+.story-tooltip-container {
+  display: inline-block;
+  position: relative;
+  /* Anchor for absolute tooltip */
+}
+
+.story-info-icon {
+  cursor: help;
+  font-size: 1.5rem;
+  /* Slightly larger icon */
+  opacity: 0.8;
+  transition: transform 0.2s, opacity 0.2s;
+  display: inline-block;
+}
+
+.story-info-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.story-tooltip-content {
+  visibility: hidden;
+  width: 280px;
+  background-color: var(--card-bg);
+  color: var(--text);
+  text-align: left;
+  border-radius: 8px;
+  padding: 1rem;
+  position: absolute;
+  z-index: 100;
+  bottom: 125%;
+  /* Position above */
+  left: 0;
+  /* Align left, no negative margin */
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  pointer-events: none;
+  /* Prevent flickering */
+  line-height: 1.5;
+}
+
+/* Arrow */
+.story-tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  /* Align arrow with icon */
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--border) transparent transparent transparent;
+}
+
+.story-tooltip-container:hover .story-tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* BOSS BATTLE ENHANCEMENTS */
+.boss-battle {
+  /* Existing styles plus: */
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.boss-shake {
+  animation: boss-shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes boss-shake {
+
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* Boss HP Bar Override */
+.boss-hp-container .hp-bar-fill {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boss-emoji {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.story-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  color: var(--text);
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}

@@ -101,6 +101,13 @@ export interface StoryStep {
 
   xpReward: number;
   nextStepId?: number | null;
+
+  // Visual / Narrative Fields
+  flavor_text?: string;
+  summary_text?: string; // For collapsed mode
+  story_icon?: string;   // Custom icon/emoji
+  display_mode?: 'visible' | 'collapsed' | 'tooltip';
+  environment_theme?: string;
 }
 
 export interface HeroStory {
