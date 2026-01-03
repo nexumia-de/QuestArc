@@ -827,6 +827,7 @@ input[type="number"]:focus {
   border-color: var(--primary);
 }
 
+
 /* Small Button (e.g., + Add Task) */
 .small-btn {
   background: transparent;
@@ -843,6 +844,29 @@ input[type="number"]:focus {
   background: var(--card-bg);
   border-color: var(--primary);
   color: var(--text);
+}
+
+.action-btn {
+  margin-top: 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.action-btn:hover {
+  background: var(--bg);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Step Header Layout */

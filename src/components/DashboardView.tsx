@@ -24,16 +24,21 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                         <ul>
                             <For each={currentStep()!.tasksToCreate}>
                                 {(task) => (
-                                    <li>
-                                        {task.title}
+                                    <li class="task-item">
+                                        <span class="task-title">{task.title}</span>
+                                        <span class="task-progress">
+                                            ({props.state.activeStory.taskProgress?.[task.title] || 0}/{task.requiredCount || 1})
+                                        </span>
                                         {task.isRepeating && <span class="tag">🔁 Repeating</span>}
                                     </li>
                                 )}
                             </For>
                         </ul>
-                        <button class="action-btn" onClick={props.onAddTasks}>
-                            📥 Add tasks to your list
-                        </button>
+                        <Show when={props.state.activeStory.tasksCreatedForStepId !== props.state.activeStory.currentStepId}>
+                            <button class="action-btn" onClick={props.onAddTasks}>
+                                📥 Add tasks to your list
+                            </button>
+                        </Show>
                     </div>
                 </Show>
 

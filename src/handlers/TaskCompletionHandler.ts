@@ -62,6 +62,9 @@ export class TaskCompletionHandler {
                         // Auto-create tasks for the new step
                         await TaskService.createTasksForStep(nextStep);
 
+                        // Mark tasks as created for this new step
+                        newState.activeStory.tasksCreatedForStepId = nextStep.id;
+
                     } catch (err) {
                         PluginService.log.error('Failed to update task title/create subtasks', err);
                     }

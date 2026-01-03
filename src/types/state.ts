@@ -16,6 +16,7 @@ export interface QuestArcState {
   activeStory: {
     id: string; // e.g., 'story_productivity_mastery'
     currentStepId: number;
+    tasksCreatedForStepId?: number | null;
     taskProgress: Record<string, number>;
   };
   activeBoss: {

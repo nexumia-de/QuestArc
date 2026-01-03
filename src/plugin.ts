@@ -1,5 +1,6 @@
 import { QuestArcState } from './types/state';
 import { createInitialState, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
+import { initializeBossIfNeeded } from './lib/game-logic';
 import { PluginService } from './services/PluginService';
 import { HeaderService } from './services/HeaderService';
 import { TaskService } from './services/TaskService';
@@ -9,10 +10,12 @@ import { MessageHandler } from './handlers/MessageHandler';
 let state: QuestArcState;
 
 const api = PluginService.api;
+const updateChannel = new BroadcastChannel('quest-arc-updates');
 
 async function saveState(newState?: QuestArcState) {
   if (newState) state = newState;
   await PluginService.saveState(JSON.stringify(state));
+  updateChannel.postMessage('UPDATE');
 }
 
 async function init() {
@@ -33,7 +36,6 @@ async function init() {
           // Self-heal: Ensure boss is initialized if needed
           const currentStep = getCurrentStep(state);
           if (currentStep) {
-            const { initializeBossIfNeeded } = await import('./lib/game-logic');
             state = initializeBossIfNeeded(state, currentStep);
           }
 
@@ -49,7 +51,6 @@ async function init() {
       const currentStep = getCurrentStep(state);
       if (currentStep) {
         await TaskService.createTasksForStep(currentStep);
-        const { initializeBossIfNeeded } = await import('./lib/game-logic');
         state = initializeBossIfNeeded(state, currentStep);
       }
     }

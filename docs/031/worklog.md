@@ -26,6 +26,11 @@
   - Aligned boss image to sit correctly on the card border (`top: -40px`).
   - Implemented self-healing logic in `plugin.ts` to restore missing bosses on load.
   - Updated `MessageHandler.ts` to initialize bosses immediately when starting a quest.
+  - Fixed build warning by using static imports for `game-logic` throughout the app.
+  - Improved task matching logic (case-insensitive, whitespace-trimming).
+  - Added visible task progress counters (0/1) to Dashboard for better feedback.
+  - Styled "Add tasks" button and added logic to hide it if tasks are already created for the step.
+  - Implemented auto-creation of tasks for Step 1 when a quest is started (if `auto add` is enabled).
 
 ## Verification
 - Reference: `src/types/messages.ts`, `src/handlers/MessageHandler.ts`, `src/app/App.tsx`, `src/components/StoryListView.tsx`, `src/components/DashboardView.tsx`, `src/app/App.css`

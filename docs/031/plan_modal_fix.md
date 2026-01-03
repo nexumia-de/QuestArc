@@ -1,4 +1,4 @@
-# Plan: Add Modal Styles
+h# Plan: Add Modal Styles
 
 ## Goal
 Fix the "Start Quest" confirmation to appear as a proper popup modal instead of inline text.

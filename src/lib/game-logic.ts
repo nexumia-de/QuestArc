@@ -70,8 +70,9 @@ export function processTaskCompletion(
   const requirement = currentStep.completion;
 
   // 1. Update Progress for this specific task
-  // Find which task definition matches the completed task (by title for now)
-  const matchingDef = currentStep.tasksToCreate?.find(t => t.title === _task.title);
+  // Normalize titles for comparison to avoid whitespace/case issues
+  const normalize = (s: string) => s.trim().toLowerCase();
+  const matchingDef = currentStep.tasksToCreate?.find(t => normalize(t.title) === normalize(_task.title));
 
   if (matchingDef) {
     const currentCount = newState.activeStory.taskProgress[_task.title] || 0;
