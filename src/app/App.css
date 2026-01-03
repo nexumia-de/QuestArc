@@ -69,15 +69,21 @@ body[class*='dark'] {
   padding: 1.5rem;
 }
 
+/* Clean Header Styles */
 .quest-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   background: var(--card-bg);
-  padding: 1rem;
-  border-radius: 4px;
-  /* Material Standard */
-  /* Remove shadow in dark mode for flat look */
+  padding: 1.25rem;
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .quest-header {
+  background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
+  border-color: #333;
 }
 
 .header-content {
@@ -86,116 +92,141 @@ body[class*='dark'] {
   gap: 1.5rem;
 }
 
-.avatar-container {
+/* Left Side: Avatar */
+.header-left {
   flex-shrink: 0;
+}
+
+.avatar-wrapper {
   position: relative;
-}
-
-.avatar {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
+  background: var(--bg);
+  padding: 3px;
   border: 2px solid var(--border);
-  background: var(--card-bg);
-  padding: 2px;
-  object-fit: cover;
-  display: block;
+  box-shadow: var(--shadow-sm);
 }
 
-.stats-container {
+[data-theme='dark'] .avatar-wrapper {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #121212;
+}
+
+/* Right Side: Stats */
+.header-stats {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-
-.stats-top-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-}
-
-.level-headline {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1;
-  color: var(--primary);
-  letter-spacing: -0.025em;
-}
-
-.xp-total {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  font-family: monospace;
-}
-
-[data-theme='dark'] .level-headline {
-  color: #818cf8;
-}
-
-.bar-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  position: relative;
-}
-
-.compact-bar {
   gap: 0.5rem;
 }
 
-.xp-bar-container,
-.hp-bar-container {
+.stats-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.hud-level-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--primary), #818cf8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.05em;
+}
+
+[data-theme='dark'] .hud-level-text {
+  background: linear-gradient(135deg, #818cf8, #c7d2fe);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hud-xp-text {
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  /* or fallback monospace */
+  color: var(--text-muted);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Stat Bars Container */
+.stat-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bar-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 20px;
+  text-transform: uppercase;
+}
+
+.bar-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  width: 70px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* HP Bar Specifics */
+/* HP Bar Specifics */
+.hp-bar-track {
   flex-grow: 1;
-  height: 8px;
-  /* Slimmer bars */
-  background: var(--border);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(239, 68, 68, 0.15);
+  border-radius: 6px;
   overflow: hidden;
   position: relative;
-  /* For overlays if needed */
-}
-
-.bar-text-overlay {
-  font-size: 0.7rem;
-  color: var(--text);
-  /* Use main text color, contrast relies on bar background */
-  font-weight: 600;
-  min-width: 40px;
-  text-align: right;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  /* Shadow for legibility on colored bars */
-  z-index: 2;
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.xp-bar-fill {
-  height: 100%;
-  background: var(--xp-gradient);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
 }
 
 .hp-bar-fill {
   height: 100%;
-  background: var(--hp-gradient);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.user-hp-fill {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
+/* XP Bar Specifics */
+.xp-bar-track {
+  flex-grow: 1;
+  height: 10px;
+  /* Matched to HP bar */
+  background: rgba(251, 191, 36, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.hp-bar-container.user-hp {
-  background: rgba(34, 197, 94, 0.1);
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  /* Matched shadow intensity */
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Matched easing */
 }
+
 
 .step-card {
   background: var(--card-bg);
