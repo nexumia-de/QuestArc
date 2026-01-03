@@ -46,13 +46,19 @@ Implement a history tracking feature for completed stories. When a user complete
 - **Update**: Remove `onEdit` from history items. Pass optional `onEdit` to `StoryCard`.
 - **Correction**: Active Quests list always visible. History list collapsible (default hidden).
 - **Core Logic Change**: Do NOT remove completed stories from the active `stories` list.
-- **UI Update**: In "My Quests", if a story ID exists in `completedStories`, render it with reduced opacity (greyed out).
+- **UI Update**: In "My Quests", separate incomplete and completed stories.
+- **UI Update**: Render "Completed Quests" as a collapsible section (hidden by default) below the active ones.
+- **UI Update**: Completed stories have `opacity: 0.6`.
 
 #### [MODIFY] [MessageHandler.ts](file:///home/deck/Projects/QuestArc/src/handlers/MessageHandler.ts)
 - In `ACKNOWLEDGE_COMPLETION`, remove the logic that filters the completed story out of `state.stories`. Keeps the definition available.
 
 #### [MODIFY] [StoryListView.tsx](file:///home/deck/Projects/QuestArc/src/components/StoryListView.tsx)
-- Check if story is in `completedStories`. If so, apply `opacity: 0.6` style.
+- Add `isCompletedExpanded` state (default false).
+- Split stories into `active` and `completed`.
+- Render `active`.
+- Render collapsible header for `completed` if any exist.
+- Render `completed` inside conditional Show.
 
 #### [MODIFY] [StoryCard.tsx](file:///home/deck/Projects/QuestArc/src/components/StoryCard.tsx)
 - Make `onEdit` prop optional.

@@ -19,7 +19,9 @@
     -   **Update**: Removed "Edit" button from completed story cards (History items).
     -   **Refinement**: Made "My Quests" (active stories) collapsible and collapsed by default. Made "History" section always visible.(Adjusted: Active always visible, History Collapsible).
     -   **Logic Update**: Completed stories are no longer removed from the "My Quests" list. They remain visible but are greyed out to indicate completion.
-    -   **UI Update**: Separated active and completed stories in "My Quests" with a visual divider line.
+    -   **Refinement**: Made "My Quests" (active stories) collapsible and collapsed by default. Made "History" section always visible.(Adjusted: Active always visible, History Collapsible).
+    -   **Logic Update**: Completed stories are no longer removed from the "My Quests" list. They remain visible but are greyed out to indicate completion.
+    -   **UI Update**: Separated active and completed stories in "My Quests". Created a collapsible "Completed Quests" section (hidden by default) with an arrow toggle.
     -   **Logic Update**: "History" serves as a log of all completions, while "My Quests" serves as the library of available quests.
     -   Updated `App.tsx` to pass `completedStories` to `StoryListView`.
 

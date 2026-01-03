@@ -17,6 +17,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
     const [showRestartConfirm, setShowRestartConfirm] = createSignal<string | null>(null);
     const [showHistoryRestartConfirm, setShowHistoryRestartConfirm] = createSignal<string | null>(null);
     const [isHistoryExpanded, setIsHistoryExpanded] = createSignal(false);
+    const [isCompletedExpanded, setIsCompletedExpanded] = createSignal(false);
 
     const handleCardClick = (storyId: string) => {
         if (storyId === props.activeStoryId) {
@@ -71,37 +72,56 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                                     </div>
                                 ))}
 
-                                <Show when={incompleteStories.length > 0 && finishedStories.length > 0}>
-                                    <div class="story-separator" style={{
-                                        'grid-column': '1 / -1',
-                                        'height': '1px',
-                                        'background-color': 'rgba(255, 255, 255, 0.1)',
-                                        'margin': '1rem 0'
-                                    }}></div>
-                                </Show>
-
-                                {finishedStories.map((story) => (
+                                <Show when={finishedStories.length > 0}>
                                     <div
-                                        onClick={() => handleCardClick(story.id)}
-                                        class="story-card-wrapper"
+                                        class="completed-separator-header"
+                                        onClick={() => setIsCompletedExpanded(!isCompletedExpanded())}
                                         style={{
-                                            cursor: 'pointer',
-                                            opacity: 0.6,
-                                            filter: 'grayscale(0.5)'
+                                            'grid-column': '1 / -1',
+                                            'display': 'flex',
+                                            'align-items': 'center',
+                                            'gap': '0.5rem',
+                                            'margin': '1rem 0',
+                                            'cursor': 'pointer',
+                                            'opacity': 0.8
                                         }}
                                     >
-                                        <StoryCard
-                                            title={story.title}
-                                            stepsCount={story.steps.length}
-                                            totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
-                                            isActive={props.activeStoryId === story.id}
-                                            onEdit={(e) => {
-                                                e.stopPropagation();
-                                                props.onEdit(story);
-                                            }}
-                                        />
+                                        <h4 style={{ margin: 0 }}>Completed Quests ({finishedStories.length})</h4>
+                                        <span style={{
+                                            transform: isCompletedExpanded() ? 'rotate(180deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s',
+                                            'font-size': '1em'
+                                        }}>
+                                            ▼
+                                        </span>
+                                        <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)', 'margin-left': '1rem' }}></div>
                                     </div>
-                                ))}
+
+                                    <Show when={isCompletedExpanded()}>
+                                        {finishedStories.map((story) => (
+                                            <div
+                                                onClick={() => handleCardClick(story.id)}
+                                                class="story-card-wrapper"
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    opacity: 0.6,
+                                                    filter: 'grayscale(0.5)'
+                                                }}
+                                            >
+                                                <StoryCard
+                                                    title={story.title}
+                                                    stepsCount={story.steps.length}
+                                                    totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
+                                                    isActive={props.activeStoryId === story.id}
+                                                    onEdit={(e) => {
+                                                        e.stopPropagation();
+                                                        props.onEdit(story);
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </Show>
+                                </Show>
                             </>
                         );
                     })()}
