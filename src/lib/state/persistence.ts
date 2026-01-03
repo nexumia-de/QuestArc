@@ -75,6 +75,10 @@ export function ensureState(state: any): QuestArcState {
         newState.stories = [STORY_DATA];
     }
 
+    if (!newState.completedStories || !Array.isArray(newState.completedStories)) {
+        newState.completedStories = [];
+    }
+
     // Ensure activeStory exists
     if (!newState.activeStory) {
         newState.activeStory = {

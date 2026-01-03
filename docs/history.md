@@ -40,3 +40,5 @@
 | 037 | 2026-01-03 | Feature: Restart Quest Confirmation Popup. | [./037/](./037/) | Antigravity |
 | 038 | 2026-01-03 | Feature: clear dashboard after quest completion. | [./038/](./038/) | Antigravity |
 | 039 | 2026-01-03 | Feature: Undo task support (reverts boss damage). | [./039/](./039/) | Antigravity |
+| 040 | 2026-01-03 | Feature: Story History tracking. | [./040/](./040/) | Antigravity |
+| 041 | 2026-01-03 | Documentation overhaul: New Guides, Protocol, and Data Models. | [./041/](./041/) | Antigravity |

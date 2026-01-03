@@ -28,6 +28,7 @@ export const INITIAL_STATE: QuestArcState = {
         },
     },
     stories: [STORY_DATA],
+    completedStories: [],
     activeStory: {
         id: STORY_DATA.id,
         currentStepId: 1,

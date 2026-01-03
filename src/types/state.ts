@@ -1,3 +1,7 @@
+export interface CompletedStory extends HeroStory {
+  completedAt: number;
+}
+
 export interface QuestArcState {
   version: number; // Schema version for migrations
   profile: {
@@ -13,6 +17,7 @@ export interface QuestArcState {
     };
   };
   stories: HeroStory[];
+  completedStories: CompletedStory[];
   activeStory: {
     id: string | null; // e.g., 'story_productivity_mastery' or null if no active story
     currentStepId: number;

@@ -56,10 +56,30 @@ export class MessageHandler {
                 const { storyId } = message.payload;
                 PluginService.log.info('Starting quest:', storyId);
 
-                const story = state.stories.find(s => s.id === storyId);
+                let story = state.stories.find(s => s.id === storyId);
+                let restoredFromHistory = false;
+
+                if (!story && state.completedStories) {
+                    // Check history
+                    const historyStory = state.completedStories.find(s => s.id === storyId);
+                    if (historyStory) {
+                        PluginService.log.info('Restoring story from history:', storyId);
+                        // Restore to active stories (remove completedAt)
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        const { completedAt, ...baseStory } = historyStory;
+                        story = baseStory as HeroStory;
+                        restoredFromHistory = true;
+                    }
+                }
+
                 if (!story) {
                     PluginService.log.error('Story not found:', storyId);
                     return { error: 'Story not found' };
+                }
+
+                if (restoredFromHistory) {
+                    // Add back to active stories if not present (logic check)
+                    // We modify state.stories in the final updateState call
                 }
 
                 // Activate Story
@@ -105,6 +125,20 @@ export class MessageHandler {
                     }
                 }
 
+                // Update state
+                const updatedStories = state.stories ? [...state.stories] : [];
+                if (restoredFromHistory && story) {
+                    // Check if it's already there (defensive)
+                    if (!updatedStories.find(s => s.id === story.id)) {
+                        updatedStories.push(story);
+                    }
+                }
+
+                newState = {
+                    ...newState,
+                    stories: updatedStories
+                };
+
                 updateState(newState);
                 await saveCallback();
                 return { success: true };
@@ -130,8 +164,26 @@ export class MessageHandler {
 
             case MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION:
                 PluginService.log.info('Acknowledging quest completion');
+
+                // Archive the story
+                const completedStoryId = state.activeStory.id;
+                const completedStory = state.stories.find(s => s.id === completedStoryId);
+
+                let newCompletedStories = state.completedStories || [];
+                if (completedStory) {
+                    newCompletedStories = [
+                        ...newCompletedStories,
+                        { ...completedStory, completedAt: Date.now() }
+                    ];
+                }
+
+                // Remove from active stories
+                const remainingStories = state.stories.filter(s => s.id !== completedStoryId);
+
                 updateState({
                     ...state,
+                    stories: remainingStories,
+                    completedStories: newCompletedStories,
                     activeStory: {
                         ...state.activeStory,
                         id: null,

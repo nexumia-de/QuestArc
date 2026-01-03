@@ -2,152 +2,90 @@
 
 This guide explains how to develop the QuestArc plugin, bridging the standard Super Productivity Plugin API with our specific "Split-Brain" architecture.
 
+## 📚 Documentation Map
+
+| Doc | Purpose |
+| :--- | :--- |
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Deep dive into "Split-Brain", Services, and Handlers. |
+| **[DATA_MODELS.md](./DATA_MODELS.md)** | Reference for `QuestArcState`, `HeroStory`, `BossConfig`, etc. |
+| **[MESSAGE_PROTOCOL.md](./MESSAGE_PROTOCOL.md)** | Reference for `Brain <-> Face` communication types. |
+| **[UI_GUIDELINES.md](./UI_GUIDELINES.md)** | Design system, CSS variables, and best practices. |
+| **[CONTRIBUTING.md](./CONTRIBUTING.md)** | Workflow rules: "Document-First", Branching, and Definition of Done. |
+| **[SUPER_PRODUCTIVITY_API.md](./SUPER_PRODUCTIVITY_API.md)** | The host application's API reference. |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+*   Node.js (v18+)
+*   npm
+
+### 2. Setup
+```bash
+# Install dependencies
+npm install
+```
+
+### 3. Development Loop
+We use a standard "Brain First, Face Second" workflow.
+
+1.  **Run Watch Mode:**
+    ```bash
+    npm run watch
+    ```
+    This rebuilds `dist/` on every change.
+
+2.  **Load in Super Productivity:**
+    *   Settings -> Plugins -> Load from Folder -> Select `dist/` folder (or `manifest.json`).
+    *   *Tip:* You often need to reload the plugin (toggle off/on) or the app (Ctrl+R) to see changes in `plugin.ts`. UI changes in `App.tsx` might require a re-open of the plugin panel.
+
+3.  **Debugging:**
+    *   **Brain:** Check the main application console (Ctrl+Shift+I).
+    *   **Face:** Right-click the plugin iframe -> Inspect.
+
+---
+
 ## 🏗️ Architecture Overview
 
 QuestArc uses a **Split-Brain Architecture** to handle the limitations of the plugin system (specifically the ephemeral nature of the UI iframe).
 
-| Component | File Path | Standard Plugin Type | Runtime | Responsibility |
-|-----------|-----------|----------------------|---------|----------------|
-| **The Brain** | `src/plugin.ts` | JavaScript Plugin | Persistent (Main Process) | State, Logic, Persistence, Events |
-| **The Face** | `src/app/App.tsx` | HTML/Iframe Plugin | Ephemeral (Iframe) | Visualization, User Input |
+| Component | File Path | Runtime | Responsibility |
+|-----------|-----------|---------|----------------|
+| **The Brain** | `src/plugin.ts` | Main Process | State, Logic, Persistence, Events |
+| **The Face** | `src/app/App.tsx` | Iframe | Visualization, User Input |
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the complete diagram and data flow.
 
 ---
 
-## 🧠 The Brain (`src/plugin.ts`)
+## 🛠️ Common Tasks
 
-The "Brain" is the entry point defined in `manifest.json` as `main`. It runs in the main application context.
+### Adding a New Story Type
+1.  Define the schema in `src/types/story.ts` (and update [DATA_MODELS.md](./DATA_MODELS.md)).
+2.  Update `StoryService` to handle creation.
+3.  Update `EditorView.tsx` to include form fields.
 
-### Key Responsibilities
+### Adding a New Message
+1.  Define the message type in `src/types/messages.ts` (and update [MESSAGE_PROTOCOL.md](./MESSAGE_PROTOCOL.md)).
+2.  Add a case in `MessageHandler.ts` (Brain side).
+3.  Send it from `App.tsx` or a Service (Face side).
 
-1.  **State Management:**
-    *   It holds the `QuestArcState` in memory.
-    *   It is the **Single Source of Truth**.
-    *   It handles all game logic (XP gain, Boss damage).
-
-2.  **Persistence:**
-    *   Uses `PluginAPI.loadSyncedData()` on init.
-    *   Uses `PluginAPI.persistDataSynced()` after every state change.
-    *   *Note:* `localStorage` is not reliable here; use the API.
-
-3.  **Event Listening (Hooks):**
-    *   Registers hooks like `PluginAPI.registerHook('taskComplete', ...)` to react to user actions even when the UI is closed.
-
-4.  **Header UI:**
-    *   Uses `PluginAPI.registerHeaderButton()` to show basic status (HP/Level).
-    *   *Limitation:* These buttons are static after registration. To update them, we would need to re-register (which is messy), so we mostly use them as static entry points or status indicators that update only on reload/init.
-
-5.  **Communication Hub:**
-    *   Listens for messages from the UI via `PluginAPI.onMessage`.
-    *   Sends state back to the UI when requested (`REQUEST_SYNC`).
-
-### Code Pattern (Brain)
-
-```typescript
-// src/plugin.ts
-let state = ...; // In-memory state
-
-// 1. Listen for App Events
-PluginAPI.registerHook('taskComplete', (payload) => {
-  // modify state...
-  saveState();
-});
-
-// 2. Handle UI Requests
-PluginAPI.onMessage((msg) => {
-  if (msg.type === 'REQUEST_SYNC') {
-    return state; // Send state back to UI
-  }
-});
-```
-
----
-
-## 🤡 The Face (`src/app/App.tsx`)
-
-The "Face" is the SolidJS application that gets compiled into `index.html`. It runs inside a sandboxed iframe when the user clicks the header button.
-
-### Key Responsibilities
-
-1.  **Visualization:** Renders the rich UI (Story text, Boss animations, Progress bars).
-### 2. Event-Driven Updates
-Using `BroadcastChannel`, the Brain sends an immediate signal to the Face whenever state changes. The Face listens for this signal and requests a fresh sync.
-
-**The "Brain" (plugin.ts):**
-```typescript
-const updateChannel = new BroadcastChannel('quest-arc-updates');
-
-async function saveState() {
-  await PluginService.saveState(...);
-  updateChannel.postMessage('UPDATE'); // Notify UI
-}
-```
-
-**The "Face" (App.tsx):**
-```tsx
-// src/app/App.tsx
-onMount(() => {
-  const channel = new BroadcastChannel('quest-arc-updates');
-  channel.onmessage = () => {
-    // Brain says data changed -> Fetch it!
-    const freshState = await window.PluginAPI.postMessage({ type: 'REQUEST_SYNC' });
-    setState(freshState);
-  };
-});
-```
-
-### 3. Commanding
-Sends user intents (e.g., "Start Quest", "Reset") to the Brain via `postMessage`.
-
-### Build Process
-*   We use `vite` with `vite-plugin-singlefile` (or similar logic via `@super-productivity/vite-plugin`) to inline **ALL** CSS and JS into a single `index.html`.
-*   External resources (images, fonts) must be inlined or base64 encoded.
-
-
-
----
-
-## 🛠️ Development Workflow
-
-### 1. Modifying State/Logic
-*   **Where:** `src/lib/game-logic.ts` called by `src/plugin.ts`.
-*   **Rule:** Logic must be pure and testable.
-*   **Verify:** Check console logs in the main app to see "QuestArc: Task completed!" even with the plugin UI closed.
-
-### 2. Modifying UI
-*   **Where:** `src/app/App.tsx`.
-*   **Rule:** Never calculate game state here. Only display it.
-*   **Preview:** You can run `npm run dev` to see the UI in a browser, but it won't have access to the real `PluginAPI`. Mock data is often needed for local dev.
-
-### 3. Building & Testing
-1.  **Build:** `npm run build`
-    *   Compiles `src/plugin.ts` -> `dist/plugin.js`
-    *   Compiles `src/app/` -> `dist/index.html` (with inlined assets)
-2.  **Package:** `npm run package`
-    *   Zips `dist/` + `manifest.json` -> `dist/quest-arc.zip`
-3.  **Install:**
-    *   Go to Super Productivity -> Settings -> Plugins.
-    *   Load the `manifest.json` or the `.zip` file.
+### Debugging State Not Saving
+*   **Check:** Did you call `saveState()`?
+*   **Check:** Is `plugin.persistDataSynced` being called?
+*   **Check:** Is the data JSON serializable? (No Functions/Circular refs).
 
 ---
 
 ## 🚫 Common Pitfalls
 
 1.  **"My UI isn't updating!"**
-    *   Check if the Polling interval is running.
-    *   Check if `plugin.ts` is actually receiving the `REQUEST_SYNC` message.
+    *   Check if the Polling interval is running in `App.tsx`.
+    *   Check if `plugin.ts` is receiving `REQUEST_SYNC`.
 
 2.  **"My data vanished!"**
-    *   Did you use `localStorage`? Don't. Use `PluginAPI.persistDataSynced()`.
-    *   Did you forget to `saveState()` after modifying it in `plugin.ts`?
+    *   **Never** use `localStorage`. Use `PluginAPI.persistDataSynced()`.
 
 3.  **"Images are broken."**
-    *   In the iframe, you cannot reference local files like `<img src="./icon.png">` easily once packaged.
-    *   Best practice: Import images in code (`import icon from './assets/icon.svg'`) so Vite inlines them as Base64.
-
-4. **"Git says packages/ are modified"**
-
-    *   We are "vendoring" these packages. It is normal that they are part of your repository now. If you update them from the upstream Super Productivity repo, you should commit those changes.
-
-## 📚 API Reference
-
-See `docs/plugin-development.md` for the official API documentation (available methods, hooks, etc.).
+    *   We use `vite-plugin-singlefile`. Import images in code (`import icon from './assets/icon.svg'`) so they get inlined as Base64.

@@ -799,6 +799,40 @@ body[class*='dark'] {
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
+  font-size: 0.85rem;
+}
+
+/* Completed Story Styles */
+.story-card-wrapper.completed {
+  opacity: 0.8;
+}
+
+.completion-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+}
+
+.completion-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.restart-btn.secondary-btn {
+  border-color: var(--border);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  min-height: 28px;
+}
+
+.restart-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(63, 81, 181, 0.05);
 }
 
 .compact-input {

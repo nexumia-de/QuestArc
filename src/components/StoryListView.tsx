@@ -1,9 +1,10 @@
 import { Component, Show, createSignal } from 'solid-js';
-import { HeroStory } from '../types/state';
+import { HeroStory, CompletedStory } from '../types/state';
 import StoryCard from './StoryCard';
 
 interface StoryListViewProps {
     stories: HeroStory[];
+    completedStories: CompletedStory[];
     activeStoryId: string;
     onEdit: (story: HeroStory) => void;
     onNavigate: (view: 'dashboard') => void;
@@ -70,6 +71,37 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                     Back to Dashboard
                 </button>
             </div>
+
+            <Show when={props.completedStories && props.completedStories.length > 0}>
+                <div class="completed-stories-section">
+                    <h3>📜 History</h3>
+                    <div class="story-grid">
+                        {props.completedStories.map((story) => (
+                            <div class="story-card-wrapper completed">
+                                <StoryCard
+                                    title={story.title}
+                                    stepsCount={story.steps.length}
+                                    totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
+                                    isActive={false}
+                                    onEdit={() => { }}
+                                />
+                                <div class="completion-footer">
+                                    <div class="completion-date">
+                                        Completed: {new Date(story.completedAt).toLocaleDateString()}
+                                    </div>
+                                    <button
+                                        class="restart-btn secondary-btn small"
+                                        onClick={() => props.onStart(story.id)}
+                                        title="Restart this quest"
+                                    >
+                                        Restart ↻
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </Show>
 
             <Show when={showStartConfirm()}>
                 <div class="modal-overlay">

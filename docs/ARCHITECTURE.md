@@ -2,6 +2,8 @@
 
 ## The Split-Brain Pattern
 
+QuestArc's specific constraints (running as both a persistent background script and an ephemeral UI iframe) dictate this architecture.
+
 ```mermaid
 graph TD
     subgraph Host["Super Productivity App"]
@@ -10,42 +12,85 @@ graph TD
         Header[Header UI]
     end
 
-    subgraph Brain["Plugin Background (plugin.ts)"]
-        Logic[Story Engine]
+    subgraph Brain["The Brain (Persistent)"]
+        PluginEntry[plugin.ts]
+        subgraph Services
+            TaskSvc[TaskService]
+            HeaderSvc[HeaderService]
+            PluginSvc[PluginService]
+        end
+        subgraph Handlers
+            MsgHandler[MessageHandler]
+            CompHandler[TaskCompletionHandler]
+            UndoHandler[TaskUndoHandler]
+        end
         State[QuestArc State]
-        Listener[Event Listener]
     end
 
-    subgraph Face["Plugin UI (SolidJS)"]
-        View[Dashboard View]
-        Anim[Animations]
+    subgraph Face["The Face (Ephemeral Iframe)"]
+        FaceEntry[App.tsx]
+        subgraph Views
+            Dash[DashboardView]
+            StoryList[StoryListView]
+            Editor[EditorView]
+        end
+        Poll[Polling Mechanism]
     end
 
-    Tasks -->|TASK_DONE| Listener
-    Listener --> Logic
-    Logic -->|Update| State
-    State -->|saveData| Storage
-    State -->|updateHeader| Header
-    State -.->|postMessage| View
-    View -.->|postMessage| Logic
+    %% Event Flow
+    Tasks -->|TASK_DONE| PluginEntry
+    PluginEntry --> CompHandler
+    CompHandler -->|Update| State
+    State -->|Save| PluginSvc
+    PluginSvc -->|Persist| Storage
 
+    %% UI Flow
+    FaceEntry --> Poll
+    Poll -.->|REQUEST_SYNC| MsgHandler
+    MsgHandler -.->|State JSON| Poll
+    Poll -->|Update Signal| Views
 ```
 
-## Critical Data Paths
+## Core Components
 
-1. **Persistence:** `State` -> JSON -> `Storage` (via `plugin.persistDataSynced()`)
-2. **Visualization:** `State` -> `Header Button` (Set once during init, cannot update dynamically)
-3. **UI Polling:** `View` polls `Brain` every 2 seconds via `postMessage` (REQUEST_SYNC)
-4. **Commands:** `View` -> `Brain` via `postMessage` (e.g., DEV_RESET)
+### 1. The Brain (`src/plugin.ts`)
+The single source of truth. It initializes the plugin, loads state, and routes events.
 
-## Communication Pattern
+*   **Services:** Pure business logic providers.
+    *   `PluginService`: Wraps the raw `PluginAPI` for easier testing/mocking.
+    *   `TaskService`: Handles task creation/updates in the host app.
+    *   `HeaderService`: Manages the header button UI.
+*   **Handlers:** Event processors.
+    *   `TaskCompletionHandler`: Reacts to `TASK_DONE` hooks. Calculates XP/Damage.
+    *   `TaskUndoHandler`: Reacts to task un-completion. Reverts XP/Damage.
+    *   `MessageHandler`: Router for all incoming `postMessage` calls from the UI.
+*   **State:** The in-memory `QuestArcState` object.
 
-**UI to Brain:**
-- UI sends `postMessage` to `window.parent`
-- Brain receives via `plugin.onMessage()` handler
-- Brain returns response
+### 2. The Face (`src/app/App.tsx`)
+The view layer. Dumb and ephemeral.
 
-**Brain to UI:**
-- Brain CANNOT push updates to UI
-- UI must poll for state changes every 2 seconds
-- Alternative: Brain shows notifications via `plugin.showSnack()`
+*   **Polling:** Since the Brain cannot "push" to the iframe efficiently (or reliably if the iframe is reloading), the UI polls for state every 2 seconds via `REQUEST_SYNC`.
+*   **Commands:** User actions (e.g., "Start Quest") are sent as messages to the Brain. The UI *optimistically* updates if possible, but ultimately relies on the next Sync to confirm truth.
+*   **Routing:** Simple conditional rendering (Dashboard vs Story List vs Editor) managed by internal UI state.
+
+## Data Flow Scenarios
+
+### Scenario A: User Completes a Task (Background)
+1.  User clicks checkmark in Super Productivity (outside our iframe).
+2.  Host fires `taskComplete` hook.
+3.  `plugin.ts` receives hook -> Calls `TaskCompletionHandler.handle()`.
+4.  Handler:
+    *   Checks if an active Quest exists.
+    *   Calculates damage to Boss.
+    *   Updates `state.activeStory`.
+    *   Calls `saveState()`.
+5.  `saveState()` notifies `BroadcastChannel` (if UI happens to be open).
+
+### Scenario B: User Starts a Quest (UI)
+1.  User clicks "Start" in `StoryListView`.
+2.  UI sends `START_QUEST` message to Brain.
+3.  `MessageHandler` receives message.
+4.  Updates `state.activeStory` with the selected story.
+5.  Calls `saveState()`.
+6.  Returns updated State to UI.
+7.  UI re-renders Dashboard.

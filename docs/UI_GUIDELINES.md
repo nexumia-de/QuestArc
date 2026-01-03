@@ -69,10 +69,57 @@ Since QuestArc runs in an `iframe` within the Super Productivity "Face":
 ## 🧩 Component Library
 
 ### Progress Bars
-Use `.xp-bar-container` and `.hp-bar-container`. They are pre-styled for consistent height (`12px`) and rounded corners.
+Use `.xp-bar-container` and `.hp-bar-container`. 
+*   **Height:** `12px`
+*   **Radius:** `6px`
+*   **Structure:**
+    ```html
+    <div class="xp-bar-container">
+      <div class="xp-bar-fill" style={{ width: `${pct}%` }}></div>
+    </div>
+    ```
 
-### Cards
-Use `.step-card` for grouping related information. It comes with default shadow and border styling that adapts to themes.
+### Cards (`.step-card`)
+Use for grouping related information.
+*   **Background:** `var(--card-bg)` (Adapts to light/dark)
+*   **Shadow:** `0 1px 3px 0 rgb(0 0 0 / 0.1)`
+*   **Border:** `1px solid var(--border)` (Crucial for dark mode separation)
 
-### Animations
-Keep animations simple and CSS-based (e.g., transitions on width for progress bars). Complex JS animations can cause jank in the iframe.
+### Buttons
+*   **Primary:** `background-color: var(--primary); color: white;`
+*   **Secondary:** `background-color: transparent; border: 1px solid var(--border);`
+
+## 🌙 Dark Mode Implementation
+The host application injects a `dark-theme` class (or similar) on the body tag of the iframe, OR we rely on media queries. QuestArc uses CSS variables to handle this automatically.
+
+**Rule:** NEVER set a fixed white (`#fff`) or black (`#000`) background on a container. Always use `var(--bg)` or `var(--card-bg)`.
+
+```css
+:root {
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --border: #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #f1f5f9;
+    --border: #334155;
+  }
+}
+```
+
+## 🎥 Animations
+Keep animations simple and CSS-based to avoid jank.
+
+*   **Transitions:** Use `transition: all 0.2s ease-in-out;` on interactive elements.
+*   **Progress Bars:** Animate `width` changes.
+    ```css
+    .xp-bar-fill {
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    ```
+*   **Avoid:** Complex JS-driven animations that require frame-perfect sync with the Brain.

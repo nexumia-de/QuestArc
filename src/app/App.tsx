@@ -129,6 +129,7 @@ function App() {
               <Show when={view() === 'story-list'}>
                 <StoryListView
                   stories={s().stories}
+                  completedStories={s().completedStories || []}
                   activeStoryId={s().activeStory.id || ''}
                   onEdit={(story) => goToEditor(story)}
                   onNavigate={setView}
