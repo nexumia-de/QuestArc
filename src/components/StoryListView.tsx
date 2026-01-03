@@ -88,9 +88,10 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                                     >
                                         <h4 style={{ margin: 0 }}>Completed Quests ({finishedStories.length})</h4>
                                         <span style={{
-                                            transform: isCompletedExpanded() ? 'rotate(180deg)' : 'rotate(0deg)',
+                                            transform: isCompletedExpanded() ? 'rotate(0deg)' : 'rotate(-90deg)',
                                             transition: 'transform 0.2s',
-                                            'font-size': '1em'
+                                            'font-size': '1em',
+                                            'display': 'inline-block'
                                         }}>
                                             ▼
                                         </span>
@@ -141,7 +142,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                 <div class="completed-stories-section">
                     <div class="section-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded())} style={{ cursor: 'pointer', display: 'flex', 'align-items': 'center', gap: '0.5rem', 'margin-bottom': '1rem' }}>
                         <h3 style={{ margin: 0 }}>📜 History</h3>
-                        <span style={{ transform: isHistoryExpanded() ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', 'font-size': '1.2em' }}>
+                        <span style={{ transform: isHistoryExpanded() ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', 'font-size': '1.2em', 'display': 'inline-block' }}>
                             ▼
                         </span>
                     </div>

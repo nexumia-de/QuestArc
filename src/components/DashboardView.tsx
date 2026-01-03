@@ -78,7 +78,6 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                     </Show>
 
                     <Show when={props.state.activeBoss}>
-                        <h4>Defeat Boss:</h4>
                         <div
                             class="boss-battle"
                             style={props.state.activeBoss!.themeColor ? { 'border-color': props.state.activeBoss!.themeColor } : {}}
