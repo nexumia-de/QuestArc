@@ -2,11 +2,14 @@ import { StoryStep } from '../types/state';
 import { PluginService } from './PluginService';
 
 export class TaskService {
-    static async createTasksForStep(step: Pick<StoryStep, 'title' | 'tasksToCreate'>) {
-        if (!step.tasksToCreate) return;
+    static async createTasksForStep(step: Pick<StoryStep, 'title' | 'tasksToCreate'>, force: boolean = false): Promise<boolean> {
+        if (!step.tasksToCreate) return true;
+
+        let allCreated = true;
 
         for (const taskDef of step.tasksToCreate) {
-            if (taskDef.isAutoCreate && PluginService.api.addTask) {
+            // Create if it's auto-create OR if forced
+            if ((taskDef.isAutoCreate || force) && PluginService.api.addTask) {
                 try {
                     const additionalFields: any = {
                         notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
@@ -24,12 +27,20 @@ export class TaskService {
                         title: taskDef.title,
                         ...additionalFields
                     });
-                    PluginService.log.info(`Auto-created task: ${taskDef.title} (Repeat: ${taskDef.isRepeating})`);
+                    PluginService.log.info(`Created task: ${taskDef.title} (Auto: ${taskDef.isAutoCreate}, Force: ${force})`);
                 } catch (e) {
-                    PluginService.log.error(`Failed to auto-create task: ${taskDef.title}`, e);
+                    PluginService.log.error(`Failed to create task: ${taskDef.title}`, e);
+                    // If creation fails, we might still want to consider it "handled" to avoid loop, 
+                    // but for now let's say allCreated is preserved as true if it was an error vs skip?
+                    // actually, if it errors, we probably want to try again? 
+                    // But for the purpose of the UI button, if we skipped it because it wasn't auto-create, that's false.
                 }
+            } else if (!taskDef.isAutoCreate) {
+                // If we skipped it because it wasn't auto-create (and not forced), then we haven't created everything
+                allCreated = false;
             }
         }
+        return allCreated;
     }
 
     static updateTaskTitle(taskId: string, newTitle: string) {

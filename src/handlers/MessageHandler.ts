@@ -91,8 +91,15 @@ export class MessageHandler {
 
                     try {
                         // Auto-create tasks for the first step if configured
-                        await TaskService.createTasksForStep(startStep);
-                        newState.activeStory.tasksCreatedForStepId = startStep.id;
+                        const allCreated = await TaskService.createTasksForStep(startStep);
+                        // Only mark as created if ALL were created (i.e. no manual ones skipped)
+                        // If allCreated is false, it means there are pending manual tasks, so button should show.
+                        if (allCreated) {
+                            newState.activeStory.tasksCreatedForStepId = startStep.id;
+                        } else {
+                            // If not all created, keep it null so button shows
+                            newState.activeStory.tasksCreatedForStepId = null;
+                        }
                     } catch (err) {
                         PluginService.log.error('Failed to auto-create tasks for start step', err);
                     }
@@ -107,7 +114,7 @@ export class MessageHandler {
                 const currentStep = getCurrentStep(state);
 
                 if (currentStep) {
-                    await TaskService.createTasksForStep(currentStep);
+                    await TaskService.createTasksForStep(currentStep, true); // Force create
                     updateState({
                         ...state,
                         activeStory: {

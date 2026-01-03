@@ -60,10 +60,14 @@ export class TaskCompletionHandler {
                         TaskService.updateTaskTitle(taskPayload.task.id, nextStep.title);
 
                         // Auto-create tasks for the new step
-                        await TaskService.createTasksForStep(nextStep);
+                        const allCreated = await TaskService.createTasksForStep(nextStep);
 
-                        // Mark tasks as created for this new step
-                        newState.activeStory.tasksCreatedForStepId = nextStep.id;
+                        // Mark tasks as created for this new step ONLY if all were created
+                        if (allCreated) {
+                            newState.activeStory.tasksCreatedForStepId = nextStep.id;
+                        } else {
+                            newState.activeStory.tasksCreatedForStepId = null;
+                        }
 
                         // Initialize boss for the new step if needed
                         newState = initializeBossIfNeeded(newState, nextStep);
