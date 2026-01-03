@@ -16,7 +16,10 @@
     "persistDataSynced",
     "showIndexHtmlAsView"
   ],
-  "hooks": ["taskComplete", "taskUpdate"],
+  "hooks": [
+    "taskComplete",
+    "taskUpdate"
+  ],
   "iFrame": true,
   "sidePanel": true,
   "isSkipMenuEntry": false,

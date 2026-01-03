@@ -1,7 +1,6 @@
 import { createSignal, Show } from 'solid-js';
 import { QuestArcState, HeroStory, StoryStep } from '../types/state';
 import { MESSAGE_TYPES } from '../types/messages';
-import { RESET_CONFIRMATION_TIMEOUT_MS } from '../lib/constants';
 import { logger } from '../lib/logger';
 import './App.css';
 
@@ -10,6 +9,10 @@ import Header from '../components/Header';
 import DashboardView from '../components/DashboardView';
 import StoryListView from '../components/StoryListView';
 import EditorView from '../components/EditorView';
+import SettingsView from '../components/SettingsView';
+import CharacterView from '../components/CharacterView';
+import InventoryView from '../components/InventoryView';
+import NavBar from '../components/NavBar';
 
 // Hooks & Services
 import { useStateSync } from '../hooks/useStateSync';
@@ -18,10 +21,9 @@ import { MessageService } from '../services/MessageService';
 
 function App() {
   const { state, setState } = useStateSync();
-  const { view, setView, editingStory, goToDashboard, goToEditor } = useNavigation();
+  const { view, setView, editingStory, goToDashboard, goToEditor, goToSettings } = useNavigation();
 
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
-  const [isResetConfirming, setIsResetConfirming] = createSignal(false);
 
   const handleSaveStory = async (title: string, steps: Omit<StoryStep, 'id' | 'nextStepId'>[]) => {
     setErrorMessage(null);
@@ -60,16 +62,9 @@ function App() {
   };
 
   const resetGame = async () => {
-    if (!isResetConfirming()) {
-      setIsResetConfirming(true);
-      setTimeout(() => setIsResetConfirming(false), RESET_CONFIRMATION_TIMEOUT_MS);
-      return;
-    }
-
     const newState = await MessageService.send(MESSAGE_TYPES.DEV_RESET) as QuestArcState;
     setState(newState);
-    setState(newState);
-    setIsResetConfirming(false);
+    goToDashboard();
   };
 
   const startQuest = async (storyId: string) => {
@@ -86,8 +81,6 @@ function App() {
 
   const addStepTasks = async () => {
     await MessageService.send(MESSAGE_TYPES.ADD_STEP_TASKS);
-    // Ideally user sees feedback. Since creating tasks is async/background, maybe just log?
-    // Or we could show a toast. For now, let's keep it simple.
   };
 
   const handleAcknowledgeCompletion = async () => {
@@ -113,9 +106,16 @@ function App() {
       <Show when={state()} fallback={<div class="loading">Loading QuestArc...</div>}>
         {(s) => (
           <main class="app-main">
-            <Header profile={s().profile} activeBoss={s().activeBoss} />
+            {/* Header is always visible on relevant tabs, or we can conditionally hide it */}
+            <Show when={view() !== 'settings' && view() !== 'editor'}>
+              <Header
+                profile={s().profile}
+                activeBoss={s().activeBoss}
+              // removed onSettings prop as it is now in nav bar
+              />
+            </Show>
 
-            <div class="view-content">
+            <div class="view-content" style={{ "padding-bottom": "80px" }}>
               <Show when={view() === 'dashboard'}>
                 <DashboardView
                   state={s()}
@@ -149,17 +149,27 @@ function App() {
                   errorMessage={errorMessage()}
                 />
               </Show>
+
+              <Show when={view() === 'settings'}>
+                <SettingsView
+                  onNavigate={setView}
+                  onReset={resetGame}
+                />
+              </Show>
+
+              <Show when={view() === 'character'}>
+                <CharacterView profile={s().profile} />
+              </Show>
+
+              <Show when={view() === 'inventory'}>
+                <InventoryView onNavigate={setView} />
+              </Show>
             </div>
 
-            <footer class="app-footer">
-              <button
-                class={`reset-btn ${isResetConfirming() ? 'confirming' : ''}`}
-                onClick={resetGame}
-                style={isResetConfirming() ? { 'border-color': 'var(--hp-color)', color: 'var(--hp-color)' } : {}}
-              >
-                {isResetConfirming() ? '⚠️ Tap again to confirm reset' : 'Reset Progress'}
-              </button>
-            </footer>
+            {/* Persistent Navigation Bar */}
+            <Show when={view() !== 'editor'}>
+              <NavBar currentView={view()} onNavigate={setView} />
+            </Show>
           </main>
         )}
       </Show>

@@ -6,7 +6,7 @@ import { superProductivityPlugin } from '@super-productivity/vite-plugin';
 export default defineConfig({
   plugins: [solidPlugin(), superProductivityPlugin()],
   build: {
-    minify: false,
+    minify: true,
     target: 'es2020',
   },
   test: {
