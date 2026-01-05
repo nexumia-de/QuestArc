@@ -15,7 +15,7 @@ QuestArc is a plugin for [Super Productivity](https://super-productivity.com) th
 
 ## Installation
 
-1. Download the latest ZIP from [Releases](https://codeberg.org/carsten/QuestArc/releases)
+1. Download the latest ZIP from [Releases](https://codeberg.org/Nexumia/QuestArc/releases)
 2. Open Super Productivity
 3. Navigate to Settings → Plugins
 4. Click "Upload Plugin"
@@ -108,7 +108,7 @@ MIT
 
 ## Support
 
-- Report bugs: [GitHub Issues](https://github.com/questarc/quest-arc/issues)
+- Report bugs or new feature ideas: [GitHub Issues](https://codeberg.org/Nexumia/QuestArc/issues)
 - Super Productivity: [super-productivity.com](https://super-productivity.com)
 
 ---
