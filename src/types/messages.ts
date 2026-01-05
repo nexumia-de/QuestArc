@@ -1,20 +1,14 @@
 import { QuestArcState, HeroStory } from './state';
 
-export const MESSAGE_TYPES = {
-  // UI -> Brain (Brain cannot push to UI, only respond)
-  REQUEST_SYNC: 'REQUEST_SYNC',
-  DEV_RESET: 'DEV_RESET',
-  // UI -> Brain: Save a new story
-  SAVE_STORY: 'SAVE_STORY',
-  // UI -> Brain: Start a quest (set active story)
-  START_QUEST: 'START_QUEST',
-  // UI -> Brain: Add tasks for the current step to the host app
-  ADD_STEP_TASKS: 'ADD_STEP_TASKS',
-  // UI -> Brain: Acknowledge quest completion (close overlay)
-  ACKNOWLEDGE_COMPLETION: 'ACKNOWLEDGE_COMPLETION',
-  // UI -> Brain: Update user profile (avatar, name, etc)
-  UPDATE_PROFILE: 'UPDATE_PROFILE',
-} as const;
+export enum MESSAGE_TYPES {
+  REQUEST_SYNC = 'REQUEST_SYNC',
+  DEV_RESET = 'DEV_RESET',
+  SAVE_STORY = 'SAVE_STORY',
+  START_QUEST = 'START_QUEST',
+  ADD_STEP_TASKS = 'ADD_STEP_TASKS',
+  ACKNOWLEDGE_COMPLETION = 'ACKNOWLEDGE_COMPLETION',
+  UPDATE_PROFILE = 'UPDATE_PROFILE',
+}
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
 

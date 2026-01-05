@@ -1,6 +1,8 @@
-import { Component, Show, createSignal } from 'solid-js';
+import { Component, Show, createSignal, For } from 'solid-js';
 import { HeroStory, CompletedStory } from '../types/state';
 import StoryCard from './StoryCard';
+import ConfirmDialog from './common/ConfirmDialog';
+import './StoryListView.css';
 
 interface StoryListViewProps {
     stories: HeroStory[];
@@ -12,120 +14,103 @@ interface StoryListViewProps {
     onStart: (storyId: string) => void;
 }
 
+type ConfirmType = 'start' | 'restart' | 'history';
+
+interface ConfirmState {
+    isOpen: boolean;
+    type: ConfirmType;
+    storyId: string | null;
+}
+
 const StoryListView: Component<StoryListViewProps> = (props) => {
-    const [showStartConfirm, setShowStartConfirm] = createSignal<string | null>(null);
-    const [showRestartConfirm, setShowRestartConfirm] = createSignal<string | null>(null);
-    const [showHistoryRestartConfirm, setShowHistoryRestartConfirm] = createSignal<string | null>(null);
+    const [confirmState, setConfirmState] = createSignal<ConfirmState>({
+        isOpen: false,
+        type: 'start',
+        storyId: null
+    });
+
     const [isHistoryExpanded, setIsHistoryExpanded] = createSignal(false);
     const [isCompletedExpanded, setIsCompletedExpanded] = createSignal(false);
 
     const handleCardClick = (storyId: string) => {
         if (storyId === props.activeStoryId) {
-            setShowRestartConfirm(storyId); // Active story click logic (already runnning)
+            setConfirmState({ isOpen: true, type: 'restart', storyId });
         } else if (props.completedStories.some(s => s.id === storyId)) {
-            setShowHistoryRestartConfirm(storyId); // Completed story click logic
+            setConfirmState({ isOpen: true, type: 'history', storyId });
         } else {
-            setShowStartConfirm(storyId); // New story click logic
+            setConfirmState({ isOpen: true, type: 'start', storyId });
         }
     };
 
-    const confirmStart = () => {
-        const id = showStartConfirm();
-        if (id) {
-            props.onStart(id);
-            setShowStartConfirm(null);
+    const handleConfirm = () => {
+        const { type, storyId } = confirmState();
+
+        if (type === 'restart') {
+            // Special case for restart: Just navigating to dashboard
+            props.onNavigate('dashboard');
+        } else if (storyId) {
+            props.onStart(storyId);
+        }
+
+        closeDialog();
+    };
+
+    const closeDialog = () => {
+        setConfirmState({ isOpen: false, type: 'start', storyId: null });
+    };
+
+    const getDialogContent = () => {
+        const { type } = confirmState();
+        switch (type) {
+            case 'start':
+                return {
+                    title: 'Start this Quest?',
+                    message: 'Do you want to start this quest?',
+                    confirmText: 'Start Quest',
+                    showCancel: true
+                };
+            case 'restart':
+                return {
+                    title: 'Quest Running',
+                    message: 'This quest is already running.',
+                    confirmText: 'Go to Dashboard',
+                    showCancel: false
+                };
+            case 'history':
+                return {
+                    title: 'Restart Quest?',
+                    message: 'Do you want to restart this completed quest? It will be moved back to your active quests.',
+                    confirmText: 'Restart',
+                    showCancel: true
+                };
+            default:
+                return { title: '', message: '', confirmText: 'OK' };
         }
     };
 
-    const confirmHistoryRestart = () => {
-        const id = showHistoryRestartConfirm();
-        if (id) {
-            props.onStart(id);
-            setShowHistoryRestartConfirm(null);
-        }
-    };
-
+    // Sub-components can be extracted to separate files if they grow larger,
+    // but for now, keeping them here cleans up the main render function significantly.
     return (
         <section class="story-list-view">
             <h2>Quest Board</h2>
             <div class="story-grid">
                 <Show when={props.stories && props.stories.length > 0} fallback={<div class="empty-state">No quests found. Create one to get started!</div>}>
-                    {(() => {
-                        const allStories = props.stories || [];
-                        const incompleteStories = allStories.filter(s => !props.completedStories.some(cs => cs.id === s.id));
-                        const finishedStories = allStories.filter(s => props.completedStories.some(cs => cs.id === s.id));
-
-                        return (
-                            <>
-                                {incompleteStories.map((story) => (
-                                    <div onClick={() => handleCardClick(story.id)} class="story-card-wrapper" style={{ cursor: 'pointer' }}>
-                                        <StoryCard
-                                            title={story.title}
-                                            stepsCount={story.steps.length}
-                                            totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
-                                            isActive={props.activeStoryId === story.id}
-                                            onEdit={(e) => {
-                                                e.stopPropagation();
-                                                props.onEdit(story);
-                                            }}
-                                        />
-                                    </div>
-                                ))}
-
-                                <Show when={finishedStories.length > 0}>
-                                    <div
-                                        class="completed-separator-header"
-                                        onClick={() => setIsCompletedExpanded(!isCompletedExpanded())}
-                                        style={{
-                                            'grid-column': '1 / -1',
-                                            'display': 'flex',
-                                            'align-items': 'center',
-                                            'gap': '0.5rem',
-                                            'margin': '1rem 0',
-                                            'cursor': 'pointer',
-                                            'opacity': 0.8
-                                        }}
-                                    >
-                                        <h4 style={{ margin: 0 }}>Completed Quests ({finishedStories.length})</h4>
-                                        <span style={{
-                                            transform: isCompletedExpanded() ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                            transition: 'transform 0.2s',
-                                            'font-size': '1em',
-                                            'display': 'inline-block'
-                                        }}>
-                                            ▼
-                                        </span>
-                                        <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)', 'margin-left': '1rem' }}></div>
-                                    </div>
-
-                                    <Show when={isCompletedExpanded()}>
-                                        {finishedStories.map((story) => (
-                                            <div
-                                                onClick={() => handleCardClick(story.id)}
-                                                class="story-card-wrapper"
-                                                style={{
-                                                    cursor: 'pointer',
-                                                    opacity: 0.6,
-                                                    filter: 'grayscale(0.5)'
-                                                }}
-                                            >
-                                                <StoryCard
-                                                    title={story.title}
-                                                    stepsCount={story.steps.length}
-                                                    totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
-                                                    isActive={props.activeStoryId === story.id}
-                                                    onEdit={(e) => {
-                                                        e.stopPropagation();
-                                                        props.onEdit(story);
-                                                    }}
-                                                />
-                                            </div>
-                                        ))}
-                                    </Show>
-                                </Show>
-                            </>
-                        );
-                    })()}
+                    <ActiveQuestsList
+                        stories={props.stories}
+                        completedStories={props.completedStories}
+                        activeStoryId={props.activeStoryId}
+                        onEdit={props.onEdit}
+                        onCardClick={handleCardClick}
+                    />
+                    <CompletedQuestsList
+                        stories={props.stories}
+                        completedStories={props.completedStories}
+                        activeStoryId={props.activeStoryId}
+                        onEdit={props.onEdit}
+                        onCardClick={handleCardClick}
+                        isExpanded={isCompletedExpanded()}
+                        toggleExpanded={() => setIsCompletedExpanded(!isCompletedExpanded())}
+                    />
                 </Show>
             </div>
 
@@ -135,29 +120,146 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                 </button>
             </div>
 
-            <Show when={props.completedStories && props.completedStories.length > 0}>
-                <div class="completed-stories-section">
-                    <div class="section-header" onClick={() => setIsHistoryExpanded(!isHistoryExpanded())} style={{ cursor: 'pointer', display: 'flex', 'align-items': 'center', gap: '0.5rem', 'margin-bottom': '1rem' }}>
-                        <h3 style={{ margin: 0 }}>📜 History</h3>
-                        <span style={{ transform: isHistoryExpanded() ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', 'font-size': '1.2em', 'display': 'inline-block' }}>
-                            ▼
-                        </span>
-                    </div>
+            <HistorySection
+                completedStories={props.completedStories}
+                onCardClick={handleCardClick}
+                isExpanded={isHistoryExpanded()}
+                toggleExpanded={() => setIsHistoryExpanded(!isHistoryExpanded())}
+            />
 
-                    <Show when={isHistoryExpanded()}>
-                        <div class="story-grid">
-                            {props.completedStories.map((story) => (
+            <ConfirmDialog
+                isOpen={confirmState().isOpen}
+                {...getDialogContent()}
+                onConfirm={handleConfirm}
+                onCancel={closeDialog}
+            />
+        </section>
+    );
+};
+
+// ----------------------------------------------------------------------
+// Sub-Components (Extracted to prevent re-render thrashing)
+// ----------------------------------------------------------------------
+
+interface ActiveQuestsListProps {
+    stories: HeroStory[];
+    completedStories: CompletedStory[];
+    activeStoryId: string;
+    onEdit: (story: HeroStory) => void;
+    onCardClick: (id: string) => void;
+}
+
+const ActiveQuestsList: Component<ActiveQuestsListProps> = (props) => {
+    const incompleteStories = () => (props.stories || []).filter(s => !props.completedStories.some(cs => cs.id === s.id));
+    return (
+        <>
+            <For each={incompleteStories()}>
+                {(story) => (
+                    <div
+                        onClick={() => props.onCardClick(story.id)}
+                        class="story-card-wrapper"
+                    >
+                        <StoryCard
+                            title={story.title}
+                            stepsCount={story.steps.length}
+                            totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
+                            isActive={props.activeStoryId === story.id}
+                            onEdit={(e) => {
+                                e.stopPropagation();
+                                props.onEdit(story);
+                            }}
+                        />
+                    </div>
+                )}
+            </For>
+        </>
+    );
+};
+
+interface CompletedQuestsListProps {
+    stories: HeroStory[];
+    completedStories: CompletedStory[];
+    activeStoryId: string;
+    onEdit: (story: HeroStory) => void;
+    onCardClick: (id: string) => void;
+    isExpanded: boolean;
+    toggleExpanded: () => void;
+}
+
+const CompletedQuestsList: Component<CompletedQuestsListProps> = (props) => {
+    const finishedStories = () => (props.stories || []).filter(s => props.completedStories.some(cs => cs.id === s.id));
+
+    return (
+        <Show when={finishedStories().length > 0}>
+            <>
+                <div
+                    class="completed-separator-header"
+                    onClick={props.toggleExpanded}
+                >
+                    <h4>Completed Quests ({finishedStories().length})</h4>
+                    <span class={`accordion-arrow ${!props.isExpanded ? 'collapsed' : ''}`}>
+                        ▼
+                    </span>
+                    <div class="separator-line"></div>
+                </div>
+
+                <Show when={props.isExpanded}>
+                    <For each={finishedStories()}>
+                        {(story) => (
+                            <div
+                                onClick={() => props.onCardClick(story.id)}
+                                class="story-card-wrapper completed-item"
+                            >
+                                <StoryCard
+                                    title={story.title}
+                                    stepsCount={story.steps.length}
+                                    totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
+                                    isActive={props.activeStoryId === story.id}
+                                    onEdit={(e) => {
+                                        e.stopPropagation();
+                                        props.onEdit(story);
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </For>
+                </Show>
+            </>
+        </Show>
+    );
+};
+
+interface HistorySectionProps {
+    completedStories: CompletedStory[];
+    onCardClick: (id: string) => void;
+    isExpanded: boolean;
+    toggleExpanded: () => void;
+}
+
+const HistorySection: Component<HistorySectionProps> = (props) => {
+    return (
+        <Show when={props.completedStories && props.completedStories.length > 0}>
+            <div class="completed-stories-section">
+                <div class="history-header" onClick={props.toggleExpanded}>
+                    <h3>📜 History</h3>
+                    <span class={`accordion-arrow ${!props.isExpanded ? 'collapsed' : ''}`}>
+                        ▼
+                    </span>
+                </div>
+
+                <Show when={props.isExpanded}>
+                    <div class="story-grid">
+                        <For each={props.completedStories}>
+                            {(story) => (
                                 <div
                                     class="story-card-wrapper completed"
-                                    onClick={() => handleCardClick(story.id)}
-                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => props.onCardClick(story.id)}
                                 >
                                     <StoryCard
                                         title={story.title}
                                         stepsCount={story.steps.length}
                                         totalXp={story.steps.reduce((acc, step) => acc + step.xpReward, 0)}
                                         isActive={false}
-                                    // onEdit is omitted, so button won't render
                                     />
                                     <div class="completion-footer">
                                         <div class="completion-date">
@@ -165,53 +267,12 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </Show>
-                </div>
-            </Show>
-
-            <Show when={showStartConfirm()}>
-                <div class="modal-overlay">
-                    <div class="modal">
-                        <h3>Start this Quest?</h3>
-                        <p>Do you want to start this quest?</p>
-                        <div class="modal-actions">
-                            <button class="secondary-btn" onClick={() => setShowStartConfirm(null)}>Cancel</button>
-                            <button class="primary-btn" onClick={confirmStart}>Start Quest</button>
-                        </div>
+                            )}
+                        </For>
                     </div>
-                </div>
-            </Show>
-
-            <Show when={showRestartConfirm()}>
-                <div class="modal-overlay">
-                    <div class="modal">
-                        <h3>Quest Running</h3>
-                        <p>This quest is already running.</p>
-                        <div class="modal-actions">
-                            <button class="primary-btn" onClick={() => {
-                                setShowRestartConfirm(null);
-                                props.onNavigate('dashboard');
-                            }}>Go to Dashboard</button>
-                        </div>
-                    </div>
-                </div>
-            </Show>
-
-            <Show when={showHistoryRestartConfirm()}>
-                <div class="modal-overlay">
-                    <div class="modal">
-                        <h3>Restart Quest?</h3>
-                        <p>Do you want to restart this completed quest? It will be moved back to your active quests.</p>
-                        <div class="modal-actions">
-                            <button class="secondary-btn" onClick={() => setShowHistoryRestartConfirm(null)}>Cancel</button>
-                            <button class="primary-btn" onClick={confirmHistoryRestart}>Restart</button>
-                        </div>
-                    </div>
-                </div>
-            </Show>
-        </section>
+                </Show>
+            </div>
+        </Show>
     );
 };
 

@@ -1,5 +1,7 @@
 import { QuestArcState } from './types/state';
-import { createInitialState, migrateState, validateState, ensureState, getCurrentStep } from './lib/state-manager';
+import { createInitialState, migrateState, ensureState } from './lib/state/persistence';
+import { validateState } from './lib/state/validation';
+import { getCurrentStep } from './lib/plugin-utils';
 import { initializeBossIfNeeded } from './lib/game-logic';
 import { PluginService } from './services/PluginService';
 import { HeaderService } from './services/HeaderService';

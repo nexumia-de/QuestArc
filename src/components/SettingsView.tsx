@@ -20,7 +20,7 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
     };
 
     return (
-        <div class="settings-view">
+        <section class="settings-view">
             <div class="settings-header">
                 <h2>Settings</h2>
             </div>
@@ -40,7 +40,7 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 

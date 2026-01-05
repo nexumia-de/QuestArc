@@ -1,0 +1,520 @@
+/* DashboardView.css */
+
+.active-quest {
+    padding-bottom: 2rem;
+}
+
+.active-quest h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+/* Step Card */
+.step-card {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.step-card p {
+    color: var(--text-muted);
+}
+
+[data-theme='dark'] .step-card {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.step-card h3 {
+    margin-top: 0;
+    color: var(--text);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.step-card.themed-step {
+    border-left: 4px solid var(--theme-color);
+    background: linear-gradient(to right, color-mix(in srgb, var(--theme-color) 10%, transparent), transparent);
+}
+
+/* Step Header Layout */
+.story-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.story-progress-indicator {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Story Content */
+.story-block-container {
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary);
+}
+
+.story-block-container.mode-collapsed {
+    border-left: none;
+}
+
+.story-flavor-text {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-size: 1.05rem;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.story-flavor-text::-webkit-scrollbar {
+    width: 6px;
+}
+
+.story-flavor-text::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.story-flavor-text::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+/* Details/Summary */
+.story-details {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.story-summary {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: var(--text);
+    list-style: none;
+    background: rgba(0, 0, 0, 0.02);
+    transition: background 0.2s ease;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.story-summary::-webkit-details-marker {
+    display: none;
+}
+
+.story-summary::before {
+    content: "›";
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    line-height: 1;
+}
+
+.story-summary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.story-details[open] .story-summary {
+    border-bottom: 1px solid var(--border);
+}
+
+.story-details[open] .story-summary::before {
+    transform: rotate(90deg);
+}
+
+.story-details[open] .story-flavor-text {
+    padding: 1rem;
+}
+
+[data-theme='dark'] .story-details {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme='dark'] .story-summary {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .story-summary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltip Mode */
+.story-tooltip-container {
+    display: inline-block;
+    position: relative;
+}
+
+.story-info-icon {
+    cursor: help;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    transition: transform 0.2s, opacity 0.2s;
+    display: inline-block;
+}
+
+.story-info-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.story-tooltip-content {
+    visibility: hidden;
+    width: 280px;
+    background-color: var(--card-bg);
+    color: var(--text);
+    text-align: left;
+    border-radius: 8px;
+    padding: 1rem;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    pointer-events: none;
+    line-height: 1.5;
+}
+
+.story-tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--border) transparent transparent transparent;
+}
+
+.story-tooltip-container:hover .story-tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Divider */
+.story-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.5rem 0;
+    border: none;
+}
+
+/* Task List */
+.step-tasks ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-item.completed {
+    opacity: 0.6;
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.task-item.completed .task-checkbox-indicator {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+    position: relative;
+}
+
+.task-item.completed .task-checkbox-indicator::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--card-bg);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.task-checkbox-indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--text-muted);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    opacity: 0.5;
+}
+
+.task-title {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.task-spacer {
+    flex-grow: 1;
+    min-width: 1rem;
+}
+
+.task-progress {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+[data-theme='dark'] .task-progress {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+}
+
+/* Additional Task Styles (missing from previous extraction but needed) */
+.tasks-section h5,
+.step-tasks h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+}
+
+/* Boss Battle */
+.boss-battle {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 12px;
+    position: relative;
+    border: 1px solid var(--hp-empty);
+    overflow: visible !important;
+    transition: border-color 0.3s ease;
+}
+
+[data-theme='dark'] .boss-battle {
+    background: #450a0a;
+}
+
+.boss-battle h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--hp-color);
+}
+
+.boss-shake {
+    animation: boss-shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes boss-shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+.boss-image-container {
+    position: absolute;
+    top: -40px;
+    right: 1rem;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    animation: bossFloat 4s ease-in-out infinite;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.boss-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.boss-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes bossFloat {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(2deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+}
+
+.boss-hp-container .hp-bar-fill {
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.damage-popup {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+    color: var(--hp-color);
+    font-weight: bold;
+    font-size: 1.5rem;
+    animation: floatUp 2s forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-40px);
+        opacity: 0;
+    }
+}
+
+/* Quest Completion */
+.quest-complete-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+    border-radius: inherit;
+}
+
+.quest-complete-content {
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.5);
+    border: 2px solid #FFF;
+    color: #000;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.quest-complete-content h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.quest-complete-content p {
+    color: #333;
+    font-weight: 500;
+}
+
+/* Empty State */
+.empty-quest-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.empty-quest-state h2 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 1.5rem;
+}
+
+.empty-quest-state p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 400px;
+}
+
+.empty-quest-state .dashboard-actions {
+    width: 100%;
+    max-width: 400px;
+    justify-content: center;
+}

@@ -51,3 +51,12 @@
 | 049 | 2026-01-03 | Make Step Title optional in stories. | [./049/](./049/) | Antigravity |
 | 050 | 2026-01-04 | Bug Fix: Task creation button only adds manual tasks. | [./050/](./050/) | Antigravity |
 | 051 | 2026-01-04 | UI Tweak: Align story summary to left (standard accordion). | [./051/](./051/) | Antigravity |
+| 052 | 2026-01-04 | Feature: Story step progress bar. | [./052/](./052/) | Antigravity |
+| 053 | 2026-01-04 | Refactoring: Inconsistencies, Modals, Error Handling, & CSS. | [./053/](./053/) | Antigravity |
+| 054 | 2026-01-04 | Refactoring: Consistency Issues (Imports, Props, Wrappers, State). | [./054/](./054/) | Antigravity |
+| 055 | 2026-01-04 | Documentation: Consistency updates (UI & Code Standards). | [./055/](./055/) | Antigravity |
+| 056 | 2026-01-04 | Refactoring: State Sync, Types, & Component Decomposition. | [./056/](./056/) | Antigravity |
+
+| 057 | 2026-01-04 | Refactoring: CSS Extraction, Deduplication, & Imports. | [./057/](./057/) | Antigravity |
+
+| 058 | 2026-01-04 | Refactoring: Inline Styles & Component Optimization. | [./058/](./058/) | Antigravity |

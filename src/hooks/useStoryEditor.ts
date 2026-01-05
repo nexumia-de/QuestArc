@@ -4,7 +4,7 @@ import { HeroStory, StoryStep, TaskDefinition, CompletionType, CompletionRequire
 // We manage the step without the ID/NextID until save time
 export type EditorStep = Omit<StoryStep, 'id' | 'nextStepId'>;
 
-export function useStoryEditor(initialStory: HeroStory | null) {
+export function useStoryEditor(initialStory: HeroStory | null | undefined) {
     const [storyTitle, setStoryTitle] = createSignal(initialStory?.title || '');
 
     // transform initial steps or default to one empty step

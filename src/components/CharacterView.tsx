@@ -1,9 +1,9 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { Component, Show, createSignal } from 'solid-js';
 import { QuestArcState, AvatarConfig } from '../types/state';
+import { MESSAGE_TYPES } from '../types/messages';
+import { MessageService } from '../services/MessageService';
 import Avatar from './Avatar';
 import AvatarEditor from './AvatarEditor';
-import { MessageService } from '../services/MessageService';
-import { MESSAGE_TYPES } from '../types/messages';
 import './CharacterView.css';
 
 interface CharacterViewProps {
@@ -15,14 +15,19 @@ const CharacterView: Component<CharacterViewProps> = (props) => {
     const [previewConfig, setPreviewConfig] = createSignal<AvatarConfig | null>(null);
 
     const handleSaveAvatar = async (config: AvatarConfig) => {
-        // Send updated config to backend
-        await MessageService.send(MESSAGE_TYPES.UPDATE_PROFILE, {
-            profile: { avatar: config }
-        });
+        try {
+            // Send updated config to backend
+            await MessageService.send(MESSAGE_TYPES.UPDATE_PROFILE, {
+                profile: { avatar: config }
+            });
 
-        // Optimistic update handled by sync, but we close editor now
-        setPreviewConfig(null);
-        setIsEditing(false);
+            // Optimistic update handled by sync, but we close editor now
+            setPreviewConfig(null);
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Failed to save avatar:', error);
+            // Optional: Show user feedback
+        }
     };
 
     const handleCancel = () => {
@@ -31,7 +36,7 @@ const CharacterView: Component<CharacterViewProps> = (props) => {
     };
 
     return (
-        <div class="character-view">
+        <section class="character-view">
             <div class="hero-card">
                 <div class="hero-avatar-section">
                     <div
@@ -79,7 +84,7 @@ const CharacterView: Component<CharacterViewProps> = (props) => {
                 </Show>
             </div>
 
-            <Show when={props.profile.pet && !isEditing()}>
+            <Show when={!isEditing() && props.profile.pet}>
                 {(pet) => (
                     <div class="pet-details-card">
                         <div class="pet-header">
@@ -105,7 +110,7 @@ const CharacterView: Component<CharacterViewProps> = (props) => {
                     </div>
                 )}
             </Show>
-        </div>
+        </section>
     );
 };
 

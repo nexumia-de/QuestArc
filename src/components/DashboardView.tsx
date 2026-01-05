@@ -1,6 +1,7 @@
-import { Component, Show, For, Switch, Match } from 'solid-js';
+import { Component, createMemo, For, Match, Show, Switch } from 'solid-js';
 import { QuestArcState } from '../types/state';
 import { getCurrentStepTitle, getCurrentStep } from '../lib/state-manager';
+import './DashboardView.css';
 
 interface DashboardViewProps {
     state: QuestArcState;
@@ -11,25 +12,23 @@ interface DashboardViewProps {
 }
 
 const DashboardView: Component<DashboardViewProps> = (props) => {
-    const currentStep = () => getCurrentStep(props.state);
+    const currentStep = createMemo(() => getCurrentStep(props.state));
 
-    const getStoryTitle = () => {
+    const storyTitle = createMemo(() => {
         if (!props.state.activeStory.id) return '';
         const story = props.state.stories?.find(s => s.id === props.state.activeStory.id);
         return story ? story.title : props.state.activeStory.id.replace(/_/g, ' ');
-    };
+    });
 
-    // Calculate progress
-    const getProgressText = () => {
+    const progressText = createMemo(() => {
         if (!props.state.activeStory.id) return '';
         const story = props.state.stories?.find(s => s.id === props.state.activeStory.id);
         if (!story) return '';
         const currentId = props.state.activeStory.currentStepId;
         const totalSteps = story.steps.length;
-        // Find index of current step
         const currentIndex = story.steps.findIndex(s => s.id === currentId);
         return currentIndex >= 0 ? `Step ${currentIndex + 1}/${totalSteps}` : '';
-    };
+    });
 
     return (
         <section class="active-quest">
@@ -37,7 +36,7 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                 <div class="quest-complete-overlay">
                     <div class="quest-complete-content">
                         <h2>🏆 QUEST COMPLETE! 🏆</h2>
-                        <p>You have finished the story: {getStoryTitle()}</p>
+                        <p>You have finished the story: {storyTitle()}</p>
                         <button class="primary-btn" style={{ 'margin-top': '1rem' }} onClick={props.onAcknowledge}>
                             Continue Adventure
                         </button>
@@ -60,7 +59,7 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
             >
                 <div class="story-header-row">
                     <h2>Current Story Step</h2>
-                    <span class="story-progress-indicator">{getProgressText()}</span>
+                    <span class="story-progress-indicator">{progressText()}</span>
                 </div>
 
                 <div

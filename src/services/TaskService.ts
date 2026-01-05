@@ -45,8 +45,12 @@ export class TaskService {
 
     static updateTaskTitle(taskId: string, newTitle: string) {
         if (PluginService.api.updateTask) {
-            PluginService.api.updateTask(taskId, { title: newTitle });
-            PluginService.log.info(`Updated task title to: ${newTitle}`);
+            try {
+                PluginService.api.updateTask(taskId, { title: newTitle });
+                PluginService.log.info(`Updated task title to: ${newTitle}`);
+            } catch (e) {
+                PluginService.log.error(`Failed to update task title: ${taskId}`, e);
+            }
         }
     }
 }

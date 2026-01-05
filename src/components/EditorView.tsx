@@ -4,7 +4,7 @@ import { useStoryEditor, EditorStep } from '../hooks/useStoryEditor';
 import StepBuilder from './editor/StepBuilder';
 
 interface EditorViewProps {
-    initialStory: HeroStory | null;
+    initialStory: HeroStory | undefined;
     onSave: (title: string, steps: EditorStep[]) => Promise<void>;
     onCancel: () => void;
     errorMessage: string | null;

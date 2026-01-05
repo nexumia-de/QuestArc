@@ -89,6 +89,21 @@ Use for grouping related information.
 *   **Primary:** `background-color: var(--primary); color: white;`
 *   **Secondary:** `background-color: transparent; border: 1px solid var(--border);`
 
+### Modals (`ConfirmDialog`)
+Use the shared `ConfirmDialog` component for confirmations.
+*   **Usage:** Destructive actions or major context switches (e.g., Restarting a Quest).
+*   **Don't:** Build custom modals unless absolutely necessary.
+*   **Pattern:**
+    ```tsx
+    <ConfirmDialog
+      isOpen={isOpen()}
+      title="Are you sure?"
+      message="This action cannot be undone."
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+    />
+    ```
+
 ## 🌙 Dark Mode Implementation
 The host application injects a `dark-theme` class (or similar) on the body tag of the iframe, OR we rely on media queries. QuestArc uses CSS variables to handle this automatically.
 

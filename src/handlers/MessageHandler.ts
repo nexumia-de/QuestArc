@@ -1,6 +1,7 @@
+import { getCurrentStep } from '../lib/plugin-utils';
 import { MESSAGE_TYPES } from '../types/messages';
 import { QuestArcState, HeroStory } from '../types/state';
-import { createInitialState, getCurrentStep } from '../lib/state-manager';
+import { createInitialState } from '../lib/state/persistence'; // Correct path
 import { initializeBossIfNeeded } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';

@@ -45,8 +45,16 @@ A task is complete only when:
 *   **Commits:** Use conventional commits (e.g., `feat: add boss capability`, `fix: dark mode contrast`).
 *   **Branches:** Feature branches preferred.
 
-## Code Style
+## Code Style & Standards
 
+*   **Component Syntax:** Always use `const Name: Component<Props> = (props) => ...`. Do not use `function Name()`.
+*   **Top-Level Elements:** Use semantic tags (e.g., `<section>`) for View roots, not `<div>`.
+*   **Import Order:**
+    1.  External Libraries (`solid-js`, etc.)
+    2.  Types (`../types/...`)
+    3.  Services/Lib (`../services/...`)
+    4.  Components (`./Folder/...`)
+    5.  Styles (`./File.css`)
 *   **Functional:** Prefer pure functions.
 *   **KISS:** Keep It Simple.
 *   **DRY:** Reuse services.

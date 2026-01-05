@@ -7,7 +7,7 @@ interface InventoryViewProps {
 
 const InventoryView: Component<InventoryViewProps> = (props) => {
     return (
-        <div class="inventory-view">
+        <section class="inventory-view">
             <div class="inventory-header">
                 <h2>Inventory</h2>
                 <div class="currency-display">
@@ -31,7 +31,7 @@ const InventoryView: Component<InventoryViewProps> = (props) => {
                     <div class="inventory-slot empty" title="Empty Slot"></div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 

@@ -17,7 +17,7 @@ const Avatar: Component<AvatarProps> = (props) => {
     const mouth = createMemo(() => props.config?.mouth || 'neutral');
 
     return (
-        <div class="avatar-svg-container" style={{ width: '100%', height: '100%' }}>
+        <div class="avatar-svg-container">
             <svg
                 viewBox="0 0 100 100"
                 xmlns="http://www.w3.org/2000/svg"

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [solidPlugin(), superProductivityPlugin()],
   build: {
     minify: true,
-    target: 'es2020',
+    target: 'es2018',
   },
   test: {
     environment: 'jsdom',

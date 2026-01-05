@@ -57,14 +57,14 @@ const CompletionRequirementEditor: Component<CompletionRequirementEditorProps> =
                 </div>
                 <div class="form-group">
                     <label>Theme Color:</label>
-                    <div style={{ display: 'flex', gap: '0.5rem', 'align-items': 'center' }}>
+                    <div class="color-input-wrapper">
                         <input
                             type="color"
                             value={props.completion.config?.boss?.themeColor || '#ff0000'}
                             onInput={(e) => props.onUpdateConfig('boss_themeColor', e.currentTarget.value)}
-                            style={{ height: '40px', width: '60px', padding: '0', border: 'none' }}
+                            class="color-input"
                         />
-                        <span style={{ 'font-size': '0.9rem', opacity: 0.7 }}>
+                        <span class="color-preview">
                             {props.completion.config?.boss?.themeColor || '#ff0000'}
                         </span>
                     </div>

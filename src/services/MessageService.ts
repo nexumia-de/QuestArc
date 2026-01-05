@@ -2,7 +2,7 @@ import { MESSAGE_TIMEOUT_MS } from '../lib/constants';
 import { logger } from '../lib/logger';
 
 export class MessageService {
-    static async send(type: string, payload?: any): Promise<any> {
+    static async send<T = any>(type: string, payload?: any): Promise<T> {
         return new Promise((resolve, reject) => {
             const messageId = Math.random().toString(36).substring(2, 11);
             logger.debug('UI: Sending message:', { type, payload, messageId });

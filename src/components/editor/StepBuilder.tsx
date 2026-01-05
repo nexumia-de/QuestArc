@@ -74,7 +74,7 @@ const StepBuilder: Component<StepBuilderProps> = (props) => {
                     </select>
                 </div>
                 <Show when={props.step.display_mode === 'tooltip'}>
-                    <div class="form-group" style={{ flex: '0 0 80px' }}>
+                    <div class="form-group icon-input-group">
                         <label>Icon</label>
                         <input
                             type="text"
