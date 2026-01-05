@@ -20,15 +20,16 @@ export class MessageHandler {
                 PluginService.log.debug('Sending state to UI');
                 return state;
 
-            case MESSAGE_TYPES.DEV_RESET:
+            case MESSAGE_TYPES.DEV_RESET: {
                 PluginService.log.info('Resetting progress');
                 const cleanState = createInitialState();
                 updateState(cleanState);
                 await saveCallback();
                 PluginService.log.info('Progress reset');
                 return cleanState;
+            }
 
-            case MESSAGE_TYPES.SAVE_STORY:
+            case MESSAGE_TYPES.SAVE_STORY: {
                 const newStory = message.payload as HeroStory;
                 PluginService.log.info('Saving story:', newStory.title);
 
@@ -52,8 +53,9 @@ export class MessageHandler {
 
                 PluginService.log.info(`Story saved: ${newStory.title}`);
                 return { success: true, stories: currentStories };
+            }
 
-            case MESSAGE_TYPES.START_QUEST:
+            case MESSAGE_TYPES.START_QUEST: {
                 const { storyId } = message.payload;
                 PluginService.log.info('Starting quest:', storyId);
 
@@ -115,8 +117,9 @@ export class MessageHandler {
                 updateState(newState);
                 await saveCallback();
                 return { success: true };
+            }
 
-            case MESSAGE_TYPES.ADD_STEP_TASKS:
+            case MESSAGE_TYPES.ADD_STEP_TASKS: {
                 PluginService.log.info('Adding tasks for current step');
                 const currentStep = getCurrentStep(state);
 
@@ -134,8 +137,9 @@ export class MessageHandler {
                 } else {
                     return { error: 'No active step found' };
                 }
+            }
 
-            case MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION:
+            case MESSAGE_TYPES.ACKNOWLEDGE_COMPLETION: {
                 PluginService.log.info('Acknowledging quest completion');
 
                 // Archive the story
@@ -165,6 +169,7 @@ export class MessageHandler {
                 });
                 await saveCallback();
                 return { success: true };
+            }
 
             case MESSAGE_TYPES.UPDATE_PROFILE: {
                 const { profile } = message.payload;
@@ -176,6 +181,34 @@ export class MessageHandler {
                         ...state.profile,
                         ...profile
                     }
+                });
+                await saveCallback();
+                return { success: true };
+            }
+
+            case MESSAGE_TYPES.DELETE_STORY: {
+                const { storyId } = message.payload;
+                PluginService.log.info('Deleting story:', storyId);
+
+                const currentStories = state.stories ? state.stories.filter(s => s.id !== storyId) : [];
+                const currentCompleted = state.completedStories ? state.completedStories.filter(s => s.id !== storyId) : [];
+
+                let activeStory = state.activeStory;
+                if (activeStory.id === storyId) {
+                    activeStory = {
+                        ...activeStory,
+                        id: null,
+                        isCompleted: false,
+                        tasksCreatedForStepId: null,
+                        taskProgress: {}
+                    };
+                }
+
+                updateState({
+                    ...state,
+                    stories: currentStories,
+                    completedStories: currentCompleted,
+                    activeStory
                 });
                 await saveCallback();
                 return { success: true };

@@ -1,0 +1,9 @@
+.delete-btn {
+    border-color: var(--danger-color, #ff4d4d);
+    color: var(--danger-color, #ff4d4d);
+}
+
+.delete-btn:hover {
+    background-color: var(--danger-color, #ff4d4d);
+    color: white;
+}

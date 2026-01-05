@@ -1,12 +1,15 @@
-import { Component, Index, Show } from 'solid-js';
+import { Component, Index, Show, createSignal } from 'solid-js';
 import { HeroStory } from '../types/state';
 import { useStoryEditor, EditorStep } from '../hooks/useStoryEditor';
 import StepBuilder from './editor/StepBuilder';
+import ConfirmDialog from './common/ConfirmDialog';
+import './EditorView.css';
 
 interface EditorViewProps {
     initialStory: HeroStory | undefined;
     onSave: (title: string, steps: EditorStep[]) => Promise<void>;
     onCancel: () => void;
+    onDelete: (storyId: string) => Promise<void>;
     errorMessage: string | null;
 }
 
@@ -25,8 +28,16 @@ const EditorView: Component<EditorViewProps> = (props) => {
         updateCompletionConfig
     } = useStoryEditor(props.initialStory);
 
+    const [showDeleteConfirm, setShowDeleteConfirm] = createSignal(false);
+
     const handleSave = () => {
         props.onSave(storyTitle(), steps());
+    };
+
+    const handleDelete = async () => {
+        if (props.initialStory) {
+            await props.onDelete(props.initialStory.id);
+        }
     };
 
     return (
@@ -80,10 +91,28 @@ const EditorView: Component<EditorViewProps> = (props) => {
                 >
                     {props.initialStory ? 'Update Story' : 'Forge Story'}
                 </button>
+                <Show when={props.initialStory}>
+                    <button class="secondary-btn delete-btn" onClick={() => setShowDeleteConfirm(true)}>
+                        Delete Story
+                    </button>
+                </Show>
                 <button class="secondary-btn cancel-btn" onClick={props.onCancel}>
                     Cancel
                 </button>
             </div>
+
+            <Show when={showDeleteConfirm()}>
+                <ConfirmDialog
+                    isOpen={true}
+                    title="Delete Story?"
+                    message="Are you sure you want to delete this story? This action cannot be undone."
+                    confirmText="Delete"
+                    onConfirm={handleDelete}
+                    onCancel={() => setShowDeleteConfirm(false)}
+                    showCancel={true}
+                    isDanger={true}
+                />
+            </Show>
         </section>
     );
 };

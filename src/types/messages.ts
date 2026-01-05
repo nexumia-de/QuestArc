@@ -8,6 +8,7 @@ export enum MESSAGE_TYPES {
   ADD_STEP_TASKS = 'ADD_STEP_TASKS',
   ACKNOWLEDGE_COMPLETION = 'ACKNOWLEDGE_COMPLETION',
   UPDATE_PROFILE = 'UPDATE_PROFILE',
+  DELETE_STORY = 'DELETE_STORY',
 }
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -51,4 +52,9 @@ export interface UpdateProfileMessage extends BaseMessage {
   payload: { profile: Partial<QuestArcState['profile']> };
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage;
+export interface DeleteStoryMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.DELETE_STORY;
+  payload: { storyId: string };
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage;

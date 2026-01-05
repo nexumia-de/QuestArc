@@ -16,10 +16,9 @@ export const PET_INITIAL_STAGE = 1;
 export const BASE_BOSS_DAMAGE = 10;
 
 // Player stats
-export const INITIAL_HP = 100;
-export const INITIAL_MAX_HP = 100;
 
 // UI polling
+
 export const STATE_POLL_INTERVAL_MS = 2000;
 export const MESSAGE_TIMEOUT_MS = 5000;
 

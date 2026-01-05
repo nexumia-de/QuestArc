@@ -105,6 +105,26 @@ export const useQuestArc = () => {
         if (onSuccess) onSuccess();
     };
 
+    const deleteStory = async (storyId: string, onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<{ success: boolean; error?: string }>(
+                MESSAGE_TYPES.DELETE_STORY,
+                { storyId }
+            );
+
+            if (response && response.success) {
+                await refreshState();
+                if (onSuccess) onSuccess();
+            } else {
+                logger.error('Failed to delete story:', response?.error);
+                setActionError(response?.error || 'Failed to delete story');
+            }
+        } catch (error) {
+            logger.error('Delete story error:', error);
+            setActionError('Failed to delete story');
+        }
+    };
+
     return {
         state,
         actionError,
@@ -113,6 +133,7 @@ export const useQuestArc = () => {
         handleAcknowledgeCompletion,
         addStepTasks,
         resetGame,
-        setActionError
+        setActionError,
+        deleteStory
     };
 };

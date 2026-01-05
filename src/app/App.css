@@ -381,6 +381,17 @@ body[class*='dark'] {
   color: var(--text);
 }
 
+.danger-btn {
+  background: #ef4444;
+  color: white;
+  border: 1px solid #ef4444;
+}
+
+.danger-btn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
 .new-quest-btn {
   margin-top: 1rem;
   width: 100%;

@@ -3,12 +3,14 @@ import storyDataRaw from '../../assets/stories/productivity-mastery.json';
 import {
     INITIAL_LEVEL,
     INITIAL_XP,
-    INITIAL_HP,
-    INITIAL_MAX_HP,
+
+
+
     PET_INITIAL_STAGE,
     XP_PER_LEVEL_MULTIPLIER
 } from '../constants';
-import { INITIAL_STATE, CURRENT_STATE_VERSION } from './config';
+import { INITIAL_STATE, CURRENT_STATE_VERSION, STARTING_HP, STARTING_MAX_HP } from './config';
+
 
 const STORY_DATA = storyDataRaw as HeroStory;
 
@@ -61,12 +63,14 @@ export function ensureState(state: any): QuestArcState {
             level: INITIAL_LEVEL,
             xp: INITIAL_XP,
             xpToNextLevel: INITIAL_LEVEL * XP_PER_LEVEL_MULTIPLIER,
-            hp: INITIAL_HP,
-            maxHp: INITIAL_MAX_HP
+            hp: STARTING_HP,
+            maxHp: STARTING_MAX_HP
+
         };
     }
-    if (!newState.profile.hp) newState.profile.hp = INITIAL_HP;
-    if (!newState.profile.maxHp) newState.profile.maxHp = INITIAL_MAX_HP;
+    if (!newState.profile.hp) newState.profile.hp = STARTING_HP;
+    if (!newState.profile.maxHp) newState.profile.maxHp = STARTING_MAX_HP;
+
     if (!newState.profile.pet) {
         newState.profile.pet = { type: 'slime', stage: PET_INITIAL_STAGE, name: 'Buddy' };
     }

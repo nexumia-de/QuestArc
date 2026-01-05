@@ -4,12 +4,16 @@ import {
     XP_PER_LEVEL_MULTIPLIER,
     INITIAL_LEVEL,
     INITIAL_XP,
-    INITIAL_HP,
-    INITIAL_MAX_HP,
+
+
+
     PET_INITIAL_STAGE
 } from '../constants';
 
 const STORY_DATA = storyDataRaw as HeroStory;
+
+export const STARTING_HP = 100;
+export const STARTING_MAX_HP = 100;
 
 export const CURRENT_STATE_VERSION = 1;
 
@@ -19,8 +23,9 @@ export const INITIAL_STATE: QuestArcState = {
         level: INITIAL_LEVEL,
         xp: INITIAL_XP,
         xpToNextLevel: INITIAL_LEVEL * XP_PER_LEVEL_MULTIPLIER,
-        hp: INITIAL_HP,
-        maxHp: INITIAL_MAX_HP,
+        hp: STARTING_HP,
+        maxHp: STARTING_MAX_HP,
+
         pet: {
             type: 'slime',
             stage: PET_INITIAL_STAGE,

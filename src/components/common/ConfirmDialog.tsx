@@ -9,6 +9,7 @@ interface ConfirmDialogProps {
     onConfirm: () => void;
     onCancel: () => void;
     showCancel?: boolean;
+    isDanger?: boolean;
 }
 
 const ConfirmDialog: Component<ConfirmDialogProps> = (props) => {
@@ -24,7 +25,7 @@ const ConfirmDialog: Component<ConfirmDialogProps> = (props) => {
                                 {props.cancelText || 'Cancel'}
                             </button>
                         </Show>
-                        <button class="primary-btn" onClick={props.onConfirm}>
+                        <button class={`primary-btn ${props.isDanger ? 'danger-btn' : ''}`} onClick={props.onConfirm}>
                             {props.confirmText || 'Confirm'}
                         </button>
                     </div>

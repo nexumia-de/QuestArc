@@ -20,6 +20,7 @@ interface ViewRouterProps {
         handleAcknowledgeCompletion: () => void;
         startQuest: (storyId: string) => void;
         handleSaveStory: (title: string, steps: any[]) => Promise<void>;
+        handleDeleteStory: (storyId: string) => Promise<void>;
         handleImportStory: (data: any) => Promise<void>;
         resetGame: () => void;
         clearErrorMessage: () => void;
@@ -60,6 +61,7 @@ const ViewRouter: Component<ViewRouterProps> = (props) => {
                         props.actions.goToDashboard();
                         props.actions.clearErrorMessage();
                     }}
+                    onDelete={props.actions.handleDeleteStory}
                     errorMessage={props.errorMessage}
                 />
             </Show>
