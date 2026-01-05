@@ -1,0 +1,21 @@
+kind: pipeline
+name: release-pipeline
+
+steps:
+  build:
+    image: node:20
+    commands:
+      - npm install
+      - npm run build
+      - npm run package
+
+  publish:
+    image: woodpeckerci/plugin-release
+    settings:
+      api_key:
+        from_secret: RELEASE_TOKEN
+      files:
+        - "*.zip"
+      base_url: https://codeberg.org
+    when:
+      event: tag
