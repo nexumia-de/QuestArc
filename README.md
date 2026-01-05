@@ -30,15 +30,6 @@ QuestArc is a plugin for [Super Productivity](https://super-productivity.com) th
 
 ## How It Works
 
-### The Split-Brain Architecture
-
-QuestArc uses a "Split-Brain" design to work seamlessly on mobile and desktop:
-
-- **The Brain** (`plugin.ts`): Runs in the main app, handles all game logic, tracks state, and persists data
-- **The Face** (`App.tsx`): The SolidJS UI that displays your progress and polls for updates every 2 seconds
-
-This ensures your progress is tracked even when the plugin UI is closed.
-
 ### Game Mechanics
 
 **Boss Battles:**
