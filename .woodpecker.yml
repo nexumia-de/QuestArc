@@ -15,7 +15,7 @@ steps:
       api_key:
         from_secret: RELEASE_TOKEN
       files:
-        - "*.zip"
+        - "quest-arc-v*.zip"
       base_url: https://codeberg.org
     when:
       event: tag
