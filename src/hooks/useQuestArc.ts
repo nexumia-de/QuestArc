@@ -125,6 +125,25 @@ export const useQuestArc = () => {
         }
     };
 
+    const cancelQuest = async (onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<{ success: boolean; error?: string }>(
+                MESSAGE_TYPES.CANCEL_QUEST
+            );
+
+            if (response && response.success) {
+                await refreshState();
+                if (onSuccess) onSuccess();
+            } else {
+                logger.error('Failed to cancel quest:', response?.error);
+                setActionError(response?.error || 'Failed to cancel quest');
+            }
+        } catch (error) {
+            logger.error('Cancel quest error:', error);
+            setActionError('Failed to cancel quest');
+        }
+    };
+
     return {
         state,
         actionError,
@@ -134,6 +153,7 @@ export const useQuestArc = () => {
         addStepTasks,
         resetGame,
         setActionError,
-        deleteStory
+        deleteStory,
+        cancelQuest
     };
 };

@@ -15,6 +15,7 @@ interface StoryListViewProps {
     onCreate: () => void;
     onStart: (storyId: string) => void;
     onImport: (data: any) => void;
+    onCancelQuest: () => void;
 }
 
 type ConfirmType = 'start' | 'restart' | 'history';
@@ -81,10 +82,31 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                 };
             case 'restart':
                 return {
-                    title: 'Quest Running',
-                    message: 'This quest is already running.',
-                    confirmText: 'Go to Dashboard',
-                    showCancel: false
+                    title: 'Quest Active',
+                    message: 'This quest is currently active. What would you like to do?',
+                    confirmText: 'Restart Quest',
+                    showCancel: true,
+                    customActions: (
+                        <>
+                            <button class="secondary-btn" onClick={closeDialog}>
+                                Close
+                            </button>
+                            <button class="secondary-btn" onClick={() => {
+                                props.onCancelQuest();
+                                closeDialog();
+                            }}>
+                                Cancel Quest
+                            </button>
+                            <button class="primary-btn" onClick={() => {
+                                if (confirmState().storyId) {
+                                    props.onStart(confirmState().storyId!);
+                                }
+                                closeDialog();
+                            }}>
+                                Restart Quest
+                            </button>
+                        </>
+                    )
                 };
             case 'history':
                 return {

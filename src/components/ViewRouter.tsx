@@ -24,6 +24,7 @@ interface ViewRouterProps {
         handleImportStory: (data: any) => Promise<void>;
         resetGame: () => void;
         clearErrorMessage: () => void;
+        cancelQuest: () => Promise<void>;
     };
 }
 
@@ -50,6 +51,7 @@ const ViewRouter: Component<ViewRouterProps> = (props) => {
                     onCreate={() => props.actions.goToEditor()}
                     onStart={props.actions.startQuest}
                     onImport={props.actions.handleImportStory}
+                    onCancelQuest={props.actions.cancelQuest}
                 />
             </Show>
 

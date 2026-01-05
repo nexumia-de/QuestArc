@@ -16,7 +16,8 @@ const App: Component = () => {
     addStepTasks,
     resetGame,
     setActionError,
-    deleteStory
+    deleteStory,
+    cancelQuest
   } = useQuestArc();
 
   const { view, setView, editingStory, goToDashboard, goToEditor, goToStoryList } = useNavigation();
@@ -91,7 +92,8 @@ const App: Component = () => {
 
                 handleImportStory,
                 resetGame: resetGameWrapper,
-                clearErrorMessage: () => setActionError(null)
+                clearErrorMessage: () => setActionError(null),
+                cancelQuest
               }}
             />
 

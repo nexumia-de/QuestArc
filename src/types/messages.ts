@@ -9,6 +9,7 @@ export enum MESSAGE_TYPES {
   ACKNOWLEDGE_COMPLETION = 'ACKNOWLEDGE_COMPLETION',
   UPDATE_PROFILE = 'UPDATE_PROFILE',
   DELETE_STORY = 'DELETE_STORY',
+  CANCEL_QUEST = 'CANCEL_QUEST',
 }
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -57,4 +58,9 @@ export interface DeleteStoryMessage extends BaseMessage {
   payload: { storyId: string };
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage;
+export interface CancelQuestMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.CANCEL_QUEST;
+  payload?: null;
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage;

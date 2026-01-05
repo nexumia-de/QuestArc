@@ -214,6 +214,25 @@ export class MessageHandler {
                 return { success: true };
             }
 
+            case MESSAGE_TYPES.CANCEL_QUEST: {
+                PluginService.log.info('Cancelling active quest');
+
+                updateState({
+                    ...state,
+                    activeStory: {
+                        ...state.activeStory,
+                        id: null,
+                        currentStepId: 1,
+                        isCompleted: false,
+                        tasksCreatedForStepId: null,
+                        taskProgress: {}
+                    },
+                    activeBoss: null
+                });
+                await saveCallback();
+                return { success: true };
+            }
+
             default:
                 PluginService.log.warn('Unknown message type:', message.type);
                 return { error: 'Unknown message type' };
