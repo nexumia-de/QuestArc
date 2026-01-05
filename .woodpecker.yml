@@ -1,11 +1,8 @@
-kind: pipeline
-name: release-pipeline
-
 workspace:
   path: /woodpecker/src
 
-steps:
-  - name: build
+pipeline:
+  build:
     image: node:20
     commands:
       - npm install
@@ -13,8 +10,9 @@ steps:
       - npm run package
       - ls -la quest-arc-v*.zip
 
-  - name: publish
+  publish:
     image: woodpeckerci/plugin-release
+    secrets: [ RELEASE_TOKEN ]
     settings:
       api_key:
         from_secret: RELEASE_TOKEN
