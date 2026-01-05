@@ -19,13 +19,12 @@
     border-top: 1px solid var(--border);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(10px);
+    box-sizing: border-box;
 }
 
 /* Adjust for centering within max-width container if needed */
 @media (min-width: 600px) {
     .nav-bar {
-        left: 50%;
-        transform: translateX(-50%);
         border-radius: 12px 12px 0 0;
         bottom: 0;
     }
