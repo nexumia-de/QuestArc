@@ -16,7 +16,7 @@ steps:
     image: woodpeckerci/plugin-release
     settings:
       api_key:
-        from_secret: RELEASE_TOKEN
+        from_secret: release_token
       files:
         - "quest-arc-v*.zip"
       base_url: https://codeberg.org
