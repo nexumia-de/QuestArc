@@ -8,16 +8,15 @@ steps:
       - npm install
       - cd packages/vite-plugin && npm run build && cd ../..
       - npm run package
-      - ls -lh *.zip
 
   publish:
-    image: plugins/gitea-release
+    image: woodpeckerci/plugin-release
     settings:
       api_key:
         from_secret: RELEASE_TOKEN
       base_url: https://codeberg.org
-      files:
-        - "quest-arc-v*.zip"
+      forgejo: true
+      files: "quest-arc-v*.zip"
       overwrite: true
     when:
       event: tag
