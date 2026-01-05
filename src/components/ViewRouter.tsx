@@ -20,6 +20,7 @@ interface ViewRouterProps {
         handleAcknowledgeCompletion: () => void;
         startQuest: (storyId: string) => void;
         handleSaveStory: (title: string, steps: any[]) => Promise<void>;
+        handleImportStory: (data: any) => Promise<void>;
         resetGame: () => void;
         clearErrorMessage: () => void;
     };
@@ -47,6 +48,7 @@ const ViewRouter: Component<ViewRouterProps> = (props) => {
                     onNavigate={props.actions.setView}
                     onCreate={() => props.actions.goToEditor()}
                     onStart={props.actions.startQuest}
+                    onImport={props.actions.handleImportStory}
                 />
             </Show>
 

@@ -2,6 +2,8 @@ import { Component, Show, createSignal, For } from 'solid-js';
 import { HeroStory, CompletedStory } from '../types/state';
 import StoryCard from './StoryCard';
 import ConfirmDialog from './common/ConfirmDialog';
+import ExportDialog from './common/ExportDialog';
+import ImportDialog from './common/ImportDialog';
 import './StoryListView.css';
 
 interface StoryListViewProps {
@@ -12,6 +14,7 @@ interface StoryListViewProps {
     onNavigate: (view: 'dashboard') => void;
     onCreate: () => void;
     onStart: (storyId: string) => void;
+    onImport: (data: any) => void;
 }
 
 type ConfirmType = 'start' | 'restart' | 'history';
@@ -28,6 +31,13 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
         type: 'start',
         storyId: null
     });
+
+    const [exportState, setExportState] = createSignal<{ isOpen: boolean; story: HeroStory | null }>({
+        isOpen: false,
+        story: null
+    });
+
+    const [importDialogOpen, setImportDialogOpen] = createSignal(false);
 
     const [isHistoryExpanded, setIsHistoryExpanded] = createSignal(false);
     const [isCompletedExpanded, setIsCompletedExpanded] = createSignal(false);
@@ -101,6 +111,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                         activeStoryId={props.activeStoryId}
                         onEdit={props.onEdit}
                         onCardClick={handleCardClick}
+                        onExport={(story) => setExportState({ isOpen: true, story })}
                     />
                     <CompletedQuestsList
                         stories={props.stories}
@@ -108,6 +119,7 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                         activeStoryId={props.activeStoryId}
                         onEdit={props.onEdit}
                         onCardClick={handleCardClick}
+                        onExport={(story) => setExportState({ isOpen: true, story })}
                         isExpanded={isCompletedExpanded()}
                         toggleExpanded={() => setIsCompletedExpanded(!isCompletedExpanded())}
                     />
@@ -117,6 +129,9 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
             <div class="button-row">
                 <button class="primary-btn" onClick={props.onCreate}>
                     ➕ Create New Quest
+                </button>
+                <button class="secondary-btn" onClick={() => setImportDialogOpen(true)} title="Import Quest from JSON">
+                    📥 Import
                 </button>
             </div>
 
@@ -133,6 +148,18 @@ const StoryListView: Component<StoryListViewProps> = (props) => {
                 onConfirm={handleConfirm}
                 onCancel={closeDialog}
             />
+
+            <ExportDialog
+                isOpen={exportState().isOpen}
+                story={exportState().story}
+                onClose={() => setExportState({ isOpen: false, story: null })}
+            />
+
+            <ImportDialog
+                isOpen={importDialogOpen()}
+                onClose={() => setImportDialogOpen(false)}
+                onImport={props.onImport}
+            />
         </section>
     );
 };
@@ -147,6 +174,7 @@ interface ActiveQuestsListProps {
     activeStoryId: string;
     onEdit: (story: HeroStory) => void;
     onCardClick: (id: string) => void;
+    onExport: (story: HeroStory) => void;
 }
 
 const ActiveQuestsList: Component<ActiveQuestsListProps> = (props) => {
@@ -168,6 +196,10 @@ const ActiveQuestsList: Component<ActiveQuestsListProps> = (props) => {
                                 e.stopPropagation();
                                 props.onEdit(story);
                             }}
+                            onExport={(e) => {
+                                e.stopPropagation();
+                                props.onExport(story);
+                            }}
                         />
                     </div>
                 )}
@@ -182,6 +214,7 @@ interface CompletedQuestsListProps {
     activeStoryId: string;
     onEdit: (story: HeroStory) => void;
     onCardClick: (id: string) => void;
+    onExport: (story: HeroStory) => void;
     isExpanded: boolean;
     toggleExpanded: () => void;
 }
@@ -218,6 +251,10 @@ const CompletedQuestsList: Component<CompletedQuestsListProps> = (props) => {
                                     onEdit={(e) => {
                                         e.stopPropagation();
                                         props.onEdit(story);
+                                    }}
+                                    onExport={(e) => {
+                                        e.stopPropagation();
+                                        props.onExport(story);
                                     }}
                                 />
                             </div>

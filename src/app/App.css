@@ -430,9 +430,126 @@ body[class*='dark'] {
 
 .button-row {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  padding: 1rem 0;
+  margin-right: -0.5rem;
 }
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal h3 {
+  margin-top: 0;
+  color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Export Modal Specifics */
+.export-modal {
+  max-width: 500px;
+}
+
+.export-help-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.export-textarea {
+  width: 100%;
+  height: 200px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  margin-bottom: 1rem;
+  white-space: pre;
+  box-sizing: border-box;
+}
+
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.primary-btn.outline {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  box-shadow: none;
+}
+
+.primary-btn.outline:hover {
+  background: rgba(63, 81, 181, 0.05);
+  /* var(--primary) with opacity */
+}
+
+/* Import Modal Specifics */
+.import-modal {
+  max-width: 500px;
+}
+
+.import-modal .secondary-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message {
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
 
 .button-row button {
   flex: 1;
@@ -583,6 +700,16 @@ body[class*='dark'] {
   flex: 1;
 }
 
+.form-group.half {
+  flex: 1;
+}
+
+.card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn,
 .edit-btn {
   background: transparent;
   border: none;
@@ -599,12 +726,14 @@ body[class*='dark'] {
   height: 36px;
 }
 
+.icon-btn:hover,
 .edit-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   opacity: 1;
   transform: scale(1.1);
 }
 
+[data-theme='light'] .icon-btn:hover,
 [data-theme='light'] .edit-btn:hover {
   background: rgba(0, 0, 0, 0.05);
 }

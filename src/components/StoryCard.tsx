@@ -6,6 +6,7 @@ interface StoryCardProps {
     totalXp: number;
     isActive: boolean;
     onEdit?: (e: MouseEvent) => void;
+    onExport?: (e: MouseEvent) => void;
 }
 
 const StoryCard: Component<StoryCardProps> = (props) => {
@@ -20,9 +21,14 @@ const StoryCard: Component<StoryCardProps> = (props) => {
             </div>
             {props.isActive && <div class="active-badge">Active</div>}
             {props.onEdit && (
-                <button class="edit-btn" onClick={props.onEdit} title="Edit Story">
-                    ✏️
-                </button>
+                <div class="card-actions">
+                    <button class="icon-btn" onClick={props.onExport} title="Export Quest">
+                        💾
+                    </button>
+                    <button class="icon-btn" onClick={props.onEdit} title="Edit Story">
+                        ✏️
+                    </button>
+                </div>
             )}
         </div>
     );

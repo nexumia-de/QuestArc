@@ -61,3 +61,4 @@
 
 | 058 | 2026-01-04 | Refactoring: Inline Styles & Component Optimization. | [./058/](./058/) | Antigravity |
 | 059 | 2026-01-05 | Bug Fix: Footer Alignment. | [./059/](./059/) | Antigravity |
+| 060 | 2026-01-05 | Feature: Story JSON Import/Export. | [./060/](./060/) | Antigravity |

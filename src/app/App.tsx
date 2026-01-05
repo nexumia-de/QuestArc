@@ -38,6 +38,28 @@ const App: Component = () => {
     });
   };
 
+
+
+  const handleImportStory = async (json: any) => {
+    try {
+      // Basic validation
+      if (!json.title || !Array.isArray(json.steps)) {
+        alert('Invalid story file format.');
+        return;
+      }
+
+      // Generate a clean ID and save
+      // Passing undefined as ID forces creation of a new story
+      await saveStory(undefined, json.title, json.steps, () => {
+        // Optional: Navigate to list or show success toast
+        // trigger a refresh by just waiting? saveStory already refreshes.
+      });
+    } catch (err) {
+      console.error('Error importing story:', err);
+      alert('Failed to parse story file.');
+    }
+  };
+
   return (
     <div class="app">
       <Show when={state()} fallback={<div class="loading">Loading QuestArc...</div>}>
@@ -63,6 +85,7 @@ const App: Component = () => {
                 handleAcknowledgeCompletion,
                 startQuest: startQuestWrapper,
                 handleSaveStory: handleSaveStoryWrapper,
+                handleImportStory,
                 resetGame: resetGameWrapper,
                 clearErrorMessage: () => setActionError(null)
               }}
