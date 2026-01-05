@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Gamify your productivity with epic stories and boss battles - A Super Productivity Plugin",
   "type": "module",
+  "workspaces": [
+    "packages/vite-plugin"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
