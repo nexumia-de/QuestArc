@@ -6,6 +6,7 @@ steps:
     image: node:20
     commands:
       - npm install
+      - cd packages/vite-plugin && npm run build && cd ../..
       - npm run package
 
   publish:
