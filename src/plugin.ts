@@ -19,6 +19,9 @@ async function saveState(newState?: QuestArcState) {
   if (newState) state = newState;
   await PluginService.saveState(JSON.stringify(state));
   updateChannel.postMessage('UPDATE');
+
+  // Update header UI to reflect new state (XP, Level, Boss HP)
+  HeaderService.updateHeader(state);
 }
 
 async function init() {

@@ -20,16 +20,19 @@ Replace the static "trending_up" arrow icon in the Global Plugin Header with a d
 
 - **Modify `updateHeader`**:
   - Register button with `icon: 'crop_free'` (placeholder).
-  - Call `this.initIconReplacer(state)`.
+  - Call `this.replacePlaceholderWithIcon(state, 'crop_free')`.
 
-- **Implement `initIconReplacer(state)`**:
-  - Generate the SVG Data URI using `generateXpIcon`.
-  - Set up a `MutationObserver` on `document.body` (or specific header container if possible).
-  - Watch for `<mat-icon>` elements with text content `crop_free`.
-  - When found:
-    - Clear its text content.
-    - Append an `<img src="${dataUri}" ...>` element styled to fit (24x24).
-    - Disconnect observer to save performance (or keep watching if header re-renders are frequent).
+- **Implement `replacePlaceholderWithIcon(state, placeholder)`**:
+  - Generate SVG Data URI.
+  - **Check if replacement already exists**: Look for `img#quest-arc-xp-icon`.
+    - If found, update `src` and return.
+  - **If not found**: Start `MutationObserver` to find `mat-icon` with `crop_free`.
+    - Replace text with `<img>` having ID `quest-arc-xp-icon`.
+
+#### [plugin.ts](file:///home/deck/Projects/QuestArc/src/plugin.ts)
+
+- **Update `saveState`**:
+  - Call `HeaderService.updateHeader(state)` after state updates to ensure the icon refreshes.
 
 ## Verification Plan
 

@@ -26,7 +26,7 @@ export class HeaderService {
                 onClick,
             });
 
-            // Initiate the DOM Replacement
+            // Initiate the DOM Replacement or Update
             this.replacePlaceholderWithIcon(state, PLACEHOLDER_ICON);
         }
     }
@@ -34,20 +34,29 @@ export class HeaderService {
     private static replacePlaceholderWithIcon(state: QuestArcState, placeholder: string) {
         // Generate the specific SVG for the current state
         const dataUri = this.generateXpIcon(state.profile.level, state.profile.xp, state.profile.xpToNextLevel);
+        const ICON_ID = 'quest-arc-xp-icon';
 
-        // Observer to locate the placeholder in the DOM once rendered by Angular
-        const observer = new MutationObserver((mutations, obs) => {
+        // 1. Check if the icon is already injected
+        const existingImg = document.getElementById(ICON_ID) as HTMLImageElement;
+        if (existingImg) {
+            existingImg.src = dataUri;
+            return;
+        }
+
+        // 2. If not found, observe the DOM to find the placeholder
+        const observer = new MutationObserver((_mutations, obs) => {
             // Look for all mat-icon elements
             const iconElements = document.querySelectorAll('mat-icon');
 
             for (const el of Array.from(iconElements)) {
                 // If we find our specific placeholder text
                 if (el.textContent?.trim() === placeholder) {
-                    // 1. Clear the text content (removing the 'crop_free' ligature)
+                    // Clear the text content (removing the 'crop_free' ligature)
                     el.textContent = '';
 
-                    // 2. Inject our custom Image
+                    // Inject our custom Image
                     const img = document.createElement('img');
+                    img.id = ICON_ID; // Mark it so we can find it later
                     img.src = dataUri;
 
                     // Enforce strict 24x24 styling to match Material spec
