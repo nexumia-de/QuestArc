@@ -67,6 +67,11 @@ export function processTaskCompletion(
   let stepCompleted = false;
   let newState = { ...state };
 
+  if (state.activeStory.isCompleted) {
+    // Safety check: Do not process tasks for completed stories
+    return { newState, damageDealt: 0, stepCompleted: false };
+  }
+
   const requirement = currentStep.completion;
 
   // 1. Update Progress for this specific task

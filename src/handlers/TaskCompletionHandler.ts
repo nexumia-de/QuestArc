@@ -13,6 +13,17 @@ export class TaskCompletionHandler {
     static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
         const taskPayload = payload as TaskCompletePayload;
 
+        if (state.activeStory.isCompleted) {
+            PluginService.log.info('Task completed for completed quest. Ignoring.');
+            return;
+        }
+
+        PluginService.log.info('TaskCompletionHandler: Processing task', {
+            taskId: taskPayload.task.id,
+            isQuestCompleted: state.activeStory.isCompleted,
+            currentStepId: state.activeStory.currentStepId
+        });
+
         PluginService.log.info('Task completed!', taskPayload);
         const currentStep = getCurrentStep(state);
         if (!currentStep) {
@@ -57,7 +68,7 @@ export class TaskCompletionHandler {
 
                 if (nextStep) {
                     try {
-                        TaskService.updateTaskTitle(taskPayload.task.id, nextStep.title);
+                        TaskService.updateTaskTitle(taskPayload.task.id, nextStep.title || 'Next Step');
 
                         // Auto-create tasks for the new step
                         const allCreated = await TaskService.createTasksForStep(nextStep);
