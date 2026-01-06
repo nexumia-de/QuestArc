@@ -63,3 +63,4 @@
 | 059 | 2026-01-05 | Bug Fix: Footer Alignment. | [./059/](./059/) | Antigravity |
 | 060 | 2026-01-05 | Feature: Story JSON Import/Export. | [./060/](./060/) | Antigravity |
 | 061 | 2026-01-05 | Feature: Story Delete Functionality. | [./061/](./061/) | Antigravity |
+| 062 | 2026-01-05 | UI Update: Circular XP Icon in Plugin Header. | [./062/](./062/) | Antigravity |
