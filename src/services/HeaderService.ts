@@ -10,40 +10,42 @@ export class HeaderService {
 
         // 1. Register Button (Once Only)
         if (!this.isRegistered) {
-            if (state.activeBoss && !state.activeBoss.isDead) {
-                PluginService.api.registerHeaderButton({
-                    label: `👹 ${state.activeBoss.hp}/${state.activeBoss.maxHp} HP`,
-                    icon: 'skull',
-                    onClick,
-                });
-            } else {
-                // Register with placeholder
-                PluginService.api.registerHeaderButton({
-                    // id property removed to fix lint error
-                    label: 'QuestArc XP',   // Static label since API doesn't support updates
-                    icon: 'crop_free',
-                    onClick,
-                });
-            }
+            PluginService.api.registerHeaderButton({
+                label: `XP: ${state.profile.xp}/${state.profile.xpToNextLevel}`,
+                icon: 'crop_free', // Placeholder
+                onClick,
+            });
             this.isRegistered = true;
         }
 
-        // 2. Dynamic Updates (Always run for XP icon)
-        if (!state.activeBoss || state.activeBoss.isDead) {
-            this.replacePlaceholderWithIcon(state, 'crop_free');
-        }
+        // 2. Dynamic Updates (Always run, no boss check)
+        this.replacePlaceholderWithIcon(state, 'crop_free');
     }
 
     private static replacePlaceholderWithIcon(state: QuestArcState, placeholder: string) {
         // Generate the specific SVG for the current state
         const dataUri = this.generateXpIcon(state.profile.level, state.profile.xp, state.profile.xpToNextLevel);
         const ICON_ID = 'quest-arc-xp-icon';
+        const TEXT_ID = 'quest-arc-header-text';
         const currentXp = state.profile.xp;
+        const tooltipText = `XP: ${state.profile.xp}/${state.profile.xpToNextLevel}`;
 
         // 1. Check if the icon is already injected
         const existingImg = document.getElementById(ICON_ID) as HTMLImageElement;
         if (existingImg) {
             existingImg.src = dataUri;
+
+            // Update Label Text (Visual)
+            const textSpan = document.getElementById(TEXT_ID);
+            if (textSpan) {
+                textSpan.textContent = tooltipText;
+            }
+
+            // Update Tooltip (Title attribute on button)
+            const button = existingImg.closest('button');
+            if (button) {
+                button.title = tooltipText;
+            }
 
             // Pulse animation only if XP has increased (and it's not the first load)
             if (this.lastXp !== -1 && currentXp > this.lastXp) {
@@ -66,23 +68,46 @@ export class HeaderService {
             const iconElements = document.querySelectorAll('mat-icon');
 
             for (const el of Array.from(iconElements)) {
-                // If we find our specific placeholder text
+                // If we find our specific placeholder text (or if we already injected and missed it)
                 if (el.textContent?.trim() === placeholder) {
-                    // Clear the text content (removing the 'crop_free' ligature)
+                    // Clear the icon text content
                     el.textContent = '';
 
                     // Inject our custom Image
                     const img = document.createElement('img');
-                    img.id = ICON_ID; // Mark it so we can find it later
+                    img.id = ICON_ID;
                     img.src = dataUri;
-
-                    // Enforce strict 24x24 styling to match Material spec
                     img.style.width = '24px';
                     img.style.height = '24px';
                     img.style.display = 'block';
-                    img.style.pointerEvents = 'none'; // Ensure clicks pass through to button
+                    img.style.pointerEvents = 'none';
 
                     el.appendChild(img);
+
+                    // Find and update the label text & Tooltip
+                    const button = el.closest('button');
+                    if (button) {
+                        button.title = tooltipText; // Set initial tooltip
+
+                        // Find label span to tag it for updates
+                        const spans = button.querySelectorAll('span');
+                        let found = false;
+                        for (const span of Array.from(spans)) {
+                            if (span.textContent?.includes('XP:')) {
+                                span.id = TEXT_ID;
+                                span.textContent = tooltipText;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            const label = button.querySelector('.mdc-button__label');
+                            if (label) {
+                                label.id = TEXT_ID;
+                                label.textContent = tooltipText;
+                            }
+                        }
+                    }
 
                     // Initialize lastXp to prevent animation on first load
                     HeaderService.lastXp = currentXp;
@@ -94,13 +119,13 @@ export class HeaderService {
             }
         });
 
-        // Watch the body for changes (since we don't know exactly where the header listens)
+        // Watch the body for changes
         observer.observe(document.body, {
             childList: true,
             subtree: true
         });
 
-        // Safety: Disconnect after 10 seconds if not found to prevent memory leaks
+        // Safety: Disconnect after 10 seconds
         setTimeout(() => observer.disconnect(), 10000);
     }
 
