@@ -1,7 +1,7 @@
 {
   "id": "quest-arc",
   "name": "QuestArc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifestVersion": 1,
   "minSupVersion": "8.0.0",
   "description": "Gamify your productivity with epic stories and boss battles.",

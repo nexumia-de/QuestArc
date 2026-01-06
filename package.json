@@ -1,6 +1,6 @@
 {
   "name": "quest-arc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gamify your productivity with epic stories and boss battles - A Super Productivity Plugin",
   "type": "module",
   "workspaces": [
