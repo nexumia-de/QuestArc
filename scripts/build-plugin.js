@@ -20,7 +20,7 @@ function packagePlugin() {
   }
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  const outputFileName = `${manifest.id}-v${manifest.version}.zip`;
+  const outputFileName = `${manifest.id}.zip`;
   const output = fs.createWriteStream(path.join(projectRoot, outputFileName));
   const archive = archiver('zip', { zlib: { level: 9 } });
 

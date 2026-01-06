@@ -8,7 +8,7 @@ steps:
       - npm install
       - cd packages/vite-plugin && npm run build && cd ../..
       - npm run package
-      - ls -la quest-arc-v*.zip
+      - ls -la quest-arc.zip
     when:
       event: tag
 
@@ -18,7 +18,7 @@ steps:
       api_key:
         from_secret: release_token
       files:
-        - "quest-arc-v*.zip"
+        - "quest-arc.zip"
       base_url: https://codeberg.org
     when:
       event: tag
