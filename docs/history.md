@@ -66,3 +66,5 @@
 | 062 | 2026-01-05 | UI Update: Circular XP Icon in Plugin Header. | [./062/](./062/) | Antigravity |
 | 063 | 2026-01-06 | Bug Fix: Infinite XP on completed quest. | [./063/](./063/) | Antigravity |
 | 064 | 2026-01-06 | Debug: Reinforced Infinite XP Fix (Logs + Safeguard). | [./064/](./064/) | Antigravity |
+| 065 | 2026-01-06 | Feature: Dynamic Story Loading (Vite glob). | [./065/](./065/) | Antigravity |
+

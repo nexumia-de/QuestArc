@@ -1,9 +1,7 @@
 import { QuestArcState, HeroStory } from '../../types/state';
-import storyDataRaw from '../../assets/stories/productivity-mastery.json';
 import {
     INITIAL_LEVEL,
     INITIAL_XP,
-
 
 
     PET_INITIAL_STAGE,
@@ -11,8 +9,9 @@ import {
 } from '../constants';
 import { INITIAL_STATE, CURRENT_STATE_VERSION, STARTING_HP, STARTING_MAX_HP } from './config';
 
-
-const STORY_DATA = storyDataRaw as HeroStory;
+// Dynamic import of all story JSON files from the assets/stories directory
+const storyFiles = import.meta.glob('../../assets/stories/*.json', { eager: true });
+const DEFAULT_STORIES: HeroStory[] = Object.values(storyFiles).map((mod: any) => mod.default || mod);
 
 /**
  * Creates a fresh copy of the initial game state
@@ -83,8 +82,8 @@ export function ensureState(state: any): QuestArcState {
         };
     }
 
-    if (!newState.stories || !Array.isArray(newState.stories)) {
-        newState.stories = [STORY_DATA];
+    if (!newState.stories || !Array.isArray(newState.stories) || newState.stories.length === 0) {
+        newState.stories = DEFAULT_STORIES;
     }
 
     if (!newState.completedStories || !Array.isArray(newState.completedStories)) {
@@ -92,9 +91,10 @@ export function ensureState(state: any): QuestArcState {
     }
 
     // Ensure activeStory exists
-    if (!newState.activeStory) {
+    if (!newState.activeStory && DEFAULT_STORIES.length > 0) {
+        const firstStory = DEFAULT_STORIES[0];
         newState.activeStory = {
-            id: STORY_DATA.id,
+            id: firstStory.id,
             currentStepId: 1,
             taskProgress: {}
         };

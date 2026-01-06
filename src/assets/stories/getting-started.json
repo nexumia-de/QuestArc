@@ -1,0 +1,76 @@
+{
+  "id": "story_1767725503618",
+  "title": "The Path of Mastery",
+  "steps": [
+    {
+      "title": "The Power of Showing Up",
+      "tasksToCreate": [
+        {
+          "title": "Check off this task to prove you are here",
+          "isAutoCreate": true
+        }
+      ],
+      "completion": {
+        "type": "tasks_completed"
+      },
+      "xpReward": 25,
+      "flavor_text": "The secret to a new habit is making it so easy you can't say no. Your journey begins with one simple click.",
+      "summary_text": "The journey of a thousand miles begins with a single task.",
+      "story_icon": "",
+      "display_mode": "collapsed",
+      "environment_theme": "",
+      "id": 1,
+      "nextStepId": 2
+    },
+    {
+      "title": "Building the Foundation",
+      "tasksToCreate": [
+        {
+          "title": "Evening Review: What did I learn today?",
+          "isAutoCreate": true,
+          "isRepeating": true,
+          "repeatCfg": {
+            "repeatEvery": 1,
+            "repeatType": "DAILY"
+          },
+          "requiredCount": 3
+        }
+      ],
+      "completion": {
+        "type": "tasks_completed"
+      },
+      "xpReward": 50,
+      "flavor_text": "To build a habit, you need a 'cue'. For the next 3 days, review your day at the same time. This 'habit stacking' creates a ritual.\nIMPORTANT: For now you have to set the repetition on your own!\"",
+      "summary_text": "",
+      "story_icon": "",
+      "display_mode": "visible",
+      "environment_theme": "",
+      "id": 2,
+      "nextStepId": 3
+    },
+    {
+      "title": "The Fog of Procrastination",
+      "tasksToCreate": [],
+      "completion": {
+        "type": "boss_defeat",
+        "config": {
+          "boss": {
+            "name": "The Procrastination Fog",
+            "image": "☁️",
+            "hp": 100,
+            "maxHp": 100,
+            "damageModifiers": []
+          }
+        }
+      },
+      "xpReward": 100,
+      "flavor_text": "The Procrastination Fog has appeared! He feeds on missed days and forgotten goals. Defeat him to protect your progress.",
+      "summary_text": "",
+      "story_icon": "",
+      "display_mode": "visible",
+      "environment_theme": "",
+      "id": 3,
+      "nextStepId": null
+    }
+  ]
+}

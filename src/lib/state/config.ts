@@ -1,5 +1,5 @@
-import { QuestArcState, HeroStory } from '../../types/state';
-import storyDataRaw from '../../assets/stories/productivity-mastery.json';
+import { QuestArcState } from '../../types/state';
+
 import {
     XP_PER_LEVEL_MULTIPLIER,
     INITIAL_LEVEL,
@@ -10,7 +10,7 @@ import {
     PET_INITIAL_STAGE
 } from '../constants';
 
-const STORY_DATA = storyDataRaw as HeroStory;
+
 
 export const STARTING_HP = 100;
 export const STARTING_MAX_HP = 100;
@@ -38,7 +38,7 @@ export const INITIAL_STATE: QuestArcState = {
             mouth: 'neutral'
         }
     },
-    stories: [STORY_DATA],
+    stories: [],
     completedStories: [],
     activeStory: {
         id: null,
