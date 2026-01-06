@@ -2,32 +2,35 @@ import { QuestArcState } from '../types/state';
 import { PluginService } from './PluginService';
 
 export class HeaderService {
-    static updateHeader(state: QuestArcState) {
-        // Note: Header buttons can't be dynamically updated after registration
-        // This is called once during init. For dynamic updates, users should open the plugin UI
+    private static isRegistered = false;
+    private static lastXp = -1;
 
+    static updateHeader(state: QuestArcState) {
         const onClick = () => PluginService.api.showIndexHtmlAsView();
 
-        if (state.activeBoss && !state.activeBoss.isDead) {
-            PluginService.api.registerHeaderButton({
-                label: `👹 ${state.activeBoss.hp}/${state.activeBoss.maxHp} HP`,
-                icon: 'skull',
-                onClick,
-            });
-        } else {
-            // WORKAROUND: The API strictly falls back to Material Text for icons, breaking Data URIs.
-            // We register with a unique placeholder ('crop_free') and then use a MutationObserver
-            // to physically replace the DOM element's content with our custom SVG image.
-            const PLACEHOLDER_ICON = 'crop_free';
+        // 1. Register Button (Once Only)
+        if (!this.isRegistered) {
+            if (state.activeBoss && !state.activeBoss.isDead) {
+                PluginService.api.registerHeaderButton({
+                    label: `👹 ${state.activeBoss.hp}/${state.activeBoss.maxHp} HP`,
+                    icon: 'skull',
+                    onClick,
+                });
+            } else {
+                // Register with placeholder
+                PluginService.api.registerHeaderButton({
+                    // id property removed to fix lint error
+                    label: 'QuestArc XP',   // Static label since API doesn't support updates
+                    icon: 'crop_free',
+                    onClick,
+                });
+            }
+            this.isRegistered = true;
+        }
 
-            PluginService.api.registerHeaderButton({
-                label: `XP: ${state.profile.xp}/${state.profile.xpToNextLevel}`,
-                icon: PLACEHOLDER_ICON,
-                onClick,
-            });
-
-            // Initiate the DOM Replacement or Update
-            this.replacePlaceholderWithIcon(state, PLACEHOLDER_ICON);
+        // 2. Dynamic Updates (Always run for XP icon)
+        if (!state.activeBoss || state.activeBoss.isDead) {
+            this.replacePlaceholderWithIcon(state, 'crop_free');
         }
     }
 
@@ -35,11 +38,25 @@ export class HeaderService {
         // Generate the specific SVG for the current state
         const dataUri = this.generateXpIcon(state.profile.level, state.profile.xp, state.profile.xpToNextLevel);
         const ICON_ID = 'quest-arc-xp-icon';
+        const currentXp = state.profile.xp;
 
         // 1. Check if the icon is already injected
         const existingImg = document.getElementById(ICON_ID) as HTMLImageElement;
         if (existingImg) {
             existingImg.src = dataUri;
+
+            // Pulse animation only if XP has increased (and it's not the first load)
+            if (this.lastXp !== -1 && currentXp > this.lastXp) {
+                existingImg.animate([
+                    { transform: 'scale(1)' },
+                    { transform: 'scale(1.2)' },
+                    { transform: 'scale(1)' }
+                ], {
+                    duration: 300,
+                    easing: 'ease-out'
+                });
+            }
+            this.lastXp = currentXp;
             return;
         }
 
@@ -66,6 +83,9 @@ export class HeaderService {
                     img.style.pointerEvents = 'none'; // Ensure clicks pass through to button
 
                     el.appendChild(img);
+
+                    // Initialize lastXp to prevent animation on first load
+                    HeaderService.lastXp = currentXp;
 
                     // Stop observing; job done
                     obs.disconnect();

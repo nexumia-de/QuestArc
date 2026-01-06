@@ -25,7 +25,10 @@ Replace the static "trending_up" arrow icon in the Global Plugin Header with a d
 - **Implement `replacePlaceholderWithIcon(state, placeholder)`**:
   - Generate SVG Data URI.
   - **Check if replacement already exists**: Look for `img#quest-arc-xp-icon`.
-    - If found, update `src` and return.
+    - If found:
+      - Update `src`.
+      - **Trigger Animation**: Use `element.animate()` to pulse the icon (scale 1.2) for visual feedback.
+      - Return.
   - **If not found**: Start `MutationObserver` to find `mat-icon` with `crop_free`.
     - Replace text with `<img>` having ID `quest-arc-xp-icon`.
 
