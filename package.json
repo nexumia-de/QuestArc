@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "package": "node scripts/build-plugin.js",
-    "deploy": "npm run build"
+    "deploy": "npm run build",
+    "release": "standard-version"
   },
   "devDependencies": {
     "@solidjs/router": "^0.15.4",
@@ -32,6 +33,7 @@
     "jsdom": "^27.2.0",
     "prettier": "^3.6.2",
     "solid-js": "^1.9.10",
+    "standard-version": "^9.5.0",
     "typescript": "^5.9.3",
     "vite": "^7.2.4",
     "vite-plugin-solid": "^2.11.10",
