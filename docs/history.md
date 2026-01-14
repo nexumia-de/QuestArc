@@ -67,4 +67,6 @@
 | 063 | 2026-01-06 | Bug Fix: Infinite XP on completed quest. | [./063/](./063/) | Antigravity |
 | 064 | 2026-01-06 | Debug: Reinforced Infinite XP Fix (Logs + Safeguard). | [./064/](./064/) | Antigravity |
 | 065 | 2026-01-06 | Feature: Dynamic Story Loading (Vite glob). | [./065/](./065/) | Antigravity |
+| 066 | 2026-01-14 | Feature: Core Logic (Regex Parsers) for v2.0. | [./066/](./066/) | Antigravity |
+| 067 | 2026-01-14 | Feature: Cloning Service & Data Injection (Compiler). | [./067/](./067/) | Antigravity |
 
