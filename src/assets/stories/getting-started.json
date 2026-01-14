@@ -14,7 +14,7 @@
         "type": "tasks_completed"
       },
       "xpReward": 25,
-      "flavor_text": "The secret to a new habit is making it so easy you can't say no. Your journey begins with one simple click.",
+      "flavor_text": "Click to begin.",
       "summary_text": "The journey of a thousand miles begins with a single task.",
       "story_icon": "",
       "display_mode": "collapsed",
@@ -40,7 +40,7 @@
         "type": "tasks_completed"
       },
       "xpReward": 50,
-      "flavor_text": "To build a habit, you need a 'cue'. For the next 3 days, review your day at the same time. This 'habit stacking' creates a ritual.\nIMPORTANT: For now you have to set the repetition on your own!\"",
+      "flavor_text": "Review daily for 3 days. Set repetition manually!",
       "summary_text": "",
       "story_icon": "",
       "display_mode": "visible",
@@ -64,7 +64,7 @@
         }
       },
       "xpReward": 100,
-      "flavor_text": "The Procrastination Fog has appeared! He feeds on missed days and forgotten goals. Defeat him to protect your progress.",
+      "flavor_text": "Defeat the Fog!",
       "summary_text": "",
       "story_icon": "",
       "display_mode": "visible",

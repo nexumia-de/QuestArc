@@ -22,11 +22,7 @@ export const QuestDashboard = () => {
 
     onMount(() => {
         refresh();
-        const handleUpdate = () => {
-            // In a real app we'd receive the full state, but here our dashboard expects QuestEnvironment (scanner result)
-            // So we should probably just re-scan.
-            refresh();
-        };
+        const handleUpdate = () => refresh();
         window.addEventListener('questarc-state-update' as any, handleUpdate as any);
         return () => window.removeEventListener('questarc-state-update' as any, handleUpdate as any);
     });
@@ -72,27 +68,27 @@ export const QuestDashboard = () => {
     };
 
     return (
-        <div class="quest-dashboard p-4 bg-gray-900 text-white rounded-lg">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Quest Control Center</h2>
+        <div class="quest-dashboard">
+            <div class="header-row" style={{ display: 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '1rem' }}>
+                <h3 style={{ margin: 0 }}>Quest Control Center</h3>
                 <button
                     onClick={refresh}
                     disabled={loading()}
-                    class="p-2 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50"
+                    class="secondary-btn"
+                    title="Refresh"
                 >
                     🔄
                 </button>
             </div>
 
             <Show when={error()}>
-                <div class="bg-red-500/20 border border-red-500 p-2 mb-4 rounded text-sm text-red-200">
+                <div class="error-message" style={{ 'margin-bottom': '1rem' }}>
                     {error()}
                 </div>
             </Show>
 
-            {/* Warnings */}
             <Show when={env()?.warnings && env()!.warnings.length > 0}>
-                <div class="bg-yellow-500/20 border border-yellow-500 p-2 mb-4 rounded text-sm text-yellow-200">
+                <div class="info-box" style={{ 'margin-bottom': '1rem', 'border-color': 'var(--xp-color)' }}>
                     <For each={env()?.warnings}>
                         {(w) => <div>⚠️ {w}</div>}
                     </For>
@@ -100,27 +96,27 @@ export const QuestDashboard = () => {
             </Show>
 
             <Show when={!env()}>
-                <div>Loading QuestArc...</div>
+                <div class="loading-state">Loading QuestArc...</div>
             </Show>
 
             <Show when={env()}>
-                {/* Active Quest Section */}
-                <section class="mb-8">
-                    <h3 class="text-lg font-semibold mb-2 text-yellow-400">Active Quest</h3>
+                {/* Active Quest */}
+                <section class="dashboard-section" style={{ 'margin-bottom': '1.5rem' }}>
+                    <h4 style={{ color: 'var(--xp-color)', 'margin-bottom': '0.5rem' }}>ACTIVE QUEST</h4>
                     <Show when={env()?.active} fallback={
-                        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center text-gray-400 italic">
+                        <div class="empty-state" style={{ padding: '1rem' }}>
                             No active quest. Start a journey below!
                         </div>
                     }>
-                        <div class="bg-gray-800 p-4 rounded-lg border border-yellow-500/30 flex justify-between items-center shadow-lg">
-                            <div>
-                                <div class="text-xl font-bold">{env()?.active?.originalTitle}</div>
-                                <div class="text-xs text-yellow-500 mt-1 uppercase tracking-wider">In Progress 🧭</div>
+                        <div class="story-card active">
+                            <div class="story-info">
+                                <h3>{env()?.active?.originalTitle}</h3>
+                                <div class="active-badge">IN PROGRESS</div>
                             </div>
                             <button
                                 onClick={handlePause}
                                 disabled={loading()}
-                                class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                                class="primary-btn"
                             >
                                 Pause
                             </button>
@@ -128,23 +124,23 @@ export const QuestDashboard = () => {
                     </Show>
                 </section>
 
-                {/* Templates Section */}
-                <section class="mb-8">
-                    <h3 class="text-lg font-semibold mb-2 text-blue-400">Available Stories</h3>
+                {/* Templates */}
+                <section class="dashboard-section" style={{ 'margin-bottom': '1.5rem' }}>
+                    <h4 style={{ color: 'var(--primary)', 'margin-bottom': '0.5rem' }}>AVAILABLE STORIES</h4>
                     <Show when={env()?.templates?.length !== 0} fallback={
-                        <div class="text-sm text-gray-500">
+                        <div class="empty-state" style={{ padding: '1rem' }}>
                             No templates found. Create a project starting with 📜.
                         </div>
                     }>
-                        <div class="space-y-2">
+                        <div class="story-grid">
                             <For each={env()?.templates}>
                                 {(t) => (
-                                    <div class="bg-gray-800 p-3 rounded flex justify-between items-center hover:bg-gray-700 transition-colors">
-                                        <span class="font-medium">{t.originalTitle}</span>
+                                    <div class="story-card">
+                                        <span style={{ 'font-weight': 500 }}>{t.originalTitle}</span>
                                         <button
                                             onClick={() => handleStart(t.id)}
                                             disabled={!!env()?.active || loading()}
-                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-sm text-center"
+                                            class="primary-btn"
                                         >
                                             Start
                                         </button>
@@ -155,19 +151,19 @@ export const QuestDashboard = () => {
                     </Show>
                 </section>
 
-                {/* Paused Section */}
+                {/* Saved Games */}
                 <Show when={env()?.paused && env()!.paused.length > 0}>
-                    <section>
-                        <h3 class="text-lg font-semibold mb-2 text-gray-400">Saved Games</h3>
-                        <div class="space-y-2">
+                    <section class="dashboard-section">
+                        <h4 style={{ color: 'var(--text-muted)', 'margin-bottom': '0.5rem' }}>SAVED GAMES</h4>
+                        <div class="story-grid">
                             <For each={env()?.paused}>
                                 {(p) => (
-                                    <div class="bg-gray-800/50 p-3 rounded flex justify-between items-center border border-gray-700 border-dashed">
-                                        <span class="text-gray-300">{p.originalTitle}</span>
+                                    <div class="story-card" style={{ opacity: 0.8 }}>
+                                        <span>{p.originalTitle}</span>
                                         <button
                                             onClick={() => handleResume(p.id)}
                                             disabled={!!env()?.active || loading()}
-                                            class="bg-green-700 hover:bg-green-800 disabled:bg-gray-700 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-sm"
+                                            class="secondary-btn"
                                         >
                                             Resume
                                         </button>

@@ -31,7 +31,7 @@ const inlineJsChunks = (js: string, distDir: string): string => {
       const importMap: Record<string, string> = {};
       importedNames.split(',').forEach(part => {
         const trimmed = part.trim();
-        const asMatch = trimmed.match(/(\w+)\s+as\s+(\w+)/);
+        const asMatch = trimmed.match(/([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/);
         if (asMatch) {
           importMap[asMatch[1]] = asMatch[2];
         } else {
@@ -50,7 +50,7 @@ const inlineJsChunks = (js: string, distDir: string): string => {
 
         exportParts.forEach(part => {
           const trimmed = part.trim();
-          const asMatch = trimmed.match(/(\w+)\s+as\s+(\w+)/);
+          const asMatch = trimmed.match(/([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/);
 
           if (asMatch) {
             const [_, originalName, exportedAs] = asMatch;
@@ -163,7 +163,13 @@ export const superProductivityPlugin = (
         const htmlPath = path.join(distDir, 'index.html');
         const nestedHtmlPath = path.join(distDir, 'src/index.html');
         if (fs.existsSync(nestedHtmlPath) && !fs.existsSync(htmlPath)) {
-          fs.renameSync(nestedHtmlPath, htmlPath);
+          let htmlContent = fs.readFileSync(nestedHtmlPath, 'utf8');
+          // Fix relative paths caused by moving file from src/ to root
+          // e.g., "../index.js" -> "./index.js"
+          htmlContent = htmlContent.replace(/src="\.\.\//g, 'src="./');
+          htmlContent = htmlContent.replace(/href="\.\.\//g, 'href="./');
+
+          fs.writeFileSync(htmlPath, htmlContent);
           try {
             fs.rmSync(path.join(distDir, 'src'), { recursive: true, force: true });
           } catch (e) { }

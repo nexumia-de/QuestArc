@@ -19,7 +19,6 @@
     "release": "standard-version"
   },
   "devDependencies": {
-    "@solidjs/router": "^0.15.4",
     "@solidjs/testing-library": "^0.8.10",
     "@super-productivity/plugin-api": "^1.0.1",
     "@super-productivity/vite-plugin": "file:./packages/vite-plugin",
@@ -31,9 +30,11 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-solid": "^0.14.5",
     "jsdom": "^27.2.0",
+    "lightningcss": "^1.30.2",
     "prettier": "^3.6.2",
     "solid-js": "^1.9.10",
     "standard-version": "^9.5.0",
+    "terser": "^5.44.1",
     "typescript": "^5.9.3",
     "vite": "^7.2.4",
     "vite-plugin-solid": "^2.11.10",
