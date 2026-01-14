@@ -14,6 +14,7 @@ export interface Task {
 export interface Project {
     id: string;
     title: string;
+    icon?: string;
     isArchived?: boolean;
 }
 
@@ -28,7 +29,17 @@ export interface PluginApi {
     addTask(task: Partial<Task>): Promise<string>; // Returns ID
     updateTask(taskId: string, updates: Partial<Task>): Promise<void>;
 
-    // Other...
+    // UI Operations
+    notify(notification: { title: string; body: string; ico?: string }): void;
+    showSnack(options: { msg: string; type?: 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING'; ico?: string; actionStr?: string; actionFn?: () => void }): void;
+
+    // Hooks
+    registerHook(hookName: string, callback: (payload: any) => void): void;
+    Hooks: {
+        TASK_COMPLETE: string;
+        TASK_UPDATE: string;
+        // ... add others as needed
+    };
 }
 
 // In the real app, PluginAPI is globally available

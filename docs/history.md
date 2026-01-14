@@ -69,4 +69,6 @@
 | 065 | 2026-01-06 | Feature: Dynamic Story Loading (Vite glob). | [./065/](./065/) | Antigravity |
 | 066 | 2026-01-14 | Feature: Core Logic (Regex Parsers) for v2.0. | [./066/](./066/) | Antigravity |
 | 067 | 2026-01-14 | Feature: Cloning Service & Data Injection (Compiler). | [./067/](./067/) | Antigravity |
+| 068 | 2026-01-14 | Feature: Phase 2 - Project Scanner & Management UI. | [./068/](./068/) | Antigravity |
+| 069 | 2026-01-14 | Feature: Phase 3 - The Game Loop (XP, Levels, Persistence). | [./069/](./069/) | Antigravity |
 

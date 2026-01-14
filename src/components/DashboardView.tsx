@@ -1,6 +1,7 @@
 import { Component, createMemo, For, Match, Show, Switch } from 'solid-js';
 import { QuestArcState } from '../types/state';
 import { getCurrentStepTitle, getCurrentStep } from '../lib/state-manager';
+import { QuestDashboard } from './QuestDashboard';
 import './DashboardView.css';
 
 interface DashboardViewProps {
@@ -47,13 +48,7 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
                 when={props.state.activeStory.id}
                 fallback={
                     <div class="empty-quest-state">
-                        <h2>Ready for Adventure?</h2>
-                        <p>Go to the Quest Board to select or create a quest!</p>
-                        <div class="dashboard-actions">
-                            <button class="primary-btn" onClick={() => props.onNavigate('story-list')}>
-                                📜 Quest Board
-                            </button>
-                        </div>
+                        <QuestDashboard />
                     </div>
                 }
             >
@@ -168,7 +163,10 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
 
                 </div>
             </Show>
-        </section>
+            <div style={{ 'margin-top': '2rem', 'border-top': '1px solid #333', 'padding-top': '1rem' }}>
+                <QuestDashboard />
+            </div>
+        </section >
     );
 };
 

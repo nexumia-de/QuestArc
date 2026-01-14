@@ -4,6 +4,7 @@ import { BASE_BOSS_DAMAGE } from './constants';
 interface TaskStub {
   tagIds: string[];
   title: string;
+  notes?: string;
 }
 
 /**
@@ -58,24 +59,156 @@ export function initializeBossIfNeeded(
  * @remarks Handles three step types: boss (damage calculation), streak (progress counter), and simple (immediate completion).
  * Creates a deep copy of state to avoid mutations.
  */
+import { parseXpTag, compileTaskData } from './parsers';
+import { Task } from '../types/plugin-api';
+
+export function checkLevelUp(state: QuestArcState): { newState: QuestArcState; leveledUp: boolean } {
+  let newState = { ...state };
+  let leveledUp = false;
+
+  while (newState.profile.xp >= newState.profile.xpToNextLevel) {
+    newState.profile.xp -= newState.profile.xpToNextLevel;
+    newState.profile.level += 1;
+    newState.profile.xpToNextLevel = Math.floor(newState.profile.xpToNextLevel * 1.5);
+    leveledUp = true;
+  }
+  return { newState, leveledUp };
+}
+
+/**
+ * Processes a task completion and updates game state accordingly
+ * @returns Object with game state updates AND task updates (if task should be modified/unchecked)
+ */
 export function processTaskCompletion(
   state: QuestArcState,
-  _task: TaskStub, // Changed from Task to TaskStub to match existing definition
+  _task: TaskStub,
   currentStep: StoryStep
-): { newState: QuestArcState; damageDealt: number; stepCompleted: boolean } {
+): {
+  newState: QuestArcState;
+  damageDealt: number;
+  xpGained: number;
+  stepCompleted: boolean;
+  leveledUp: boolean;
+  taskUpdates?: Partial<Task>;
+} {
   let damageDealt = 0;
+  let xpGained = 0;
   let stepCompleted = false;
+  let leveledUp = false;
+  let taskUpdates: Partial<Task> | undefined;
   let newState = { ...state };
 
   if (state.activeStory.isCompleted) {
-    // Safety check: Do not process tasks for completed stories
-    return { newState, damageDealt: 0, stepCompleted: false };
+    return { newState, damageDealt: 0, xpGained: 0, stepCompleted: false, leveledUp: false };
   }
+
+  // 0. Parse Task Metadata (QUEST_DATA persistence)
+  // We try to look for JSON in notes first (Source of Truth for stateful tasks)
+  let questData = null;
+  if (_task.notes) {
+    try {
+      // Look for validation block or just parse assuming it might be wrapped
+      // For now, let's assume if it starts with { it might be JSON, or searched for specific block
+      // Roadmap says: ```json\n{...}\n``` or just raw text? 
+      // Implementation Plan says: Injection of `QUEST_DATA` JSON into notes.
+      // Let's regex for the block.
+      const match = _task.notes.match(/```json\n([\s\S]*?)\n```/);
+      if (match && match[1]) {
+        questData = JSON.parse(match[1]);
+      }
+    } catch (e) {
+      // invalid json, ignore
+    }
+  }
+
+  // Fallback to title parsing if no notes data or if it's the first time
+  if (!questData) {
+    const compiled = compileTaskData(_task.title);
+    questData = compiled.data;
+    // If we compiled it, it means we might need to initialize the note structure?
+    // But we only do that if it's a Grind/Habit that needs tracking.
+    // Simple tasks don't strictly need persistence if they just complete.
+  }
+
+  const type = questData.meta.type;
+
+  // LOGIC: Handle Task Types
+  if (type === 'GRIND') {
+    // Grind: Increment current count
+    const current = questData.progress?.current || 0;
+    const target = questData.progress?.target || 1;
+
+    if (current < target) {
+      const newCurrent = current + 1;
+      questData.progress.current = newCurrent;
+
+      // Update Task: Keep it incomplete!
+      taskUpdates = {
+        isDone: false,
+        title: _task.title, // Optionally update title to show progress? e.g. "50x Pushups (10/50)"
+        notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
+      };
+
+      // Update Title Visual?
+      // If title doesn't already have progress, maybe append it?
+      // For now, let's just stick to the notes persistence as the mechanism.
+
+      if (newCurrent < target) {
+        // Not done yet, so we return here!
+        // Grinds awarding XP per rep? Or only on completion? 
+        // Usually Grinds award small XP per rep or big XP on completion.
+        // Let's give small XP (1) per rep for feeling of progress?
+        xpGained = 1;
+        newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
+
+        return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+      }
+      // If we reached target, we fall through to "Completion" logic below
+      // But we still might want to update the note to say 50/50?
+      // Actually if it completes, it gets hidden (isDone=true), so notes update might be irrelevant 
+      // unless user un-completes it.
+    }
+  } else if (type === 'HABIT') {
+    // Habit: Check if done for today
+    // For MVP, completing a habit just increments its "streak" or "done count" and keeps it open
+    // UNLESS we want to enforce "Daily limit".
+    // Let's assume Habit = Always recurring, so we uncheck it.
+
+    taskUpdates = {
+      isDone: false,
+      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
+    };
+
+    // Award XP for the habit rep
+    xpGained = questData.reward?.xp || 10;
+    newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
+
+    // Check Level Up immediately for habits
+    const lvl = checkLevelUp(newState);
+    newState = lvl.newState;
+    leveledUp = lvl.leveledUp;
+
+    return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+  }
+
+  // --- STANDARD COMPLETION (Simple Task or Finished Grind) ---
 
   const requirement = currentStep.completion;
 
-  // 1. Update Progress for this specific task
-  // Normalize titles for comparison to avoid whitespace/case issues
+  // 1. Calculate XP (if not already handled above)
+  if (xpGained === 0) {
+    const { xp } = parseXpTag(_task.title);
+    xpGained = xp || 10;
+    newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
+  }
+
+  // Check Level Up
+  const levelResult = checkLevelUp(newState);
+  newState = levelResult.newState;
+  leveledUp = levelResult.leveledUp;
+
+
+  // 2. Update Progress for this specific task
   const normalize = (s: string) => s.trim().toLowerCase();
   const matchingDef = currentStep.tasksToCreate?.find(t => normalize(t.title) === normalize(_task.title));
 
@@ -87,7 +220,7 @@ export function processTaskCompletion(
     };
   }
 
-  // 2. Check Step Completion
+  // 3. Check Step Completion & Boss Damage
   if (requirement.type === 'boss_defeat') {
     // Boss Logic
     if (newState.activeBoss && !newState.activeBoss.isDead) {
@@ -106,9 +239,8 @@ export function processTaskCompletion(
       }
     }
   } else if (requirement.type === 'tasks_completed') {
-    // Check if ALL required tasks meet their targets
     const tasks = currentStep.tasksToCreate || [];
-    const requiredTasks = tasks.filter(t => t.isRequired !== false); // Default to true if undefined
+    const requiredTasks = tasks.filter(t => t.isRequired !== false);
 
     const allMet = requiredTasks.every(def => {
       const progress = newState.activeStory.taskProgress[def.title] || 0;
@@ -119,11 +251,9 @@ export function processTaskCompletion(
     if (requiredTasks.length > 0 && allMet) {
       stepCompleted = true;
     } else if (requiredTasks.length === 0) {
-      // If no tasks are explicitly required, we might fallback to "Any Task" logic or auto-complete?
-      // For now, let's assume if you have 0 required tasks, you just need to do 1 thing to pass.
       stepCompleted = true;
     }
   }
 
-  return { newState, damageDealt, stepCompleted };
+  return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
 }
