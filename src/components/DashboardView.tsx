@@ -2,7 +2,6 @@ import { Component, createMemo, For, Match, Show, Switch } from 'solid-js';
 import { QuestArcState } from '../types/state';
 import { getCurrentStepTitle, getCurrentStep } from '../lib/state-manager';
 import { QuestDashboard } from './QuestDashboard';
-import './DashboardView.css';
 
 interface DashboardViewProps {
     state: QuestArcState;

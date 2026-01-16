@@ -6,6 +6,8 @@ export const QuestDashboard = () => {
     const [env, setEnv] = createSignal<QuestEnvironment | null>(null);
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
+    // Add Game State signal for Boss UI
+    const [gameState, setGameState] = createSignal<any>(null); // Type as 'any' for speed, ideal: QuestArcState
 
     const refresh = async () => {
         setLoading(true);
@@ -22,7 +24,19 @@ export const QuestDashboard = () => {
 
     onMount(() => {
         refresh();
-        const handleUpdate = () => refresh();
+        // Initial load of game state
+        try {
+            const raw = localStorage.getItem('questarc_state');
+            if (raw) setGameState(JSON.parse(raw));
+        } catch (e) { }
+
+        const handleUpdate = (e: CustomEvent) => {
+            refresh();
+            // Also update game state for boss UI
+            if (e.detail) {
+                setGameState(e.detail);
+            }
+        };
         window.addEventListener('questarc-state-update' as any, handleUpdate as any);
         return () => window.removeEventListener('questarc-state-update' as any, handleUpdate as any);
     });
@@ -120,6 +134,42 @@ export const QuestDashboard = () => {
                             >
                                 Pause
                             </button>
+                        </div>
+                    </Show>
+
+                    {/* BOSS BATTLE UI */}
+                    <Show when={gameState()?.activeBoss && !gameState()?.activeBoss.isDead}>
+                        <div class="boss-card" style={{
+                            'margin-top': '1rem',
+                            'background': `linear-gradient(135deg, #1a1a1a, ${gameState()?.activeBoss?.themeColor || '#4a0000'})`,
+                            'padding': '1.5rem',
+                            'border-radius': '8px',
+                            'color': 'white',
+                            'text-align': 'center',
+                            'border': '2px solid #ff4444'
+                        }}>
+                            <h2 style={{ 'margin-top': 0 }}>⚔️ BOSS BATTLE ⚔️</h2>
+                            {gameState()?.activeBoss?.image && (
+                                gameState()?.activeBoss?.image.startsWith('http') ?
+                                    <img src={gameState()?.activeBoss?.image} style={{ 'max-width': '100px', 'border-radius': '50%', 'margin-bottom': '1rem' }} /> :
+                                    <div style={{ 'font-size': '4rem', 'margin-bottom': '0.5rem' }}>{gameState()?.activeBoss?.image}</div>
+                            )}
+                            <h3>{gameState()?.activeBoss?.name || 'Unknown Boss'}</h3>
+
+                            <div class="health-bar-container" style={{ 'background': '#333', 'height': '20px', 'border-radius': '10px', 'margin': '1rem 0', 'overflow': 'hidden' }}>
+                                <div class="health-bar-fill" style={{
+                                    'background': '#ff4444',
+                                    'height': '100%',
+                                    'width': `${(gameState()?.activeBoss?.hp / gameState()?.activeBoss?.maxHp) * 100}%`,
+                                    'transition': 'width 0.5s ease-out'
+                                }}></div>
+                            </div>
+                            <div style={{ 'font-weight': 'bold', 'font-size': '1.2rem' }}>
+                                HP: {gameState()?.activeBoss?.hp} / {gameState()?.activeBoss?.maxHp}
+                            </div>
+                            <p style={{ 'font-size': '0.9rem', 'opacity': 0.8 }}>
+                                Complete tasks to deal damage!
+                            </p>
                         </div>
                     </Show>
                 </section>

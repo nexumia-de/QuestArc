@@ -127,73 +127,7 @@
     color: #fbbf24;
 }
 
-/* Pet Card */
-.pet-details-card {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-}
 
-.pet-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.pet-header h3 {
-    margin: 0;
-    color: var(--primary);
-}
-
-.pet-stage-badge {
-    background: rgba(var(--primary), 0.1);
-    color: var(--primary);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1px solid var(--border);
-}
-
-.pet-showcase {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.pet-emoji-large {
-    font-size: 4rem;
-    line-height: 1;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-    animation: bounce 3s infinite ease-in-out;
-}
-
-.pet-info h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-}
-
-.pet-lore {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.4;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-}
 
 /* Avatar Editor */
 .avatar-editor {

@@ -52,7 +52,7 @@ export class ProjectScannerService {
             };
 
             if (!hasIcon && isQuestPattern) {
-                env.warnings.push(`Project "${p.title}" is detected as a Quest but is missing the 🏹 icon.`);
+                env.warnings.push(`"${p.title}": Missing 🏹 icon.`);
             }
 
             if (hasIcon && !isQuestPattern) {
@@ -65,8 +65,8 @@ export class ProjectScannerService {
                 case 'ACTIVE':
                     // Critical: Enforce Single Source of Truth
                     if (env.active) {
-                        const msg = `Integrity Warning: Multiple active quests detected (${env.active.title} and ${p.title}). Using ${env.active.title}.`;
-                        console.warn(msg);
+                        const msg = `Multi-active: ${env.active.title} & ${p.title}. Using ${env.active.title}.`;
+                        // console.warn(msg);
                         env.warnings.push(msg);
                     } else {
                         env.active = questProj;

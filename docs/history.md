@@ -71,5 +71,5 @@
 | 067 | 2026-01-14 | Feature: Cloning Service & Data Injection (Compiler). | [./067/](./067/) | Antigravity |
 | 068 | 2026-01-14 | Feature: Phase 2 - Project Scanner & Management UI. | [./068/](./068/) | Antigravity |
 | 069 | 2026-01-14 | Feature: Phase 3 - The Game Loop (XP, Levels, Persistence). | [./069/](./069/) | Antigravity |
-| 070 | 2026-01-14 | Bug Fix: Plugin manifest size optimization. | [./070/](./070/) | Antigravity |
+| 070 | 2026-01-14 | Feature: Phase 4 - Content Expansion (Stories & Bosses). | [./070/](./070/) | Antigravity |
 
