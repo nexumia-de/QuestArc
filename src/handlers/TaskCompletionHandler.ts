@@ -4,6 +4,7 @@ import { getCurrentStep, updateXp } from '../lib/state-manager';
 import { initializeBossIfNeeded, processTaskCompletion } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';
+import { CompilerService } from '../services/compiler.service';
 
 export interface TaskCompletePayload {
     task: Task;
@@ -50,6 +51,27 @@ export class TaskCompletionHandler {
         const currentStep = getCurrentStep(state);
         if (!currentStep) {
             PluginService.log.info('No current step found. Processing task for independent logic (Grind/Habit) only.');
+
+            // SEQUENTIAL CUSTOM QUESTS
+            if (state.activeStory.sourceTemplateId && state.activeStory.id) {
+                const createdCount = state.activeStory.currentStepId;
+                const nextFound = await CompilerService.compileNextTask(
+                    state.activeStory.sourceTemplateId,
+                    state.activeStory.id,
+                    createdCount
+                );
+
+                if (nextFound) {
+                    state.activeStory.currentStepId++;
+                    PluginService.showSnack('Next Quest Task Unlocked! 📜', 'SUCCESS');
+                } else {
+                    // No next task found -> Quest Complete?
+                    // Verify if the completed task was indeed part of the chain?
+                    // For now, assume yes if sourceTemplateId is set.
+                    state.activeStory.isCompleted = true;
+                    PluginService.showSnack('Quest Completed! 🏆', 'SUCCESS');
+                }
+            }
         } else {
             PluginService.log.info('Current step:', currentStep);
         }
@@ -93,7 +115,8 @@ export class TaskCompletionHandler {
                         TaskService.updateTaskTitle(task.id, nextStep.title || 'Next Step');
 
                         // Auto-create tasks for the new step
-                        const allCreated = await TaskService.createTasksForStep(nextStep);
+                        // Auto-create tasks for the new step
+                        const allCreated = await TaskService.createTasksForStep(nextStep, false, newState.activeStory.id);
 
                         // Mark tasks as created for this new step ONLY if all were created
                         if (allCreated) {
@@ -116,12 +139,22 @@ export class TaskCompletionHandler {
             }
 
             PluginService.showSnack(snackMessage, 'SUCCESS');
-        } else if (damageDealt > 0) {
-            // Show damage notification for boss hits
-            PluginService.showSnack(
-                `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
-                'SUCCESS'
-            );
+        } else {
+            // SEQUENTIAL BUILT-IN
+            if (currentStep) {
+                const nextCreated = await TaskService.createNextTask(currentStep, task.title, state.activeStory.id);
+                if (nextCreated) {
+                    PluginService.showSnack('Next Sub-task Unlocked! 🗝️', 'SUCCESS');
+                }
+            }
+
+            if (damageDealt > 0) {
+                // Show damage notification for boss hits
+                PluginService.showSnack(
+                    `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
+                    'SUCCESS'
+                );
+            }
         }
 
         // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)

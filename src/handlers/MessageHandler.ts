@@ -103,7 +103,7 @@ export class MessageHandler {
                     newState = initializeBossIfNeeded(newState, startStep);
 
                     try {
-                        const allCreated = await TaskService.createTasksForStep(startStep);
+                        const allCreated = await TaskService.createTasksForStep(startStep, false, storyId);
                         if (allCreated) {
                             newState.activeStory.tasksCreatedForStepId = startStep.id;
                         } else {
@@ -124,7 +124,7 @@ export class MessageHandler {
                 const currentStep = getCurrentStep(state);
 
                 if (currentStep) {
-                    await TaskService.createTasksForStep(currentStep, true); // Force create
+                    await TaskService.createTasksForStep(currentStep, true, state.activeStory.id); // Force create
                     updateState({
                         ...state,
                         activeStory: {

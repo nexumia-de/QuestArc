@@ -28,6 +28,7 @@ export interface QuestArcState {
   completedStories: CompletedStory[];
   activeStory: {
     id: string | null; // e.g., 'story_productivity_mastery' or null if no active story
+    sourceTemplateId?: string | null; // ID of the template project this was created from
     currentStepId: number;
     tasksCreatedForStepId?: number | null;
     isCompleted?: boolean;

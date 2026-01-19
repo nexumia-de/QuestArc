@@ -2,12 +2,19 @@ import { StoryStep } from '../types/state';
 import { PluginService } from './PluginService';
 
 export class TaskService {
-    static async createTasksForStep(step: Pick<StoryStep, 'title' | 'tasksToCreate'>, force: boolean = false): Promise<boolean> {
+    static async createTasksForStep(step: Pick<StoryStep, 'title' | 'tasksToCreate'>, force: boolean = false, projectId?: string | null): Promise<boolean> {
         if (!step.tasksToCreate) return true;
 
-        let allCreated = true;
+        let createdCount = 0;
+        const tasksToCreateList = step.tasksToCreate;
 
-        for (const taskDef of step.tasksToCreate) {
+        for (let i = 0; i < tasksToCreateList.length; i++) {
+            const taskDef = tasksToCreateList[i];
+            if (!taskDef) continue;
+
+            // SEQUENTIAL: Only create the first task (index 0)
+            if (i > 0) continue;
+
             // Logic:
             // 1. Initial load (force=false): Create only Auto tasks.
             // 2. Button click (force=true): Create only Manual tasks.
@@ -18,6 +25,11 @@ export class TaskService {
                     const additionalFields: any = {
                         notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
                     };
+
+                    // If projectId is provided, assign it
+                    if (projectId) {
+                        additionalFields.projectId = projectId;
+                    }
 
                     if (taskDef.isRepeating && taskDef.repeatCfg) {
                         additionalFields.taskRepeatCfg = {
@@ -31,16 +43,72 @@ export class TaskService {
                         title: `${taskDef.title} #QuestArc`,
                         ...additionalFields
                     });
-                    PluginService.log.info(`Created task: ${taskDef.title} (Auto: ${taskDef.isAutoCreate}, Force: ${force})`);
+
+                    createdCount++;
+                    PluginService.log.info(`Created task: ${taskDef.title} (Sequential: True, Project: ${projectId})`);
                 } catch (e) {
                     PluginService.log.error(`Failed to create task: ${taskDef.title}`, e);
                 }
-            } else if (!taskDef.isAutoCreate && !force) {
-                // If we skipped a manual task during initial load, we haven't created everything
-                allCreated = false;
             }
         }
-        return allCreated;
+
+        return true;
+    }
+
+    /**
+     * Creates the next task in the sequence for a built-in step.
+     */
+    static async createNextTask(step: StoryStep, completedTaskTitle: string, projectId?: string | null): Promise<boolean> {
+        if (!step.tasksToCreate) return false;
+
+        // Find index of completed task
+        // We match by title (ignoring #QuestArc suffix if present in title, but here we compare definition titles)
+        const cleanTitle = completedTaskTitle.replace(' #QuestArc', '');
+        const currentIndex = step.tasksToCreate.findIndex(t => t.title === cleanTitle);
+
+        if (currentIndex === -1) {
+            return false;
+        }
+
+        const nextIndex = currentIndex + 1;
+        if (nextIndex >= step.tasksToCreate.length) {
+            return false;
+        }
+
+        const nextTaskDef = step.tasksToCreate[nextIndex];
+        if (!nextTaskDef) return false;
+
+        // Create it
+        if (PluginService.api.addTask) {
+            try {
+                const additionalFields: any = {
+                    notes: nextTaskDef.notes || `Quest Sub-task for: ${step.title}`
+                };
+
+                if (projectId) {
+                    additionalFields.projectId = projectId;
+                }
+
+                if (nextTaskDef.isRepeating && nextTaskDef.repeatCfg) {
+                    additionalFields.taskRepeatCfg = {
+                        repeatEvery: 1,
+                        repeatCycle: nextTaskDef.repeatCfg.repeatType || 'DAILY',
+                        startDate: new Date().toISOString().split('T')[0],
+                    };
+                }
+
+                await PluginService.api.addTask({
+                    title: `${nextTaskDef.title} #QuestArc`,
+                    ...additionalFields
+                });
+
+                PluginService.log.info(`Created NEXT task: ${nextTaskDef.title}`);
+                return true;
+            } catch (e) {
+                PluginService.log.error(`Failed to create next task: ${nextTaskDef.title}`, e);
+            }
+        }
+        return false;
     }
 
     static updateTaskTitle(taskId: string, newTitle: string) {

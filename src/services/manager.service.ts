@@ -18,7 +18,7 @@ export class QuestManagerService {
         }
 
         let newProjectId: string;
-        let storyDef: HeroStory | undefined;
+
 
         // 2. Create Project & Initialize State
         try {
@@ -27,15 +27,11 @@ export class QuestManagerService {
 
             // Init State for new quest
             const state = Persistence.loadState();
-            const storyDef = {
-                id: targetId,
-                title: 'Custom Quest',
-                steps: [], // Custom quests don't have rigid steps yet
-                boss: undefined
-            };
+
 
             state.activeStory = {
-                id: targetId,
+                id: newProjectId,
+                sourceTemplateId: targetId,
                 currentStepId: 1,
                 taskProgress: {}
             };

@@ -63,7 +63,7 @@ async function init() {
       PluginService.log.info('No saved state found, using initial state');
       const currentStep = getCurrentStep(state);
       if (currentStep) {
-        await TaskService.createTasksForStep(currentStep);
+        await TaskService.createTasksForStep(currentStep, false, state.activeStory.id);
         state = initializeBossIfNeeded(state, currentStep);
       }
     }

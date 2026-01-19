@@ -34,11 +34,37 @@ export class CompilerService {
         // 4. Clone Tasks (Root level first)
         const rootTasks = templateTasks.filter(t => !t.parentId);
 
-        for (const task of rootTasks) {
-            await this.cloneTask(task, newProjectId, templateTasks);
+        // SEQUENTIAL LOADING: Just clone the first one
+        if (rootTasks.length > 0 && rootTasks[0]) {
+            await this.cloneTask(rootTasks[0], newProjectId, templateTasks);
         }
 
         return newProjectId;
+    }
+
+    /**
+     * Clones the next task in the sequence from the template.
+     * @param templateProjectId The ID of the source template
+     * @param activeProjectId The ID of the active quest project
+     * @param completedTaskCount How many root tasks have been completed/created so far
+     */
+    static async compileNextTask(templateProjectId: string, activeProjectId: string, completedTaskCount: number): Promise<boolean> {
+        // 1. Fetch Template Tasks again
+        const allTasks = await PluginAPI.getTasks();
+        const templateTasks = allTasks.filter(t => t.projectId === templateProjectId);
+        const rootTasks = templateTasks.filter(t => !t.parentId);
+
+        // 2. Identify Next Task
+        // If we have completed N tasks, we want index N (0-based)
+        if (completedTaskCount >= rootTasks.length) {
+            return false; // No more tasks
+        }
+
+        const nextTask = rootTasks[completedTaskCount];
+
+        // 3. Clone it
+        await this.cloneTask(nextTask, activeProjectId, templateTasks);
+        return true;
     }
 
     /**

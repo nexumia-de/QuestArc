@@ -78,3 +78,6 @@
 | 073 | 2026-01-17 | Bug Fix: Grind tasks erroneously unchecking on completion. | [./073/](./073/) | Antigravity |
 | 074 | 2026-01-19 | Refactor: Remove Quest Board and cleanup legacy UI. | [./074/](./074/) | Antigravity |
 | 075 | 2026-01-19 | Refactor: Remove duplicate Quest Dashboard. | [./075/](./075/) | Antigravity |
+| 076 | 2026-01-19 | Feature: Project Backlog (Current Task Dashboard). | [./076/](./076/) | Antigravity |
+| 077 | 2026-01-19 | Bug Fix: Project Backlog Creation (ProjectId assignment). | [./077/](./077/) | Antigravity |
+| 078 | 2026-01-19 | Sequential Task Loading | [./078/](./078/) | Antigravity |

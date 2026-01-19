@@ -92,10 +92,21 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
 
                     <Show when={currentStep()?.tasksToCreate && currentStep()!.tasksToCreate!.length > 0}>
                         <div class="step-tasks">
-                            <h4>Complete Tasks:</h4>
+                            <h4>Current Task:</h4>
                             <ul>
-                                <For each={currentStep()!.tasksToCreate}>
+                                <For each={(() => {
+                                    const allTasks = currentStep()!.tasksToCreate || [];
+                                    const uncompleted = allTasks.filter((task): task is NonNullable<typeof task> => {
+                                        if (!task) return false;
+                                        const progress = props.state.activeStory.taskProgress?.[task.title] || 0;
+                                        const required = task.requiredCount || 1;
+                                        return progress < required;
+                                    });
+                                    // Return only the first uncompleted task, or empty list if all done
+                                    return uncompleted.length > 0 ? [uncompleted[0]] : [];
+                                })()}>
                                     {(task) => {
+                                        if (!task) return null;
                                         const progress = props.state.activeStory.taskProgress?.[task.title] || 0;
                                         const required = task.requiredCount || 1;
                                         const isCompleted = progress >= required;
