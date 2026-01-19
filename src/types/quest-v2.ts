@@ -15,8 +15,14 @@ export interface QuestTaskData {
     // For Conditions (Subtasks)
     progress?: {
         current: number;
-        target: number; // HP or Repetitions
+        target?: number; // HP or Repetitions
         unit?: string;  // e.g., "HP"
+        lastUpdated?: number;
+        streak?: {
+            current: number;
+            target?: number; // Optional target to complete something
+            highest?: number;
+        };
     };
 
     // Only for Habits

@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js';
 import { HeroStory } from '../types/state';
 
-export type AppView = 'dashboard' | 'editor' | 'story-list' | 'settings' | 'character' | 'inventory';
+export type AppView = 'dashboard' | 'editor' | 'settings' | 'character' | 'inventory';
 
 export function useNavigation() {
     const [view, setView] = createSignal<AppView>('dashboard');
@@ -10,10 +10,6 @@ export function useNavigation() {
     const goToDashboard = () => {
         setEditingStory(null);
         setView('dashboard');
-    };
-
-    const goToStoryList = () => {
-        setView('story-list');
     };
 
     const goToEditor = (story?: HeroStory) => {
@@ -30,7 +26,6 @@ export function useNavigation() {
         setView,
         editingStory,
         goToDashboard,
-        goToStoryList,
         goToEditor,
         goToSettings
     };

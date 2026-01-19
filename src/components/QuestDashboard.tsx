@@ -1,6 +1,7 @@
 import { createSignal, onMount, For, Show } from 'solid-js';
 import { ProjectScannerService, QuestEnvironment } from '../services/scanner.service';
 import { QuestManagerService } from '../services/manager.service';
+import { Persistence } from '../lib/persistence';
 
 export const QuestDashboard = () => {
     const [env, setEnv] = createSignal<QuestEnvironment | null>(null);
@@ -26,8 +27,8 @@ export const QuestDashboard = () => {
         refresh();
         // Initial load of game state
         try {
-            const raw = localStorage.getItem('questarc_state');
-            if (raw) setGameState(JSON.parse(raw));
+            const state = Persistence.loadState();
+            setGameState(state);
         } catch (e) { }
 
         const handleUpdate = (e: CustomEvent) => {
@@ -41,11 +42,11 @@ export const QuestDashboard = () => {
         return () => window.removeEventListener('questarc-state-update' as any, handleUpdate as any);
     });
 
-    const handleStart = async (templateId: string) => {
+    const handleStart = async (targetId: string, _isSystem: boolean) => {
         if (env()?.active) return;
         setLoading(true);
         try {
-            const newEnv = await QuestManagerService.startQuest(templateId);
+            const newEnv = await QuestManagerService.startQuest(targetId);
             setEnv(newEnv);
         } catch (err: any) {
             setError(err.message);
@@ -124,7 +125,10 @@ export const QuestDashboard = () => {
                     }>
                         <div class="story-card active">
                             <div class="story-info">
-                                <h3>{env()?.active?.originalTitle}</h3>
+                                <h3>
+                                    {env()?.active?.icon && <span style={{ 'margin-right': '0.5rem' }}>{env()?.active?.icon}</span>}
+                                    {env()?.active?.originalTitle}
+                                </h3>
                                 <div class="active-badge">IN PROGRESS</div>
                             </div>
                             <button
@@ -174,29 +178,33 @@ export const QuestDashboard = () => {
                     </Show>
                 </section>
 
-                {/* Templates */}
+                {/* Templates (From File System) */}
                 <section class="dashboard-section" style={{ 'margin-bottom': '1.5rem' }}>
-                    <h4 style={{ color: 'var(--primary)', 'margin-bottom': '0.5rem' }}>AVAILABLE STORIES</h4>
-                    <Show when={env()?.templates?.length !== 0} fallback={
+                    <h4 style={{ color: 'var(--primary)', 'margin-bottom': '0.5rem' }}>AVAILABLE TEMPLATES</h4>
+
+                    <div class="story-grid">
+                        <For each={env()?.templates}>
+                            {(t) => (
+                                <div class="story-card">
+                                    <span style={{ 'font-weight': 500 }}>
+                                        {t.icon && <span style={{ 'margin-right': '0.5rem' }}>{t.icon}</span>}
+                                        {t.originalTitle}
+                                    </span>
+                                    <button
+                                        onClick={() => handleStart(t.id, false)}
+                                        disabled={!!env()?.active || loading()}
+                                        class="primary-btn"
+                                    >
+                                        Start
+                                    </button>
+                                </div>
+                            )}
+                        </For>
+                    </div>
+
+                    <Show when={!env()?.templates?.length}>
                         <div class="empty-state" style={{ padding: '1rem' }}>
                             No templates found. Create a project starting with 📜.
-                        </div>
-                    }>
-                        <div class="story-grid">
-                            <For each={env()?.templates}>
-                                {(t) => (
-                                    <div class="story-card">
-                                        <span style={{ 'font-weight': 500 }}>{t.originalTitle}</span>
-                                        <button
-                                            onClick={() => handleStart(t.id)}
-                                            disabled={!!env()?.active || loading()}
-                                            class="primary-btn"
-                                        >
-                                            Start
-                                        </button>
-                                    </div>
-                                )}
-                            </For>
                         </div>
                     </Show>
                 </section>

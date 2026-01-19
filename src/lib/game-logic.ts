@@ -82,7 +82,7 @@ export function checkLevelUp(state: QuestArcState): { newState: QuestArcState; l
 export function processTaskCompletion(
   state: QuestArcState,
   _task: TaskStub,
-  currentStep: StoryStep
+  currentStep?: StoryStep
 ): {
   newState: QuestArcState;
   damageDealt: number;
@@ -112,9 +112,17 @@ export function processTaskCompletion(
       // Roadmap says: ```json\n{...}\n``` or just raw text? 
       // Implementation Plan says: Injection of `QUEST_DATA` JSON into notes.
       // Let's regex for the block.
-      const match = _task.notes.match(/```json\n([\s\S]*?)\n```/);
+      // Regex to find JSON block, handling various newline formats and potential missing newlines
+      const match = _task.notes.match(/```json\s*([\s\S]*?)\s*```/);
       if (match && match[1]) {
         questData = JSON.parse(match[1]);
+      } else {
+        // Fallback: Try to find a raw JSON object if no code blocks are present
+        // This handles cases where user might have pasted just the JSON
+        const rawJsonMatch = _task.notes.match(/\{[\s\S]*"meta"[\s\S]*\}/);
+        if (rawJsonMatch) {
+          questData = JSON.parse(rawJsonMatch[0]);
+        }
       }
     } catch (e) {
       // invalid json, ignore
@@ -130,6 +138,9 @@ export function processTaskCompletion(
     // Simple tasks don't strictly need persistence if they just complete.
   }
 
+
+
+
   const type = questData.meta.type;
 
   // LOGIC: Handle Task Types
@@ -142,10 +153,12 @@ export function processTaskCompletion(
       const newCurrent = current + 1;
       questData.progress.current = newCurrent;
 
-      // Update Task: Keep it incomplete!
+      // Update Task status
+      const isFinished = newCurrent >= target;
+
       taskUpdates = {
-        isDone: false,
-        title: _task.title, // Optionally update title to show progress? e.g. "50x Pushups (10/50)"
+        isDone: !isFinished ? false : true, // If finished, let it be checked (true). If not, uncheck it (false).
+        title: _task.title,
         notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
       };
 
@@ -169,13 +182,86 @@ export function processTaskCompletion(
       // unless user un-completes it.
     }
   } else if (type === 'HABIT') {
-    // Habit: Check if done for today
-    // For MVP, completing a habit just increments its "streak" or "done count" and keeps it open
-    // UNLESS we want to enforce "Daily limit".
-    // Let's assume Habit = Always recurring, so we uncheck it.
+    // Habit Logic:
+    // 1. If it has a target (multi-count), increment it.
+    // 2. If current < target, keep it unchecked (isDone = false).
+    // 3. If current >= target, let it complete (isDone = true) -> User finished for the day.
+
+    // Check if progress tracking exists
+    const current = questData.progress?.current || 0;
+    const target = questData.progress?.target || 1;
+
+    // Increment (unless we are just completing a single-tick habit which has target=1, current=0)
+    // Actually, persistence always starts at 0.
+    const newCurrent = current + 1;
+    const now = Date.now();
+
+    if (questData.progress) {
+      questData.progress.current = newCurrent;
+      questData.progress.lastUpdated = now;
+    }
+
+    // Determine visual state
+    const isFinishedForDay = newCurrent >= target;
+
+    // Handle Streaks
+    if (isFinishedForDay) {
+      // Logic: If lastUpdated was NOT today (already checked by newCurrent logic incrementing),
+      // And we just met the target.
+
+      // Check if we already incremented streak today? 
+      // questData.progress.lastUpdated is now `now`. 
+      // But we need to know if we *just* finished it.
+      // Actually, if newCurrent === target, we just finished it.
+      // If newCurrent > target, we are over-completing (shouldn't double count streak).
+
+      if (newCurrent === target && questData.progress?.streak) {
+        // Increment Streak
+        questData.progress.streak.current = (questData.progress.streak.current || 0) + 1;
+
+        // Check Highest
+        const currentStreak = questData.progress.streak.current;
+        const highest = questData.progress.streak.highest || 0;
+        if (currentStreak > highest) {
+          questData.progress.streak.highest = currentStreak;
+        }
+      }
+    }
+
+    // Update Title with Progress if target > 1
+    // e.g. "Drink Water" -> "Drink Water (1/3)"
+    let newTitle = _task.title;
+
+    // 1. Strip existing patterns
+    // Strip (x/y)
+    let baseTitle = _task.title.replace(/\s*\(\d+\/\d+\)$/, '');
+    // Strip existing 🔥 streaks
+    baseTitle = baseTitle.replace(/\s*🔥\s*\d+(\/\d+)?$/, '');
+
+    // 2. Rebuild Title
+    newTitle = baseTitle;
+
+    // Add (x/y)
+    if (target > 1) {
+      newTitle = `${newTitle} (${newCurrent}/${target})`;
+    }
+
+    // Add Streak 🔥
+    if (questData?.progress?.streak && questData.progress.streak.current > 0) {
+      const sCurrent = questData.progress.streak.current;
+      const sTarget = questData.progress.streak.target;
+
+      let streakStr = `🔥 ${sCurrent}`;
+      if (sTarget) {
+        streakStr += `/${sTarget}`;
+      }
+      newTitle = `${newTitle} ${streakStr}`;
+    }
+
 
     taskUpdates = {
-      isDone: false,
+      isDone: isFinishedForDay, // If finished, let it be checked. If not, uncheck it.
+      title: newTitle,
       notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
     };
 
@@ -192,6 +278,12 @@ export function processTaskCompletion(
   }
 
   // --- STANDARD COMPLETION (Simple Task or Finished Grind) ---
+
+  if (!currentStep) {
+    // If we don't have a step, we can't do step completion logic.
+    // But we still apply XP updates if calculated above (Grind/Habit XP).
+    return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+  }
 
   const requirement = currentStep.completion;
 

@@ -1,29 +1,78 @@
 // import { Project } from '../types/plugin-api';
 import { ProjectScannerService, QuestEnvironment } from './scanner.service';
 import { CompilerService } from './compiler.service';
+import { Persistence } from '../lib/persistence';
+import { HeroStory, StoryStep } from '../types/state';
 
 export class QuestManagerService {
     /**
-     * Starts a new quest from a template.
-     * Compiles the template and returns the updated environment.
+     * Starts a new quest.
+     * @param targetId - Either a template Project ID (for custom quests) or a Story ID (for built-in quests)
+     * @param isSystemQuest - If true, loads from built-in stories.
      */
-    static async startQuest(templateId: string): Promise<QuestEnvironment> {
+    static async startQuest(targetId: string): Promise<QuestEnvironment> {
         // 1. Safety Check: Is there an active quest?
         const currentEnv = await ProjectScannerService.scan();
         if (currentEnv.active) {
             throw new Error('An active quest is already running. Please pause or complete it first.');
         }
 
-        // 2. Compile (Create new project)
+        let newProjectId: string;
+        let storyDef: HeroStory | undefined;
+
+        // 2. Create Project & Initialize State
         try {
-            await CompilerService.compileQuest(templateId);
+            // Just compile. No system quests.
+            newProjectId = await CompilerService.compileQuest(targetId);
+
+            // Init State for new quest
+            const state = Persistence.loadState();
+            const storyDef = {
+                id: targetId,
+                title: 'Custom Quest',
+                steps: [], // Custom quests don't have rigid steps yet
+                boss: undefined
+            };
+
+            state.activeStory = {
+                id: targetId,
+                currentStepId: 1,
+                taskProgress: {}
+            };
+            // We might need to ensure a "Custom Story" placeholder exists in state if we want Bosses to work?
+            // For now, let's just save the active state so the UI knows something is running.
+            Persistence.saveState(state);
+
         } catch (error) {
-            console.error('Failed to compile quest:', error);
+            console.error('Failed to start quest:', error);
             throw new Error(`Failed to start quest: ${(error as any).message}`);
         }
 
         // 3. Return updated environment (Reactive update)
         return await ProjectScannerService.scan();
+    }
+
+    /**
+     * Injects tasks for a specific step into the project.
+     */
+    static async injectStepTasks(projectId: string, step: StoryStep) {
+        if (!step.tasksToCreate) return;
+
+        console.log(`[QuestArc] Injecting ${step.tasksToCreate.length} tasks for Step ${step.id}`);
+
+        for (const def of step.tasksToCreate) {
+            if (def.isAutoCreate) {
+                await PluginAPI.addTask({
+                    title: def.title,
+                    projectId: projectId,
+                    notes: def.notes || '' // Persistence/QuestData
+                });
+            }
+        }
+
+        // Mark that we created tasks (in state)? 
+        // Ideally state-manager tracks this to avoid double-creation on reload.
+        // For now, fire-and-forget.
     }
 
     /**

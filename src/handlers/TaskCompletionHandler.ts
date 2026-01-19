@@ -11,7 +11,29 @@ export interface TaskCompletePayload {
 
 export class TaskCompletionHandler {
     static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
-        const taskPayload = payload as TaskCompletePayload;
+        let task: Task;
+
+        // Normalize payload: It can be a string ID or an object { task: Task }
+        if (typeof payload === 'string') {
+            // It's an ID, we must fetch the task
+            try {
+                const tasks = await PluginAPI.getTasks();
+                const found = tasks.find(t => t.id === payload);
+                if (!found) {
+                    PluginService.log.warn(`TaskCompletionHandler: Task not found with ID ${payload}`);
+                    return;
+                }
+                task = found;
+            } catch (e) {
+                PluginService.log.error('Failed to fetch tasks', e);
+                return;
+            }
+        } else if (payload && typeof payload === 'object' && 'task' in payload) {
+            task = (payload as any).task;
+        } else {
+            // Assume payload IS the task (legacy or direct call)
+            task = payload as Task;
+        }
 
         if (state.activeStory.isCompleted) {
             PluginService.log.info('Task completed for completed quest. Ignoring.');
@@ -19,27 +41,27 @@ export class TaskCompletionHandler {
         }
 
         PluginService.log.info('TaskCompletionHandler: Processing task', {
-            taskId: taskPayload.task.id,
+            taskId: task.id,
             isQuestCompleted: state.activeStory.isCompleted,
             currentStepId: state.activeStory.currentStepId
         });
 
-        PluginService.log.info('Task completed!', taskPayload);
+        PluginService.log.info('Task completed!', task);
         const currentStep = getCurrentStep(state);
         if (!currentStep) {
-            PluginService.log.info('No current step found');
-            return;
+            PluginService.log.info('No current step found. Processing task for independent logic (Grind/Habit) only.');
+        } else {
+            PluginService.log.info('Current step:', currentStep);
         }
-        PluginService.log.info('Current step:', currentStep);
 
         // Initialize boss if needed
-        let newState = initializeBossIfNeeded(state, currentStep);
+        let newState = currentStep ? initializeBossIfNeeded(state, currentStep) : state;
 
-        const result = processTaskCompletion(newState, taskPayload.task, currentStep);
+        const result = processTaskCompletion(newState, task, currentStep);
         newState = result.newState;
         const { damageDealt, stepCompleted } = result;
 
-        if (stepCompleted) {
+        if (stepCompleted && currentStep) {
             const xpResult = updateXp(newState, currentStep.xpReward);
             newState = xpResult.state;
             const leveledUp = xpResult.leveledUp;
@@ -68,7 +90,7 @@ export class TaskCompletionHandler {
 
                 if (nextStep) {
                     try {
-                        TaskService.updateTaskTitle(taskPayload.task.id, nextStep.title || 'Next Step');
+                        TaskService.updateTaskTitle(task.id, nextStep.title || 'Next Step');
 
                         // Auto-create tasks for the new step
                         const allCreated = await TaskService.createTasksForStep(nextStep);
@@ -100,6 +122,52 @@ export class TaskCompletionHandler {
                 `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
                 'SUCCESS'
             );
+        }
+
+        // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)
+        // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)
+        if (result.taskUpdates) {
+            try {
+                // GUARD: Prevent infinite loops by checking if update is redundant.
+                // Especially for isDone, if we set it to true, we don't want to re-trigger completion.
+                // We should fetch the latest task state to be sure? 
+                // Or compare with the `task` object we derived everything from.
+
+                const currentIsDone = task.isDone;
+                const newIsDone = result.taskUpdates.isDone;
+
+                // Optimization: Deep compare notes to see if they actually changed?
+                // For now, let's just be careful about emitting isDone.
+
+                const updatesToApply: Partial<Task> = { ...result.taskUpdates };
+
+                // If task is already done, and we want it done -> remove isDone from update
+                if (currentIsDone === true && newIsDone === true) {
+                    delete updatesToApply.isDone;
+                }
+
+                // If title unchanged -> remove title
+                if (task.title === updatesToApply.title) {
+                    delete updatesToApply.title;
+                }
+
+                // If notes unchanged -> remove notes
+                // We need to normalize strings (trim)
+                if (task.notes && updatesToApply.notes && task.notes.trim() === updatesToApply.notes.trim()) {
+                    delete updatesToApply.notes;
+                }
+
+                // Only update if there are keys left
+                if (Object.keys(updatesToApply).length > 0) {
+                    // Cast to any to bypass strict type mismatch between local Task type and PluginAPI Task type if they differ
+                    await PluginAPI.updateTask(task.id, updatesToApply as any);
+                } else {
+                    PluginService.log.info('Skipping redundant task update to prevent loops.');
+                }
+
+            } catch (err) {
+                PluginService.log.error('Failed to update task properties', err);
+            }
         }
 
         await saveCallback(newState);

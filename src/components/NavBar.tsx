@@ -19,32 +19,8 @@ const NavBar: Component<NavBarProps> = (props) => {
                 <span class="nav-label">Adventure</span>
             </button>
 
-            <button
-                class={`nav-item ${props.currentView === 'story-list' ? 'active' : ''}`}
-                onClick={() => props.onNavigate('story-list')}
-                aria-label="Quest Board"
-            >
-                <span class="nav-icon">📜</span>
-                <span class="nav-label">Quest Board</span>
-            </button>
 
-            <button
-                class={`nav-item ${props.currentView === 'character' ? 'active' : ''}`}
-                onClick={() => props.onNavigate('character')}
-                aria-label="Character"
-            >
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Hero</span>
-            </button>
 
-            <button
-                class={`nav-item ${props.currentView === 'inventory' ? 'active' : ''}`}
-                onClick={() => props.onNavigate('inventory')}
-                aria-label="Inventory"
-            >
-                <span class="nav-icon">🎒</span>
-                <span class="nav-label">Bag</span>
-            </button>
 
             <button
                 class={`nav-item ${props.currentView === 'settings' ? 'active' : ''}`}

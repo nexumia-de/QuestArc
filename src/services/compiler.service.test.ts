@@ -47,6 +47,7 @@ describe('CompilerService', () => {
         // Verify Project Creation
         expect(mockPluginAPI.addProject).toHaveBeenCalledWith({
             title: 'My Story 🧭',
+            icon: '🏹'
         });
         expect(newProjectId).toBe('new_p_id');
 
@@ -60,7 +61,7 @@ describe('CompilerService', () => {
             title: 'Chapter 1',
             projectId: 'new_p_id',
             parentId: undefined,
-            notes: expect.stringContaining('"QUEST_DATA"'),
+            notes: expect.stringContaining('"meta"'),
         }));
 
         // Verify Task 2 (Subtask)

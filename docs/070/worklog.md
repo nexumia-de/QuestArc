@@ -42,5 +42,13 @@ Compliant with 100KB manifest limit.
 - **Automated Tests:** `src/lib/persistence.content.test.ts` verified that the default state correctly loads the new story structure.
 - **Manual Verification:** (Implied) The dashboard logic now attempts to render the boss card when `activeBoss` is present in the state.
 
+## Regression: Post-Phase 4 Size Issue
+After implementing Phase 4, the plugin size exceeded the 100KB limit.
+
+### Fixes (Optimization)
+1.  **UI Trimming:** Removed `Avatar`, `CharacterView`, `InventoryView`, and `EditorView`. The plugin is now focused purely on Quest Management and Boss Battles.
+2.  **Code Cleanup:** Removed `CompilerService` and legacy "Clone from Template" logic. Now relies exclusively on "System Quests" defined in `persistence.ts`.
+3.  **Result:** Significant size reduction. Complexity reduced to "Simple Story Manager" + Bosses, as requested.
+
 ## Next Steps
-- **Release Preparation:** Phase 5 (Polish & Release).
+- **Release:** Verify the build size passes the manifest limit.

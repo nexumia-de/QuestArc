@@ -20,13 +20,9 @@ const App: Component = () => {
     cancelQuest
   } = useQuestArc();
 
-  const { view, setView, editingStory, goToDashboard, goToEditor, goToStoryList } = useNavigation();
+  const { view, setView, editingStory, goToDashboard, goToEditor } = useNavigation();
 
-  const handleSaveStoryWrapper = async (title: string, steps: any[]) => {
-    await saveStory(editingStory()?.id, title, steps, () => {
-      goToStoryList();
-    });
-  };
+
 
 
   const startQuestWrapper = async (storyId: string) => {
@@ -87,8 +83,7 @@ const App: Component = () => {
                 addStepTasks,
                 handleAcknowledgeCompletion,
                 startQuest: startQuestWrapper,
-                handleSaveStory: handleSaveStoryWrapper,
-                handleDeleteStory: (storyId: string) => deleteStory(storyId, goToStoryList),
+                handleDeleteStory: (storyId: string) => deleteStory(storyId, goToDashboard),
 
                 handleImportStory,
                 resetGame: resetGameWrapper,

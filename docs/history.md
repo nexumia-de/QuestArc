@@ -72,4 +72,9 @@
 | 068 | 2026-01-14 | Feature: Phase 2 - Project Scanner & Management UI. | [./068/](./068/) | Antigravity |
 | 069 | 2026-01-14 | Feature: Phase 3 - The Game Loop (XP, Levels, Persistence). | [./069/](./069/) | Antigravity |
 | 070 | 2026-01-14 | Feature: Phase 4 - Content Expansion (Stories & Bosses). | [./070/](./070/) | Antigravity |
+| 071 | 2026-01-16 | Bug Fix: Copy Story Icon from Template. | [./071/](./071/) | Antigravity |
 
+| 072 | 2026-01-17 | Bug Fix: Grind/Habit tasks not updating when Step context missing. | [./072/](./072/) | Antigravity |
+| 073 | 2026-01-17 | Bug Fix: Grind tasks erroneously unchecking on completion. | [./073/](./073/) | Antigravity |
+| 074 | 2026-01-19 | Refactor: Remove Quest Board and cleanup legacy UI. | [./074/](./074/) | Antigravity |
+| 075 | 2026-01-19 | Refactor: Remove duplicate Quest Dashboard. | [./075/](./075/) | Antigravity |

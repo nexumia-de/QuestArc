@@ -41,35 +41,68 @@ export function parseTaskType(title: string): {
         };
     }
 
-    // 2. Habit: 3x @daily TaskName
-    const habitRegex = /(\d+)x\s+(@daily|@weekly)\s+(.+)/i;
+    // 2. Habit: 3x @daily TaskName OR TaskName 3x @daily
+    // Supports:
+    // - "3x @daily Task"
+    // - "Task 3x @daily"
+    // - "daily 2x@daily" (missing space)
+    const habitRegex = /(?:^|\s)(\d+)x\s*(@daily|@weekly)(?:\s+|$)|(@daily|@weekly)\s*(\d+)x(?:\s+|$)/i;
     const habitMatch = title.match(habitRegex);
+
     if (habitMatch) {
-        const targetStr = habitMatch[1] || '1';
-        const freq = habitMatch[2] || '@daily';
-        const name = habitMatch[3] || 'Task';
+        // Groups match depending on order. 
+        // G1=Target, G2=Freq (Prefix style)
+        // G3=Freq, G4=Target (Suffix/Mix style? - Actually regex above covers specific cases)
+        // Let's simplify: Extract logic
+
+        const targetStr = habitMatch[1] || habitMatch[4] || '1';
+        const freq = habitMatch[2] || habitMatch[3] || '@daily';
+
+        // Clean Title: Remove the matched part
+        let cleanTitle = title.replace(habitMatch[0], '').trim();
+
+        // Check for Streak: [streak:3], streak:3, [s:3], or s:3
+        const streakRegex = /(?:\[|\s)(?:streak|s):(\d+)(?:\]|($|\s))/i;
+        const streakMatch = cleanTitle.match(streakRegex);
+        let streakTarget = undefined;
+
+        if (streakMatch) {
+            streakTarget = parseInt(streakMatch[1], 10);
+            cleanTitle = cleanTitle.replace(streakMatch[0], '').trim();
+        }
+
         return {
             type: 'HABIT',
             meta: {
                 target: parseInt(targetStr, 10),
-                frequency: freq.toLowerCase()
+                frequency: freq.toLowerCase(),
+                streakTarget
             },
-            cleanTitle: name.trim()
+            cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
         };
     }
 
-    // 3. Grind: 50x TaskName (Must be checked AFTER Habit to avoid conflict if Grind doesn't have @interval)
-    const grindRegex = /(\d+)x\s+(?!@)(.+)/i; // Negative lookahead to ensure it's not a habit
+    // 3. Grind: 50x TaskName OR TaskName 50x
+    // Supports:
+    // - "50x Pushups"
+    // - "Pushups 50x"
+    // - "Multi 3x"
+    // Must be careful not to match simple numbers (e.g. "Chapter 1") - needs 'x'
+    const grindRegex = /(?:^|\s)(\d+)x(?:\s+|$)/i;
     const grindMatch = title.match(grindRegex);
+
     if (grindMatch) {
         const targetStr = grindMatch[1] || '1';
-        const name = grindMatch[2] || 'Task';
+
+        // Clean Title: Remove the matched part "3x"
+        const cleanTitle = title.replace(grindMatch[0], '').trim();
+
         return {
             type: 'GRIND',
             meta: {
                 target: parseInt(targetStr, 10)
             },
-            cleanTitle: name.trim()
+            cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
         };
     }
 
@@ -124,6 +157,13 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
             frequency: meta.frequency,
             lastDone: null
         };
+        if (meta.streakTarget) {
+            data.progress!.streak = {
+                current: 0,
+                target: meta.streakTarget,
+                highest: 0
+            };
+        }
     }
 
     return { title: cleanTitle, data };

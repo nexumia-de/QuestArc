@@ -1,40 +1,41 @@
-import { Task } from '../types/plugin-api';
 import { compileTaskData } from '../lib/parsers';
-
-// We rely on the global PluginAPI object provided by the host
-// In tests, this will be mocked.
+import { Task } from '../types/plugin-api';
 
 export class CompilerService {
     /**
-     * Clones a template project into an active quest project.
-     * @param templateProjectId The ID of the template project to clone.
-     * @returns The ID of the newly created Active Project.
+     * Compiles a Quest Template into a new Active Quest.
+     * @param templateProjectId The ID of the template project (starts with 📜)
+     * @returns The ID of the newly created active project
      */
     static async compileQuest(templateProjectId: string): Promise<string> {
+        // 1. Fetch Template Data
         const projects = await PluginAPI.getAllProjects();
-        const templateProject = projects.find(p => p.id === templateProjectId);
+        const template = projects.find(p => p.id === templateProjectId);
+        if (!template) throw new Error(`Template not found: ${templateProjectId}`);
 
-        if (!templateProject) {
-            throw new Error(`Template project with ID ${templateProjectId} not found.`);
-        }
+        // 2. Create New Project
+        // "📜 My Quest" -> "My Quest 🧭"
+        const coreTitle = template.title.replace(/^📜\s*/, '').trim();
+        const newTitle = `${coreTitle} 🧭`;
 
-        // 1. Create the new Active Project
-        const newTitle = `${templateProject.title.replace('📜', '').trim()} 🧭`;
+        // Use the template's icon, or default to 🏹 if missing (though scanner guarantees 🏹 usually)
+        const newIcon = template.icon || '🏹';
+
         const newProjectId = await PluginAPI.addProject({
             title: newTitle,
+            icon: newIcon
         });
 
-        // 2. Fetch all tasks from the template project
+        // 3. Fetch Tasks from Template
+        // Fallback: fetch all tasks and filter if specific API is missing
         const allTasks = await PluginAPI.getTasks();
         const templateTasks = allTasks.filter(t => t.projectId === templateProjectId);
 
-        // We need to maintain the hierarchy. 
-        // SP returns a flat list, but tasks have `parentId` and `subTaskIds`.
-        // We should clone top-level tasks first, then their children.
-        const topLevelTasks = templateTasks.filter(t => !t.parentId);
+        // 4. Clone Tasks (Root level first)
+        const rootTasks = templateTasks.filter(t => !t.parentId);
 
-        for (const task of topLevelTasks) {
-            await this.cloneTaskRecursively(task, newProjectId, undefined, allTasks);
+        for (const task of rootTasks) {
+            await this.cloneTask(task, newProjectId, templateTasks);
         }
 
         return newProjectId;
@@ -43,35 +44,38 @@ export class CompilerService {
     /**
      * Recursively clones a task and its subtasks.
      */
-    private static async cloneTaskRecursively(
+    private static async cloneTask(
         originalTask: Task,
         targetProjectId: string,
-        newParentId: string | undefined,
-        allTasks: Task[]
-    ): Promise<void> {
-        // 1. Compile Data (Sanitize Title + Inject JSON)
-        const { title: cleanTitle, data: questData } = compileTaskData(originalTask.title);
+        allTemplateTasks: Task[],
+        parentId: string | null = null
+    ) {
+        // Parse special syntax (e.g. [XP:100]) using our parsers
+        const { title: cleanTitle, data } = compileTaskData(originalTask.title);
 
-        // 2. Append QUEST_DATA to notes
-        const originalNotes = originalTask.notes || '';
-        const injection = `\n\n\`\`\`json\n${JSON.stringify({ QUEST_DATA: questData }, null, 2)}\n\`\`\``;
-        const newNotes = originalNotes + injection;
+        // Serialize QuestData into notes
+        // We preserve original notes if they exist, but append our system data block
+        const noteContent = originalTask.notes || '';
+        const systemDataBlock = `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
 
-        // 3. Create the new task
+        // If notes already have JSON, we might want to be careful, but for templates, 
+        // we assume the template builder used clean notes or raw text.
+        // Let's just append.
+        const finalNotes = noteContent ? `${noteContent}\n\n${systemDataBlock}` : systemDataBlock;
+
         const newTaskId = await PluginAPI.addTask({
             title: cleanTitle,
+            notes: finalNotes,
             projectId: targetProjectId,
-            parentId: newParentId,
-            notes: newNotes,
-            tagIds: originalTask.tagIds || [], // Preserve tags
+            parentId: parentId || undefined
         });
 
-        // 4. Handle Subtasks
+        // Clone subtasks
         if (originalTask.subTaskIds && originalTask.subTaskIds.length > 0) {
-            // Find tasks in allTasks whose ID is in subTaskIds
-            const subTasks = allTasks.filter(t => originalTask.subTaskIds?.includes(t.id));
-            for (const subTask of subTasks) {
-                await this.cloneTaskRecursively(subTask, targetProjectId, newTaskId, allTasks);
+            // Match IDs (assuming string IDs)
+            const subTasks = allTemplateTasks.filter(t => originalTask.subTaskIds?.includes(t.id));
+            for (const sub of subTasks) {
+                await this.cloneTask(sub, targetProjectId, allTemplateTasks, newTaskId);
             }
         }
     }

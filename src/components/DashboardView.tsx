@@ -45,11 +45,6 @@ const DashboardView: Component<DashboardViewProps> = (props) => {
             </Show>
             <Show
                 when={props.state.activeStory.id}
-                fallback={
-                    <div class="empty-quest-state">
-                        <QuestDashboard />
-                    </div>
-                }
             >
                 <div class="story-header-row">
                     <h2>Current Story Step</h2>

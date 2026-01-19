@@ -9,7 +9,7 @@ import { TaskService } from './services/TaskService';
 import { TaskCompletionHandler } from './handlers/TaskCompletionHandler';
 import { TaskUndoHandler } from './handlers/TaskUndoHandler';
 import { MessageHandler } from './handlers/MessageHandler';
-import { TaskHandler } from './handlers/task-handler';
+
 
 let state: QuestArcState;
 
@@ -44,17 +44,7 @@ async function init() {
           // Note: Assuming PluginAPI.Hooks.TASK_COMPLETE maps to 'taskComplete' or similar string literal
           // and that TaskHandler.handleTaskComplete expects a taskId.
           // This is a new hook registration, distinct from the existing TaskCompletionHandler.
-          // Register hook to call TaskHandler
-          api.registerHook((api as any).Hooks?.TASK_COMPLETE || 'taskComplete', (payload: any) => {
-            // Check if payload is just ID (legacy?) or object { task: ... }
-            if (typeof payload === 'string') {
-              TaskHandler.handleTaskComplete(payload);
-            } else if (payload && payload.task) {
-              TaskHandler.handleTaskComplete(payload.task);
-            } else {
-              console.warn('[QuestArc] Unknown taskComplete payload:', payload);
-            }
-          });
+
 
           // Self-heal: Ensure boss is initialized if needed
           const currentStep = getCurrentStep(state);
@@ -79,6 +69,11 @@ async function init() {
     }
 
     HeaderService.updateHeader(state);
+    HeaderService.updateHeader(state);
+
+    // Check for daily habit resets
+    await TaskService.checkDailyResets();
+
     PluginService.log.info('QuestArc initialized successfully');
   } catch (error) {
     PluginService.log.error('Critical error during initialization:', error);

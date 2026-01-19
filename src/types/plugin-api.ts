@@ -26,6 +26,7 @@ export interface PluginApi {
 
     // Tasks
     getTasks(): Promise<Task[]>;
+    getTasksByProject(projectId: string): Promise<Task[]>;
     addTask(task: Partial<Task>): Promise<string>; // Returns ID
     updateTask(taskId: string, updates: Partial<Task>): Promise<void>;
 

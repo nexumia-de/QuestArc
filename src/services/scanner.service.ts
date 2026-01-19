@@ -4,6 +4,7 @@ export interface QuestProject {
     id: string;
     title: string;
     originalTitle: string; // The title without status icons
+    icon?: string;
     type: 'TEMPLATE' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'UNKNOWN';
 }
 
@@ -48,6 +49,7 @@ export class ProjectScannerService {
                 id: p.id,
                 title: p.title,
                 originalTitle: this.cleanTitle(p.title, classification),
+                icon: p.icon,
                 type: classification
             };
 
@@ -72,11 +74,12 @@ export class ProjectScannerService {
                         env.active = questProj;
                     }
                     break;
-                case 'TEMPLATE':
-                    env.templates.push(questProj);
-                    break;
+
                 case 'PAUSED':
                     env.paused.push(questProj);
+                    break;
+                case 'TEMPLATE':
+                    env.templates.push(questProj);
                     break;
                 case 'UNKNOWN':
                     // Just ignore unknown types even if they have the icon?

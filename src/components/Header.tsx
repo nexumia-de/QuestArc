@@ -1,6 +1,5 @@
 import { Component } from 'solid-js';
 import { QuestArcState } from '../types/state';
-import Avatar from './Avatar';
 
 interface HeaderProps {
     profile: QuestArcState['profile'];
@@ -8,24 +7,13 @@ interface HeaderProps {
 }
 
 const Header: Component<HeaderProps> = (props) => {
-    // Determine pet stage for the avatar overlay
-    const getPetStage = () => {
-        const pet = props.profile.pet;
-        if (!pet) return 0;
-        return pet.stage;
-    };
-
     return (
         <header class="quest-header">
             <div class="header-content">
-                {/* Left Side: Avatar & Basic Info */}
+                {/* Left Side: Empty/Logo */}
                 <div class="header-left">
-                    <div class="avatar-wrapper">
-                        <Avatar
-                            level={props.profile.level}
-                            stage={getPetStage()}
-                            config={props.profile.avatar}
-                        />
+                    <div class="logo-wrapper" style={{ 'font-size': '2rem' }}>
+                        ⚔️
                     </div>
                 </div>
 
