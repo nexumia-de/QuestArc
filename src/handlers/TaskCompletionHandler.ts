@@ -1,14 +1,8 @@
 import { Task } from '@super-productivity/plugin-api';
 import { QuestArcState } from '../types/state';
-import { getCurrentStep, updateXp } from '../lib/state-manager';
-import { initializeBossIfNeeded, processTaskCompletion } from '../lib/game-logic';
+import { processTaskCompletion } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
-import { TaskService } from '../services/TaskService';
 import { CompilerService } from '../services/compiler.service';
-
-export interface TaskCompletePayload {
-    task: Task;
-}
 
 export class TaskCompletionHandler {
     static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
@@ -48,129 +42,106 @@ export class TaskCompletionHandler {
         });
 
         PluginService.log.info('Task completed!', task);
-        const currentStep = getCurrentStep(state);
-        if (!currentStep) {
-            PluginService.log.info('No current step found. Processing task for independent logic (Grind/Habit) only.');
 
-            // SEQUENTIAL CUSTOM QUESTS
-            if (state.activeStory.sourceTemplateId && state.activeStory.id) {
-                const createdCount = state.activeStory.currentStepId;
-                const nextFound = await CompilerService.compileNextTask(
-                    state.activeStory.sourceTemplateId,
-                    state.activeStory.id,
-                    createdCount
-                );
-
-                if (nextFound) {
-                    state.activeStory.currentStepId++;
-                    PluginService.showSnack('Next Quest Task Unlocked! 📜', 'SUCCESS');
-                } else {
-                    // No next task found -> Quest Complete?
-                    // Verify if the completed task was indeed part of the chain?
-                    // For now, assume yes if sourceTemplateId is set.
-                    state.activeStory.isCompleted = true;
-                    PluginService.showSnack('Quest Completed! 🏆', 'SUCCESS');
-                }
-            }
-        } else {
-            PluginService.log.info('Current step:', currentStep);
-        }
-
-        // Initialize boss if needed
-        let newState = currentStep ? initializeBossIfNeeded(state, currentStep) : state;
-
-        const result = processTaskCompletion(newState, task, currentStep);
+        // Process task completion for game logic (XP, damage, etc.) first
+        // We pass undefined for currentQuestStep because we no longer rely on legacy structure
+        let newState = state;
+        const result = processTaskCompletion(newState, task, undefined);
         newState = result.newState;
-        const { damageDealt, stepCompleted } = result;
+        const { damageDealt } = result;
 
-        if (stepCompleted && currentStep) {
-            const xpResult = updateXp(newState, currentStep.xpReward);
-            newState = xpResult.state;
-            const leveledUp = xpResult.leveledUp;
+        // Template-based quest logic only
+        // Check if task belongs to an active quest project by looking at the project title (should have 🧭 icon)
+        // ONLY process root tasks (tasks without a parent)
+        if (task.projectId && !task.parentId) {
+            PluginService.log.info(`[TaskCompletion] Root task completed with projectId: ${task.projectId}`);
 
-            let snackMessage = `Quest Step Completed: ${currentStep.title}! +${currentStep.xpReward} XP`;
-            if (leveledUp) {
-                snackMessage += ` 🎉 Level Up! Now Level ${newState.profile.level}!`;
-            }
+            try {
+                // We need to fetch all projects to check titles
+                const allProjects = await PluginAPI.getAllProjects();
+                const taskProject = allProjects.find(p => p.id === task.projectId);
 
-            // Move to next step
-            if (currentStep.nextStepId) {
-                newState = {
-                    ...newState,
-                    activeStory: {
-                        ...newState.activeStory,
-                        currentStepId: currentStep.nextStepId,
-                        taskProgress: {}
-                    },
-                    activeBoss: null
-                };
+                if (taskProject && taskProject.title.includes('🧭')) {
+                    PluginService.log.info(`[TaskCompletion] Task belongs to active quest: "${taskProject.title}"`);
 
-                // Rename the host task to the new step title
-                const nextStep = newState.activeStory && newState.stories
-                    ? newState.stories.find(s => s.id === newState.activeStory.id)?.steps.find(step => step.id === currentStep.nextStepId)
-                    : null;
+                    // Extract the base title (remove 🧭 and trim)
+                    const baseTitle = taskProject.title.replace('🧭', '').trim();
 
-                if (nextStep) {
-                    try {
-                        TaskService.updateTaskTitle(task.id, nextStep.title || 'Next Step');
+                    // Find the template project (📜 + same base title)
+                    const templateProject = allProjects.find(p =>
+                        p.title.includes('📜') && p.title.replace('📜', '').trim() === baseTitle
+                    );
 
-                        // Auto-create tasks for the new step
-                        // Auto-create tasks for the new step
-                        const allCreated = await TaskService.createTasksForStep(nextStep, false, newState.activeStory.id);
+                    if (templateProject) {
+                        PluginService.log.info(`[TaskCompletion] Found template: "${templateProject.title}" (ID: ${templateProject.id})`);
 
-                        // Mark tasks as created for this new step ONLY if all were created
-                        if (allCreated) {
-                            newState.activeStory.tasksCreatedForStepId = nextStep.id;
+                        // Get all tasks from the active quest to count how many have been created
+                        const allTasks = await PluginAPI.getTasks();
+                        const questTasks = allTasks.filter(t => t.projectId === task.projectId);
+                        const rootQuestTasks = questTasks.filter(t => !t.parentId);
+                        const createdCount = rootQuestTasks.length;
+
+                        PluginService.log.info(`[TaskCompletion] Quest has ${createdCount} root tasks created`);
+
+                        // Try to create the next task
+                        const nextFound = await CompilerService.compileNextTask(
+                            templateProject.id,
+                            task.projectId,
+                            createdCount
+                        );
+
+                        if (nextFound) {
+                            PluginService.log.info(`[TaskCompletion] Next task created!`);
+                            PluginService.showSnack('Next Quest Task Unlocked! 📜', 'SUCCESS');
                         } else {
-                            newState.activeStory.tasksCreatedForStepId = null;
+                            // Quest completed! Change icon from 🧭 to ✅
+                            PluginService.log.info(`[TaskCompletion] No more tasks - Quest completed!`);
+
+                            try {
+                                await PluginAPI.updateProject(task.projectId, {
+                                    title: taskProject.title.replace('🧭', '✅')
+                                });
+                                PluginService.log.info(`[TaskCompletion] Updated project icon to ✅`);
+                            } catch (error) {
+                                PluginService.log.error('[TaskCompletion] Failed to update project icon:', error);
+                            }
+
+                            PluginService.showSnack(
+                                `🎉 Quest Completed: "${baseTitle}"! 🏆\nCheck the plugin to archive this quest.`,
+                                'SUCCESS'
+                            );
                         }
-
-                        // Initialize boss for the new step if needed
-                        newState = initializeBossIfNeeded(newState, nextStep);
-
-                    } catch (err) {
-                        PluginService.log.error('Failed to update task title/create subtasks', err);
+                    } else {
+                        PluginService.log.warn(`[TaskCompletion] No template found for quest "${baseTitle}"`);
                     }
+                } else {
+                    PluginService.log.info(`[TaskCompletion] Task project is not an active quest (no 🧭 icon)`);
                 }
-            } else {
-                // No next step -> Quest Completed!
-                newState.activeStory.isCompleted = true;
-                snackMessage += " 🏆 QUEST COMPLETED!";
+            } catch (error) {
+                PluginService.log.error('[TaskCompletion] Error checking for quest:', error);
             }
-
-            PluginService.showSnack(snackMessage, 'SUCCESS');
         } else {
-            // SEQUENTIAL BUILT-IN
-            if (currentStep) {
-                const nextCreated = await TaskService.createNextTask(currentStep, task.title, state.activeStory.id);
-                if (nextCreated) {
-                    PluginService.showSnack('Next Sub-task Unlocked! 🗝️', 'SUCCESS');
-                }
-            }
-
-            if (damageDealt > 0) {
-                // Show damage notification for boss hits
-                PluginService.showSnack(
-                    `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
-                    'SUCCESS'
-                );
+            if (task.parentId) {
+                PluginService.log.info(`[TaskCompletion] Subtask completed (parentId: ${task.parentId}) - ignoring for quest progression`);
+            } else {
+                PluginService.log.info(`[TaskCompletion] Task has no projectId`);
             }
         }
 
-        // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)
+        // Show damage notification for boss hits (if any generic boss logic remains)
+        if (damageDealt > 0) {
+            PluginService.showSnack(
+                `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
+                'SUCCESS'
+            );
+        }
+
         // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)
         if (result.taskUpdates) {
             try {
                 // GUARD: Prevent infinite loops by checking if update is redundant.
-                // Especially for isDone, if we set it to true, we don't want to re-trigger completion.
-                // We should fetch the latest task state to be sure? 
-                // Or compare with the `task` object we derived everything from.
-
                 const currentIsDone = task.isDone;
                 const newIsDone = result.taskUpdates.isDone;
-
-                // Optimization: Deep compare notes to see if they actually changed?
-                // For now, let's just be careful about emitting isDone.
 
                 const updatesToApply: Partial<Task> = { ...result.taskUpdates };
 
@@ -185,7 +156,6 @@ export class TaskCompletionHandler {
                 }
 
                 // If notes unchanged -> remove notes
-                // We need to normalize strings (trim)
                 if (task.notes && updatesToApply.notes && task.notes.trim() === updatesToApply.notes.trim()) {
                     delete updatesToApply.notes;
                 }
