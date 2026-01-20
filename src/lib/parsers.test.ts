@@ -38,21 +38,28 @@ describe('QuestArc v2 Parsers', () => {
         });
 
         it('should detect Habit (Daily)', () => {
-            const result = parseTaskType('3x @daily Meditation');
+            const result = parseTaskType('[count:3] [freq:daily] Meditation');
             expect(result.type).toBe('HABIT');
             expect(result.meta.target).toBe(3);
-            expect(result.meta.frequency).toBe('@daily');
+            expect(result.meta.frequency).toBe('daily');
             expect(result.cleanTitle).toBe('Meditation');
         });
 
         it('should detect Habit (Weekly)', () => {
-            const result = parseTaskType('1x @weekly Review');
+            const result = parseTaskType('[count:1] [freq:weekly] Review');
             expect(result.type).toBe('HABIT');
-            expect(result.meta.frequency).toBe('@weekly');
+            expect(result.meta.frequency).toBe('weekly');
+        });
+
+        it('should detect Habit (Cron)', () => {
+            const result = parseTaskType('[freq:5 4 * * *] Backup');
+            expect(result.type).toBe('HABIT');
+            expect(result.meta.frequency).toBe('5 4 * * *');
+            expect(result.meta.target).toBe(1); // Default to 1
         });
 
         it('should detect Grind', () => {
-            const result = parseTaskType('50x Pushups');
+            const result = parseTaskType('[count:50] Pushups');
             expect(result.type).toBe('GRIND');
             expect(result.meta.target).toBe(50);
             expect(result.cleanTitle).toBe('Pushups');
@@ -79,24 +86,22 @@ describe('QuestArc v2 Parsers', () => {
             expect(data.meta.type).toBe('BOSS');
             expect(data.boss?.hp).toBe(1000);
             expect(data.progress?.target).toBe(1000);
-            // XP parsing happens first, so internal parser sees "⚔️ Final Boss [HP:1000]"
             expect(data.reward?.xp).toBe(5000);
         });
 
         it('should compile a Habit correctly', () => {
-            const raw = '5x @daily Drink Water';
+            const raw = '[count:5] [freq:daily] Drink Water';
             const { title, data } = compileTaskData(raw);
 
             expect(title).toBe('Drink Water (0/5)');
             expect(data.meta.type).toBe('HABIT');
-            expect(data.routine?.frequency).toBe('@daily');
-            expect(data.progress?.target).toBe(5);
+            expect(data.routine?.frequency).toBe('daily');
             expect(data.progress?.target).toBe(5);
             expect(data.progress?.current).toBe(0);
         });
 
         it('should append initial progress count to title for Grinds', () => {
-            const raw = '50x Pushups';
+            const raw = '[count:50] Pushups';
             const { title, data } = compileTaskData(raw);
 
             expect(title).toBe('Pushups (0/50)');
@@ -104,7 +109,7 @@ describe('QuestArc v2 Parsers', () => {
         });
 
         it('should append initial progress count to title for Habits', () => {
-            const raw = '3x @daily Drink Water';
+            const raw = '[count:3] [freq:daily] Drink Water';
             const { title, data } = compileTaskData(raw);
 
             expect(title).toBe('Drink Water (0/3)');

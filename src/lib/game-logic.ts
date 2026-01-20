@@ -97,28 +97,20 @@ export function processTaskCompletion(
   let leveledUp = false;
   let taskUpdates: Partial<Task> | undefined;
   let newState = { ...state };
+  let stepProgressIncrement = 0; // NEW: Track if we should increment parent step progress
 
   if (state.activeStory.isCompleted) {
     return { newState, damageDealt: 0, xpGained: 0, stepCompleted: false, leveledUp: false };
   }
 
   // 0. Parse Task Metadata (QUEST_DATA persistence)
-  // We try to look for JSON in notes first (Source of Truth for stateful tasks)
   let questData = null;
   if (_task.notes) {
     try {
-      // Look for validation block or just parse assuming it might be wrapped
-      // For now, let's assume if it starts with { it might be JSON, or searched for specific block
-      // Roadmap says: ```json\n{...}\n``` or just raw text? 
-      // Implementation Plan says: Injection of `QUEST_DATA` JSON into notes.
-      // Let's regex for the block.
-      // Regex to find JSON block, handling various newline formats and potential missing newlines
       const match = _task.notes.match(/```json\s*([\s\S]*?)\s*```/);
       if (match && match[1]) {
         questData = JSON.parse(match[1]);
       } else {
-        // Fallback: Try to find a raw JSON object if no code blocks are present
-        // This handles cases where user might have pasted just the JSON
         const rawJsonMatch = _task.notes.match(/\{[\s\S]*"meta"[\s\S]*\}/);
         if (rawJsonMatch) {
           questData = JSON.parse(rawJsonMatch[0]);
@@ -129,17 +121,10 @@ export function processTaskCompletion(
     }
   }
 
-  // Fallback to title parsing if no notes data or if it's the first time
   if (!questData) {
     const compiled = compileTaskData(_task.title);
     questData = compiled.data;
-    // If we compiled it, it means we might need to initialize the note structure?
-    // But we only do that if it's a Grind/Habit that needs tracking.
-    // Simple tasks don't strictly need persistence if they just complete.
   }
-
-
-
 
   const type = questData.meta.type;
 
@@ -153,50 +138,34 @@ export function processTaskCompletion(
       const newCurrent = current + 1;
       questData.progress.current = newCurrent;
 
-      // Update Task status
       const isFinished = newCurrent >= target;
 
       // Mod: Update Title Visual
       let newTitle = _task.title;
-      // Strip existing (x/y)
       newTitle = newTitle.replace(/\s*\(\d+\/\d+\)$/, '');
-
       const progressStr = `(${newCurrent}/${target})`;
       newTitle = `${newTitle} ${progressStr}`;
 
       taskUpdates = {
-        isDone: !isFinished ? false : true, // If finished, let it be checked (true). If not, uncheck it (false).
+        isDone: !isFinished ? false : true,
         title: newTitle,
         notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
       };
 
       if (newCurrent < target) {
-        // Not done yet, so we return here!
-        // Grinds awarding XP per rep? Or only on completion? 
-        // Usually Grinds award small XP per rep or big XP on completion.
-        // Let's give small XP (1) per rep for feeling of progress?
         xpGained = 1;
         newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
-
         return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
       }
-      // If we reached target, we fall through to "Completion" logic below
-      // But we still might want to update the note to say 50/50?
-      // Actually if it completes, it gets hidden (isDone=true), so notes update might be irrelevant 
-      // unless user un-completes it.
+      // Finished! Fall through to standard completion (stepProgressIncrement = 1 via default fallthrough logic?)
+      // Actually, if we fall through, we need to ensure we mark it as a completion.
+      // We'll let the standard block handle the increment.
     }
   } else if (type === 'HABIT') {
-    // Habit Logic:
-    // 1. If it has a target (multi-count), increment it.
-    // 2. If current < target, keep it unchecked (isDone = false).
-    // 3. If current >= target, let it complete (isDone = true) -> User finished for the day.
-
-    // Check if progress tracking exists
+    // Habit Logic
     const current = questData.progress?.current || 0;
     const target = questData.progress?.target || 1;
 
-    // Increment (unless we are just completing a single-tick habit which has target=1, current=0)
-    // Actually, persistence always starts at 0.
     const newCurrent = current + 1;
     const now = Date.now();
 
@@ -205,93 +174,76 @@ export function processTaskCompletion(
       questData.progress.lastUpdated = now;
     }
 
-    // Determine visual state
     const isFinishedForDay = newCurrent >= target;
 
     // Handle Streaks
     if (isFinishedForDay) {
-      // Logic: If lastUpdated was NOT today (already checked by newCurrent logic incrementing),
-      // And we just met the target.
-
-      // Check if we already incremented streak today? 
-      // questData.progress.lastUpdated is now `now`. 
-      // But we need to know if we *just* finished it.
-      // Actually, if newCurrent === target, we just finished it.
-      // If newCurrent > target, we are over-completing (shouldn't double count streak).
-
       if (newCurrent === target && questData.progress?.streak) {
-        // Increment Streak
         questData.progress.streak.current = (questData.progress.streak.current || 0) + 1;
-
-        // Check Highest
         const currentStreak = questData.progress.streak.current;
         const highest = questData.progress.streak.highest || 0;
         if (currentStreak > highest) {
           questData.progress.streak.highest = currentStreak;
         }
       }
+
+      // NEW: Only increment step progress if we JUST reached the target
+      if (newCurrent === target) {
+        stepProgressIncrement = 1;
+      }
     }
 
-    // Update Title with Progress if target > 1
-    // e.g. "Drink Water" -> "Drink Water (1/3)"
+    // Update Title
     let newTitle = _task.title;
 
-    // 1. Strip existing patterns
-    // Strip (x/y)
-    let baseTitle = _task.title.replace(/\s*\(\d+\/\d+\)$/, '');
-    // Strip existing 🔥 streaks
-    baseTitle = baseTitle.replace(/\s*🔥\s*\d+(\/\d+)?$/, '');
+    // Robust cleanup: Remove all existing progress/streak patterns to prevent accumulation
+    // We remove them globally from the string to catch cases like "(0/3) (1/3)"
+    let baseTitle = _task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
+    baseTitle = baseTitle.replace(/\s*\(\d+\/\d+\)/g, '');
+    baseTitle = baseTitle.trim();
 
-    // 2. Rebuild Title
     newTitle = baseTitle;
 
-    // Add (x/y)
     if (target > 1) {
       newTitle = `${newTitle} (${newCurrent}/${target})`;
     }
 
-    // Add Streak 🔥
-    if (questData?.progress?.streak && questData.progress.streak.current > 0) {
-      const sCurrent = questData.progress.streak.current;
+    // Display Streak (Always show if configured)
+    if (questData.progress?.streak) {
+      const sCurrent = questData.progress.streak.current || 0;
       const sTarget = questData.progress.streak.target;
 
       let streakStr = `🔥 ${sCurrent}`;
       if (sTarget) {
         streakStr += `/${sTarget}`;
       }
-      newTitle = `${newTitle} ${streakStr}`;
+
+      // If target exists, we always show "🔥 0/3". 
+      // If no target, show only if current > 0? Or always "🔥 0"?
+      // Let's adopt "Always show if present" as requested.
+      if (sTarget || sCurrent > 0) {
+        newTitle = `${newTitle} ${streakStr}`;
+      }
     }
 
-
     taskUpdates = {
-      isDone: isFinishedForDay, // If finished, let it be checked. If not, uncheck it.
+      isDone: isFinishedForDay,
       title: newTitle,
       notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
     };
 
-    // Award XP for the habit rep
     xpGained = questData.reward?.xp || 10;
     newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
 
-    // Check Level Up immediately for habits
-    const lvl = checkLevelUp(newState);
-    newState = lvl.newState;
-    leveledUp = lvl.leveledUp;
-
-    return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+    // We do NOT return here anymore. We fall through to consolidate Step Completion checks.
+    // BUT we must flag that we are a Habit and handled XP/Level logic already?
+    // The Standard block adds XP if xpGained == 0. So we are safe there.
   }
 
-  // --- STANDARD COMPLETION (Simple Task or Finished Grind) ---
+  // --- STANDARD COMPLETION LOGIC ---
+  // (Runs for Simple, Finished Grind, and processed Habit)
 
-  if (!currentStep) {
-    // If we don't have a step, we can't do step completion logic.
-    // But we still apply XP updates if calculated above (Grind/Habit XP).
-    return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
-  }
-
-  const requirement = currentStep.completion;
-
-  // 1. Calculate XP (if not already handled above)
+  // 1. Calculate XP (if not already handled)
   if (xpGained === 0) {
     const { xp } = parseXpTag(_task.title);
     xpGained = xp || 10;
@@ -301,53 +253,94 @@ export function processTaskCompletion(
   // Check Level Up
   const levelResult = checkLevelUp(newState);
   newState = levelResult.newState;
-  leveledUp = levelResult.leveledUp;
-
+  leveledUp = levelResult.leveledUp; // Merge with existing leveledUp? 
+  // If habit caused level up, leveledUp is true. If not, this checks again. 
+  // Actually checkLevelUp consumes XP. If habit called it, XP is low. 
+  // Logic: 
+  // Habit block: adds XP, calls checkLevelUp -> newState has level X, XP Y.
+  // Standard block: `levelResult` calls checkLevelUp(newState).
+  // If XP < target, nothing happens. Safe.
 
   // 2. Update Progress for this specific task
-  const normalize = (s: string) => s.trim().toLowerCase();
-  const matchingDef = currentStep.tasksToCreate?.find(t => normalize(t.title) === normalize(_task.title));
-
-  if (matchingDef) {
-    const currentCount = newState.activeStory.taskProgress[_task.title] || 0;
-    newState.activeStory.taskProgress = {
-      ...newState.activeStory.taskProgress,
-      [_task.title]: currentCount + 1
+  if (currentStep) {
+    const cleanForMatch = (t: string) => {
+      let s = t.trim();
+      s = s.replace(/\s*\(\d+\/\d+\)$/, '');
+      s = s.replace(/\s*🔥\s*\d+(\/\d+)?$/, '');
+      return s.toLowerCase();
     };
+
+    const taskTitleClean = cleanForMatch(_task.title);
+    const matchingDef = currentStep.tasksToCreate?.find(t => cleanForMatch(t.title) === taskTitleClean);
+
+    // Determine increment
+    let increment = 0;
+    if (type === 'HABIT') {
+      increment = stepProgressIncrement; // 0 or 1
+    } else {
+      // Simple or Finished Grind -> Always counts as 1 completion of the task *intention*
+      increment = 1;
+    }
+
+    if (matchingDef && increment > 0) {
+      // Use matchingDef.title as the key to ensure consistency irrespective of current task title state (suffixes)
+      // This maps "Drink Water 2x @daily (1/2)" back to "Drink Water 2x @daily" key in progress map.
+      const currentCount = newState.activeStory.taskProgress[matchingDef.title] || 0;
+      newState.activeStory.taskProgress = {
+        ...newState.activeStory.taskProgress,
+        [matchingDef.title]: currentCount + increment
+      };
+    }
   }
 
   // 3. Check Step Completion & Boss Damage
-  if (requirement.type === 'boss_defeat') {
-    // Boss Logic
-    if (newState.activeBoss && !newState.activeBoss.isDead) {
-      const baseDamage = 10;
-      const isCrit = Math.random() > 0.8;
-      damageDealt = isCrit ? baseDamage * 2 : baseDamage;
+  if (currentStep) {
+    const requirement = currentStep.completion;
 
-      newState.activeBoss = {
-        ...newState.activeBoss,
-        hp: Math.max(0, newState.activeBoss.hp - damageDealt),
-      };
+    if (requirement.type === 'boss_defeat') {
+      // Boss Logic
+      if (newState.activeBoss && !newState.activeBoss.isDead) {
+        // If habit, do we deal damage? Yes, if it "Counts".
+        // If increment > 0 (it was a meaningful completion), deal damage.
+        // Or do strictly simple tasks deal damage? 
+        // Usually Habits deal damage on completion.
+        // Let's use `stepProgressIncrement` concept: if it contributed, it deals damage.
+        // Use `stepProgressIncrement` for habits, `1` for others.
 
-      if (newState.activeBoss.hp === 0) {
-        newState.activeBoss.isDead = true;
-        stepCompleted = true;
+        let shouldDealDamage = true;
+        if (type === 'HABIT' && stepProgressIncrement === 0) shouldDealDamage = false;
+
+        if (shouldDealDamage) {
+          const baseDamage = 10;
+          const isCrit = Math.random() > 0.8;
+          damageDealt = isCrit ? baseDamage * 2 : baseDamage;
+
+          newState.activeBoss = {
+            ...newState.activeBoss,
+            hp: Math.max(0, newState.activeBoss.hp - damageDealt),
+          };
+
+          if (newState.activeBoss.hp === 0) {
+            newState.activeBoss.isDead = true;
+            stepCompleted = true;
+          }
+        }
       }
-    }
-  } else if (requirement.type === 'tasks_completed') {
-    const tasks = currentStep.tasksToCreate || [];
-    const requiredTasks = tasks.filter(t => t.isRequired !== false);
+    } else if (requirement.type === 'tasks_completed') {
+      const tasks = currentStep.tasksToCreate || [];
+      const requiredTasks = tasks.filter(t => t.isRequired !== false);
 
-    const allMet = requiredTasks.every(def => {
-      const progress = newState.activeStory.taskProgress[def.title] || 0;
-      const target = def.requiredCount || 1;
-      return progress >= target;
-    });
+      const allMet = requiredTasks.every(def => {
+        const progress = newState.activeStory.taskProgress[def.title] || 0;
+        const target = def.requiredCount || 1;
+        return progress >= target;
+      });
 
-    if (requiredTasks.length > 0 && allMet) {
-      stepCompleted = true;
-    } else if (requiredTasks.length === 0) {
-      stepCompleted = true;
+      if (requiredTasks.length > 0 && allMet) {
+        stepCompleted = true;
+      } else if (requiredTasks.length === 0) {
+        stepCompleted = true; // Fallback?
+      }
     }
   }
 

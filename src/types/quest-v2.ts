@@ -28,7 +28,7 @@ export interface QuestTaskData {
 
     // Only for Habits
     routine?: {
-        frequency: '@daily' | '@weekly';
+        frequency: string; // '@daily', 'cron:...' or custom
         lastDone: number | null; // Timestamp
     };
 

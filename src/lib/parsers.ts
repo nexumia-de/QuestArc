@@ -27,8 +27,6 @@ export function parseTaskType(title: string): {
     cleanTitle: string
 } {
     // 1. Boss: ⚔️ Name [HP:500]
-    // Regex looks for shield/swords emoji (optional range of emojis) or just the structure if emojis vary.
-    // Roadmap says: ⚔️ Name [HP:INT]
     const bossRegex = /(?:⚔️|🛡️)\s*(.+?)\s*\[HP:(\d+)\]/u;
     const bossMatch = title.match(bossRegex);
     if (bossMatch) {
@@ -41,27 +39,26 @@ export function parseTaskType(title: string): {
         };
     }
 
-    // 2. Habit: 3x @daily TaskName OR TaskName 3x @daily
-    // Supports:
-    // - "3x @daily Task"
-    // - "Task 3x @daily"
-    // - "daily 2x@daily" (missing space)
-    const habitRegex = /(?:^|\s)(\d+)x\s*(@daily|@weekly)(?:\s+|$)|(@daily|@weekly)\s*(\d+)x(?:\s+|$)/i;
-    const habitMatch = title.match(habitRegex);
+    // 2. Habit: [freq:daily] or [freq:cron]
+    // We look for the freq tag first.
+    const freqRegex = /\[freq:([^\]]+)\]/i;
+    const freqMatch = title.match(freqRegex);
 
-    if (habitMatch) {
-        // Groups match depending on order. 
-        // G1=Target, G2=Freq (Prefix style)
-        // G3=Freq, G4=Target (Suffix/Mix style? - Actually regex above covers specific cases)
-        // Let's simplify: Extract logic
+    if (freqMatch && freqMatch[1]) {
+        const frequency = freqMatch[1].trim();
+        let cleanTitle = title.replace(freqMatch[0], '').trim();
 
-        const targetStr = habitMatch[1] || habitMatch[4] || '1';
-        const freq = habitMatch[2] || habitMatch[3] || '@daily';
+        // Check for Multi-count (Target): [count:2]
+        let target = 1;
+        const countRegex = /\[count:(\d+)\]/i;
+        const countMatch = cleanTitle.match(countRegex);
 
-        // Clean Title: Remove the matched part
-        let cleanTitle = title.replace(habitMatch[0], '').trim();
+        if (countMatch && countMatch[1]) {
+            target = parseInt(countMatch[1], 10);
+            cleanTitle = cleanTitle.replace(countMatch[0], '').trim();
+        }
 
-        // Check for Streak: [streak:3], streak:3, [s:3], or s:3
+        // Check for Streak: [streak:3] or s:3
         const streakRegex = /(?:\[|\s)(?:streak|s):(\d+)(?:\]|($|\s))/i;
         const streakMatch = cleanTitle.match(streakRegex);
         let streakTarget = undefined;
@@ -74,28 +71,22 @@ export function parseTaskType(title: string): {
         return {
             type: 'HABIT',
             meta: {
-                target: parseInt(targetStr, 10),
-                frequency: freq.toLowerCase(),
+                target,
+                frequency, // Passes raw string (e.g., "daily", "weekly", "5 4 * * *")
                 streakTarget
             },
             cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
         };
     }
 
-    // 3. Grind: 50x TaskName OR TaskName 50x
-    // Supports:
-    // - "50x Pushups"
-    // - "Pushups 50x"
-    // - "Multi 3x"
-    // Must be careful not to match simple numbers (e.g. "Chapter 1") - needs 'x'
-    const grindRegex = /(?:^|\s)(\d+)x(?:\s+|$)/i;
-    const grindMatch = title.match(grindRegex);
+    // 3. Grind: [count:50] TaskName
+    // Only if no freq tag was found
+    const countRegex = /\[count:(\d+)\]/i;
+    const countMatch = title.match(countRegex);
 
-    if (grindMatch) {
-        const targetStr = grindMatch[1] || '1';
-
-        // Clean Title: Remove the matched part "3x"
-        const cleanTitle = title.replace(grindMatch[0], '').trim();
+    if (countMatch && countMatch[1]) {
+        const targetStr = countMatch[1];
+        const cleanTitle = title.replace(countMatch[0], '').trim();
 
         return {
             type: 'GRIND',
@@ -180,7 +171,27 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
         if (!cleanTitle.includes(progressStr)) {
             // We modify the returned title to include the starting progress
             // This ensures the task is created with "Count (0/5)" visible immediately
-            return { title: `${cleanTitle} ${progressStr}`, data };
+            // AND we should include Streak too if configured? 
+            // NOTE: cleanTitle doesn't have streak either.
+            // Let's rely on logic below which constructs full title? 
+            // Wait, this block returns EARLY.
+            let titleWithSuffix = `${cleanTitle} ${progressStr}`
+
+            // Add Streak if configured
+            if (data.progress.streak && data.progress.streak.target) {
+                titleWithSuffix += ` 🔥 0/${data.progress.streak.target}`;
+            }
+
+            return { title: titleWithSuffix, data };
+        }
+    }
+
+    // If we didn't return above (e.g. target <= 1 or no progress object),
+    // but we HAVE a streak target (e.g. 1x Daily but Streak 3), we should add it.
+    if (data.progress?.streak?.target) {
+        const streakStr = `🔥 0/${data.progress.streak.target}`;
+        if (!cleanTitle.includes(streakStr)) {
+            return { title: `${cleanTitle} ${streakStr}`, data };
         }
     }
 

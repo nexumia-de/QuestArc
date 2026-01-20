@@ -203,18 +203,36 @@ export class TaskService {
                         }
 
                         // We must reset the title
-                        // Strip (x/y)
-                        let newTitle = task.title.replace(/\s*\(\d+\/\d+\)$/, '');
-                        // Strip 🔥
-                        newTitle = newTitle.replace(/\s*🔥\s*\d+(\/\d+)?$/, '');
+                        // Robust cleanup: Remove all existing progress/streak patterns
+                        let newTitle = task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
+                        newTitle = newTitle.replace(/\s*\(\d+\/\d+\)/g, '').trim();
 
                         // Re-add Streak (only if > 0)
-                        if (questData.progress?.streak && questData.progress.streak.current > 0) {
-                            const sCurrent = questData.progress.streak.current;
+                        // Re-add Streak visual (Always show if configured, e.g. "🔥 0/3")
+                        if (questData.progress?.streak) {
+                            const sCurrent = questData.progress.streak.current || 0;
                             const sTarget = questData.progress.streak.target;
+
+                            // User request: "It should always show: 🔥 1/2"
+                            // If target exists, show "current/target"
+                            // If no target, show "current" (or maybe user wants "🔥 X" only?)
+                            // Assuming "🔥 1/2" implies "🔥 Count / Target"
+
                             let streakStr = `🔥 ${sCurrent}`;
-                            if (sTarget) streakStr += `/${sTarget}`;
-                            newTitle = `${newTitle} ${streakStr}`;
+                            if (sTarget) {
+                                streakStr += `/${sTarget}`;
+                            } else if (sCurrent > 0) {
+                                // If no target, only show if > 0? Or always "🔥 0"? 
+                                // User said "always show: 🔥 1/2". 
+                                // For consistency, let's show "🔥 0" if no target exists but streak tracking is enabled?
+                                // Let's Stick to: show if target exists OR current > 0.
+                                // Actually user wants "Always show". So "🔥 0" seems consistent with "🔥 0/2".
+                            }
+
+                            // To match strict "Always show: 🔥 1/2" (target based) implementation:
+                            if (sTarget || sCurrent > 0) {
+                                newTitle = `${newTitle} ${streakStr}`;
+                            }
                         }
 
                         const updates = {

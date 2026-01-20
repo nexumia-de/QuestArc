@@ -1,9 +1,6 @@
-
 import { describe, it, expect } from 'vitest';
 import { processTaskCompletion } from './game-logic';
-import { TaskStub } from '../services/TaskService'; // Mock or interface
 import { createInitialState } from './state/persistence';
-import { compileTaskData } from './parsers';
 
 // Mimic local TaskStub from game-logic
 interface TaskStub {
@@ -23,7 +20,7 @@ describe('Habit Logic & Looping Fix', () => {
         // Initial state: 0/2
         const habitTask: TaskStub = {
             id: 't1',
-            title: '2x @daily Drink Water',
+            title: 'Drink Water [count:2] [freq:daily]',
             notes: '',
             isDone: false,
             tagIds: []
@@ -84,7 +81,7 @@ describe('Habit Logic & Looping Fix', () => {
         let state = createInitialState();
         const habitTask: TaskStub = {
             id: 't2',
-            title: '1x @daily Stretch',
+            title: 'Stretch [count:1] [freq:daily]',
             notes: '',
             isDone: false,
             tagIds: []
@@ -97,4 +94,25 @@ describe('Habit Logic & Looping Fix', () => {
         expect(now - qd.progress.lastUpdated).toBeLessThan(1000); // within 1 second
     });
 
+    it('should clean up accumulated suffixes', () => {
+        let state = createInitialState();
+        // Simulate a dirty title
+        const dirtyTask: TaskStub = {
+            id: 't3',
+            title: 'Messy Task [count:3] [freq:daily] (0/3) (1/3) 🔥 1/2',
+            notes: '',
+            isDone: false,
+            tagIds: []
+        };
+
+        const result = processTaskCompletion(state, dirtyTask);
+        const updates = result.taskUpdates!;
+
+        // Should have cleaned up old suffixes and appended *only* the new one
+        // Expect: "Messy Task [count:3] [freq:daily] (1/3)"
+        // Note: Streak info is missing in input data so it won't be re-appended unless we mock the JSON note too.
+        // But cleanTitle logic should remove the garbage.
+
+        expect(updates.title).toBe('Messy Task [count:3] [freq:daily] (1/3)');
+    });
 });
