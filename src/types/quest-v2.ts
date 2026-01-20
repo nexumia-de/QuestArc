@@ -5,6 +5,7 @@ export interface QuestTaskData {
         type: QuestTaskType;
         version: number;
         originalTitle: string; // Keep track of the source title
+        sourceIndex?: number; // Original index in template (for sequential loading)
     };
 
     // For Story Steps (Parents)

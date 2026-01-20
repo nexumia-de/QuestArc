@@ -75,19 +75,43 @@ export class TaskCompletionHandler {
                     if (templateProject) {
                         PluginService.log.info(`[TaskCompletion] Found template: "${templateProject.title}" (ID: ${templateProject.id})`);
 
-                        // Get all tasks from the active quest to count how many have been created
+                        // Get all tasks from the active quest
                         const allTasks = await PluginAPI.getTasks();
-                        const questTasks = allTasks.filter(t => t.projectId === task.projectId);
-                        const rootQuestTasks = questTasks.filter(t => !t.parentId);
-                        const createdCount = rootQuestTasks.length;
 
-                        PluginService.log.info(`[TaskCompletion] Quest has ${createdCount} root tasks created`);
+                        // New Logic: Check if the *completed* task has a sourceIndex
+                        let targetIndexToLoad = 0;
+
+                        // Parse the completed task's data to find its sourceIndex
+                        // The `result` from processTaskCompletion might not include the full meta if we didn't parse it there for this purpose.
+                        // But `task.notes` has it.
+                        let sourceIndex = -1;
+                        try {
+                            const match = task.notes?.match(/```json\s*([\s\S]*?)\s*```/);
+                            if (match && match[1]) {
+                                const data = JSON.parse(match[1]);
+                                if (typeof data.meta.sourceIndex === 'number') {
+                                    sourceIndex = data.meta.sourceIndex;
+                                }
+                            }
+                        } catch (e) { /* ignore */ }
+
+                        if (sourceIndex !== -1) {
+                            PluginService.log.info(`[TaskCompletion] Found sourceIndex: ${sourceIndex}. Loading next: ${sourceIndex + 1}`);
+                            targetIndexToLoad = sourceIndex + 1;
+                        } else {
+                            // Fallback: Count rooted tasks (Legacy behavior for existing quests)
+                            const questTasks = allTasks.filter(t => t.projectId === task.projectId);
+                            const rootQuestTasks = questTasks.filter(t => !t.parentId);
+                            const createdCount = rootQuestTasks.length;
+                            PluginService.log.info(`[TaskCompletion] No sourceIndex found. Fallback to count: ${createdCount}`);
+                            targetIndexToLoad = createdCount;
+                        }
 
                         // Try to create the next task
                         const nextFound = await CompilerService.compileNextTask(
                             templateProject.id,
                             task.projectId,
-                            createdCount
+                            targetIndexToLoad
                         );
 
                         if (nextFound) {

@@ -36,7 +36,8 @@ export class CompilerService {
 
         // SEQUENTIAL LOADING: Just clone the first one
         if (rootTasks.length > 0 && rootTasks[0]) {
-            await this.cloneTask(rootTasks[0], newProjectId, templateTasks);
+            // Pass index 0 explicitly
+            await this.cloneTask(rootTasks[0], newProjectId, templateTasks, null, 0);
         }
 
         return newProjectId;
@@ -46,24 +47,24 @@ export class CompilerService {
      * Clones the next task in the sequence from the template.
      * @param templateProjectId The ID of the source template
      * @param activeProjectId The ID of the active quest project
-     * @param completedTaskCount How many root tasks have been completed/created so far
+     * @param targetIndex The index of the task to load (from source)
      */
-    static async compileNextTask(templateProjectId: string, activeProjectId: string, completedTaskCount: number): Promise<boolean> {
+    static async compileNextTask(templateProjectId: string, activeProjectId: string, targetIndex: number): Promise<boolean> {
         // 1. Fetch Template Tasks again
         const allTasks = await PluginAPI.getTasks();
         const templateTasks = allTasks.filter(t => t.projectId === templateProjectId);
         const rootTasks = templateTasks.filter(t => !t.parentId);
 
         // 2. Identify Next Task
-        // If we have completed N tasks, we want index N (0-based)
-        if (completedTaskCount >= rootTasks.length) {
+        // We use the explicit targetIndex
+        if (targetIndex >= rootTasks.length) {
             return false; // No more tasks
         }
 
-        const nextTask = rootTasks[completedTaskCount];
+        const nextTask = rootTasks[targetIndex];
 
         // 3. Clone it
-        await this.cloneTask(nextTask, activeProjectId, templateTasks);
+        await this.cloneTask(nextTask, activeProjectId, templateTasks, null, targetIndex);
         return true;
     }
 
@@ -74,10 +75,16 @@ export class CompilerService {
         originalTask: Task,
         targetProjectId: string,
         allTemplateTasks: Task[],
-        parentId: string | null = null
+        parentId: string | null = null,
+        sourceIndex?: number
     ) {
         // Parse special syntax (e.g. [XP:100]) using our parsers
         const { title: cleanTitle, data } = compileTaskData(originalTask.title);
+
+        // Inject sourceIndex if provided
+        if (sourceIndex !== undefined) {
+            data.meta.sourceIndex = sourceIndex;
+        }
 
         // Serialize QuestData into notes
         // We preserve original notes if they exist, but append our system data block
@@ -101,6 +108,7 @@ export class CompilerService {
             // Match IDs (assuming string IDs)
             const subTasks = allTemplateTasks.filter(t => originalTask.subTaskIds?.includes(t.id));
             for (const sub of subTasks) {
+                // Subtasks don't need sourceIndex logic for sequential loading (as they load with parent)
                 await this.cloneTask(sub, targetProjectId, allTemplateTasks, newTaskId);
             }
         }
