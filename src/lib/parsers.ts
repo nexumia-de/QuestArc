@@ -26,7 +26,6 @@ export function parseTaskType(title: string): {
     meta: any;
     cleanTitle: string
 } {
-    // 1. Boss: ⚔️ Name [HP:500]
     const bossRegex = /(?:⚔️|🛡️)\s*(.+?)\s*\[HP:(\d+)\]/u;
     const bossMatch = title.match(bossRegex);
     if (bossMatch) {
@@ -39,8 +38,6 @@ export function parseTaskType(title: string): {
         };
     }
 
-    // 2. Habit: [freq:daily] or [freq:cron]
-    // We look for the freq tag first.
     const freqRegex = /\[freq:([^\]]+)\]/i;
     const freqMatch = title.match(freqRegex);
 
@@ -48,7 +45,6 @@ export function parseTaskType(title: string): {
         const frequency = freqMatch[1].trim();
         let cleanTitle = title.replace(freqMatch[0], '').trim();
 
-        // Check for Multi-count (Target): [count:2]
         let target = 1;
         const countRegex = /\[count:(\d+)\]/i;
         const countMatch = cleanTitle.match(countRegex);
@@ -58,7 +54,6 @@ export function parseTaskType(title: string): {
             cleanTitle = cleanTitle.replace(countMatch[0], '').trim();
         }
 
-        // Check for Streak: [streak:3] or s:3
         const streakRegex = /(?:\[|\s)(?:streak|s):(\d+)(?:\]|($|\s))/i;
         const streakMatch = cleanTitle.match(streakRegex);
         let streakTarget = undefined;
@@ -79,8 +74,6 @@ export function parseTaskType(title: string): {
         };
     }
 
-    // 3. Grind: [count:50] TaskName
-    // Only if no freq tag was found
     const countRegex = /\[count:(\d+)\]/i;
     const countMatch = title.match(countRegex);
 
@@ -97,7 +90,6 @@ export function parseTaskType(title: string): {
         };
     }
 
-    // 4. Simple: Default
     return {
         type: 'SIMPLE',
         meta: {},
@@ -109,10 +101,8 @@ export function parseTaskType(title: string): {
  * Helper to compile the full QuestTaskData
  */
 export function compileTaskData(originalTitle: string): { title: string; data: QuestTaskData } {
-    // First check for XP (Parent Task)
     const { xp, cleanTitle: titleWithoutXp } = parseXpTag(originalTitle);
 
-    // Then check for Task Type (Subtasks)
     const { type, meta, cleanTitle } = parseTaskType(titleWithoutXp);
 
     const data: QuestTaskData = {
@@ -169,15 +159,8 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
         const progressStr = `(${current}/${target})`;
 
         if (!cleanTitle.includes(progressStr)) {
-            // We modify the returned title to include the starting progress
-            // This ensures the task is created with "Count (0/5)" visible immediately
-            // AND we should include Streak too if configured? 
-            // NOTE: cleanTitle doesn't have streak either.
-            // Let's rely on logic below which constructs full title? 
-            // Wait, this block returns EARLY.
             let titleWithSuffix = `${cleanTitle} ${progressStr}`
 
-            // Add Streak if configured
             if (data.progress.streak && data.progress.streak.target) {
                 titleWithSuffix += ` 🔥 0/${data.progress.streak.target}`;
             }
@@ -186,8 +169,6 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
         }
     }
 
-    // If we didn't return above (e.g. target <= 1 or no progress object),
-    // but we HAVE a streak target (e.g. 1x Daily but Streak 3), we should add it.
     if (data.progress?.streak?.target) {
         const streakStr = `🔥 0/${data.progress.streak.target}`;
         if (!cleanTitle.includes(streakStr)) {

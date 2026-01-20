@@ -12,12 +12,6 @@ export class TaskService {
             const taskDef = tasksToCreateList[i];
             if (!taskDef) continue;
 
-            // SEQUENTIAL: Only create the first task (index 0)
-            if (i > 0) continue;
-
-            // Logic:
-            // 1. Initial load (force=false): Create only Auto tasks.
-            // 2. Button click (force=true): Create only Manual tasks.
             const shouldCreate = (taskDef.isAutoCreate && !force) || (!taskDef.isAutoCreate && force);
 
             if (shouldCreate && PluginService.api.addTask) {
@@ -26,7 +20,6 @@ export class TaskService {
                         notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
                     };
 
-                    // If projectId is provided, assign it
                     if (projectId) {
                         additionalFields.projectId = projectId;
                     }
@@ -61,8 +54,6 @@ export class TaskService {
     static async createNextTask(step: StoryStep, completedTaskTitle: string, projectId?: string | null): Promise<boolean> {
         if (!step.tasksToCreate) return false;
 
-        // Find index of completed task
-        // We match by title (ignoring #QuestArc suffix if present in title, but here we compare definition titles)
         const cleanTitle = completedTaskTitle.replace(' #QuestArc', '');
         const currentIndex = step.tasksToCreate.findIndex(t => t.title === cleanTitle);
 
@@ -78,7 +69,6 @@ export class TaskService {
         const nextTaskDef = step.tasksToCreate[nextIndex];
         if (!nextTaskDef) return false;
 
-        // Create it
         if (PluginService.api.addTask) {
             try {
                 const additionalFields: any = {
@@ -136,50 +126,23 @@ export class TaskService {
 
             for (const task of habitTasks) {
                 let questData = null;
-                // Simplified parsing logic similar to game-logic
                 const match = task.notes!.match(/```json\s*([\s\S]*?)\s*```/);
                 if (match && match[1]) {
                     try {
                         questData = JSON.parse(match[1]);
                     } catch (e) { continue; }
-                } else {
-                    const rawJsonMatch = task.notes!.match(/\{[\s\S]*"meta"[\s\S]*\}/);
-                    if (rawJsonMatch) {
-                        try {
-                            questData = JSON.parse(rawJsonMatch[0]);
-                        } catch (e) { continue; }
-                    }
                 }
 
                 if (!questData || questData.meta.type !== 'HABIT') continue;
 
                 const lastUpdated = questData.progress?.lastUpdated || 0;
 
-                // If last updated before today (and it feels "done" or has progress), reset it!
-                // Logic: 
-                // 1. If lastUpdated < today start -> It's a new day. We MUST reset `current` progress.
-                // 2. STREAK CHECK: Did we do it yesterday?
-                //    - If lastUpdated was within "Yesterday" (Start of Yesterday <= lastUpdated < Start of Today)
-                //    - AND `current >= target` (it was finished)
-                //    -> Streak is safe.
-                //    - ELSE -> Streak broken! Reset to 0 (unless we just started it? No, strict.)
-
                 if (lastUpdated < startOfDay) {
                     let streakBroken = false;
 
                     if (questData.progress?.streak) {
-                        // Check if last update was "Yesterday"
-                        // Yesterday Start = StartOfToday - 24h
                         const startOfYesterday = startOfDay - (24 * 60 * 60 * 1000);
 
-                        // If it wasn't updated since before yesterday -> You missed a whole day -> Broken
-                        // If it WAS updated yesterday, was it finished?
-                        // "current" stores the count derived from JSON.
-                        // But we are about to reset "current" to 0. 
-                        // We rely on the fact that if it's "Done", `current` matches `target`.
-                        // Wait, if it's < target, it wasn't finished.
-
-                        // Was it finished yesterday?
                         const wasFinished = (questData.progress.current || 0) >= (questData.progress.target || 1);
                         const updatedYesterday = lastUpdated >= startOfYesterday;
 
@@ -188,62 +151,36 @@ export class TaskService {
                         }
                     }
 
-                    // Check if reset is needed:
-                    // 1. If it has progress > 0
-                    // 2. OR if it is checked (isDone=true)
-                    // 3. OR if streak needs to be reset (visually update title)
-
-                    if ((questData.progress?.current || 0) > 0 || task.isDone || streakBroken) {
-
-                        questData.progress.current = 0;
-                        questData.progress.lastUpdated = Date.now(); // reset buffer? or leave old? 
-
-                        if (streakBroken && questData.progress?.streak) {
-                            questData.progress.streak.current = 0;
-                        }
-
-                        // We must reset the title
-                        // Robust cleanup: Remove all existing progress/streak patterns
-                        let newTitle = task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
-                        newTitle = newTitle.replace(/\s*\(\d+\/\d+\)/g, '').trim();
-
-                        // Re-add Streak (only if > 0)
-                        // Re-add Streak visual (Always show if configured, e.g. "🔥 0/3")
-                        if (questData.progress?.streak) {
-                            const sCurrent = questData.progress.streak.current || 0;
-                            const sTarget = questData.progress.streak.target;
-
-                            // User request: "It should always show: 🔥 1/2"
-                            // If target exists, show "current/target"
-                            // If no target, show "current" (or maybe user wants "🔥 X" only?)
-                            // Assuming "🔥 1/2" implies "🔥 Count / Target"
-
-                            let streakStr = `🔥 ${sCurrent}`;
-                            if (sTarget) {
-                                streakStr += `/${sTarget}`;
-                            } else if (sCurrent > 0) {
-                                // If no target, only show if > 0? Or always "🔥 0"? 
-                                // User said "always show: 🔥 1/2". 
-                                // For consistency, let's show "🔥 0" if no target exists but streak tracking is enabled?
-                                // Let's Stick to: show if target exists OR current > 0.
-                                // Actually user wants "Always show". So "🔥 0" seems consistent with "🔥 0/2".
-                            }
-
-                            // To match strict "Always show: 🔥 1/2" (target based) implementation:
-                            if (sTarget || sCurrent > 0) {
-                                newTitle = `${newTitle} ${streakStr}`;
-                            }
-                        }
-
-                        const updates = {
-                            isDone: false,
-                            title: newTitle,
-                            notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
-                        };
-
-                        await PluginService.api.updateTask(task.id, updates);
-                        resetCount++;
+                    if (streakBroken && questData.progress?.streak) {
+                        questData.progress.streak.current = 0;
                     }
+
+                    let newTitle = task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
+                    newTitle = newTitle.replace(/\s*\(\d+\/\d+\)/g, '').trim();
+
+                    if (questData.progress?.streak) {
+                        const sCurrent = questData.progress.streak.current || 0;
+                        const sTarget = questData.progress.streak.target;
+
+                        let streakStr = `🔥 ${sCurrent}`;
+                        if (sTarget) {
+                            streakStr += `/${sTarget}`;
+                        } else if (sCurrent > 0) {
+                        }
+
+                        if (sTarget || sCurrent > 0) {
+                            newTitle = `${newTitle} ${streakStr}`;
+                        }
+                    }
+
+                    const updates = {
+                        isDone: false,
+                        title: newTitle,
+                        notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
+                    };
+
+                    await PluginService.api.updateTask(task.id, updates);
+                    resetCount++;
                 }
             }
 
