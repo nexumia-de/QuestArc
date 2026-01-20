@@ -87,11 +87,28 @@ describe('QuestArc v2 Parsers', () => {
             const raw = '5x @daily Drink Water';
             const { title, data } = compileTaskData(raw);
 
-            expect(title).toBe('Drink Water');
+            expect(title).toBe('Drink Water (0/5)');
             expect(data.meta.type).toBe('HABIT');
             expect(data.routine?.frequency).toBe('@daily');
             expect(data.progress?.target).toBe(5);
+            expect(data.progress?.target).toBe(5);
             expect(data.progress?.current).toBe(0);
+        });
+
+        it('should append initial progress count to title for Grinds', () => {
+            const raw = '50x Pushups';
+            const { title, data } = compileTaskData(raw);
+
+            expect(title).toBe('Pushups (0/50)');
+            expect(data.progress?.target).toBe(50);
+        });
+
+        it('should append initial progress count to title for Habits', () => {
+            const raw = '3x @daily Drink Water';
+            const { title, data } = compileTaskData(raw);
+
+            expect(title).toBe('Drink Water (0/3)');
+            expect(data.progress?.target).toBe(3);
         });
     });
 });

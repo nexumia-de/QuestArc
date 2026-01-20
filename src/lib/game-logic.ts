@@ -156,15 +156,19 @@ export function processTaskCompletion(
       // Update Task status
       const isFinished = newCurrent >= target;
 
+      // Mod: Update Title Visual
+      let newTitle = _task.title;
+      // Strip existing (x/y)
+      newTitle = newTitle.replace(/\s*\(\d+\/\d+\)$/, '');
+
+      const progressStr = `(${newCurrent}/${target})`;
+      newTitle = `${newTitle} ${progressStr}`;
+
       taskUpdates = {
         isDone: !isFinished ? false : true, // If finished, let it be checked (true). If not, uncheck it (false).
-        title: _task.title,
+        title: newTitle,
         notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
       };
-
-      // Update Title Visual?
-      // If title doesn't already have progress, maybe append it?
-      // For now, let's just stick to the notes persistence as the mechanism.
 
       if (newCurrent < target) {
         // Not done yet, so we return here!

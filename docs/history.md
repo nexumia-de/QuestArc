@@ -81,3 +81,4 @@
 | 076 | 2026-01-19 | Feature: Project Backlog (Current Task Dashboard). | [./076/](./076/) | Antigravity |
 | 077 | 2026-01-19 | Bug Fix: Project Backlog Creation (ProjectId assignment). | [./077/](./077/) | Antigravity |
 | 078 | 2026-01-19 | Sequential Task Loading | [./078/](./078/) | Antigravity |
+| 079 | 2026-01-20 | Subtask Progress Visibility (Counts). | [./079/](./079/) | Antigravity |

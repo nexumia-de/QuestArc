@@ -67,7 +67,7 @@ export function parseTaskType(title: string): {
         let streakTarget = undefined;
 
         if (streakMatch) {
-            streakTarget = parseInt(streakMatch[1], 10);
+            streakTarget = parseInt(streakMatch[1] || '0', 10);
             cleanTitle = cleanTitle.replace(streakMatch[0], '').trim();
         }
 
@@ -163,6 +163,24 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
                 target: meta.streakTarget,
                 highest: 0
             };
+        }
+    }
+
+    // Mod: Add initial progress to title
+    if (
+        (data.meta.type === 'GRIND' || data.meta.type === 'HABIT') &&
+        data.progress &&
+        (data.progress.target || 0) > 1
+    ) {
+        // Only if it doesn't already have it (though cleanTitle should be clean)
+        const current = data.progress.current || 0;
+        const target = data.progress.target!;
+        const progressStr = `(${current}/${target})`;
+
+        if (!cleanTitle.includes(progressStr)) {
+            // We modify the returned title to include the starting progress
+            // This ensures the task is created with "Count (0/5)" visible immediately
+            return { title: `${cleanTitle} ${progressStr}`, data };
         }
     }
 
