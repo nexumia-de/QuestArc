@@ -1,5 +1,6 @@
 import { StoryStep } from '../types/state';
 import { PluginService } from './PluginService';
+import { cleanTaskTitle, formatTaskTitle } from '../lib/parsers';
 
 export class TaskService {
     static async createTasksForStep(step: Pick<StoryStep, 'title' | 'tasksToCreate'>, force: boolean = false, projectId?: string | null): Promise<boolean> {
@@ -16,26 +17,8 @@ export class TaskService {
 
             if (shouldCreate && PluginService.api.addTask) {
                 try {
-                    const additionalFields: any = {
-                        notes: taskDef.notes || `Quest Sub-task for: ${step.title}`
-                    };
-
-                    if (projectId) {
-                        additionalFields.projectId = projectId;
-                    }
-
-                    if (taskDef.isRepeating && taskDef.repeatCfg) {
-                        additionalFields.taskRepeatCfg = {
-                            repeatEvery: 1, // Default to 1
-                            repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
-                            startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
-                        };
-                    }
-
-                    await PluginService.api.addTask({
-                        title: `${taskDef.title} #QuestArc`,
-                        ...additionalFields
-                    });
+                    const payload = prepareTaskPayload(taskDef, step.title, projectId);
+                    await PluginService.api.addTask(payload);
 
                     createdCount++;
                     PluginService.log.info(`Created task: ${taskDef.title} (Sequential: True, Project: ${projectId})`);
@@ -69,28 +52,12 @@ export class TaskService {
         const nextTaskDef = step.tasksToCreate[nextIndex];
         if (!nextTaskDef) return false;
 
+        if (!PluginService.api.getTasks) return false;
+
         if (PluginService.api.addTask) {
             try {
-                const additionalFields: any = {
-                    notes: nextTaskDef.notes || `Quest Sub-task for: ${step.title}`
-                };
-
-                if (projectId) {
-                    additionalFields.projectId = projectId;
-                }
-
-                if (nextTaskDef.isRepeating && nextTaskDef.repeatCfg) {
-                    additionalFields.taskRepeatCfg = {
-                        repeatEvery: 1,
-                        repeatCycle: nextTaskDef.repeatCfg.repeatType || 'DAILY',
-                        startDate: new Date().toISOString().split('T')[0],
-                    };
-                }
-
-                await PluginService.api.addTask({
-                    title: `${nextTaskDef.title} #QuestArc`,
-                    ...additionalFields
-                });
+                const payload = prepareTaskPayload(nextTaskDef, step.title, projectId);
+                await PluginService.api.addTask(payload);
 
                 PluginService.log.info(`Created NEXT task: ${nextTaskDef.title}`);
                 return true;
@@ -155,23 +122,8 @@ export class TaskService {
                         questData.progress.streak.current = 0;
                     }
 
-                    let newTitle = task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
-                    newTitle = newTitle.replace(/\s*\(\d+\/\d+\)/g, '').trim();
-
-                    if (questData.progress?.streak) {
-                        const sCurrent = questData.progress.streak.current || 0;
-                        const sTarget = questData.progress.streak.target;
-
-                        let streakStr = `🔥 ${sCurrent}`;
-                        if (sTarget) {
-                            streakStr += `/${sTarget}`;
-                        } else if (sCurrent > 0) {
-                        }
-
-                        if (sTarget || sCurrent > 0) {
-                            newTitle = `${newTitle} ${streakStr}`;
-                        }
-                    }
+                    const baseTitle = cleanTaskTitle(task.title);
+                    const newTitle = formatTaskTitle(baseTitle, questData.progress);
 
                     const updates = {
                         isDone: false,
@@ -192,4 +144,29 @@ export class TaskService {
             PluginService.log.error('Failed to check daily resets', e);
         }
     }
+
+}
+
+function prepareTaskPayload(taskDef: any, stepTitle: string | undefined, projectId?: string | null): any {
+    const sTitle = stepTitle || 'Quest Step';
+    const additionalFields: any = {
+        notes: taskDef.notes || `Quest Sub-task for: ${sTitle}`
+    };
+
+    if (projectId) {
+        additionalFields.projectId = projectId;
+    }
+
+    if (taskDef.isRepeating && taskDef.repeatCfg) {
+        additionalFields.taskRepeatCfg = {
+            repeatEvery: 1, // Default to 1
+            repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
+            startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
+        };
+    }
+
+    return {
+        title: `${taskDef.title} #QuestArc`,
+        ...additionalFields
+    };
 }

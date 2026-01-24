@@ -82,3 +82,4 @@
 | 077 | 2026-01-19 | Bug Fix: Project Backlog Creation (ProjectId assignment). | [./077/](./077/) | Antigravity |
 | 078 | 2026-01-19 | Sequential Task Loading | [./078/](./078/) | Antigravity |
 | 079 | 2026-01-20 | Subtask Progress Visibility (Counts) & Sequential Loading Fix. | [./079/](./079/) | Antigravity |
+| 080 | 2026-01-20 | Code Review: Refactor logic reuse & cleanup. | [./080/](./080/) | Antigravity |

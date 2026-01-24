@@ -178,3 +178,45 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
 
     return { title: cleanTitle, data };
 }
+
+/**
+ * Removes dynamic status suffix (streak, progress) from a title.
+ * Used for matching tasks against their definitions.
+ */
+export function cleanTaskTitle(title: string): string {
+    let clean = title;
+    clean = clean.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
+    clean = clean.replace(/\s*\(\d+\/\d+\)$/, '');
+    return clean.trim();
+}
+
+/**
+ * Formats a task title with progress and streak information.
+ */
+export function formatTaskTitle(baseTitle: string, progress?: QuestTaskData['progress']): string {
+    let newTitle = baseTitle;
+    const target = progress?.target || 0;
+    const current = progress?.current || 0;
+
+    // Append progress if target > 1
+    if (target > 1) {
+        newTitle = `${newTitle} (${current}/${target})`;
+    }
+
+    // Append streak if applicable
+    if (progress?.streak) {
+        const sCurrent = progress.streak.current || 0;
+        const sTarget = progress.streak.target;
+
+        let streakStr = `🔥 ${sCurrent}`;
+        if (sTarget) {
+            streakStr += `/${sTarget}`;
+        }
+
+        if (sTarget || sCurrent > 0) {
+            newTitle = `${newTitle} ${streakStr}`;
+        }
+    }
+
+    return newTitle;
+}

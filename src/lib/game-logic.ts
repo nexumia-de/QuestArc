@@ -1,4 +1,5 @@
 import { Modifier, QuestArcState, StoryStep } from '../types/state';
+import { QuestTaskData } from '../types/quest-v2';
 import { BASE_BOSS_DAMAGE } from './constants';
 
 interface TaskStub {
@@ -36,7 +37,7 @@ export function initializeBossIfNeeded(
   return state;
 }
 
-import { parseXpTag, compileTaskData } from './parsers';
+import { parseXpTag, compileTaskData, formatTaskTitle, cleanTaskTitle } from './parsers';
 import { Task } from '../types/plugin-api';
 
 export function checkLevelUp(state: QuestArcState): { newState: QuestArcState; leveledUp: boolean } {
@@ -70,124 +71,52 @@ export function processTaskCompletion(
   let leveledUp = false;
   let taskUpdates: Partial<Task> | undefined;
   let newState = { ...state };
-  let stepProgressIncrement = 0; // NEW: Track if we should increment parent step progress
+  let stepProgressIncrement = 0;
 
   if (state.activeStory.isCompleted) {
     return { newState, damageDealt: 0, xpGained: 0, stepCompleted: false, leveledUp: false };
   }
 
-  let questData = null;
-  if (_task.notes) {
-    try {
-      const match = _task.notes.match(/```json\s*([\s\S]*?)\s*```/);
-      if (match && match[1]) {
-        questData = JSON.parse(match[1]);
-      }
-    } catch (e) {
-      // invalid json, ignore
-    }
-  }
-
-  if (!questData) {
-    const compiled = compileTaskData(_task.title);
-    questData = compiled.data;
-  }
-
+  let questData = getQuestData(_task);
   const type = questData.meta.type;
 
+  // Clean title for matching logic
+  const cleanTitle = cleanTaskTitle(_task.title);
+
   if (type === 'GRIND') {
-    const current = questData.progress?.current || 0;
-    const target = questData.progress?.target || 1;
-
-    if (current < target) {
-      const newCurrent = current + 1;
-      questData.progress.current = newCurrent;
-
-      const isFinished = newCurrent >= target;
-
-      let newTitle = _task.title;
-      newTitle = newTitle.replace(/\s*\(\d+\/\d+\)$/, '');
-      const progressStr = `(${newCurrent}/${target})`;
-      newTitle = `${newTitle} ${progressStr}`;
-
-      taskUpdates = {
-        isDone: !isFinished ? false : true,
-        title: newTitle,
-        notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
-      };
-
-      if (newCurrent < target) {
+    const result = processGrindProgress(questData, cleanTitle);
+    if (result) {
+      taskUpdates = result.updates;
+      if (result.isPartial) {
+        // Partial completion (n < target): Give 1 XP and return early
         xpGained = 1;
         newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
         return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
       }
+      // If finished, fall through to full XP logic
     }
   } else if (type === 'HABIT') {
-    const current = questData.progress?.current || 0;
-    const target = questData.progress?.target || 1;
-
-    const newCurrent = current + 1;
-    const now = Date.now();
-
-    if (questData.progress) {
-      questData.progress.current = newCurrent;
-      questData.progress.lastUpdated = now;
+    const result = processHabitProgress(questData, cleanTitle);
+    taskUpdates = result.updates;
+    stepProgressIncrement = result.stepIncrement;
+    xpGained = result.xpGained; // Habit specific XP logic (streak etc is handled in updates, but XP is distinct)
+    // Actually, in original code, habit XP falls through to line 187: `xpGained = questData.reward?.xp || 10;`.
+    // But wait, line 188: `newState.profile = ... + xpGained`.
+    // My helper should probably not modify state directly but return XP.
+    // Let's stick to the flow.
+    if (result.xpGained > 0) {
+      xpGained = result.xpGained;
+      newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
+    } else {
+      // Validation: if result.xpGained is 0, it means we rely on fallthrough?
+      // Original code line 187: `xpGained = questData.reward?.xp || 10`.
+      // So we should set that here.
+      xpGained = questData.reward?.xp || 10;
+      newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
     }
-
-    const isFinishedForDay = newCurrent >= target;
-
-    // Handle Streaks
-    if (isFinishedForDay) {
-      if (newCurrent === target && questData.progress?.streak) {
-        questData.progress.streak.current = (questData.progress.streak.current || 0) + 1;
-        const currentStreak = questData.progress.streak.current;
-        const highest = questData.progress.streak.highest || 0;
-        if (currentStreak > highest) {
-          questData.progress.streak.highest = currentStreak;
-        }
-      }
-
-      if (newCurrent === target) {
-        stepProgressIncrement = 1;
-      }
-    }
-
-    let newTitle = _task.title;
-
-    let baseTitle = _task.title.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
-    baseTitle = baseTitle.replace(/\s*\(\d+\/\d+\)/g, '');
-    baseTitle = baseTitle.trim();
-
-    newTitle = baseTitle;
-
-    if (target > 1) {
-      newTitle = `${newTitle} (${newCurrent}/${target})`;
-    }
-
-    if (questData.progress?.streak) {
-      const sCurrent = questData.progress.streak.current || 0;
-      const sTarget = questData.progress.streak.target;
-
-      let streakStr = `🔥 ${sCurrent}`;
-      if (sTarget) {
-        streakStr += `/${sTarget}`;
-      }
-
-      if (sTarget || sCurrent > 0) {
-        newTitle = `${newTitle} ${streakStr}`;
-      }
-    }
-
-    taskUpdates = {
-      isDone: isFinishedForDay,
-      title: newTitle,
-      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
-    };
-
-    xpGained = questData.reward?.xp || 10;
-    newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
   }
 
+  // Fallback XP if not set (mostly for SIMPLE or GRIND completion)
   if (xpGained === 0) {
     const { xp } = parseXpTag(_task.title);
     xpGained = xp || 10;
@@ -198,27 +127,16 @@ export function processTaskCompletion(
   newState = levelResult.newState;
   leveledUp = levelResult.leveledUp;
 
+  // Handle Parent Step Progress
   if (currentStep) {
-    const cleanForMatch = (t: string) => {
-      let s = t.trim();
-      s = s.replace(/\s*\(\d+\/\d+\)$/, '');
-      s = s.replace(/\s*🔥\s*\d+(\/\d+)?$/, '');
-      return s.toLowerCase();
-    };
+    const taskTitleClean = cleanTitle.toLowerCase();
 
-    const taskTitleClean = cleanForMatch(_task.title);
-    const matchingDef = currentStep.tasksToCreate?.find(t => cleanForMatch(t.title) === taskTitleClean);
+    // Find matching definition using clean title
+    const matchingDef = currentStep.tasksToCreate?.find(t => cleanTaskTitle(t.title).toLowerCase() === taskTitleClean);
 
-    let increment = 0;
-    if (type === 'HABIT') {
-      increment = stepProgressIncrement;
-    } else {
-      increment = 1;
-    }
+    let increment = (type === 'HABIT') ? stepProgressIncrement : 1;
 
     if (matchingDef && increment > 0) {
-      // Use matchingDef.title as the key to ensure consistency irrespective of current task title state (suffixes)
-      // This maps "Drink Water 2x @daily (1/2)" back to "Drink Water 2x @daily" key in progress map.
       const currentCount = newState.activeStory.taskProgress[matchingDef.title] || 0;
       newState.activeStory.taskProgress = {
         ...newState.activeStory.taskProgress,
@@ -227,12 +145,14 @@ export function processTaskCompletion(
     }
   }
 
+  // Check Step Completion (Boss or Tasks)
   if (currentStep) {
     const requirement = currentStep.completion;
 
     if (requirement.type === 'boss_defeat') {
       if (newState.activeBoss && !newState.activeBoss.isDead) {
         let shouldDealDamage = true;
+        // Habits only deal damage if they caused a step increment (completed daily target)
         if (type === 'HABIT' && stepProgressIncrement === 0) shouldDealDamage = false;
 
         if (shouldDealDamage) {
@@ -252,6 +172,7 @@ export function processTaskCompletion(
         }
       }
     } else if (requirement.type === 'tasks_completed') {
+      // Check if all required tasks are done
       const tasks = currentStep.tasksToCreate || [];
       const requiredTasks = tasks.filter(t => t.isRequired !== false);
 
@@ -264,10 +185,97 @@ export function processTaskCompletion(
       if (requiredTasks.length > 0 && allMet) {
         stepCompleted = true;
       } else if (requiredTasks.length === 0) {
-        stepCompleted = true; // Fallback?
+        stepCompleted = true;
       }
     }
   }
 
   return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+}
+
+// --- Helper Functions ---
+
+function getQuestData(task: TaskStub): QuestTaskData {
+  let questData: QuestTaskData | null = null;
+  if (task.notes) {
+    try {
+      const match = task.notes.match(/```json\s*([\s\S]*?)\s*```/);
+      if (match && match[1]) {
+        questData = JSON.parse(match[1]);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  if (!questData) {
+    const compiled = compileTaskData(task.title);
+    questData = compiled.data;
+  }
+  return questData!;
+}
+
+function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
+  const current = questData.progress?.current || 0;
+  const target = questData.progress?.target || 1;
+
+  if (current < target) {
+    const newCurrent = current + 1;
+    // Safety check just in case
+    if (!questData.progress) questData.progress = { current: 0, target };
+    questData.progress.current = newCurrent;
+
+    const isFinished = newCurrent >= target;
+
+    const newTitle = formatTaskTitle(cleanTitle, questData.progress);
+
+    const updates = {
+      isDone: isFinished,
+      title: newTitle,
+      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
+    };
+
+    return { updates, isPartial: !isFinished };
+  }
+  return null;
+}
+
+function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
+  const current = questData.progress?.current || 0;
+  const target = questData.progress?.target || 1;
+  let stepIncrement = 0;
+
+  const newCurrent = current + 1;
+  const now = Date.now();
+
+  if (!questData.progress) questData.progress = { current: 0, target };
+
+  questData.progress.current = newCurrent;
+  questData.progress.lastUpdated = now;
+
+  const isFinishedForDay = newCurrent >= target;
+
+  if (isFinishedForDay) {
+    // Streak Logic
+    if (newCurrent === target && questData.progress.streak) {
+      questData.progress.streak.current = (questData.progress.streak.current || 0) + 1;
+      const currentStreak = questData.progress.streak.current;
+      const highest = questData.progress.streak.highest || 0;
+      if (currentStreak > highest) {
+        questData.progress.streak.highest = currentStreak;
+      }
+    }
+
+    if (newCurrent === target) {
+      stepIncrement = 1;
+    }
+  }
+
+  const newTitle = formatTaskTitle(cleanTitle, questData.progress);
+
+  const updates = {
+    isDone: isFinishedForDay,
+    title: newTitle,
+    notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
+  };
+
+  return { updates, stepIncrement, xpGained: 0 }; // XP handled in main
 }
