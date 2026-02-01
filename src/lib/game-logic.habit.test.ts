@@ -115,4 +115,20 @@ describe('Habit Logic & Looping Fix', () => {
 
         expect(updates.title).toBe('Messy Task [count:3] [freq:daily] (1/3)');
     });
+
+    it('should clean up new streak format 1/2 🔥', () => {
+        let state = createInitialState();
+        const dirtyTask: TaskStub = {
+            id: 't4',
+            title: 'Messy Task [count:3] [freq:daily] (0/3) (1/3) 1/2 🔥',
+            notes: '',
+            isDone: false,
+            tagIds: []
+        };
+
+        const result = processTaskCompletion(state, dirtyTask);
+        const updates = result.taskUpdates!;
+
+        expect(updates.title).toBe('Messy Task [count:3] [freq:daily] (1/3)');
+    });
 });

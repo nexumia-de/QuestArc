@@ -83,3 +83,18 @@
 | 078 | 2026-01-19 | Sequential Task Loading | [./078/](./078/) | Antigravity |
 | 079 | 2026-01-20 | Subtask Progress Visibility (Counts) & Sequential Loading Fix. | [./079/](./079/) | Antigravity |
 | 080 | 2026-01-20 | Code Review: Refactor logic reuse & cleanup. | [./080/](./080/) | Antigravity |
+| 081 | 2026-01-24 | Feature: Auto-tag tasks with #QuestArc. | [./081/](./081/) | Antigravity |
+| 082 | 2026-01-24 | Doc Update: Story Manager & Template Syntax. | [./082/](./082/) | Antigravity |
+| 083 | 2026-01-24 | Doc Update: Update README for Story Manager. | [./083/](./083/) | Antigravity |
+| 084 | 2026-01-24 | Doc Correction: Icon vs Title Logic for Templates. | [./084/](./084/) | Antigravity |
+| 085 | 2026-01-24 | Doc Cleanup: Deprecated JSON Stories & legacy guides. | [./085/](./085/) | Antigravity |
+| 086 | 2026-01-24 | Doc Deletion: Removed deprecated STORIES.md. | [./086/](./086/) | Antigravity |
+| 087 | 2026-01-24 | Doc Update: Clarified Boss Lifecycle in GUIDE. | [./087/](./087/) | Antigravity |
+| 088 | 2026-01-24 | Logic Update: Subtasks inherit #QuestArc damage from parent. | [./088/](./088/) | Antigravity |
+| 089 | 2026-01-24 | Bug Fix: Recursive root check for subtask damage. | [./089/](./089/) | Antigravity |
+| 090 | 2026-01-24 | Logic Update: Quest Project Context for damage & Boss Name notification. | [./090/](./090/) | Antigravity |
+| 091 | 2026-01-24 | Refactor: Streak display format (1/2 🔥). | [./091/](./091/) | Antigravity |
+| 092 | 2026-01-25 | Feature: Dynamic Sibling Boss Damage (V2 Projects). | [./092/](./092/) | Antigravity |
+| 093 | 2026-01-29 | Feature: Stateless Boss HP & Custom Damage Config ([dmg], [dmgevery]). | [./093/](./093/) | Antigravity |
+| 094 | 2026-01-31 | Refactor: Move QuestManager to Brain & Fix Persistence Violation. | [./094/](./094/) | Antigravity |
+| 095 | 2026-01-31 | Feature: Custom Damage Tags & Settings UI. | [./095/](./095/) | Antigravity |

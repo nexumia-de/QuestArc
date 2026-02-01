@@ -7,7 +7,7 @@ import { compileTaskData } from './parsers';
 describe('Streak Logic', () => {
 
     it('should parse streak tag', () => {
-        const title = '2x @daily Drink Water streak:3';
+        const title = 'Drink Water [count:2] [freq:daily] streak:3';
         const { data, title: clean } = compileTaskData(title);
 
         expect(data.meta.type).toBe('HABIT');
@@ -20,7 +20,7 @@ describe('Streak Logic', () => {
         let state = createInitialState();
         const task = {
             id: 't1',
-            title: '1x @daily Stretch streak:5',
+            title: 'Stretch [count:1] [freq:daily] streak:5',
             notes: '',
             isDone: false,
             tagIds: []
@@ -34,7 +34,7 @@ describe('Streak Logic', () => {
         const qd = JSON.parse(updates.notes!.match(/```json\s*([\s\S]*?)\s*```/)![1]);
 
         expect(qd.progress.streak.current).toBe(1);
-        expect(updates.title).toContain('🔥 1/5');
+        expect(updates.title).toContain('1/5 🔥');
         expect(updates.isDone).toBe(true);
     });
 
@@ -42,7 +42,7 @@ describe('Streak Logic', () => {
         let state = createInitialState();
         const task = {
             id: 't2',
-            title: '2x @daily Pushups streak:10',
+            title: 'Pushups [count:2] [freq:daily] streak:10',
             notes: '',
             isDone: false,
             tagIds: []
@@ -59,7 +59,7 @@ describe('Streak Logic', () => {
     });
 
     it('should parse bracketed streak tag [streak:3]', () => {
-        const title = '2x @daily Drink Water [streak:3]';
+        const title = 'Drink Water [count:2] [freq:daily] [streak:3]';
         const { data, title: clean } = compileTaskData(title);
 
         expect(data.meta.type).toBe('HABIT');
@@ -68,7 +68,7 @@ describe('Streak Logic', () => {
     });
 
     it('should parse shorthand streak tag s:3', () => {
-        const title = '2x @daily Drink Water s:3';
+        const title = 'Drink Water [count:2] [freq:daily] s:3';
         const { data, title: clean } = compileTaskData(title);
 
         expect(data.progress?.streak?.target).toBe(3);

@@ -61,10 +61,9 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for the complete diagram and data flow.
 
 ## 🛠️ Common Tasks
 
-### Adding a New Story Type
-1.  Define the schema in `src/types/story.ts` (and update [DATA_MODELS.md](./DATA_MODELS.md)).
-2.  Update `StoryService` to handle creation.
-3.  Update `EditorView.tsx` to include form fields.
+### Modifying the Story Parser
+1.  **Logic:** The parser lives in `src/lib/parsers.ts`.
+2.  **State:** Updates to `HeroStory` logic happen in `scanner.service.ts` or `compiler.service.ts`.
 
 ### Adding a New Message
 1.  Define the message type in `src/types/messages.ts` (and update [MESSAGE_PROTOCOL.md](./MESSAGE_PROTOCOL.md)).

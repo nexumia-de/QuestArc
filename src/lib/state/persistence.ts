@@ -107,5 +107,23 @@ export function ensureState(state: any): QuestArcState {
         delete (newState.activeStory as any).steps;
     }
 
+    // Ensure settings exist
+    if (!newState.settings) {
+        newState.settings = {
+            customTags: []
+        };
+    }
+
+    // Ensure #questarc system tag exists
+    const systemTag = newState.settings.customTags.find((t: any) => t.tag === '#questarc');
+    if (!systemTag) {
+        newState.settings.customTags.push({
+            id: 'sys_questarc',
+            tag: '#questarc',
+            damage: 10,
+            isSystem: true
+        });
+    }
+
     return newState as QuestArcState;
 }

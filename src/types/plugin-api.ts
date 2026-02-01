@@ -18,6 +18,12 @@ export interface Project {
     isArchived?: boolean;
 }
 
+export interface Tag {
+    id: string;
+    title: string;
+    color?: string;
+}
+
 export interface PluginApi {
     // Projects
     getAllProjects(): Promise<Project[]>;
@@ -29,6 +35,9 @@ export interface PluginApi {
     getTasksByProject(projectId: string): Promise<Task[]>;
     addTask(task: Partial<Task>): Promise<string>; // Returns ID
     updateTask(taskId: string, updates: Partial<Task>): Promise<void>;
+
+    // Tags
+    getAllTags(): Promise<Tag[]>;
 
     // UI Operations
     notify(notification: { title: string; body: string; ico?: string }): void;

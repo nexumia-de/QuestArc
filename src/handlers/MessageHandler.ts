@@ -2,9 +2,9 @@ import { getCurrentStep } from '../lib/plugin-utils';
 import { MESSAGE_TYPES } from '../types/messages';
 import { QuestArcState, HeroStory } from '../types/state';
 import { createInitialState } from '../lib/state/persistence'; // Correct path
-import { initializeBossIfNeeded } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';
+import { QuestManagerService } from '../services/manager.service';
 
 export class MessageHandler {
     static async handle(
@@ -57,74 +57,55 @@ export class MessageHandler {
 
             case MESSAGE_TYPES.START_QUEST: {
                 const { storyId } = message.payload;
-                PluginService.log.info('Starting quest:', storyId);
+                PluginService.log.info('Starting quest (V2):', storyId);
 
-                let story = state.stories.find(s => s.id === storyId);
-
-                // If story not in active list (shouldn't happen with new logic, but for safety/old states)
-                // check history and restore it.
-                if (!story && state.completedStories) {
-                    const historyStory = state.completedStories.find(s => s.id === storyId);
-                    if (historyStory) {
-                        PluginService.log.info('Restoring story definition from history:', storyId);
-                        const { completedAt, ...baseStory } = historyStory;
-                        story = baseStory as HeroStory;
-
-                        // Add it back to active stories if it was missing
-                        const currentStories = state.stories ? [...state.stories] : [];
-                        currentStories.push(story);
-                        updateState({ ...state, stories: currentStories });
-                        // We don't save yet, will save down below
-                    }
+                try {
+                    const newState = await QuestManagerService.startQuest(storyId, state);
+                    updateState(newState);
+                    await saveCallback();
+                    return { success: true };
+                } catch (e: any) {
+                    PluginService.log.error('Failed to start quest:', e);
+                    return { error: e.message };
                 }
+            }
 
-                if (!story) {
-                    PluginService.log.error('Story not found:', storyId);
-                    return { error: 'Story not found' };
+            case MESSAGE_TYPES.PAUSE_QUEST: {
+                PluginService.log.info('Pausing quest');
+                try {
+                    const newState = await QuestManagerService.pauseQuest(state);
+                    updateState(newState);
+                    await saveCallback();
+                    return { success: true };
+                } catch (e: any) {
+                    PluginService.log.error('Failed to pause quest:', e);
+                    return { error: e.message };
                 }
+            }
 
-                // Create base new state with switched story
-                let newState: QuestArcState = {
-                    ...state,
-                    activeStory: {
-                        ...state.activeStory,
-                        id: storyId,
-                        currentStepId: story.steps[0]?.id || 1,
-                        tasksCreatedForStepId: null, // Reset this too
-                        isCompleted: false,
-                        taskProgress: {}
-                    },
-                    activeBoss: null // Reset boss when starting new story
-                };
-
-                // Initialize boss if the new step requires it
-                const startStep = story.steps.find(s => s.id === (story.steps[0]?.id || 1));
-                if (startStep) {
-                    newState = initializeBossIfNeeded(newState, startStep);
-
-                    try {
-                        const allCreated = await TaskService.createTasksForStep(startStep, false, storyId);
-                        if (allCreated) {
-                            newState.activeStory.tasksCreatedForStepId = startStep.id;
-                        } else {
-                            newState.activeStory.tasksCreatedForStepId = null;
-                        }
-                    } catch (err) {
-                        PluginService.log.error('Failed to auto-create tasks for start step', err);
-                    }
+            case MESSAGE_TYPES.RESUME_QUEST: {
+                const { projectId } = message.payload;
+                PluginService.log.info('Resuming quest:', projectId);
+                try {
+                    const newState = await QuestManagerService.resumeQuest(projectId, state);
+                    updateState(newState);
+                    await saveCallback();
+                    return { success: true };
+                } catch (e: any) {
+                    PluginService.log.error('Failed to resume quest:', e);
+                    return { error: e.message };
                 }
-
-                updateState(newState);
-                await saveCallback();
-                return { success: true };
             }
 
             case MESSAGE_TYPES.ADD_STEP_TASKS: {
                 PluginService.log.info('Adding tasks for current step');
-                const currentStep = getCurrentStep(state);
+                // Note: This matches V1 logic. For V2 sequential loading, see CompilerService.compileNextTask
+                // If we want to support manual add via UI for V2, we need to adapt QuestManagerService
 
+                // Legacy support or fallback:
+                const currentStep = getCurrentStep(state);
                 if (currentStep) {
-                    await TaskService.createTasksForStep(currentStep, true, state.activeStory.id); // Force create
+                    await TaskService.createTasksForStep(currentStep, true, state.activeStory.id);
                     updateState({
                         ...state,
                         activeStory: {
@@ -135,6 +116,11 @@ export class MessageHandler {
                     await saveCallback();
                     return { success: true };
                 } else {
+                    // Try V2 injection?
+                    if (state.activeStory.id) {
+                        // Doing nothing for now as V2 uses CompilerService
+                        return { success: true };
+                    }
                     return { error: 'No active step found' };
                 }
             }
@@ -228,6 +214,33 @@ export class MessageHandler {
                         taskProgress: {}
                     },
                     activeBoss: null
+                });
+                await saveCallback();
+                return { success: true };
+            }
+
+            case MESSAGE_TYPES.UPDATE_SETTINGS: {
+                const { settings } = message.payload;
+                PluginService.log.info('Updating settings');
+
+                // Validate System Tags (Prevent deletion/renaming)
+                const currentSystemTags = state.settings.customTags.filter(t => t.isSystem);
+                const newSystemTags = settings.customTags.filter((t: any) => t.isSystem);
+
+                // Ensure all system tags are present and have correct names/IDs
+                for (const sysTag of currentSystemTags) {
+                    const match = newSystemTags.find((t: any) => t.id === sysTag.id);
+                    if (!match) {
+                        return { error: `Cannot delete system tag ${sysTag.tag}` };
+                    }
+                    if (match.tag !== sysTag.tag) {
+                        return { error: `Cannot rename system tag ${sysTag.tag}` };
+                    }
+                }
+
+                updateState({
+                    ...state,
+                    settings
                 });
                 await saveCallback();
                 return { success: true };

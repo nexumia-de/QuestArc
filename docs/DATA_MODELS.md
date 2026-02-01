@@ -2,6 +2,8 @@
 
 This document defines the core data structures used in QuestArc. These types are the "Source of Truth" for the application state.
 
+> **Note**: User content (Stories, Tasks) is created in **Projects** and **Tasks**. The models below represent the *Internal Game State* parsed from those user inputs.
+
 ## Core State (`QuestArcState`)
 
 The root state object managed by the Brain and persisted to storage.
@@ -10,7 +12,7 @@ The root state object managed by the Brain and persisted to storage.
 export interface QuestArcState {
   version: number;         // Schema version for migrations (e.g., 1)
   profile: HeroProfile;    // Player stats
-  stories: HeroStory[];    // List of available stories
+  stories: HeroStory[];    // Cached List of available stories (parsed from Templates)
   completedStories: CompletedStory[]; // History
   activeStory: ActiveStoryState;      // Currently running quest
   activeBoss: ActiveBoss | null;      // Currently fighting boss
@@ -37,22 +39,23 @@ interface HeroProfile {
 
 ## Story Data (`HeroStory`)
 
-The static definition of a Quest.
+The internal representation of a Quest, parsed from a **Project Template** (Title starts with `📜`).
 
 ```typescript
 export interface HeroStory {
-  id: string;        // Unique ID (e.g., "story_morning_routine")
-  title: string;     // Display title
+  id: string;        // Derived from Project ID
+  title: string;     // Derived from Project Title
   steps: StoryStep[];
 }
 
 export interface StoryStep {
-  id: number;        // Step sequence ID (1, 2, 3...)
-  title?: string;
+  id: number;        // Step sequence ID (based on Task Order)
+  title?: string;    // Derived from Top-Level Task Title
   xpReward: number;
-  nextStepId?: number | null; // ID of the next step, or null if end of story
+  nextStepId?: number | null; // ID of the next generic step
 
-  // Tasks to inject into Super Productivity
+  // Tasks that define this step's requirements
+  // Parsed from Subtasks of the Top-Level Task
   tasksToCreate?: TaskDefinition[];
   
   // What is required to finish this step?
@@ -60,13 +63,13 @@ export interface StoryStep {
 }
 
 export interface TaskDefinition {
-  title: string;
-  isAutoCreate: boolean;  // If true, created immediately when step starts
+  title: string;          // Parsed from Subtask Title
+  isAutoCreate: boolean;  // usually true for required subtasks
   notes?: string;
   isRequired?: boolean;
-  requiredCount?: number;
+  requiredCount?: number; // Parsed from [count:N]
   
-  // Recurring config
+  // Recurring config parsed from [freq:...]
   isRepeating?: boolean;
   repeatCfg?: {
     repeatEvery: number;
@@ -79,7 +82,7 @@ export interface TaskDefinition {
 
 ## Boss Configuration (`BossConfig`)
 
-Defines a boss enemy that can appear in a step.
+Defines a boss enemy that can appear in a step. Parsed from `⚔️` tags in titles.
 
 ```typescript
 export interface BossConfig {
@@ -110,9 +113,11 @@ export interface Modifier {
 ## Active State
 
 ### Active Story
+Tracks the user's progress through the currently running instance of a Story.
+
 ```typescript
 interface ActiveStoryState {
-  id: string | null;            // Null if no active quest
+  id: string | null;            // Project ID of the *Active* Project (copy of Template)
   currentStepId: number;
   tasksCreatedForStepId?: number | null; // Tracks if we already spawned tasks for this step
   isCompleted?: boolean;

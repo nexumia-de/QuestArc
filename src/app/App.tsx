@@ -17,7 +17,8 @@ const App: Component = () => {
     resetGame,
     setActionError,
     deleteStory,
-    cancelQuest
+    cancelQuest,
+    updateSettings
   } = useQuestArc();
 
   const { view, setView, editingStory, goToDashboard, goToEditor } = useNavigation();
@@ -84,6 +85,7 @@ const App: Component = () => {
                 handleAcknowledgeCompletion,
                 startQuest: startQuestWrapper,
                 handleDeleteStory: (storyId: string) => deleteStory(storyId, goToDashboard),
+                handleUpdateSettings: updateSettings,
 
                 handleImportStory,
                 resetGame: resetGameWrapper,

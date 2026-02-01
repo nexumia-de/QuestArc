@@ -1,24 +1,14 @@
-import { Modifier, QuestArcState, StoryStep } from '../types/state';
+import { QuestArcState, StoryStep } from '../types/state';
 import { QuestTaskData } from '../types/quest-v2';
-import { BASE_BOSS_DAMAGE } from './constants';
 
-interface TaskStub {
+export interface TaskStub {
   tagIds: string[];
   title: string;
   notes?: string;
+  resolvedTagNames?: string[]; // Tag names resolved from tagIds
 }
 
-export function calculateDamage(task: TaskStub, modifiers: Modifier[] = []): number {
-  let multiplier = 1.0;
-
-  for (const mod of modifiers) {
-    if (mod.trigger.type === 'tag' && task.tagIds.includes(mod.trigger.value)) {
-      multiplier *= mod.multiplier;
-    }
-  }
-
-  return BASE_BOSS_DAMAGE * multiplier;
-}
+// calculateDamage removed (deprecated)
 
 export function initializeBossIfNeeded(
   state: QuestArcState,
@@ -56,7 +46,9 @@ export function checkLevelUp(state: QuestArcState): { newState: QuestArcState; l
 export function processTaskCompletion(
   state: QuestArcState,
   _task: TaskStub,
-  currentStep?: StoryStep
+  currentStep?: StoryStep,
+  rootTask?: TaskStub,
+  isQuestTask: boolean = false
 ): {
   newState: QuestArcState;
   damageDealt: number;
@@ -72,6 +64,7 @@ export function processTaskCompletion(
   let taskUpdates: Partial<Task> | undefined;
   let newState = { ...state };
   let stepProgressIncrement = 0;
+  let customDamageTrigger = false; // Flag to force damage even on partial completion
 
   if (state.activeStory.isCompleted) {
     return { newState, damageDealt: 0, xpGained: 0, stepCompleted: false, leveledUp: false };
@@ -87,11 +80,18 @@ export function processTaskCompletion(
     const result = processGrindProgress(questData, cleanTitle);
     if (result) {
       taskUpdates = result.updates;
+      customDamageTrigger = result.shouldDealDamage;
+
       if (result.isPartial) {
-        // Partial completion (n < target): Give 1 XP and return early
+        // Partial completion (n < target): Give 1 XP
         xpGained = 1;
         newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
-        return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+
+        // Return EARLY unless we have custom damage to deal
+        if (!customDamageTrigger) {
+          return { newState, damageDealt, xpGained, stepCompleted, leveledUp, taskUpdates };
+        }
+        // If we DO have custom damage, we continue falling through to the damage block
       }
       // If finished, fall through to full XP logic
     }
@@ -99,18 +99,13 @@ export function processTaskCompletion(
     const result = processHabitProgress(questData, cleanTitle);
     taskUpdates = result.updates;
     stepProgressIncrement = result.stepIncrement;
-    xpGained = result.xpGained; // Habit specific XP logic (streak etc is handled in updates, but XP is distinct)
-    // Actually, in original code, habit XP falls through to line 187: `xpGained = questData.reward?.xp || 10;`.
-    // But wait, line 188: `newState.profile = ... + xpGained`.
-    // My helper should probably not modify state directly but return XP.
-    // Let's stick to the flow.
+    xpGained = result.xpGained;
+    customDamageTrigger = result.shouldDealDamage;
+
     if (result.xpGained > 0) {
       xpGained = result.xpGained;
       newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
     } else {
-      // Validation: if result.xpGained is 0, it means we rely on fallthrough?
-      // Original code line 187: `xpGained = questData.reward?.xp || 10`.
-      // So we should set that here.
       xpGained = questData.reward?.xp || 10;
       newState.profile = { ...newState.profile, xp: newState.profile.xp + xpGained };
     }
@@ -127,15 +122,12 @@ export function processTaskCompletion(
   newState = levelResult.newState;
   leveledUp = levelResult.leveledUp;
 
-  // Handle Parent Step Progress
+  // Handle Parent Step Progress (Quest V1)
   if (currentStep) {
+    // ... existing logic ...
     const taskTitleClean = cleanTitle.toLowerCase();
-
-    // Find matching definition using clean title
     const matchingDef = currentStep.tasksToCreate?.find(t => cleanTaskTitle(t.title).toLowerCase() === taskTitleClean);
-
     let increment = (type === 'HABIT') ? stepProgressIncrement : 1;
-
     if (matchingDef && increment > 0) {
       const currentCount = newState.activeStory.taskProgress[matchingDef.title] || 0;
       newState.activeStory.taskProgress = {
@@ -145,48 +137,150 @@ export function processTaskCompletion(
     }
   }
 
+  // --- 1. explicit Damage Calculation (Tags & [dmg:N]) ---
+  // This applies to ANY active boss, regardless of the current step type.
+  let explicitDamage = 0;
+  // customDamageTrigger already declared at top of function
+  customDamageTrigger = false;
+  let tagDamage = 0;
+  let hasTagTrigger = false;
+  const taskTitleLower = _task.title.toLowerCase();
+
+  // Check [dmg:N] (Highest Priority)
+  if (questData.meta.damage !== undefined) {
+    explicitDamage = questData.meta.damage;
+    customDamageTrigger = true;
+  }
+
+  // Check Custom Tags (Check resolvedTagNames first, then fallback to title)
+  if (state.settings?.customTags) {
+    // 1. Check resolved tag names (from Super Productivity's tag system)
+    const taskTagNames = _task.resolvedTagNames || [];
+    const rootTagNames = rootTask?.resolvedTagNames || [];
+
+    for (const configuredTag of state.settings.customTags) {
+      // Strip # prefix for comparison if present
+      const tagNameToMatch = configuredTag.tag.replace(/^#/, '').toLowerCase();
+
+      // Check task's tags
+      const taskMatch = taskTagNames.some(name => name.toLowerCase() === tagNameToMatch);
+      if (taskMatch) {
+        tagDamage = configuredTag.damage;
+        hasTagTrigger = true;
+        break;
+      }
+
+      // Check root's tags (inheritance)
+      const rootMatch = rootTagNames.some(name => name.toLowerCase() === tagNameToMatch);
+      if (rootMatch) {
+        tagDamage = configuredTag.damage;
+        hasTagTrigger = true;
+        break;
+      }
+    }
+
+    // 2. Fallback: Check title for inline hashtags (e.g., "Do task #questarc")
+    if (!hasTagTrigger) {
+      const matchingTag = state.settings.customTags.find(t => taskTitleLower.includes(t.tag.toLowerCase()));
+      if (matchingTag) {
+        tagDamage = matchingTag.damage;
+        hasTagTrigger = true;
+      } else if (rootTask) {
+        const rootTitleLower = rootTask.title.toLowerCase();
+        const rootMatchingTag = state.settings.customTags.find(t => rootTitleLower.includes(t.tag.toLowerCase()));
+        if (rootMatchingTag) {
+          tagDamage = rootMatchingTag.damage;
+          hasTagTrigger = true;
+        }
+      }
+    }
+  }
+
+  // Fallback for missing settings (migration edge case) for legacy #questarc
+  if (!state.settings && (taskTitleLower.includes('#questarc') || rootTask?.title.toLowerCase().includes('#questarc'))) {
+    tagDamage = 10;
+    hasTagTrigger = true;
+  }
+
+  // Determine final Explicit Damage
+  if (!customDamageTrigger && hasTagTrigger) {
+    explicitDamage = tagDamage;
+  }
+
+  // Apply Explicit Damage to Active Boss
+  if (explicitDamage > 0 && newState.activeBoss && !newState.activeBoss.isDead) {
+    const isCrit = Math.random() > 0.8;
+    const finalDmg = isCrit ? explicitDamage * 2 : explicitDamage;
+
+    damageDealt += finalDmg; // Accumulate damage
+    newState.activeBoss = {
+      ...newState.activeBoss,
+      hp: Math.max(0, newState.activeBoss.hp - finalDmg),
+    };
+
+    if (newState.activeBoss.hp === 0) {
+      newState.activeBoss.isDead = true;
+      // Note: Step completion check will happen below if we are in a boss step
+    }
+  }
+
+
+  // --- 2. Step Completion Logic ---
   // Check Step Completion (Boss or Tasks)
   if (currentStep) {
     const requirement = currentStep.completion;
 
     if (requirement.type === 'boss_defeat') {
-      if (newState.activeBoss && !newState.activeBoss.isDead) {
-        let shouldDealDamage = true;
-        // Habits only deal damage if they caused a step increment (completed daily target)
-        if (type === 'HABIT' && stepProgressIncrement === 0) shouldDealDamage = false;
+      // If boss is dead (possibly killed just now by explicit damage), we complete.
+      if (newState.activeBoss && newState.activeBoss.isDead) {
+        stepCompleted = true;
+      }
+      else if (newState.activeBoss && !newState.activeBoss.isDead) {
+        // Boss still alive. Check if we should deal STANDARD/IMPLICIT damage.
+        // Rule: If we just dealt explicit damage, we DON'T deal standard damage (prevent double dip).
+        // Standard damage applies if: isQuestTask OR #questarc (but #questarc is now explicit via system tag).
+        // So really, "Standard Damage" is just for Tasks belonging to the Quest Project that DON'T have a tag.
 
-        if (shouldDealDamage) {
-          const baseDamage = 10;
-          const isCrit = Math.random() > 0.8;
-          damageDealt = isCrit ? baseDamage * 2 : baseDamage;
+        if (damageDealt === 0) { // Only if we haven't damaged it yet
+          // 1. Tag Check: Relaxed for dynamic boss (isQuestTask=true) 
+          // Logic: If isQuestTask is true, we deal default 10 damage.
+          let shouldDealStandardDamage = true;
 
-          newState.activeBoss = {
-            ...newState.activeBoss,
-            hp: Math.max(0, newState.activeBoss.hp - damageDealt),
-          };
+          if (!isQuestTask) {
+            shouldDealStandardDamage = false;
+          }
 
-          if (newState.activeBoss.hp === 0) {
-            newState.activeBoss.isDead = true;
-            stepCompleted = true;
+          // Habit/Grind Check (Optimization: Don't spam damage if not completed)
+          if (type === 'HABIT' && stepProgressIncrement === 0) shouldDealStandardDamage = false;
+
+          if (shouldDealStandardDamage) {
+            const baseDamage = 10;
+            const isCrit = Math.random() > 0.8;
+            const implicitDmg = isCrit ? baseDamage * 2 : baseDamage;
+
+            damageDealt += implicitDmg;
+            newState.activeBoss = {
+              ...newState.activeBoss,
+              hp: Math.max(0, newState.activeBoss.hp - implicitDmg),
+            };
+            if (newState.activeBoss.hp === 0) {
+              newState.activeBoss.isDead = true;
+              stepCompleted = true;
+            }
           }
         }
       }
     } else if (requirement.type === 'tasks_completed') {
-      // Check if all required tasks are done
+      // ... existing logic ...
       const tasks = currentStep.tasksToCreate || [];
       const requiredTasks = tasks.filter(t => t.isRequired !== false);
-
       const allMet = requiredTasks.every(def => {
         const progress = newState.activeStory.taskProgress[def.title] || 0;
         const target = def.requiredCount || 1;
         return progress >= target;
       });
-
-      if (requiredTasks.length > 0 && allMet) {
-        stepCompleted = true;
-      } else if (requiredTasks.length === 0) {
-        stepCompleted = true;
-      }
+      if (requiredTasks.length > 0 && allMet) stepCompleted = true;
+      else if (requiredTasks.length === 0) stepCompleted = true;
     }
   }
 
@@ -216,16 +310,25 @@ function getQuestData(task: TaskStub): QuestTaskData {
 function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
   const current = questData.progress?.current || 0;
   const target = questData.progress?.target || 1;
+  const damageEvery = questData.meta.damageEvery !== undefined ? questData.meta.damageEvery : 1; // Default: Every time (1)
 
   if (current < target) {
     const newCurrent = current + 1;
-    // Safety check just in case
     if (!questData.progress) questData.progress = { current: 0, target };
     questData.progress.current = newCurrent;
 
     const isFinished = newCurrent >= target;
-
     const newTitle = formatTaskTitle(cleanTitle, questData.progress);
+
+    // Damage Logic:
+    // If damageEvery == 0, only on finish.
+    // If damageEvery > 0, check modulus.
+    let shouldDealDamage = false;
+    if (damageEvery === 0) {
+      shouldDealDamage = isFinished;
+    } else {
+      shouldDealDamage = (newCurrent % damageEvery === 0);
+    }
 
     const updates = {
       isDone: isFinished,
@@ -233,7 +336,7 @@ function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
       notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
     };
 
-    return { updates, isPartial: !isFinished };
+    return { updates, isPartial: !isFinished, shouldDealDamage };
   }
   return null;
 }
@@ -241,6 +344,8 @@ function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
 function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
   const current = questData.progress?.current || 0;
   const target = questData.progress?.target || 1;
+  const damageEvery = questData.meta.damageEvery !== undefined ? questData.meta.damageEvery : 1; // Default: Every time (1)
+
   let stepIncrement = 0;
 
   const newCurrent = current + 1;
@@ -252,6 +357,14 @@ function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
   questData.progress.lastUpdated = now;
 
   const isFinishedForDay = newCurrent >= target;
+
+  // Damage Logic:
+  let shouldDealDamage = false;
+  if (damageEvery === 0) {
+    shouldDealDamage = isFinishedForDay;
+  } else {
+    shouldDealDamage = (newCurrent % damageEvery === 0);
+  }
 
   if (isFinishedForDay) {
     // Streak Logic
@@ -277,5 +390,5 @@ function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
     notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
   };
 
-  return { updates, stepIncrement, xpGained: 0 }; // XP handled in main
+  return { updates, stepIncrement, xpGained: 0, shouldDealDamage };
 }

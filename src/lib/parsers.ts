@@ -26,7 +26,7 @@ export function parseTaskType(title: string): {
     meta: any;
     cleanTitle: string
 } {
-    const bossRegex = /(?:⚔️|🛡️)\s*(.+?)\s*\[HP:(\d+)\]/u;
+    const bossRegex = /(?:(?:⚔️|🛡️)\s*)?(.+?)\s*\[HP:(\d+)\]/iu;
     const bossMatch = title.match(bossRegex);
     if (bossMatch) {
         const name = bossMatch[1] || 'Boss';
@@ -79,21 +79,52 @@ export function parseTaskType(title: string): {
 
     if (countMatch && countMatch[1]) {
         const targetStr = countMatch[1];
-        const cleanTitle = title.replace(countMatch[0], '').trim();
+        let cleanTitleTemp = title.replace(countMatch[0], '').trim();
+
+        // Parse Damage Config
+        const dmgRegex = /\[dmg:(\d+)\]/i;
+        const dmgMatch = cleanTitleTemp.match(dmgRegex);
+        let damage = undefined;
+        if (dmgMatch && dmgMatch[0] && dmgMatch[1]) {
+            damage = parseInt(dmgMatch[1], 10);
+            cleanTitleTemp = cleanTitleTemp.replace(dmgMatch[0], '').trim();
+        }
+
+        const dmgeveryRegex = /\[dmgevery:(\d+)\]/i;
+        const dmgeveryMatch = cleanTitleTemp.match(dmgeveryRegex);
+        let damageEvery = undefined;
+        if (dmgeveryMatch && dmgeveryMatch[0] && dmgeveryMatch[1]) {
+            damageEvery = parseInt(dmgeveryMatch[1], 10);
+            cleanTitleTemp = cleanTitleTemp.replace(dmgeveryMatch[0], '').trim();
+        }
 
         return {
             type: 'GRIND',
             meta: {
-                target: parseInt(targetStr, 10)
+                target: parseInt(targetStr, 10),
+                damage,
+                damageEvery
             },
-            cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
+            cleanTitle: cleanTitleTemp.replace(/\s+/g, ' ').trim()
         };
+    }
+
+    // Parse Damage Config for SIMPLE tasks too
+    const dmgRegex = /\[dmg:(\d+)\]/i;
+    const dmgMatch = title.match(dmgRegex);
+    let damage = undefined;
+    let cleanSimpleTitle = title;
+    if (dmgMatch && dmgMatch[0] && dmgMatch[1]) {
+        damage = parseInt(dmgMatch[1], 10);
+        cleanSimpleTitle = cleanSimpleTitle.replace(dmgMatch[0], '').trim();
     }
 
     return {
         type: 'SIMPLE',
-        meta: {},
-        cleanTitle: title
+        meta: {
+            damage
+        },
+        cleanTitle: cleanSimpleTitle
     };
 }
 
@@ -109,7 +140,9 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
         meta: {
             type,
             version: 1,
-            originalTitle
+            originalTitle,
+            damage: meta.damage,
+            damageEvery: meta.damageEvery
         }
     };
 
@@ -126,6 +159,14 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
         data.boss = {
             hp: meta.hp
         };
+
+        // Mod: Add Boss Visual "Name 100/100 ❤️"
+        const current = meta.hp;
+        const target = meta.hp;
+        const visual = `${current}/${target} ❤️`;
+        if (!cleanTitle.includes(visual)) {
+            return { title: `${cleanTitle} ${visual}`, data };
+        }
     } else if (type === 'GRIND' || type === 'HABIT') {
         data.progress = {
             current: 0,
@@ -162,7 +203,7 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
             let titleWithSuffix = `${cleanTitle} ${progressStr}`
 
             if (data.progress.streak && data.progress.streak.target) {
-                titleWithSuffix += ` 🔥 0/${data.progress.streak.target}`;
+                titleWithSuffix += ` 0/${data.progress.streak.target} 🔥`;
             }
 
             return { title: titleWithSuffix, data };
@@ -170,7 +211,7 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
     }
 
     if (data.progress?.streak?.target) {
-        const streakStr = `🔥 0/${data.progress.streak.target}`;
+        const streakStr = `0/${data.progress.streak.target} 🔥`;
         if (!cleanTitle.includes(streakStr)) {
             return { title: `${cleanTitle} ${streakStr}`, data };
         }
@@ -185,7 +226,8 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
  */
 export function cleanTaskTitle(title: string): string {
     let clean = title;
-    clean = clean.replace(/\s*🔥\s*\d+(\/\d+)?/g, '');
+    // Match both "🔥 1/2" (old) and "1/2 🔥" (new) formats for backward compatibility
+    clean = clean.replace(/(\s*🔥\s*\d+(\/\d+)?)|(\s*\d+(\/\d+)?\s*🔥)/g, '');
     clean = clean.replace(/\s*\(\d+\/\d+\)$/, '');
     return clean.trim();
 }
@@ -208,10 +250,11 @@ export function formatTaskTitle(baseTitle: string, progress?: QuestTaskData['pro
         const sCurrent = progress.streak.current || 0;
         const sTarget = progress.streak.target;
 
-        let streakStr = `🔥 ${sCurrent}`;
+        let streakStr = `${sCurrent}`;
         if (sTarget) {
             streakStr += `/${sTarget}`;
         }
+        streakStr += ` 🔥`;
 
         if (sTarget || sCurrent > 0) {
             newTitle = `${newTitle} ${streakStr}`;

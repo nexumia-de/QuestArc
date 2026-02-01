@@ -23,12 +23,28 @@ QuestArc is a plugin for [Super Productivity](https://super-productivity.com) th
 
 ## Quick Start
 
-1. After installation, click the QuestArc button in the Super Productivity header
-2. Start completing tasks to damage the boss and earn XP
-3. Tag tasks with "deep-work" for 2x damage multiplier
-4. Complete story steps to progress through the adventure
+1.  **Create a Story Template**:
+    *   Create a new Project in Super Productivity.
+    *   **Set the Project Icon**: Choose the **Bow & Arrow** (🏹).
+    *   **Set the Project Title**: Must start with `📜` (e.g., `📜 Morning Routine`).
+    *   Add Tasks (Steps) and Subtasks (Requirements).
+    *   *Tip: Use tags like `[freq:daily]` or `[count:5]` in titles for game logic. See [Syntax Guide](docs/SYNTAX_GUIDE.md) for full list.*
+2.  **Play**:
+    *   Click "Start" on your new project to begin the quest.
+    *   Complete tasks to earn XP and damage bosses (when active).
 
 ## How It Works
+
+### Creating Stories (The "Story Manager")
+QuestArc uses Super Productivity's native **Projects** as the "Story Editor".
+
+1.  **Preparation**: Set the Project Icon to **Bow** (🏹) to mark it as a QuestArc project.
+2.  **Template**: Start the Project Title with **Scroll** (`📜`) to define it as a Template.
+    *   *Example: `📜 Morning Routine`*
+3.  **Instance**: When you "Start" a story, the game creates a playable copy (e.g., `Morning Routine 🧭`).
+4.  **Syntax**: Define logic directly in Task Titles (see [Syntax Guide](docs/SYNTAX_GUIDE.md)).
+    *   `Drink Water [freq:daily]` -> Recurring Habit
+    *   `⚔️ Dragon [HP:500]` -> Boss Battle
 
 ### Game Mechanics
 
@@ -41,10 +57,6 @@ QuestArc is a plugin for [Super Productivity](https://super-productivity.com) th
 - Earn XP by completing story steps
 - Level up when you accumulate enough XP
 - XP requirement increases with each level (Level × 100)
-
-**Story Steps:**
-- **Streak Steps**: Complete N tasks in a row
-- **Boss Steps**: Deal enough damage to defeat the boss
 
 ## Development
 

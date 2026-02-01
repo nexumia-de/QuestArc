@@ -9,8 +9,18 @@ export interface AvatarConfig {
   mouth: 'neutral' | 'smile' | 'frown' | 'surprised';
 }
 
+export interface CustomTagConfig {
+  id: string;
+  tag: string;
+  damage: number;
+  isSystem?: boolean;
+}
+
 export interface QuestArcState {
   version: number; // Schema version for migrations
+  settings: {
+    customTags: CustomTagConfig[];
+  };
   profile: {
     level: number;
     xp: number;
@@ -44,22 +54,10 @@ export interface QuestArcState {
   } | null;
 }
 
-export type ModifierTriggerType = 'tag' | 'project';
-
-export interface ModifierTrigger {
-  type: ModifierTriggerType;
-  value: string;
-}
-
-export interface Modifier {
-  trigger: ModifierTrigger;
-  multiplier: number;
-}
-
 export interface BossConfig {
   hp: number;
   maxHp: number;
-  damageModifiers: Modifier[];
+  // damageModifiers removed
   isDead?: boolean;
   // Rich Boss Features
   name?: string;

@@ -1,5 +1,6 @@
 import { compileTaskData } from '../lib/parsers';
 import { Task } from '../types/plugin-api';
+import { PluginService } from './PluginService';
 
 export class CompilerService {
     /**
@@ -9,7 +10,7 @@ export class CompilerService {
      */
     static async compileQuest(templateProjectId: string): Promise<string> {
         // 1. Fetch Template Data
-        const projects = await PluginAPI.getAllProjects();
+        const projects = await PluginService.api.getAllProjects();
         const template = projects.find(p => p.id === templateProjectId);
         if (!template) throw new Error(`Template not found: ${templateProjectId}`);
 
@@ -21,14 +22,14 @@ export class CompilerService {
         // Use the template's icon, or default to 🏹 if missing (though scanner guarantees 🏹 usually)
         const newIcon = template.icon || '🏹';
 
-        const newProjectId = await PluginAPI.addProject({
+        const newProjectId = await PluginService.api.addProject({
             title: newTitle,
             icon: newIcon
         });
 
         // 3. Fetch Tasks from Template
         // Fallback: fetch all tasks and filter if specific API is missing
-        const allTasks = await PluginAPI.getTasks();
+        const allTasks = await PluginService.api.getTasks();
         const templateTasks = allTasks.filter(t => t.projectId === templateProjectId);
 
         // 4. Clone Tasks (Root level first)
@@ -51,7 +52,7 @@ export class CompilerService {
      */
     static async compileNextTask(templateProjectId: string, activeProjectId: string, targetIndex: number): Promise<boolean> {
         // 1. Fetch Template Tasks again
-        const allTasks = await PluginAPI.getTasks();
+        const allTasks = await PluginService.api.getTasks();
         const templateTasks = allTasks.filter(t => t.projectId === templateProjectId);
         const rootTasks = templateTasks.filter(t => !t.parentId);
 
@@ -62,6 +63,7 @@ export class CompilerService {
         }
 
         const nextTask = rootTasks[targetIndex];
+        if (!nextTask) return false;
 
         // 3. Clone it
         await this.cloneTask(nextTask, activeProjectId, templateTasks, null, targetIndex);
@@ -96,8 +98,11 @@ export class CompilerService {
         // Let's just append.
         const finalNotes = noteContent ? `${noteContent}\n\n${systemDataBlock}` : systemDataBlock;
 
-        const newTaskId = await PluginAPI.addTask({
-            title: cleanTitle,
+        // Only add #QuestArc tag if it is a root task (no parentId)
+        const titleSuffix = parentId ? '' : ' #QuestArc';
+
+        const newTaskId = await PluginService.api.addTask({
+            title: `${cleanTitle}${titleSuffix}`,
             notes: finalNotes,
             projectId: targetProjectId,
             parentId: parentId || undefined

@@ -78,15 +78,24 @@ describe('QuestArc v2 Parsers', () => {
     });
 
     describe('compileTaskData', () => {
-        it('should compile a complete Boss step', () => {
+        it('should compile a complete Boss step with Icon', () => {
             const raw = '⚔️ Final Boss [HP:1000] [XP:5000]';
             const { title, data } = compileTaskData(raw);
 
-            expect(title).toBe('Final Boss');
+            expect(title).toBe('Final Boss 1000/1000 ❤️');
             expect(data.meta.type).toBe('BOSS');
             expect(data.boss?.hp).toBe(1000);
             expect(data.progress?.target).toBe(1000);
             expect(data.reward?.xp).toBe(5000);
+        });
+
+        it('should compile Boss step without Icon (case insensitive)', () => {
+            const raw = 'Shadow Bug [hp:100]';
+            const { title, data } = compileTaskData(raw);
+
+            expect(title).toBe('Shadow Bug 100/100 ❤️');
+            expect(data.meta.type).toBe('BOSS');
+            expect(data.boss?.hp).toBe(100);
         });
 
         it('should compile a Habit correctly', () => {

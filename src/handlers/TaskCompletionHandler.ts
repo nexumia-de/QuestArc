@@ -1,33 +1,37 @@
-import { Task } from '@super-productivity/plugin-api';
+import { Task } from '../types/plugin-api';
 import { QuestArcState } from '../types/state';
-import { processTaskCompletion } from '../lib/game-logic';
+import { processTaskCompletion, TaskStub } from '../lib/game-logic';
 import { PluginService } from '../services/PluginService';
 import { CompilerService } from '../services/compiler.service';
+import { BossService } from '../services/BossService';
+
 
 export class TaskCompletionHandler {
     static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
         let task: Task;
 
-        // Normalize payload: It can be a string ID or an object { task: Task }
+        // Normalize payload to get ID
+        let taskId: string;
         if (typeof payload === 'string') {
-            // It's an ID, we must fetch the task
-            try {
-                const tasks = await PluginAPI.getTasks();
-                const found = tasks.find(t => t.id === payload);
-                if (!found) {
-                    PluginService.log.warn(`TaskCompletionHandler: Task not found with ID ${payload}`);
-                    return;
-                }
-                task = found;
-            } catch (e) {
-                PluginService.log.error('Failed to fetch tasks', e);
+            taskId = payload;
+        } else if (payload && typeof payload === 'object' && 'task' in payload) {
+            taskId = ((payload as any).task as Task).id;
+        } else {
+            taskId = (payload as Task).id;
+        }
+
+        // Always fetch fresh task from API to ensure parentId/projectId are present and correct
+        try {
+            const tasks = await PluginService.api.getTasks();
+            const found = tasks.find(t => t.id === taskId);
+            if (!found) {
+                PluginService.log.warn(`TaskCompletionHandler: Task not found with ID ${taskId}`);
                 return;
             }
-        } else if (payload && typeof payload === 'object' && 'task' in payload) {
-            task = (payload as any).task;
-        } else {
-            // Assume payload IS the task (legacy or direct call)
-            task = payload as Task;
+            task = found as unknown as Task;
+        } catch (e) {
+            PluginService.log.error('Failed to fetch tasks', e);
+            return;
         }
 
         if (state.activeStory.isCompleted) {
@@ -44,28 +48,108 @@ export class TaskCompletionHandler {
         PluginService.log.info('Task completed!', task);
 
         // Process task completion for game logic (XP, damage, etc.) first
-        // We pass undefined for currentQuestStep because we no longer rely on legacy structure
         let newState = state;
-        const result = processTaskCompletion(newState, task, undefined);
+
+        // Find the active story definition to get the steps
+        const activeStoryDef = state.stories.find(s => s.id === state.activeStory.id);
+        const currentStep = activeStoryDef?.steps.find(s => s.id === state.activeStory.currentStepId);
+
+        let rootTask: TaskStub | undefined;
+        if (task.parentId) {
+            try {
+                // We recursively look up the parent until we find the root
+                const allTasks = await PluginService.api.getTasks();
+
+                let currentParentId = task.parentId;
+                let currentParent = allTasks.find(t => t.id === currentParentId);
+
+                // Traverse up
+                while (currentParent && currentParent.parentId) {
+                    currentParentId = currentParent.parentId;
+                    currentParent = allTasks.find(t => t.id === currentParentId);
+                }
+
+                if (currentParent) {
+                    // Resolve root task tag names
+                    let rootResolvedTagNames: string[] = [];
+                    if (currentParent.tagIds && currentParent.tagIds.length > 0) {
+                        try {
+                            const allTags = await PluginService.api.getAllTags();
+                            rootResolvedTagNames = currentParent.tagIds
+                                .map(id => allTags.find(t => t.id === id)?.title)
+                                .filter((name): name is string => !!name);
+                        } catch (e) { /* ignore */ }
+                    }
+
+                    rootTask = {
+                        tagIds: currentParent.tagIds || [],
+                        title: currentParent.title,
+                        notes: currentParent.notes,
+                        resolvedTagNames: rootResolvedTagNames
+                    };
+                }
+            } catch (e) {
+                PluginService.log.warn('Failed to fetch root task for logic check', e);
+            }
+        }
+
+        // Check if task belongs to an active quest project by looking at the project title (should have 🧭 icon)
+        let isQuestTask = false;
+        let taskProject = null;
+
+        if (task.projectId) {
+            try {
+                const allProjects = await PluginService.api.getAllProjects();
+                taskProject = allProjects.find(p => p.id === task.projectId);
+                if (taskProject && taskProject.title.includes('🧭')) {
+                    isQuestTask = true;
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        // Resolve tag names from tagIds
+        let resolvedTagNames: string[] = [];
+        if (task.tagIds && task.tagIds.length > 0) {
+            try {
+                const allTags = await PluginService.api.getAllTags();
+                resolvedTagNames = task.tagIds
+                    .map(id => allTags.find(t => t.id === id)?.title)
+                    .filter((name): name is string => !!name);
+                PluginService.log.debug('[TaskCompletionHandler] Resolved Tag Names:', resolvedTagNames);
+            } catch (e) {
+                PluginService.log.warn('Failed to resolve tag names:', e);
+            }
+        }
+
+        const taskStub: TaskStub = {
+            ...task,
+            tagIds: task.tagIds || [],
+            resolvedTagNames
+        };
+
+        const result = processTaskCompletion(newState, taskStub, currentStep, rootTask, isQuestTask);
         newState = result.newState;
         const { damageDealt } = result;
 
         // Template-based quest logic only
-        // Check if task belongs to an active quest project by looking at the project title (should have 🧭 icon)
         // ONLY process root tasks (tasks without a parent)
         if (task.projectId && !task.parentId) {
             PluginService.log.info(`[TaskCompletion] Root task completed with projectId: ${task.projectId}`);
 
             try {
-                // We need to fetch all projects to check titles
-                const allProjects = await PluginAPI.getAllProjects();
-                const taskProject = allProjects.find(p => p.id === task.projectId);
+                // We already fetched projects above if needed
+                if (!taskProject) {
+                    const allProjects = await PluginService.api.getAllProjects();
+                    taskProject = allProjects.find(p => p.id === task.projectId);
+                }
 
                 if (taskProject && taskProject.title.includes('🧭')) {
                     PluginService.log.info(`[TaskCompletion] Task belongs to active quest: "${taskProject.title}"`);
 
                     // Extract the base title (remove 🧭 and trim)
                     const baseTitle = taskProject.title.replace('🧭', '').trim();
+
+                    const allProjects = await PluginService.api.getAllProjects();
 
                     // Find the template project (📜 + same base title)
                     const templateProject = allProjects.find(p =>
@@ -76,7 +160,7 @@ export class TaskCompletionHandler {
                         PluginService.log.info(`[TaskCompletion] Found template: "${templateProject.title}" (ID: ${templateProject.id})`);
 
                         // Get all tasks from the active quest
-                        const allTasks = await PluginAPI.getTasks();
+                        const allTasks = await PluginService.api.getTasks();
 
                         // New Logic: Check if the *completed* task has a sourceIndex
                         let targetIndexToLoad = 0;
@@ -122,7 +206,7 @@ export class TaskCompletionHandler {
                             PluginService.log.info(`[TaskCompletion] No more tasks - Quest completed!`);
 
                             try {
-                                await PluginAPI.updateProject(task.projectId, {
+                                await PluginService.api.updateProject(task.projectId, {
                                     title: taskProject.title.replace('🧭', '✅')
                                 });
                                 PluginService.log.info(`[TaskCompletion] Updated project icon to ✅`);
@@ -144,7 +228,6 @@ export class TaskCompletionHandler {
             } catch (error) {
                 PluginService.log.error('[TaskCompletion] Error checking for quest:', error);
             }
-        } else {
             if (task.parentId) {
                 PluginService.log.info(`[TaskCompletion] Subtask completed (parentId: ${task.parentId}) - ignoring for quest progression`);
             } else {
@@ -152,51 +235,186 @@ export class TaskCompletionHandler {
             }
         }
 
+        // --- Dynamic Boss Context (Sibling Damage) ---
+        // If we don't have a valid currentStep for a boss, check if any sibling is a BOSS
+        // This supports V2 Project structure where "Dragon [HP:100]" is a sibling subtask.
+        let dynamicStep = currentStep;
+        let bossTaskId: string | null = null; // Store boss task ID for updates
+        let bossOriginalTitle: string | null = null;
+
+        const noActiveBossLogic = !currentStep || currentStep.completion.type !== 'boss_defeat';
+
+        if (noActiveBossLogic) {
+            try {
+                // Find siblings and check for Boss
+                // BossService now returns both config AND taskId
+                const bossResult = await BossService.scanForSiblingBoss(task);
+
+                if (bossResult) {
+                    const { config: boss, taskId } = bossResult;
+                    bossTaskId = taskId;
+
+                    PluginService.log.info(`[TaskCompletion] Found Sibling Boss: ${boss.name} (Task ID: ${taskId})`);
+
+                    // Read HP from boss task's JSON (stateless - no caching)
+                    // The boss config already has the current HP from JSON or title
+                    newState.activeBoss = {
+                        ...boss,
+                        isDead: boss.isDead ?? false
+                    };
+
+                    // Store original title for later update
+                    const allTasks = await PluginService.api.getTasks() as unknown as Task[];
+                    const bossTask = allTasks.find(t => t.id === taskId);
+                    if (bossTask) {
+                        // Try to get original title from JSON notes
+                        try {
+                            const match = bossTask.notes?.match(/```json\s*([\s\S]*?)\s*```/);
+                            if (match && match[1]) {
+                                const data = JSON.parse(match[1]);
+                                bossOriginalTitle = data.meta?.originalTitle || bossTask.title;
+                            } else {
+                                bossOriginalTitle = bossTask.title;
+                            }
+                        } catch (e) {
+                            bossOriginalTitle = bossTask.title;
+                        }
+                    }
+
+                    PluginService.log.info(`[TaskCompletion] Boss HP from source: ${boss.hp}/${boss.maxHp}`);
+
+                    // Create Synthetic Step using the CURRENT HP from the boss task
+                    dynamicStep = {
+                        id: 999, // Synthetic ID
+                        title: 'Dynamic Boss Battle',
+                        xpReward: 0,
+                        completion: {
+                            type: 'boss_defeat',
+                            config: {
+                                boss: {
+                                    hp: boss.hp,
+                                    maxHp: boss.maxHp,
+                                    isDead: boss.isDead,
+                                    name: boss.name,
+                                    themeColor: boss.themeColor
+                                }
+                            }
+                        }
+                    };
+                }
+            } catch (e) {
+                PluginService.log.error('Error in Dynamic Boss Context', e);
+            }
+        }
+
+
         // Show damage notification for boss hits (if any generic boss logic remains)
-        if (damageDealt > 0) {
+        // We run the logic with the potentially synthetic step
+        // Rerun processTaskCompletion? No, we ran it at the top (line 82) with `currentStep`.
+        // If `currentStep` was undefined/wrong, `processTaskCompletion` did NO damage.
+        // We must run it AGAIN if we found a dynamic boss.
+        let finalDamage = damageDealt;
+
+        if (dynamicStep && dynamicStep !== currentStep) {
+            PluginService.log.info('[TaskCompletion] Re-running logic with Dynamic Boss Step');
+            // FORCE isQuestTask = true because we explicitly found a Boss Context locally.
+            // This bypasses the need for the 🧭 project icon or #QuestArc tags when fighting a visible boss.
+            const forcedQuestContext = true;
+            const reRunResult = processTaskCompletion(newState, { ...task, tagIds: task.tagIds || [] }, dynamicStep, rootTask, forcedQuestContext);
+            newState = reRunResult.newState;
+            finalDamage = reRunResult.damageDealt;
+
+            // Use task updates from the re-run result (GRIND/HABIT progress)
+            if (reRunResult.taskUpdates) {
+                try {
+                    const diff: Partial<Task> = { ...reRunResult.taskUpdates };
+                    if (task.isDone === diff.isDone) delete diff.isDone;
+                    if (task.title === diff.title) delete diff.title;
+                    if (task.notes && diff.notes && task.notes.trim() === diff.notes.trim()) delete diff.notes;
+
+                    if (Object.keys(diff).length > 0) {
+                        PluginService.log.info('[TaskCompletion] Applying task updates (from re-run):', diff);
+                        await PluginService.api.updateTask(task.id, diff);
+                    }
+                } catch (e) {
+                    PluginService.log.error('Failed to apply re-run task updates', e);
+                }
+            }
+        }
+
+        // Update Boss Task JSON with new HP (Stateless Boss HP)
+        // If we didn't find a sibling boss (bossTaskId is null), try to find the boss in the ACTIVE PROJECT
+        if (finalDamage > 0 && !bossTaskId && newState.activeStory.id) {
+            try {
+                const projectBoss = await BossService.scanProjectForBoss(newState.activeStory.id);
+                if (projectBoss) {
+                    bossTaskId = projectBoss.taskId;
+                    PluginService.log.info(`[TaskCompletion] Found Remote Boss Task: ${projectBoss.config.name} (ID: ${bossTaskId})`);
+
+                    // fetch original title
+                    const allTasks = await PluginService.api.getTasks() as unknown as Task[];
+                    const bTask = allTasks.find(t => t.id === bossTaskId);
+                    if (bTask) {
+                        try {
+                            const match = bTask.notes?.match(/```json\s*([\s\S]*?)\s*```/);
+                            if (match && match[1]) {
+                                const data = JSON.parse(match[1]);
+                                bossOriginalTitle = data.meta?.originalTitle || bTask.title;
+                            } else {
+                                bossOriginalTitle = bTask.title;
+                            }
+                        } catch (e) {
+                            bossOriginalTitle = bTask.title;
+                        }
+                    }
+                }
+            } catch (e) {
+                PluginService.log.error('Failed to lookup remote boss task', e);
+            }
+        }
+
+        if (finalDamage > 0 && bossTaskId && bossOriginalTitle && newState.activeBoss) {
+            try {
+                const newHp = newState.activeBoss.hp;
+                const maxHp = newState.activeBoss.maxHp;
+
+                await BossService.updateBossHp(bossTaskId, newHp, maxHp, bossOriginalTitle);
+            } catch (e) {
+                PluginService.log.error('Failed to update boss task HP', e);
+            }
+        }
+
+        if (finalDamage > 0) {
+            const bossName = newState.activeBoss?.name || 'Boss';
             PluginService.showSnack(
-                `💥 Dealt ${damageDealt} damage to boss! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
+                `💥 Dealt ${finalDamage} damage to ${bossName}! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
                 'SUCCESS'
             );
         }
 
-        // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet)
-        if (result.taskUpdates) {
+        // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet) - Only if not already applied above
+        const updates = result.taskUpdates; // Original updates (from first pass)
+
+        if (updates && (!dynamicStep || dynamicStep === currentStep)) {
             try {
-                // GUARD: Prevent infinite loops by checking if update is redundant.
                 const currentIsDone = task.isDone;
-                const newIsDone = result.taskUpdates.isDone;
+                const newIsDone = updates.isDone;
 
-                const updatesToApply: Partial<Task> = { ...result.taskUpdates };
+                const diff: Partial<Task> = { ...updates };
+                if (currentIsDone === true && newIsDone === true) delete diff.isDone;
+                if (task.title === diff.title) delete diff.title;
+                if (task.notes && diff.notes && task.notes.trim() === diff.notes.trim()) delete diff.notes;
 
-                // If task is already done, and we want it done -> remove isDone from update
-                if (currentIsDone === true && newIsDone === true) {
-                    delete updatesToApply.isDone;
+                if (Object.keys(diff).length > 0) {
+                    PluginService.log.info('[TaskCompletion] Applying task updates (from first pass):', diff);
+                    await PluginService.api.updateTask(task.id, diff);
                 }
-
-                // If title unchanged -> remove title
-                if (task.title === updatesToApply.title) {
-                    delete updatesToApply.title;
-                }
-
-                // If notes unchanged -> remove notes
-                if (task.notes && updatesToApply.notes && task.notes.trim() === updatesToApply.notes.trim()) {
-                    delete updatesToApply.notes;
-                }
-
-                // Only update if there are keys left
-                if (Object.keys(updatesToApply).length > 0) {
-                    // Cast to any to bypass strict type mismatch between local Task type and PluginAPI Task type if they differ
-                    await PluginAPI.updateTask(task.id, updatesToApply as any);
-                } else {
-                    PluginService.log.info('Skipping redundant task update to prevent loops.');
-                }
-
-            } catch (err) {
-                PluginService.log.error('Failed to update task properties', err);
+            } catch (e) {
+                PluginService.log.error('Failed to apply task updates', e);
             }
         }
 
+        // Save state
         await saveCallback(newState);
     }
 }

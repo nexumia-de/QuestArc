@@ -21,6 +21,7 @@ interface ViewRouterProps {
         resetGame: () => void;
         clearErrorMessage: () => void;
         cancelQuest: () => Promise<void>;
+        handleUpdateSettings: (settings: QuestArcState['settings']) => Promise<void>;
     };
 }
 
@@ -41,8 +42,10 @@ const ViewRouter: Component<ViewRouterProps> = (props) => {
 
             <Show when={props.view === 'settings'}>
                 <SettingsView
+                    settings={props.state.settings}
                     onNavigate={props.actions.setView}
                     onReset={props.actions.resetGame}
+                    onUpdateSettings={props.actions.handleUpdateSettings}
                 />
             </Show>
         </div>

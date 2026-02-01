@@ -144,6 +144,62 @@ export const useQuestArc = () => {
         }
     };
 
+    const pauseQuest = async (onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<{ success: boolean; error?: string }>(
+                MESSAGE_TYPES.PAUSE_QUEST
+            );
+            if (response && response.success) {
+                await refreshState();
+                if (onSuccess) onSuccess();
+            } else {
+                logger.error('Failed to pause quest:', response?.error);
+                setActionError(response?.error || 'Failed to pause quest');
+            }
+        } catch (error) {
+            logger.error('Pause quest error:', error);
+            setActionError('Failed to pause quest');
+        }
+    };
+
+    const resumeQuest = async (projectId: string, onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<{ success: boolean; error?: string }>(
+                MESSAGE_TYPES.RESUME_QUEST,
+                { projectId }
+            );
+            if (response && response.success) {
+                await refreshState();
+                if (onSuccess) onSuccess();
+            } else {
+                logger.error('Failed to resume quest:', response?.error);
+                setActionError(response?.error || 'Failed to resume quest');
+            }
+        } catch (error) {
+            logger.error('Resume quest error:', error);
+            setActionError('Failed to resume quest');
+        }
+    };
+
+    const updateSettings = async (settings: QuestArcState['settings'], onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<{ success: boolean; error?: string }>(
+                MESSAGE_TYPES.UPDATE_SETTINGS,
+                { settings }
+            );
+            if (response && response.success) {
+                await refreshState();
+                if (onSuccess) onSuccess();
+            } else {
+                logger.error('Failed to update settings:', response?.error);
+                setActionError(response?.error || 'Failed to update settings');
+            }
+        } catch (error) {
+            logger.error('Update settings error:', error);
+            setActionError('Failed to update settings');
+        }
+    };
+
     return {
         state,
         actionError,
@@ -154,6 +210,9 @@ export const useQuestArc = () => {
         resetGame,
         setActionError,
         deleteStory,
-        cancelQuest
+        cancelQuest,
+        pauseQuest,
+        resumeQuest,
+        updateSettings
     };
 };

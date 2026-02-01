@@ -10,6 +10,9 @@ export enum MESSAGE_TYPES {
   UPDATE_PROFILE = 'UPDATE_PROFILE',
   DELETE_STORY = 'DELETE_STORY',
   CANCEL_QUEST = 'CANCEL_QUEST',
+  PAUSE_QUEST = 'PAUSE_QUEST',
+  RESUME_QUEST = 'RESUME_QUEST',
+  UPDATE_SETTINGS = 'UPDATE_SETTINGS',
 }
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -63,4 +66,19 @@ export interface CancelQuestMessage extends BaseMessage {
   payload?: null;
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage;
+export interface PauseQuestMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.PAUSE_QUEST;
+  payload?: null;
+}
+
+export interface ResumeQuestMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.RESUME_QUEST;
+  payload: { projectId: string };
+}
+
+export interface UpdateSettingsMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.UPDATE_SETTINGS;
+  payload: { settings: QuestArcState['settings'] };
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage | PauseQuestMessage | ResumeQuestMessage | UpdateSettingsMessage;

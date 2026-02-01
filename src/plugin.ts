@@ -9,6 +9,7 @@ import { TaskService } from './services/TaskService';
 import { TaskCompletionHandler } from './handlers/TaskCompletionHandler';
 import { TaskUndoHandler } from './handlers/TaskUndoHandler';
 import { MessageHandler } from './handlers/MessageHandler';
+import { ContextHandler } from './handlers/ContextHandler';
 
 
 let state: QuestArcState;
@@ -16,13 +17,29 @@ let state: QuestArcState;
 const api = PluginService.api;
 const updateChannel = new BroadcastChannel('quest-arc-updates');
 
+// Basic debounce implementation
+let saveTimeout: any = null;
+const SAVE_DELAY = 1500; // 1.5s delay to satisfy rate limit
+
 async function saveState(newState?: QuestArcState) {
   if (newState) state = newState;
-  await PluginService.saveState(JSON.stringify(state));
+
+  // Always update header immediately for UI responsiveness
+  HeaderService.updateHeader(state);
   updateChannel.postMessage('UPDATE');
 
-  // Update header UI to reflect new state (XP, Level, Boss HP)
-  HeaderService.updateHeader(state);
+  // Cancel pending save
+  if (saveTimeout) clearTimeout(saveTimeout);
+
+  // Schedule new save
+  saveTimeout = setTimeout(async () => {
+    try {
+      await PluginService.saveState(JSON.stringify(state));
+    } catch (e) {
+      PluginService.log.error('Failed to save state:', e);
+    }
+    saveTimeout = null;
+  }, SAVE_DELAY);
 }
 
 async function init() {
@@ -82,25 +99,32 @@ async function init() {
   }
 }
 
+
+
 // Hooks
 api.registerHook('taskComplete' as any, async (payload: unknown) => {
   await TaskCompletionHandler.handle(state, payload, saveState);
 });
 
 api.registerHook('taskUpdate' as any, async (payload: unknown) => {
-  // payload: { task: Task, oldTask: Task } or just task?
-  // Docs say taskUpdate returns "taskUpdate(task, updates, isRecursive)"? No, let's check docs again if needed.
-  // Actually usually it passes the task. 
-  // We need to check if isDone changed from true to false.
-  // BUT `taskUpdate` usually triggers on ANY update.
   const updatePayload = payload as { task: unknown };
-  const task = updatePayload.task as any; // Type casting for safety
+  const task = updatePayload.task as any;
 
-  if (task && task.isDone === false) {
-    // It *might* be an undo.
-    // We check if we have progress recorded for it.
+  if (!task) return;
+
+  // 1. Undo Handling
+  if (task.isDone === false) {
     await TaskUndoHandler.handle(state, task, saveState);
   }
+
+  // 2. Boss Detection (Context Update)
+  // If I rename a task or move it, re-check context.
+  await ContextHandler.handle(task.id, state, saveState);
+});
+
+api.registerHook('currentTaskChange' as any, async (taskId: unknown) => {
+  // Proactive Boss Detection on Context Switch
+  await ContextHandler.handle(taskId as string | null, state, saveState);
 });
 
 // UI Communication

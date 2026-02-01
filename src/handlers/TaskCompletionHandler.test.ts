@@ -2,20 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TaskCompletionHandler } from './TaskCompletionHandler';
 import { PluginService } from '../services/PluginService';
 
+// Mock PluginAPI global
+const mockPluginAPI = {
+    updateTask: vi.fn(),
+    getTasks: vi.fn(),
+    getAllProjects: vi.fn()
+};
+(global as any).PluginAPI = mockPluginAPI;
+
 // Mock PluginService
 vi.mock('../services/PluginService', () => ({
     PluginService: {
         log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
-        showSnack: vi.fn()
+        showSnack: vi.fn(),
+        get api() { return (global as any).PluginAPI; }
     }
 }));
-
-// Mock PluginAPI global
-const mockPluginAPI = {
-    updateTask: vi.fn(),
-    getTasks: vi.fn()
-};
-(global as any).PluginAPI = mockPluginAPI;
 
 describe('TaskCompletionHandler', () => {
     beforeEach(() => {
@@ -46,10 +48,13 @@ describe('TaskCompletionHandler', () => {
 
         // Expect notes to be updated to current: 1
         const updates = mockPluginAPI.updateTask.mock.calls[0][1];
-        expect(updates.notes).toContain('"current": 1');
+        expect(updates).toBeDefined();
+        if (updates) {
+            expect(updates.notes).toContain('"current": 1');
+        }
 
         // Expect isDone: false (keep unchecked)
-        expect(updates.isDone).toBe(false);
+        expect(updates?.isDone).toBe(false);
 
         // Expect saveCallback
         expect(saveCallback).toHaveBeenCalled();
@@ -74,5 +79,58 @@ describe('TaskCompletionHandler', () => {
         expect(mockPluginAPI.updateTask).toHaveBeenCalledWith(taskId, expect.objectContaining({
             isDone: false
         }));
+    });
+    it('should DETECT sibling boss and deal damage (Dynamic Boss Context)', async () => {
+        const saveCallback = vi.fn();
+
+        // Setup: Sibling tasks (Boss + Worker)
+        const parentId = 'p1';
+        const bossTask = {
+            id: 'boss1',
+            title: 'Dragon [HP:100]',
+            parentId: parentId,
+            isDone: false
+        };
+        const workerTask = {
+            id: 'w1',
+            title: 'Attack',
+            parentId: parentId,
+            projectId: 'proj1',
+            isDone: true
+        };
+
+        // Mock getTasks to return siblings
+        mockPluginAPI.getTasks = vi.fn().mockResolvedValue([bossTask, workerTask]);
+
+        // Mock getAllProjects to return a Quest Project (with 🧭)
+        (PluginService.api as any).getAllProjects = vi.fn().mockResolvedValue([
+            { id: 'proj1', title: 'My Quest 🧭' }
+        ]);
+
+        // State with NO active boss and NO story
+        const noBossState: any = {
+            activeStory: { isCompleted: false, currentStepId: 999, taskProgress: {} }, // Invalid step
+            profile: { xp: 0, level: 1 },
+            stories: [],
+            activeBoss: null
+        };
+
+        // Mock Math.random to avoid crits (0.5 < 0.8)
+        const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+        await TaskCompletionHandler.handle(noBossState, { task: workerTask }, saveCallback);
+
+        // Expect activeBoss to be initialized in the NEW state passed to saveCallback
+        const savedState = saveCallback.mock.calls[0][0];
+        expect(savedState.activeBoss).not.toBeNull();
+        expect(savedState.activeBoss?.name).toBe('Dragon');
+
+        // Expect damage snackbar
+        expect(PluginService.showSnack).toHaveBeenCalledWith(
+            expect.stringContaining('Dealt 10 damage to Dragon'),
+            'SUCCESS'
+        );
+
+        randomSpy.mockRestore();
     });
 });
