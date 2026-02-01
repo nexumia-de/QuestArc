@@ -47,6 +47,20 @@ export class TaskCompletionHandler {
 
         PluginService.log.info('Task completed!', task);
 
+        // --- 0. BOSS GUARD: Prevent Manual Completion ---
+        // If the user ticked a task that IS a Boss (has HP meta), we must block it if HP > 0.
+        // Bosses can ONLY be defeated via damage (which auto-closes them).
+        const bossConfig = BossService.extractBossConfig(task);
+        if (bossConfig && bossConfig.hp > 0) {
+            PluginService.log.warn(`[TaskCompletion] Blocked manual completion of Boss "${task.title}" (HP: ${bossConfig.hp})`);
+
+            // Immediately revert the tick
+            await PluginService.api.updateTask(task.id, { isDone: false });
+
+            PluginService.showSnack('⛔ You cannot defeat the boss by clicking! Attack it with tasks!', 'ERROR');
+            return; // Stop processing
+        }
+
         // Process task completion for game logic (XP, damage, etc.) first
         let newState = state;
 
@@ -386,10 +400,20 @@ export class TaskCompletionHandler {
 
         if (finalDamage > 0) {
             const bossName = newState.activeBoss?.name || 'Boss';
-            PluginService.showSnack(
-                `💥 Dealt ${finalDamage} damage to ${bossName}! HP: ${newState.activeBoss?.hp}/${newState.activeBoss?.maxHp}`,
-                'SUCCESS'
-            );
+            const currentHp = newState.activeBoss?.hp ?? 0;
+            const maxHp = newState.activeBoss?.maxHp ?? 100;
+
+            if (newState.activeBoss && newState.activeBoss.hp <= 0) {
+                PluginService.showSnack(
+                    `🎉 VICTORY! You defeated ${bossName}! 🏆`,
+                    'SUCCESS'
+                );
+            } else {
+                PluginService.showSnack(
+                    `💥 Dealt ${finalDamage} damage to ${bossName}! HP: ${currentHp}/${maxHp}`,
+                    'SUCCESS'
+                );
+            }
         }
 
         // Apply task updates (e.g. for Grinds/Habits that shouldn't complete yet) - Only if not already applied above

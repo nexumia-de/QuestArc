@@ -97,4 +97,5 @@
 | 092 | 2026-01-25 | Feature: Dynamic Sibling Boss Damage (V2 Projects). | [./092/](./092/) | Antigravity |
 | 093 | 2026-01-29 | Feature: Stateless Boss HP & Custom Damage Config ([dmg], [dmgevery]). | [./093/](./093/) | Antigravity |
 | 094 | 2026-01-31 | Refactor: Move QuestManager to Brain & Fix Persistence Violation. | [./094/](./094/) | Antigravity |
-| 095 | 2026-01-31 | Feature: Custom Damage Tags & Settings UI. | [./095/](./095/) | Antigravity |
+| 095 | 2026-02-01 | Feature: Custom Damage Tags & Settings UI. | [./095/](./095/) | Antigravity |
+| 096 | 2026-02-01 | Feature: Boss Interaction Logic (Guard Manual Kill). | [./096/](./096/) | Antigravity |
