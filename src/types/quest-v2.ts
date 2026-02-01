@@ -8,6 +8,7 @@ export interface QuestTaskData {
         sourceIndex?: number; // Original index in template (for sequential loading)
         damage?: number; // Custom damage amount (e.g. [dmg:10])
         damageEvery?: number; // Custom damage frequency (e.g. [dmgevery:1])
+        frequency?: string; // [freq:...] value
     };
 
     // For Story Steps (Parents)
@@ -21,6 +22,7 @@ export interface QuestTaskData {
         target?: number; // HP or Repetitions
         unit?: string;  // e.g., "HP"
         lastUpdated?: number;
+        lastDoneDate?: string; // Human readable ISO date (manual override)
         streak?: {
             current: number;
             target?: number; // Optional target to complete something

@@ -98,4 +98,4 @@ Any task without special tags is a standard single-action task.
 **Do not type these manually.** The game adds them to show progress.
 
 *   `(1/5)`: Progress counter for Grinds/Habits.
-*   `🔥 3/7`: Streak tracking.
+*   `3/7 🔥`: Streak tracking.

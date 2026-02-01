@@ -32,6 +32,10 @@ export class BossService {
                             isDead: data.progress.current <= 0,
                             themeColor: '#ff0000'
                         };
+                    } else if (data.meta?.type && data.meta.type !== 'BOSS') {
+                        // If it's explicitly marked as something else (HABIT, GRIND), 
+                        // do NOT fall back to regex parsing.
+                        return null;
                     }
                 }
             } catch (e) { /* ignore parse errors */ }
@@ -145,7 +149,7 @@ export class BossService {
             // FIX: Allow checking subtasks too. The boss might be a subtask of a "Step" task.
             const projectTasks = allTasks.filter(t => t.projectId === projectId);
 
-            PluginService.log.info(`[BossService] Scanning ${projectTasks.length} root tasks in project ${projectId} for boss.`);
+            PluginService.log.debug(`[BossService] Scanning ${projectTasks.length} root tasks in project ${projectId} for boss.`);
 
             const bossTask = projectTasks.find(t => {
                 if (t.isDone) return false;

@@ -1,16 +1,19 @@
 import { Task } from '../types/plugin-api';
 import { QuestArcState } from '../types/state';
 import { processTaskCompletion, TaskStub } from '../lib/game-logic';
+
 import { PluginService } from '../services/PluginService';
 import { CompilerService } from '../services/compiler.service';
 import { BossService } from '../services/BossService';
 
 
 export class TaskCompletionHandler {
+
+
     static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
         let task: Task;
 
-        // Normalize payload to get ID
+        // ... (existing payload normalization) ...
         let taskId: string;
         if (typeof payload === 'string') {
             taskId = payload;
@@ -20,7 +23,7 @@ export class TaskCompletionHandler {
             taskId = (payload as Task).id;
         }
 
-        // Always fetch fresh task from API to ensure parentId/projectId are present and correct
+        // Always fetch fresh task from API
         try {
             const tasks = await PluginService.api.getTasks();
             const found = tasks.find(t => t.id === taskId);
@@ -33,6 +36,10 @@ export class TaskCompletionHandler {
             PluginService.log.error('Failed to fetch tasks', e);
             return;
         }
+
+        // Note: Blocking logic for HABIT tasks is now handled entirely by game-logic.ts
+        // using lastDoneDate as the source of truth. No in-memory guard needed here.
+        // GRIND tasks have no frequency restriction and are handled by their own logic.
 
         if (state.activeStory.isCompleted) {
             PluginService.log.info('Task completed for completed quest. Ignoring.');
@@ -50,15 +57,67 @@ export class TaskCompletionHandler {
         // --- 0. BOSS GUARD: Prevent Manual Completion ---
         // If the user ticked a task that IS a Boss (has HP meta), we must block it if HP > 0.
         // Bosses can ONLY be defeated via damage (which auto-closes them).
-        const bossConfig = BossService.extractBossConfig(task);
-        if (bossConfig && bossConfig.hp > 0) {
-            PluginService.log.warn(`[TaskCompletion] Blocked manual completion of Boss "${task.title}" (HP: ${bossConfig.hp})`);
+        // IMPORTANT: Check JSON type first - we don't want to block Habits/Grinds with progress counters.
+        let taskType: string | null = null;
+        try {
+            const match = task.notes?.match(/```json\s*([\s\S]*?)\s*```/);
+            if (match && match[1]) {
+                const data = JSON.parse(match[1]);
+                taskType = data.meta?.type || null;
+            }
+        } catch (e) { /* ignore */ }
 
-            // Immediately revert the tick
-            await PluginService.api.updateTask(task.id, { isDone: false });
+        // Only apply Boss Guard if task is explicitly a BOSS type
+        if (taskType === 'BOSS') {
+            const bossConfig = BossService.extractBossConfig(task);
+            if (bossConfig && bossConfig.hp > 0) {
+                PluginService.log.warn(`[TaskCompletion] Blocked manual completion of Boss "${task.title}" (HP: ${bossConfig.hp})`);
 
-            PluginService.showSnack('⛔ You cannot defeat the boss by clicking! Attack it with tasks!', 'ERROR');
-            return; // Stop processing
+                // Immediately revert the tick
+                await PluginService.api.updateTask(task.id, { isDone: false });
+
+                PluginService.showSnack('⛔ You cannot defeat the boss by clicking! Attack it with tasks!', 'ERROR');
+                return; // Stop processing
+            }
+        }
+
+        // --- 1. STRUCTURE GUARD: Enforce Parent/Child Logic (Active Quest Only) ---
+        if (state.activeStory.id && task.projectId === state.activeStory.id) {
+            try {
+                const allTasks = await PluginService.api.getTasks();
+
+                // A. BLOCK PARENT: Cannot complete if subtasks are open
+                if (task.subTaskIds && task.subTaskIds.length > 0) {
+                    const openSubtasks = allTasks.filter(t => task.subTaskIds?.includes(t.id) && !t.isDone);
+                    if (openSubtasks.length > 0) {
+                        PluginService.log.warn(`[TaskCompletion] Blocked parent completion. ${openSubtasks.length} subtasks open.`);
+
+                        await PluginService.api.updateTask(task.id, { isDone: false });
+                        PluginService.showSnack('⛔ [Quest] Step incomplete! Finish all subtasks first.', 'ERROR');
+                        return;
+                    }
+                }
+
+                // B. AUTO-FINISH PARENT: If this is a subtask, check if parent should close
+                if (task.parentId) {
+                    const parent = allTasks.find(t => t.id === task.parentId);
+                    if (parent && parent.subTaskIds && !parent.isDone) {
+                        // Check if ALL subtasks are now done (including this one, which is technically done but maybe not in cache yet)
+                        // We assume 'task' is done because this handler fired.
+                        const siblings = allTasks.filter(t => parent.subTaskIds?.includes(t.id));
+                        const allDone = siblings.every(t => t.id === task.id ? true : t.isDone); // Force true for current
+
+                        if (allDone) {
+                            PluginService.log.info(`[TaskCompletion] All subtasks done. Auto-completing parent "${parent.title}"`);
+                            await PluginService.api.updateTask(parent.id, { isDone: true });
+                            PluginService.showSnack('✅ [Quest] Step Completed!', 'SUCCESS');
+                        }
+                    }
+                }
+
+            } catch (e) {
+                PluginService.log.error('Structure Guard Error', e);
+            }
         }
 
         // Process task completion for game logic (XP, damage, etc.) first
@@ -142,6 +201,64 @@ export class TaskCompletionHandler {
         };
 
         const result = processTaskCompletion(newState, taskStub, currentStep, rootTask, isQuestTask);
+
+        if (result.shouldBlock) {
+            PluginService.log.warn(`[TaskCompletion] Blocked: ${result.blockReason}`);
+            await PluginService.api.updateTask(task.id, { isDone: false });
+
+            // Show appropriate notification based on reason
+            if (result.blockReason === 'ALREADY_DONE_TODAY') {
+                PluginService.showSnack('✅ Daily goal already completed for today!', 'SUCCESS');
+            } else {
+                PluginService.showSnack(`⛔ ${result.blockReason}`, 'ERROR');
+            }
+            return;
+        }
+
+        // Show habit/grind completion notification (first time only)
+        if (taskType === 'HABIT' || taskType === 'GRIND') {
+
+            // First-time completion of habit/grind for this cycle
+            // Check if we reached a streak milestone
+            if (result.taskUpdates?.notes) {
+                try {
+                    const match = result.taskUpdates.notes.match(/```json\s*([\s\S]*?)\s*```/);
+                    if (match && match[1]) {
+                        const data = JSON.parse(match[1]);
+                        const isGrind = data.meta?.type === 'GRIND';
+                        const progress = data.progress;
+
+                        if (isGrind) {
+                            // Grinds show progress, not cycles
+                            if (progress?.current >= progress?.target) {
+                                PluginService.showSnack(`🎉 Grind Complete! ${progress.current}/${progress.target}`, 'SUCCESS');
+                            } else {
+                                PluginService.showSnack(`✅ Progress: ${progress.current}/${progress.target}`, 'SUCCESS');
+                            }
+                        } else {
+                            // Habits have streaks and cycles
+                            const streak = data.progress?.streak;
+                            if (streak?.target && streak?.current) {
+                                if (streak.current >= streak.target) {
+                                    PluginService.showSnack(`🎉 Streak Challenge Complete! ${streak.current}/${streak.target} 🔥`, 'SUCCESS');
+                                } else {
+                                    PluginService.showSnack(`🔥 Streak: ${streak.current}/${streak.target} - Keep it going!`, 'SUCCESS');
+                                }
+                            } else if (streak?.current) {
+                                PluginService.showSnack(`🔥 ${streak.current} day streak! Come back tomorrow.`, 'SUCCESS');
+                            } else {
+                                PluginService.showSnack(`✅ Task completed! Come back next cycle.`, 'SUCCESS');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    PluginService.showSnack(`✅ Task completed!`, 'SUCCESS');
+                }
+            } else {
+                PluginService.showSnack(`✅ Task completed!`, 'SUCCESS');
+            }
+        }
+
         newState = result.newState;
         const { damageDealt } = result;
 
@@ -218,6 +335,9 @@ export class TaskCompletionHandler {
                         } else {
                             // Quest completed! Change icon from 🧭 to ✅
                             PluginService.log.info(`[TaskCompletion] No more tasks - Quest completed!`);
+
+                            // CRITICAL FIX: Mark the story as completed in the state so we can start new ones
+                            newState.activeStory.isCompleted = true;
 
                             try {
                                 await PluginService.api.updateProject(task.projectId, {
@@ -398,7 +518,8 @@ export class TaskCompletionHandler {
             }
         }
 
-        if (finalDamage > 0) {
+        // Only show boss messages if we actually have a boss context (not just random damage)
+        if (finalDamage > 0 && bossTaskId) {
             const bossName = newState.activeBoss?.name || 'Boss';
             const currentHp = newState.activeBoss?.hp ?? 0;
             const maxHp = newState.activeBoss?.maxHp ?? 100;

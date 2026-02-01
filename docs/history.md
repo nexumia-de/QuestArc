@@ -16,8 +16,7 @@
 | 011 | 2026-01-02 | UI Polish: Compact header and cleaner cards. | [./011/](./011/) | Antigravity |
 | 012 | 2026-01-02 | Fix Dark Mode Contrast. | [./012/](./012/) | Antigravity |
 | 013 | 2026-01-02 | Robust Dark Mode Fix. | [./013/](./013/) | Antigravity |
-| 014 | 2026-01-02 | Design Alignment: Material Theme. | [./014/](./014/) | Antigravity |
-| 015 | 2026-01-02 | Code Review & Refactoring: Immutability and DRY fixes. | [./015/](./015/) | Gemini |
+| 101 | 2026-02-01 | Habit UI Refinements: Next Run Indicator & Readable Dates. | [./101/](./101/) | Antigravity |
 | 016 | 2026-01-02 | Multi-Step "Heroic Story" Editor. | [./016/](./016/) | Antigravity |
 | 017 | 2026-01-02 | Logic Update: Sync Task Title on Step Complete | [./017/](./017/) | Antigravity |
 | 018 | 2026-01-02 | Refactor StoryCard Component | [./018/](./018/) | Antigravity |
@@ -99,3 +98,6 @@
 | 094 | 2026-01-31 | Refactor: Move QuestManager to Brain & Fix Persistence Violation. | [./094/](./094/) | Antigravity |
 | 095 | 2026-02-01 | Feature: Custom Damage Tags & Settings UI. | [./095/](./095/) | Antigravity |
 | 096 | 2026-02-01 | Feature: Boss Interaction Logic (Guard Manual Kill). | [./096/](./096/) | Antigravity |
+| 097 | 2026-02-01 | Feature: Structure Enforcement (Auto-Finish & Blocking). | [./097/](./097/) | Antigravity |
+| 098 | 2026-02-01 | Bug Fix: Zombie Quest State (Fix `isCompleted` update). | - | Antigravity |
+| 099 | 2026-02-01 | Feature: Frequency & Streak Logic (Double-Dip Guard + Sticky Streaks). | [./099/](./099/) | Antigravity |

@@ -35,7 +35,7 @@ export class PluginService {
         info: (msg: string, ...args: any[]) => this.api.log.info(msg, ...args),
         warn: (msg: string, ...args: any[]) => this.api.log.warn(msg, ...args),
         error: (msg: string, ...args: any[]) => this.api.log.error(msg, ...args),
-        debug: (msg: string, ...args: any[]) => this.api.log.info(`[DEBUG] ${msg}`, ...args),
+        debug: (msg: string, ...args: any[]) => console.debug(`[QuestArc DEBUG] ${msg}`, ...args),
     };
 
     static showSnack(msg: string, type: 'SUCCESS' | 'ERROR') {

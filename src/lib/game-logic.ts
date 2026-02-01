@@ -27,6 +27,7 @@ export function initializeBossIfNeeded(
   return state;
 }
 
+import { CronHelper } from './cron';
 import { parseXpTag, compileTaskData, formatTaskTitle, cleanTaskTitle } from './parsers';
 import { Task } from '../types/plugin-api';
 
@@ -56,6 +57,8 @@ export function processTaskCompletion(
   stepCompleted: boolean;
   leveledUp: boolean;
   taskUpdates?: Partial<Task>;
+  shouldBlock?: boolean;
+  blockReason?: string;
 } {
   let damageDealt = 0;
   let xpGained = 0;
@@ -97,6 +100,20 @@ export function processTaskCompletion(
     }
   } else if (type === 'HABIT') {
     const result = processHabitProgress(questData, cleanTitle);
+
+    // Check for block FIRST
+    if (result.shouldBlock) {
+      return {
+        newState,
+        damageDealt: 0,
+        xpGained: 0,
+        stepCompleted: false,
+        leveledUp: false,
+        shouldBlock: true,
+        blockReason: result.blockReason || 'BLOCKED'
+      };
+    }
+
     taskUpdates = result.updates;
     stepProgressIncrement = result.stepIncrement;
     xpGained = result.xpGained;
@@ -147,9 +164,18 @@ export function processTaskCompletion(
   const taskTitleLower = _task.title.toLowerCase();
 
   // Check [dmg:N] (Highest Priority)
+  // BUT: For Habits/Grinds, we must respect the internal 'shouldDealDamage' logic (cooldowns/double-dips).
+  // If it's a simple task, we always trigger.
   if (questData.meta.damage !== undefined) {
-    explicitDamage = questData.meta.damage;
-    customDamageTrigger = true;
+    let applyDamage = true;
+    if (type === 'HABIT' || type === 'GRIND') {
+      if (!customDamageTrigger) applyDamage = false;
+    }
+
+    if (applyDamage) {
+      explicitDamage = questData.meta.damage;
+      customDamageTrigger = true;
+    }
   }
 
   // Check Custom Tags (Check resolvedTagNames first, then fallback to title)
@@ -341,32 +367,110 @@ function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
   return null;
 }
 
-function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
-  const current = questData.progress?.current || 0;
-  const target = questData.progress?.target || 1;
-  const damageEvery = questData.meta.damageEvery !== undefined ? questData.meta.damageEvery : 1; // Default: Every time (1)
+// Helper to strip dynamic tags for clean processing
+function stripDynamicTags(title: string): string {
+  // Removes [Next: ...] and [Due: ...] tags
+  return title.replace(/\s*\[\s*(Next|Due):.*?\]/gi, '').trim();
+}
 
+function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
+  const now = Date.now();
+
+  // 0. Human Readable Date Override
+  // If user manually edited "lastDoneDate" in JSON, use that as the source of truth for lastUpdated.
+  let resolvedLastUpdated = questData.progress?.lastUpdated || 0;
+  if (questData.progress?.lastDoneDate) {
+    const manualDate = new Date(questData.progress.lastDoneDate);
+    if (!isNaN(manualDate.getTime())) {
+      resolvedLastUpdated = manualDate.getTime();
+    }
+  }
+  const lastUpdated = resolvedLastUpdated;
+
+  // Frequency Parsing
+  const rawFreq = questData.meta.frequency || 'daily';
+  // Use raw freq, CronHelper handles 'daily'/'weekly' aliases internally
+  const freqExpression = rawFreq;
+
+  const target = questData.progress?.target || 1;
+
+  // --- 1. Missed Streak Logic ---
+  if (questData.progress?.streak && lastUpdated > 0) {
+    // Check if we missed any COMPLETE execution windows between last update and now.
+    const missedCount = CronHelper.getOccurrencesBetween(freqExpression, lastUpdated, now);
+
+    // If missedCount > 1, we missed at least one complete cycle boundary AND the window closed.
+    // Example: Daily. Done Monday. Now Wednesday. MissedCount(Mon, Wed) = 2 (Tue, Wed). RESET.
+    // Daily. Done Monday. Now Tuesday. MissedCount(Mon, Tue) = 1 (Tue). KEEP.
+    if (missedCount > 1) {
+      questData.progress.streak.current = 0;
+      questData.progress.current = 0; // Reset daily progress too
+    }
+  } else if (lastUpdated === 0) {
+    // First time initialization
+    questData.progress = { ...questData.progress, current: 0 };
+  }
+
+  // --- 2. Double-Dip Guard (Anti-Cheat) ---
+  const cyclesPassed = (lastUpdated > 0)
+    ? CronHelper.getOccurrencesBetween(freqExpression, lastUpdated, now)
+    : 1; // First time counts as new cycle
+
+  console.log('[QuestArc Debug] DoubleDip Check:', {
+    freq: freqExpression,
+    lastUpdated: new Date(lastUpdated).toISOString(),
+    now: new Date(now).toISOString(),
+    cyclesPassed,
+    current: questData.progress?.current,
+    target
+  });
+
+  const freshCurrent = questData.progress?.current || 0;
+
+  if (cyclesPassed === 0 && lastUpdated > 0) {
+    // Same Cycle - Block second attempt
+    if (freshCurrent >= target) {
+      console.log('[QuestArc Debug] BLOCKING DoubleDip');
+      return {
+        updates: {}, // No updates needed
+        stepIncrement: 0,
+        xpGained: 0,
+        shouldDealDamage: false,
+        shouldBlock: true, // BLOCK and revert the tick
+        blockReason: 'ALREADY_DONE_TODAY'
+      };
+    }
+  } else if (cyclesPassed > 0) {
+    // We crossed a cycle boundary, so we should reset current if not done already above
+    if (questData.progress) questData.progress.current = 0;
+  }
+
+  // Re-read current after potential reset
+  const actualCurrent = questData.progress?.current || 0;
+
+  const damageEvery = questData.meta.damageEvery !== undefined ? questData.meta.damageEvery : 1;
   let stepIncrement = 0;
 
-  const newCurrent = current + 1;
-  const now = Date.now();
+  const newCurrent = actualCurrent + 1;
 
   if (!questData.progress) questData.progress = { current: 0, target };
 
   questData.progress.current = newCurrent;
   questData.progress.lastUpdated = now;
+  // Write Human Readable Date
+  questData.progress.lastDoneDate = new Date(now).toISOString();
 
-  const isFinishedForDay = newCurrent >= target;
+  const isFinishedForCycle = newCurrent >= target;
 
   // Damage Logic:
   let shouldDealDamage = false;
   if (damageEvery === 0) {
-    shouldDealDamage = isFinishedForDay;
+    shouldDealDamage = isFinishedForCycle;
   } else {
     shouldDealDamage = (newCurrent % damageEvery === 0);
   }
 
-  if (isFinishedForDay) {
+  if (isFinishedForCycle) {
     // Streak Logic
     if (newCurrent === target && questData.progress.streak) {
       questData.progress.streak.current = (questData.progress.streak.current || 0) + 1;
@@ -382,13 +486,45 @@ function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
     }
   }
 
-  const newTitle = formatTaskTitle(cleanTitle, questData.progress);
+  // 3. Sticky Streak Persistence
+  // If the task has a streak TARGET, keep it OPEN (unchecked) until the target is met.
+  let isDoneGlobal = isFinishedForCycle;
+  if (questData.progress?.streak?.target) {
+    const streakCurrent = questData.progress.streak.current || 0;
+    const streakTarget = questData.progress.streak.target;
+    if (streakCurrent < streakTarget) {
+      isDoneGlobal = false; // Keep task open
+    }
+  }
+
+  // 4. Next Run Indicator
+  let nextRunTag = '';
+  // Only show Next tag if the task is practically done for this cycle
+  // (Note: processHabitProgress implies it IS a frequency/habit task)
+  if (isFinishedForCycle) {
+    const nextMs = CronHelper.getNextOccurrence(freqExpression, now);
+    if (nextMs) {
+      const nextDate = new Date(nextMs);
+      const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Use absolute day name (e.g. "Mon", "Tue") to avoid stale "Tomorrow" labels
+      const dayStr = nextDate.toLocaleDateString([], { weekday: 'short' });
+
+      nextRunTag = ` [Next: ${dayStr} ${timeStr}]`;
+    }
+  }
+
+  // Debug Next Tag
+  console.log('[QuestArc Debug] Next Tag Check:', { isFinishedForCycle, nextRunTag });
+
+  // Apply stripDynamicTags to ensure we don't accumulate tags
+  const newTitle = formatTaskTitle(stripDynamicTags(cleanTitle), questData.progress) + nextRunTag;
 
   const updates = {
-    isDone: isFinishedForDay,
+    isDone: isDoneGlobal,
     title: newTitle,
     notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``
   };
 
-  return { updates, stepIncrement, xpGained: 0, shouldDealDamage };
+  return { updates, stepIncrement, xpGained: 0, shouldDealDamage, shouldBlock: false };
 }
