@@ -98,22 +98,7 @@ export class TaskCompletionHandler {
                     }
                 }
 
-                // B. AUTO-FINISH PARENT: If this is a subtask, check if parent should close
-                if (task.parentId) {
-                    const parent = allTasks.find(t => t.id === task.parentId);
-                    if (parent && parent.subTaskIds && !parent.isDone) {
-                        // Check if ALL subtasks are now done (including this one, which is technically done but maybe not in cache yet)
-                        // We assume 'task' is done because this handler fired.
-                        const siblings = allTasks.filter(t => parent.subTaskIds?.includes(t.id));
-                        const allDone = siblings.every(t => t.id === task.id ? true : t.isDone); // Force true for current
-
-                        if (allDone) {
-                            PluginService.log.info(`[TaskCompletion] All subtasks done. Auto-completing parent "${parent.title}"`);
-                            await PluginService.api.updateTask(parent.id, { isDone: true });
-                            PluginService.showSnack('✅ [Quest] Step Completed!', 'SUCCESS');
-                        }
-                    }
-                }
+                // B. AUTO-FINISH PARENT: [MOVED] Logic moved to end of function to respect Habit/Streak updates
 
             } catch (e) {
                 PluginService.log.error('Structure Guard Error', e);
@@ -556,6 +541,41 @@ export class TaskCompletionHandler {
                 }
             } catch (e) {
                 PluginService.log.error('Failed to apply task updates', e);
+            }
+        }
+
+        // --- 3. AUTO-FINISH PARENT (Modified Location) ---
+        // We run this LAST so we know if the subtask (Habit/Grind) was *actually* completed or kept open.
+        if (task.parentId && !state.activeStory.isCompleted) {
+            try {
+                // Determine effective status of CURRENT task
+                // If updates.isDone is explicitly defined, use it.
+                // Otherwise fallback to true (since we entered this handler because it was ticked)
+                const effectiveIsDone = updates?.isDone ?? true;
+
+                // Only proceed if the current task is effectively done
+                if (effectiveIsDone) {
+                    const allTasks = await PluginService.api.getTasks();
+                    const parent = allTasks.find(t => t.id === task.parentId);
+
+                    if (parent && parent.subTaskIds && !parent.isDone) {
+                        const siblings = allTasks.filter(t => parent.subTaskIds?.includes(t.id));
+                        const allDone = siblings.every(t => {
+                            if (t.id === task.id) return effectiveIsDone;
+                            return t.isDone;
+                        });
+
+                        if (allDone) {
+                            PluginService.log.info(`[TaskCompletion] All subtasks done. Auto-completing parent "${parent.title}"`);
+                            await PluginService.api.updateTask(parent.id, { isDone: true });
+                            PluginService.showSnack('✅ [Quest] Step Completed!', 'SUCCESS');
+                        }
+                    }
+                } else {
+                    PluginService.log.info(`[TaskCompletion] Subtask logic kept task OPEN (Sticky Streak). Parent will NOT auto-complete.`);
+                }
+            } catch (e) {
+                PluginService.log.error('Structure Guard Auto-Complete Error', e);
             }
         }
 
