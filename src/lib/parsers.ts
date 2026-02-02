@@ -228,7 +228,7 @@ export function cleanTaskTitle(title: string): string {
     let clean = title;
     // Match both "🔥 1/2" (old) and "1/2 🔥" (new) formats for backward compatibility
     clean = clean.replace(/(\s*🔥\s*\d+(\/\d+)?)|(\s*\d+(\/\d+)?\s*🔥)/g, '');
-    clean = clean.replace(/\s*\(\d+\/\d+\)$/, '');
+    clean = clean.replace(/\s*\(\d+\/\d+\)/g, '');
     return clean.trim();
 }
 

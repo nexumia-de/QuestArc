@@ -24,7 +24,15 @@ export interface Tag {
     color?: string;
 }
 
-export interface PluginApi {
+export interface TaskStub {
+    id: string;
+    tagIds: string[];
+    title: string;
+    notes?: string;
+    resolvedTagNames?: string[];
+}
+
+export type PluginAPI = {
     // Projects
     getAllProjects(): Promise<Project[]>;
     addProject(project: Partial<Project>): Promise<string>; // Returns ID

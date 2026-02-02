@@ -1,41 +1,55 @@
-# Plan 100: Next Run Indicator ⏳
+# Plan: Undo Feature (Task & Boss Damage)
 
-## Goal
-Always show the user when a completed habit will be available again.
-
-## User Request
-"Show the user always that the habit is already ticked and next avail timeslot is at xy"
+## User Review Required
+> [!NOTE]
+> **Storage Strategy**: Per user feedback, we will use the **Root Task** (the main parent task of the current step) to store the undo history. This avoids creating a separate "Quest Log" task and keeps the history contextual.
+>
+> *Note: To "Global Undo" from the header, we will scan the active project's root tasks to find the most recent log entry.*
 
 ## Proposed Changes
 
-### 1. `src/lib/game-logic.ts`
--   In `processHabitProgress`:
-    -   Calculate `nextRun` using `CronHelper.getNextOccurrence`.
-    -   Format `nextRun` (e.g., "Tomorrow", "in 5h", or absolute time).
-    -   Append/Update a status tag in the title: `Task Name [1/1] ✅ [Next: Tomorrow]`
-    -   Ensure this tag is REMOVED when the task resets or becomes active again.
+### Logic & Services (Brain)
 
-### 2. `src/lib/cron.ts`
--   Ensure `getNextOccurrence` is exposed and reliable.
--   Add `formatDuration(ms)` helper? Or use `Intl.RelativeTimeFormat`.
+#### [NEW] `src/services/UndoService.ts`
+- **Purpose**: Centralized service to handle undo operations.
+- **Methods**:
+    - `logAction(rootTaskId: string, action: UndoAction)`: Appends an action to the specified Root Task's notes.
+    - `undoLastAction(state: QuestArcState)`:
+        - Scans all Root Tasks in the active Project.
+        - Parses their notes to find the most recent `UndoAction` (checking timestamps).
+        - Reverts that action.
+        - Removes the log entry from the Root Task.
+        - Returns updated State.
 
-## Title Format
-Current: `Task 1/2 🔥`
-New (Completed): `Task 1/2 🔥 [Next: 14:00]`
+#### [MODIFY] `src/handlers/TaskCompletionHandler.ts`
+- Integrate with `UndoService`.
+- When valid damage/completion occurs, call `UndoService.logAction`.
 
-## UX
--   When `isDone: true` (Habit completed for cycle):
-    -   Title updates to include `[Next: ...]`.
--   When `isDone: false` (Sticky Streak / Active):
-    -   No "Next" tag (Available now).
+#### [MODIFY] `src/handlers/TaskUndoHandler.ts`
+- Refactor to use `UndoService` or align logic.
+- Currently, Sp triggers this when a user *manually* unchecks a box. We should ensure this also consults the Log if available, to revert damage correctly.
 
-## Verification
-1.  Complete a Daily Habit.
-2.  Check Title: Should say `[Next: ...]` with correct future time.
-3.  Wait until time passes (or fake it).
-4.  Check Title: Should clear the tag (on next interaction/scan?).
-    *   *Self-correction*: Titles only update when we interact with them or when the specific refresh logic runs. If we rely on `TaskCompletionHandler`, it only updates on click.
-    *   If the user does nothing, the title says `[Next: Tomorrow]` forever?
-    *   When the new day comes, the user sees `[Next: Tomorrow]` (now incorrect) until they click it?
-    *   When they click it, `cyclesPassed` > 0, so it resets, clears the tag, and processes the new click.
-    *   Acceptable for v1.
+### UI (Face)
+
+#### [MODIFY] `src/components/Header.tsx`
+- Add an **Undo Button** (`↩️`) near the Boss/Stats area.
+- Click handler triggers `PluginAPI.postMessage({ type: 'UNDO' })`.
+
+#### [MODIFY] `src/handlers/MessageHandler.ts`
+- Handle `'UNDO'` message type.
+- Call `UndoService.undoLastAction`.
+
+## Verification Plan
+
+### Manual Verification
+1.  **Setup**: Start a valid Quest (e.g. "Kill the Dragon").
+2.  **Action**: Complete a task that deals damage (e.g., "Hit Dragon [dmg:10]").
+3.  **Verify**:
+    - Boss HP decreases.
+    - "Quest Log" task is created/updated in the project (visible in Super Productivity task list).
+4.  **Action**: Click the new "Undo" button in the QuestArc Header.
+5.  **Verify**:
+    - Boss HP restores.
+    - Task is unchecked in Super Productivity.
+    - Notification appears: "Undid action...".
+6.  **Edge Case**: Click Undo multiple times (should handle empty log).

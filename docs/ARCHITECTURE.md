@@ -53,10 +53,20 @@ graph TD
 
 ## Core Components
 
-### 1. The Brain (`src/plugin.ts`)
-The single source of truth. It initializes the plugin, loads state, and routes events.
-
-*   **Services:** Pure business logic providers.
+### 1. The Brain (`src/plugin.ts`, `src/lib/`)
+*   **Role**: Source of Truth. Maintains state.
+*   **Components**:
+    *   `plugin.ts`: Entry point. Hooks into Super Productivity.
+    *   `game-logic.ts`: Orchestrator for game rules (XP, Damage, Level Up).
+    *   **Logic Modules** (`src/lib/logic/`):
+        *   `XpLogic.ts`: XP calculation tables and level curves.
+        *   `BossLogic.ts`: Boss initialization and scaling.
+        *   `StreakLogic.ts`: Habit/Grind strictness and cooldowns.
+    *   **Parsers** (`src/lib/parsers/`):
+        *   `NoteParser.ts`: Stateless extraction of JSON/Tag data from notes.
+    *   **Validators** (`src/lib/validators/`):
+        *   `TaskValidators.ts`: Guard logic for Boss/Quest completion prevention.
+    *   `QuestManagerService`: Manages Quest/Story progression.
     *   `PluginService`: Wraps the raw `PluginAPI` for easier testing/mocking.
     *   `TaskService`: Handles task creation/updates in the host app.
     *   `HeaderService`: Manages the header button UI.

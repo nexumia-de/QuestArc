@@ -10,8 +10,8 @@ export interface BossResult {
 export class BossService {
     // Relaxed Regex 1: [ HP : 100 ]
     private static readonly BOSS_REGEX_BRACKET = /(?:(?:⚔️|🛡️)\s*)?(.+?)\s*\[\s*HP\s*:\s*(\d+)\s*\]/iu;
-    // Relaxed Regex 2: Name 100/100 (Common RPG format), allows optional heart
-    private static readonly BOSS_REGEX_FRACTION = /(?:(?:⚔️|🛡️)\s*)?(.+?)\s+(\d+)\s*\/\s*(\d+)/iu;
+    // Relaxed Regex 2: Name 100/100 ❤️ (Must have heart to distinguish from Habits 1/3)
+    private static readonly BOSS_REGEX_FRACTION = /(?:(?:⚔️|🛡️)\s*)?(.+?)\s+(\d+)\s*\/\s*(\d+)\s*❤️/iu;
 
     /**
      * Extracts Boss Configuration from a task.
@@ -32,10 +32,13 @@ export class BossService {
                             isDead: data.progress.current <= 0,
                             themeColor: '#ff0000'
                         };
-                    } else if (data.meta?.type && data.meta.type !== 'BOSS') {
-                        // If it's explicitly marked as something else (HABIT, GRIND), 
-                        // do NOT fall back to regex parsing.
-                        return null;
+                    }
+                    // If JSON says NON-BOSS (e.g. HABIT), we ONLY override if the Title implies a STRICT [HP:100] Boss.
+                    // We do NOT override for visual "100/100 ❤️" because that could conceivably be a Habit title with emojis.
+                    // And definitely not for "100/100" which matches Habits.
+                    if (data.meta?.type && data.meta.type !== 'BOSS') {
+                        const strongMatch = task.title.match(this.BOSS_REGEX_BRACKET);
+                        if (!strongMatch) return null;
                     }
                 }
             } catch (e) { /* ignore parse errors */ }
@@ -50,7 +53,7 @@ export class BossService {
             return { name, hp, maxHp: hp, isDead: false, themeColor: '#ff0000' };
         }
 
-        // Try Fraction Match
+        // Try Fraction Match (Must have ❤️)
         match = task.title.match(this.BOSS_REGEX_FRACTION);
         if (match && match[1] && match[2] && match[3]) {
             const name = match[1].trim();
@@ -61,7 +64,6 @@ export class BossService {
 
         return null;
     }
-
     /**
      * Scans for a sibling task that matches the Boss pattern.
      * Returns both the config AND the boss task ID for updates.

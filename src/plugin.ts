@@ -1,4 +1,5 @@
 import { QuestArcState } from './types/state';
+import { Task } from './types/plugin-api';
 import { createInitialState, migrateState, ensureState } from './lib/state/persistence';
 import { validateState } from './lib/state/validation';
 import { getCurrentStep } from './lib/plugin-utils';
@@ -10,6 +11,7 @@ import { TaskCompletionHandler } from './handlers/TaskCompletionHandler';
 import { TaskUndoHandler } from './handlers/TaskUndoHandler';
 import { MessageHandler } from './handlers/MessageHandler';
 import { ContextHandler } from './handlers/ContextHandler';
+import { HookName } from './constants';
 
 
 let state: QuestArcState;
@@ -101,13 +103,16 @@ async function init() {
 
 
 
+import { TaskHookPayload } from './types/payloads';
+
 // Hooks
-api.registerHook('taskComplete' as any, async (payload: unknown) => {
-  await TaskCompletionHandler.handle(state, payload, saveState);
+api.registerHook(HookName.TASK_COMPLETE as any, async (payload: unknown) => {
+  await TaskCompletionHandler.handle(state, payload as TaskHookPayload | Task | string, saveState);
 });
 
-api.registerHook('taskUpdate' as any, async (payload: unknown) => {
-  const updatePayload = payload as { task: unknown };
+api.registerHook(HookName.TASK_UPDATE as any, async (payload: unknown) => {
+  const updatePayload = payload as TaskHookPayload;
+  // The hook payload might be a partial task, so we cast to any for compatibility with handlers that expect full Task but only use ID/Title
   const task = updatePayload.task as any;
 
   if (!task) return;
@@ -122,7 +127,7 @@ api.registerHook('taskUpdate' as any, async (payload: unknown) => {
   await ContextHandler.handle(task.id, state, saveState);
 });
 
-api.registerHook('currentTaskChange' as any, async (taskId: unknown) => {
+api.registerHook(HookName.CURRENT_TASK_CHANGE as any, async (taskId: unknown) => {
   // Proactive Boss Detection on Context Switch
   await ContextHandler.handle(taskId as string | null, state, saveState);
 });

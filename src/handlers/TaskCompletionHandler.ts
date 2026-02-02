@@ -1,16 +1,24 @@
-import { Task } from '../types/plugin-api';
+import { Task, TaskStub } from '../types/plugin-api';
 import { QuestArcState } from '../types/state';
-import { processTaskCompletion, TaskStub } from '../lib/game-logic';
+import { processTaskCompletion } from '../lib/game-logic';
 
+import { TaskHookPayload } from '../types/payloads';
 import { PluginService } from '../services/PluginService';
 import { CompilerService } from '../services/compiler.service';
 import { BossService } from '../services/BossService';
+import { TaskType, Symbol } from '../constants';
+import { TaskValidators } from '../lib/validators/TaskValidators';
+import { UndoService } from '../services/UndoService';
+import { NoteParser } from '../lib/parsers/NoteParser';
+
+
+
 
 
 export class TaskCompletionHandler {
 
 
-    static async handle(state: QuestArcState, payload: unknown, saveCallback: (newState: QuestArcState) => Promise<void>) {
+    static async handle(state: QuestArcState, payload: Task | TaskStub | string | TaskHookPayload, saveCallback: (newState?: QuestArcState) => void) {
         let task: Task;
 
         // ... (existing payload normalization) ...
@@ -18,9 +26,11 @@ export class TaskCompletionHandler {
         if (typeof payload === 'string') {
             taskId = payload;
         } else if (payload && typeof payload === 'object' && 'task' in payload) {
-            taskId = ((payload as any).task as Task).id;
+            // TaskHookPayload
+            taskId = (payload as { task: { id: string } }).task.id;
         } else {
-            taskId = (payload as Task).id;
+            // Basic Task object fallback
+            taskId = (payload as { id: string }).id;
         }
 
         // Always fetch fresh task from API
@@ -55,55 +65,26 @@ export class TaskCompletionHandler {
         PluginService.log.info('Task completed!', task);
 
         // --- 0. BOSS GUARD: Prevent Manual Completion ---
-        // If the user ticked a task that IS a Boss (has HP meta), we must block it if HP > 0.
-        // Bosses can ONLY be defeated via damage (which auto-closes them).
-        // IMPORTANT: Check JSON type first - we don't want to block Habits/Grinds with progress counters.
-        let taskType: string | null = null;
-        try {
-            const match = task.notes?.match(/```json\s*([\s\S]*?)\s*```/);
-            if (match && match[1]) {
-                const data = JSON.parse(match[1]);
-                taskType = data.meta?.type || null;
-            }
-        } catch (e) { /* ignore */ }
-
-        // Only apply Boss Guard if task is explicitly a BOSS type
-        if (taskType === 'BOSS') {
-            const bossConfig = BossService.extractBossConfig(task);
-            if (bossConfig && bossConfig.hp > 0) {
-                PluginService.log.warn(`[TaskCompletion] Blocked manual completion of Boss "${task.title}" (HP: ${bossConfig.hp})`);
-
-                // Immediately revert the tick
-                await PluginService.api.updateTask(task.id, { isDone: false });
-
-                PluginService.showSnack('⛔ You cannot defeat the boss by clicking! Attack it with tasks!', 'ERROR');
-                return; // Stop processing
-            }
+        const bossGuard = TaskValidators.validateBossGuard(task);
+        if (bossGuard.shouldBlock) {
+            PluginService.log.warn(`[TaskCompletion] Blocked by Boss Guard: ${bossGuard.reason}`);
+            await PluginService.api.updateTask(task.id, { isDone: false });
+            if (bossGuard.uiMessage) PluginService.showSnack(bossGuard.uiMessage, 'ERROR');
+            return;
         }
 
-        // --- 1. STRUCTURE GUARD: Enforce Parent/Child Logic (Active Quest Only) ---
-        if (state.activeStory.id && task.projectId === state.activeStory.id) {
-            try {
-                const allTasks = await PluginService.api.getTasks();
-
-                // A. BLOCK PARENT: Cannot complete if subtasks are open
-                if (task.subTaskIds && task.subTaskIds.length > 0) {
-                    const openSubtasks = allTasks.filter(t => task.subTaskIds?.includes(t.id) && !t.isDone);
-                    if (openSubtasks.length > 0) {
-                        PluginService.log.warn(`[TaskCompletion] Blocked parent completion. ${openSubtasks.length} subtasks open.`);
-
-                        await PluginService.api.updateTask(task.id, { isDone: false });
-                        PluginService.showSnack('⛔ [Quest] Step incomplete! Finish all subtasks first.', 'ERROR');
-                        return;
-                    }
-                }
-
-                // B. AUTO-FINISH PARENT: [MOVED] Logic moved to end of function to respect Habit/Streak updates
-
-            } catch (e) {
-                PluginService.log.error('Structure Guard Error', e);
-            }
+        // --- 1. STRUCTURE GUARD: Enforce Parent/Child Logic ---
+        const structureGuard = await TaskValidators.validateStructureGuard(task, state, PluginService.api);
+        if (structureGuard.shouldBlock) {
+            PluginService.log.warn(`[TaskCompletion] Blocked by Structure Guard: ${structureGuard.reason}`);
+            await PluginService.api.updateTask(task.id, { isDone: false });
+            if (structureGuard.uiMessage) PluginService.showSnack(structureGuard.uiMessage, 'ERROR');
+            return;
         }
+
+        // Restore taskType for downstream logic
+        const noteJson = NoteParser.parse(task.notes);
+        const taskType = noteJson?.meta?.type || null;
 
         // Process task completion for game logic (XP, damage, etc.) first
         let newState = state;
@@ -140,6 +121,7 @@ export class TaskCompletionHandler {
                     }
 
                     rootTask = {
+                        id: currentParent.id,
                         tagIds: currentParent.tagIds || [],
                         title: currentParent.title,
                         notes: currentParent.notes,
@@ -159,7 +141,7 @@ export class TaskCompletionHandler {
             try {
                 const allProjects = await PluginService.api.getAllProjects();
                 taskProject = allProjects.find(p => p.id === task.projectId);
-                if (taskProject && taskProject.title.includes('🧭')) {
+                if (taskProject && taskProject.title.includes(Symbol.QUEST_ACTIVE)) {
                     isQuestTask = true;
                 }
             } catch (e) { /* ignore */ }
@@ -201,7 +183,7 @@ export class TaskCompletionHandler {
         }
 
         // Show habit/grind completion notification (first time only)
-        if (taskType === 'HABIT' || taskType === 'GRIND') {
+        if (taskType === TaskType.HABIT || taskType === TaskType.GRIND) {
 
             // First-time completion of habit/grind for this cycle
             // Check if we reached a streak milestone
@@ -210,7 +192,7 @@ export class TaskCompletionHandler {
                     const match = result.taskUpdates.notes.match(/```json\s*([\s\S]*?)\s*```/);
                     if (match && match[1]) {
                         const data = JSON.parse(match[1]);
-                        const isGrind = data.meta?.type === 'GRIND';
+                        const isGrind = data.meta?.type === TaskType.GRIND;
                         const progress = data.progress;
 
                         if (isGrind) {
@@ -244,6 +226,16 @@ export class TaskCompletionHandler {
             }
         }
 
+        if ((result.explicitDamage || 0) > 0 && rootTask) {
+            await UndoService.logAction(rootTask.id, {
+                id: Date.now().toString(),
+                timestamp: Date.now(),
+                type: 'BOSS_DAMAGE',
+                payload: { damage: result.explicitDamage!, previousHp: state.activeBoss?.hp },
+                description: `Dealt ${result.explicitDamage!} damage via ${task.title}`
+            });
+        }
+
         newState = result.newState;
         const { damageDealt } = result;
 
@@ -259,17 +251,17 @@ export class TaskCompletionHandler {
                     taskProject = allProjects.find(p => p.id === task.projectId);
                 }
 
-                if (taskProject && taskProject.title.includes('🧭')) {
+                if (taskProject && taskProject.title.includes(Symbol.QUEST_ACTIVE)) {
                     PluginService.log.info(`[TaskCompletion] Task belongs to active quest: "${taskProject.title}"`);
 
                     // Extract the base title (remove 🧭 and trim)
-                    const baseTitle = taskProject.title.replace('🧭', '').trim();
+                    const baseTitle = taskProject.title.replace(Symbol.QUEST_ACTIVE, '').trim();
 
                     const allProjects = await PluginService.api.getAllProjects();
 
                     // Find the template project (📜 + same base title)
                     const templateProject = allProjects.find(p =>
-                        p.title.includes('📜') && p.title.replace('📜', '').trim() === baseTitle
+                        p.title.includes(Symbol.TEMPLATE) && p.title.replace(Symbol.TEMPLATE, '').trim() === baseTitle
                     );
 
                     if (templateProject) {
@@ -326,7 +318,7 @@ export class TaskCompletionHandler {
 
                             try {
                                 await PluginService.api.updateProject(task.projectId, {
-                                    title: taskProject.title.replace('🧭', '✅')
+                                    title: taskProject.title.replace(Symbol.QUEST_ACTIVE, Symbol.QUEST_DONE)
                                 });
                                 PluginService.log.info(`[TaskCompletion] Updated project icon to ✅`);
                             } catch (error) {
@@ -569,7 +561,11 @@ export class TaskCompletionHandler {
                             PluginService.log.info(`[TaskCompletion] All subtasks done. Auto-completing parent "${parent.title}"`);
                             await PluginService.api.updateTask(parent.id, { isDone: true });
                             PluginService.showSnack('✅ [Quest] Step Completed!', 'SUCCESS');
+                        } else {
+                            PluginService.log.info(`[TaskCompletion] Siblings not all done. Siblings: ${siblings.length}, AllDone: ${allDone}`);
                         }
+                    } else {
+                        PluginService.log.info(`[TaskCompletion] Parent check skipped. Parent: ${!!parent}, SubTasks: ${parent?.subTaskIds?.length}, ParentDone: ${parent?.isDone}`);
                     }
                 } else {
                     PluginService.log.info(`[TaskCompletion] Subtask logic kept task OPEN (Sticky Streak). Parent will NOT auto-complete.`);
