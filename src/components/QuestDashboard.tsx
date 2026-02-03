@@ -1,11 +1,14 @@
 import { createSignal, onMount, For, Show } from 'solid-js';
 import { ProjectScannerService, QuestEnvironment } from '../services/scanner.service';
+import { QuestManagerService } from '../services/manager.service';
 import { useQuestArc } from '../hooks/useQuestArc';
 
 export const QuestDashboard = () => {
     const [env, setEnv] = createSignal<QuestEnvironment | null>(null);
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
+    const [importMode, setImportMode] = createSignal(false);
+    let importRef: HTMLTextAreaElement | undefined;
 
     // Use the hook for Brain communication
     const { state: gameState, startQuest, pauseQuest, resumeQuest } = useQuestArc();
@@ -64,19 +67,76 @@ export const QuestDashboard = () => {
         setLoading(false);
     };
 
+    const handleExport = async (projectId: string) => {
+        try {
+            setLoading(true);
+            const json = await QuestManagerService.exportTemplate(projectId);
+            await navigator.clipboard.writeText(json);
+            // Optional: plugin success notification?
+            setError('Template JSON copied to clipboard! 📋'); // reusing error for status temporarily or use snackbar if available
+            setTimeout(() => setError(null), 3000);
+        } catch (err: any) {
+            setError(err.message || 'Failed to export');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleImport = async () => {
+        if (!importRef?.value) return;
+        try {
+            setLoading(true);
+            await QuestManagerService.importTemplate(importRef.value);
+            setImportMode(false);
+            await refresh();
+            setError('Import successful! 🎉');
+            setTimeout(() => setError(null), 3000);
+        } catch (err: any) {
+            setError(err.message || 'Failed to import');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div class="quest-dashboard">
             <div class="header-row" style={{ display: 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '1rem' }}>
                 <h3 style={{ margin: 0 }}>Quest Control Center</h3>
-                <button
-                    onClick={refresh}
-                    disabled={loading()}
-                    class="secondary-btn"
-                    title="Refresh"
-                >
-                    🔄
-                </button>
+                <div>
+                    <button
+                        onClick={() => setImportMode(!importMode())}
+                        disabled={loading()}
+                        class="secondary-btn"
+                        style={{ 'margin-right': '0.5rem' }}
+                        title="Import Project JSON"
+                    >
+                        📥 Import
+                    </button>
+                    <button
+                        onClick={refresh}
+                        disabled={loading()}
+                        class="secondary-btn"
+                        title="Refresh"
+                    >
+                        🔄
+                    </button>
+                </div>
             </div>
+
+            <Show when={importMode()}>
+                <div class="import-box" style={{ 'margin-bottom': '1rem', 'padding': '1rem', 'background': 'var(--bg-card)', 'border': '1px solid var(--border)', 'border-radius': '4px' }}>
+                    <h4 style={{ 'margin-top': 0 }}>Import Project JSON</h4>
+                    <textarea
+                        ref={importRef}
+                        placeholder="Paste project JSON here..."
+                        style={{ 'width': '100%', 'height': '100px', 'margin-bottom': '0.5rem', 'background': 'var(--bg-input)', 'color': 'var(--text)', 'border': '1px solid var(--border)' }}
+                    />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={handleImport} disabled={loading()} class="primary-btn">Import</button>
+                        <button onClick={() => setImportMode(false)} class="secondary-btn">Cancel</button>
+                    </div>
+                </div>
+            </Show>
 
             <Show when={error()}>
                 <div class="error-message" style={{ 'margin-bottom': '1rem' }}>
@@ -136,13 +196,22 @@ export const QuestDashboard = () => {
                                         {t.icon && <span style={{ 'margin-right': '0.5rem' }}>{t.icon}</span>}
                                         {t.originalTitle}
                                     </span>
-                                    <button
-                                        onClick={() => handleStart(t.id, false)}
-                                        disabled={!!env()?.active || loading()}
-                                        class="primary-btn"
-                                    >
-                                        Start
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            onClick={() => handleExport(t.id)}
+                                            class="secondary-btn"
+                                            title="Copy Project JSON"
+                                        >
+                                            📋
+                                        </button>
+                                        <button
+                                            onClick={() => handleStart(t.id, false)}
+                                            disabled={!!env()?.active || loading()}
+                                            class="primary-btn"
+                                        >
+                                            Start
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </For>

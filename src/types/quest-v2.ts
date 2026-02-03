@@ -9,6 +9,7 @@ export interface QuestTaskData {
         damage?: number; // Custom damage amount (e.g. [dmg:10])
         damageEvery?: number; // Custom damage frequency (e.g. [dmgevery:1])
         frequency?: string; // [freq:...] value
+        persistent?: string | boolean; // [persistent] value
     };
 
     // For Story Steps (Parents)

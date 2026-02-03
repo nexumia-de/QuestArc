@@ -92,6 +92,20 @@ Any task without special tags is a standard single-action task.
 **Example**:
 *   `Buy Milk`
 
+### E. Persistence (Challenges)
+Tasks in a Story can be marked to become persistent Habits in your **Grimoire** upon completion (e.g., "Run 5km [count:3]" becomes "Run 5km" in your permanent habits).
+
+**Syntax**: `[persistent:Group]` (Group is Optional)
+
+| Component | Syntax | Description |
+| :--- | :--- | :--- |
+| **Persistence** | `[persistent]` | Default. Moves task to **Inbox** in Grimoire. |
+| | `[persistent:Morning]` | Moves task to **Morning** group in Grimoire. |
+
+**Examples**:
+*   `Run 5km [freq:weekly] [count:3] [persistent:Health]` -> Moves to "Health" group after 3 runs.
+*   `Read Book [freq:daily] [count:7] [persistent]` -> Moves to "Inbox" after 7 days.
+
 ---
 ## 4. Visual Indicators (Auto-Generated)
 

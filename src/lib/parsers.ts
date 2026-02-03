@@ -38,12 +38,27 @@ export function parseTaskType(title: string): {
         };
     }
 
+    // Parse Persistence Tag (Global for all types)
+    const persistentRegex = /\[persistent(?::(.*?))?\]/i;
+    const persistentMatch = title.match(persistentRegex);
+    let persistent: string | boolean | undefined = undefined;
+    let cleanTitleGlobal = title;
+
+    if (persistentMatch) {
+        if (persistentMatch[1]) {
+            persistent = persistentMatch[1].trim(); // "Health"
+        } else {
+            persistent = true; // Default inbox
+        }
+        cleanTitleGlobal = cleanTitleGlobal.replace(persistentMatch[0], '').trim();
+    }
+
     const freqRegex = /\[freq:([^\]]+)\]/i;
-    const freqMatch = title.match(freqRegex);
+    const freqMatch = cleanTitleGlobal.match(freqRegex);
 
     if (freqMatch && freqMatch[1]) {
         const frequency = freqMatch[1].trim();
-        let cleanTitle = title.replace(freqMatch[0], '').trim();
+        let cleanTitle = cleanTitleGlobal.replace(freqMatch[0], '').trim();
 
         let target = 1;
         const countRegex = /\[count:(\d+)\]/i;
@@ -61,6 +76,9 @@ export function parseTaskType(title: string): {
         if (streakMatch) {
             streakTarget = parseInt(streakMatch[1] || '0', 10);
             cleanTitle = cleanTitle.replace(streakMatch[0], '').trim();
+        } else if (frequency.toLowerCase() === 'daily' || frequency.toLowerCase() === 'd') {
+            // Default to streak:1 for daily habits if not specified
+            streakTarget = 1;
         }
 
         return {
@@ -68,18 +86,19 @@ export function parseTaskType(title: string): {
             meta: {
                 target,
                 frequency, // Passes raw string (e.g., "daily", "weekly", "5 4 * * *")
-                streakTarget
+                streakTarget,
+                persistent // Added
             },
             cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
         };
     }
 
     const countRegex = /\[count:(\d+)\]/i;
-    const countMatch = title.match(countRegex);
+    const countMatch = cleanTitleGlobal.match(countRegex);
 
     if (countMatch && countMatch[1]) {
         const targetStr = countMatch[1];
-        let cleanTitleTemp = title.replace(countMatch[0], '').trim();
+        let cleanTitleTemp = cleanTitleGlobal.replace(countMatch[0], '').trim();
 
         // Parse Damage Config
         const dmgRegex = /\[dmg:(\d+)\]/i;
@@ -103,7 +122,8 @@ export function parseTaskType(title: string): {
             meta: {
                 target: parseInt(targetStr, 10),
                 damage,
-                damageEvery
+                damageEvery,
+                persistent // Added
             },
             cleanTitle: cleanTitleTemp.replace(/\s+/g, ' ').trim()
         };
@@ -111,9 +131,9 @@ export function parseTaskType(title: string): {
 
     // Parse Damage Config for SIMPLE tasks too
     const dmgRegex = /\[dmg:(\d+)\]/i;
-    const dmgMatch = title.match(dmgRegex);
+    const dmgMatch = cleanTitleGlobal.match(dmgRegex);
     let damage = undefined;
-    let cleanSimpleTitle = title;
+    let cleanSimpleTitle = cleanTitleGlobal;
     if (dmgMatch && dmgMatch[0] && dmgMatch[1]) {
         damage = parseInt(dmgMatch[1], 10);
         cleanSimpleTitle = cleanSimpleTitle.replace(dmgMatch[0], '').trim();
@@ -122,9 +142,10 @@ export function parseTaskType(title: string): {
     return {
         type: 'SIMPLE',
         meta: {
-            damage
+            damage,
+            persistent // Added
         },
-        cleanTitle: cleanSimpleTitle
+        cleanTitle: cleanSimpleTitle.trim()
     };
 }
 

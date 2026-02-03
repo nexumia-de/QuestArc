@@ -10,6 +10,12 @@ export interface ExtendedPluginAPI extends PluginAPIBase {
         error(msg: string, ...args: any[]): void;
     };
     onMessage?: (handler: (message: any) => Promise<any> | any) => void;
+    // Missing methods from PluginAPIBase or needed overrides
+    // Missing methods from PluginAPIBase or needed overrides
+    getAllProjects(): Promise<any[]>;
+    addProject(project: any): Promise<string>;
+    addTask(task: any): Promise<string>;
+    updateTask(taskId: string, updates: any): Promise<void>;
 }
 
 declare const PluginAPI: ExtendedPluginAPI;
@@ -32,9 +38,18 @@ export class PluginService {
     }
 
     static log = {
-        info: (msg: string, ...args: any[]) => this.api.log.info(msg, ...args),
-        warn: (msg: string, ...args: any[]) => this.api.log.warn(msg, ...args),
-        error: (msg: string, ...args: any[]) => this.api.log.error(msg, ...args),
+        info: (msg: string, ...args: any[]) => {
+            if (this.api.log?.info) this.api.log.info(msg, ...args);
+            else console.log(`[QuestArc INFO] ${msg}`, ...args);
+        },
+        warn: (msg: string, ...args: any[]) => {
+            if (this.api.log?.warn) this.api.log.warn(msg, ...args);
+            else console.warn(`[QuestArc WARN] ${msg}`, ...args);
+        },
+        error: (msg: string, ...args: any[]) => {
+            if (this.api.log?.error) this.api.log.error(msg, ...args);
+            else console.error(`[QuestArc ERROR] ${msg}`, ...args);
+        },
         debug: (msg: string, ...args: any[]) => console.debug(`[QuestArc DEBUG] ${msg}`, ...args),
     };
 

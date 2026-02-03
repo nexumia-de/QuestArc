@@ -10,6 +10,7 @@ import { TaskType, Symbol } from '../constants';
 import { TaskValidators } from '../lib/validators/TaskValidators';
 import { UndoService } from '../services/UndoService';
 import { NoteParser } from '../lib/parsers/NoteParser';
+import { HabitService } from '../services/HabitService';
 
 
 
@@ -199,22 +200,44 @@ export class TaskCompletionHandler {
                             // Grinds show progress, not cycles
                             if (progress?.current >= progress?.target) {
                                 PluginService.showSnack(`🎉 Grind Complete! ${progress.current}/${progress.target}`, 'SUCCESS');
+
+                                // NEW: Persistence Check (Challenge Defeated)
+                                const questTitle = state.stories.find(s => s.id === state.activeStory.id)?.title || 'Unknown Quest';
+                                await HabitService.persistHabit(task, questTitle);
                             } else {
                                 PluginService.showSnack(`✅ Progress: ${progress.current}/${progress.target}`, 'SUCCESS');
                             }
                         } else {
                             // Habits have streaks and cycles
                             const streak = data.progress?.streak;
-                            if (streak?.target && streak?.current) {
-                                if (streak.current >= streak.target) {
+
+                            if (progress?.current >= progress?.target) {
+                                if (streak?.target && streak?.current >= streak?.target) {
                                     PluginService.showSnack(`🎉 Streak Challenge Complete! ${streak.current}/${streak.target} 🔥`, 'SUCCESS');
                                 } else {
-                                    PluginService.showSnack(`🔥 Streak: ${streak.current}/${streak.target} - Keep it going!`, 'SUCCESS');
+                                    PluginService.showSnack(`✅ Task completed! Come back next cycle.`, 'SUCCESS');
                                 }
-                            } else if (streak?.current) {
-                                PluginService.showSnack(`🔥 ${streak.current} day streak! Come back tomorrow.`, 'SUCCESS');
+
+                                // NEW: Persistence Check
+                                // Only persist if the task is effectively DONE (closed).
+                                // StreakLogic keeps task open (isDone: false) if streak target not met.
+                                // We trust result.taskUpdates?.isDone.
+                                if (result.taskUpdates?.isDone) {
+                                    const questTitle = state.stories.find(s => s.id === state.activeStory.id)?.title || 'Unknown Quest';
+
+                                    // CRITICAL: Use the UPDATED notes from result.taskUpdates if available!
+                                    // The `task` object passed so far is the old state.
+                                    // We need the new state (incremented counters) to be persisted.
+                                    const taskToPersist = { ...task };
+                                    if (result.taskUpdates.notes) {
+                                        taskToPersist.notes = result.taskUpdates.notes;
+                                    }
+
+                                    await HabitService.persistHabit(taskToPersist, questTitle);
+                                }
+
                             } else {
-                                PluginService.showSnack(`✅ Task completed! Come back next cycle.`, 'SUCCESS');
+                                PluginService.showSnack(`✅ Progress: ${progress.current}/${progress.target}`, 'SUCCESS');
                             }
                         }
                     }
