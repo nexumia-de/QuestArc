@@ -75,16 +75,15 @@ One-off tasks that require multiple actions to complete.
 ### C. Bosses (Enemies)
 Add a Boss battle to a Step.
 
-**Syntax**: `⚔️ Name [HP:N]`
+**Syntax**: `Name [HP:N]`
 
 | Component | Syntax | Description |
 | :--- | :--- | :--- |
-| **Icon** | `⚔️` | **Required** to identify a Boss. |
 | **HP** | `[HP:N]` | Sets Health Points. |
 | **XP** | `[XP:N]` | (Optional) Sets XP reward. |
 
 **Example**:
-*   `⚔️ Shadow Bug [HP:100]`
+*   `Shadow Bug [HP:100]`
 
 ### D. Single Tasks
 Any task without special tags is a standard single-action task.
