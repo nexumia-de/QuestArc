@@ -1,7 +1,7 @@
 import { CronHelper } from '../cron';
 import { QuestTaskData } from '../../types/quest-v2';
 import { formatTaskTitle } from '../parsers';
-import { PluginService } from '../../services/PluginService';
+import { FrequencyHelper } from '../FrequencyHelper';
 
 export class StreakLogic {
 
@@ -43,7 +43,6 @@ export class StreakLogic {
 
     static processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
         const now = Date.now();
-        PluginService.log.info(`[StreakLogic] DEBUG: Processing Habit "${cleanTitle}"`);
 
         // 0. Human Readable Date Override
         let resolvedLastUpdated = questData.progress?.lastUpdated || 0;
@@ -55,25 +54,8 @@ export class StreakLogic {
         }
         const lastUpdated = resolvedLastUpdated;
 
-        // Frequency Parsing
-        // SYNC FREQUENCY: If title has [freq:...] tag, update JSON (Source of Truth) to prevent stale data
-        const freqRegex = /\[freq(?::(.*?))?\]/i;
-        const freqMatch = cleanTitle.match(freqRegex);
-        if (freqMatch && freqMatch[1]) {
-            const titleFreq = freqMatch[1].trim();
-            if (titleFreq) {
-                PluginService.log.info(`[StreakLogic] DEBUG: Found FREQ in title: "${titleFreq}"`);
-                // Update BOTH locations for consistency
-                if (!questData.routine) questData.routine = { frequency: titleFreq, lastDone: null };
-                else questData.routine.frequency = titleFreq;
-                if (!questData.meta) questData.meta = {} as any;
-                questData.meta.frequency = titleFreq;
-            }
-        }
-
-        // FIX: Read from routine.frequency (where compileTaskData stores it), fallback to meta.frequency, then daily
-        const freqExpression = questData.routine?.frequency || questData.meta?.frequency || 'daily';
-        PluginService.log.info(`[StreakLogic] DEBUG: Using freqExpression: "${freqExpression}"`);
+        // Frequency Parsing (using shared helper for consistency)
+        const freqExpression = FrequencyHelper.syncAndGetFrequency(questData, cleanTitle);
         const target = questData.progress?.target || 1;
 
         // --- 1. Missed Streak Logic ---

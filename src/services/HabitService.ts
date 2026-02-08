@@ -2,6 +2,7 @@ import { PluginService } from './PluginService';
 import { CronHelper } from '../lib/cron';
 import { Task } from '../types/plugin-api';
 import { cleanTaskTitle, formatTaskTitle } from '../lib/parsers';
+import { FrequencyHelper } from '../lib/FrequencyHelper';
 
 const GRIMOIRE_PROJECT_TITLE = 'QuestArc Grimoire';
 const GRIMOIRE_ICON = '📖'; // Book icon for the project
@@ -144,17 +145,12 @@ export class HabitService {
                     }
 
                     // Re-serialize
-                    // SYNC FREQUENCY: If title has [freq:...] tag, update JSON (Source of Truth)
-                    // Match parser logic: [freq:...] or [freq ...] or [freq] (though simple [freq] is daily)
-                    const freqRegex = /\[freq(?::(.*?))?\]/i;
-                    const freqMatch = task.title.match(freqRegex) || (task.notes || '').match(freqRegex);
-                    if (freqMatch && freqMatch[1]) {
-                        const titleFreq = freqMatch[1].trim();
-                        // If empty (just [freq]), default is daily. If contains value, use it.
-                        if (titleFreq) {
-                            if (!data.routine) data.routine = {};
-                            data.routine.frequency = titleFreq;
-                        }
+                    // Sync frequency from title to JSON (using shared helper)
+                    const freqFromTitle = FrequencyHelper.extractFrequencyFromText(task.title) ||
+                        FrequencyHelper.extractFrequencyFromText(task.notes || '');
+                    if (freqFromTitle) {
+                        if (!data.routine) data.routine = {};
+                        data.routine.frequency = freqFromTitle;
                     }
 
                     const newJson = JSON.stringify(data, null, 2);
