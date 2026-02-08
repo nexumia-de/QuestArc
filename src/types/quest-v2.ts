@@ -22,6 +22,7 @@ export interface QuestTaskData {
         current: number;
         target?: number; // HP or Repetitions
         unit?: string;  // e.g., "HP"
+        /** @deprecated Use lastDoneDate instead */
         lastUpdated?: number;
         lastDoneDate?: string; // Human readable ISO date (manual override)
         streak?: {
@@ -29,13 +30,20 @@ export interface QuestTaskData {
             target?: number; // Optional target to complete something
             highest?: number;
             tier?: 'bronze' | 'silver' | 'gold' | 'diamond'; // Milestone tier
-            graceUsed?: number;        // Shields consumed this cycle
+            availableGrace?: number;   // Bank of grace tokens
+            graceCron?: string;        // Optional cron schedule to earn bonus grace
+            lastGraceGrantDate?: string; // ISO string tracking last bonus grant
+
+            /** @deprecated Use availableGrace instead */
+            graceUsed?: number;        // Shields consumed this cycle (Legacy)
+
             totalCompletions?: number; // Lifetime count (never resets)
-            lastMissTimestamp?: number; // When streak was last reduced
+            lastMissDate?: string; // Human readable date when streak was last reduced
         };
     };
 
     // Only for Habits
+    /** @deprecated Use meta.frequency instead */
     routine?: {
         frequency: string; // '@daily', 'cron:...' or custom
         lastDone: number | null; // Timestamp

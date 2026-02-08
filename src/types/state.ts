@@ -35,6 +35,7 @@ export interface StreakBehaviorConfig {
     gold: number;     // Default: 30
     diamond: number;  // Default: 60
   };
+  defaultGraceCron?: string; // Optional: Cron schedule for bonus grace accumulation
 }
 
 export interface QuestArcState {

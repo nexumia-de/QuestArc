@@ -15,6 +15,7 @@ const DEFAULT_STREAK_BEHAVIOR: Required<StreakBehaviorConfig> = {
         gold: 30,
         diamond: 60,
     },
+    defaultGraceCron: '', // No default cron
 };
 
 // Tier thresholds (highest streak needed to reach tier)
@@ -90,41 +91,79 @@ export class StreakLogic {
         const now = Date.now();
         const settings = { ...DEFAULT_STREAK_BEHAVIOR, ...streakBehavior };
 
-        // 0. Human Readable Date Override
-        let resolvedLastUpdated = questData.progress?.lastUpdated || 0;
+        // 0. Resolve Time Source of Truth
+        // Priority: progress.lastDoneDate (ISO) -> progress.lastUpdated (Legacy TS) -> 0
+        let lastCompletionTime = 0;
+
         if (questData.progress?.lastDoneDate) {
-            const manualDate = new Date(questData.progress.lastDoneDate);
-            if (!isNaN(manualDate.getTime())) {
-                resolvedLastUpdated = manualDate.getTime();
+            const date = new Date(questData.progress.lastDoneDate);
+            if (!isNaN(date.getTime())) {
+                lastCompletionTime = date.getTime();
             }
+        } else if (questData.progress?.lastUpdated) {
+            // Legacy Fallback
+            lastCompletionTime = questData.progress.lastUpdated;
         }
-        const lastUpdated = resolvedLastUpdated;
 
         // Frequency Parsing (using shared helper for consistency)
         const freqExpression = FrequencyHelper.syncAndGetFrequency(questData, cleanTitle);
         const target = questData.progress?.target || 1;
 
+        // --- 0. Grace Initialization & Accumulation ---
+        if (questData.progress?.streak) {
+            const streak = questData.progress.streak;
+            // Ensure availableGrace is initialized (Migration from graceUsed or new)
+            if (streak.availableGrace === undefined) {
+                streak.availableGrace = settings.gracePeriodsPerCycle ?? 1;
+            }
+
+            // Accumulate Bonus Grace from Cron
+            // Accumulate Bonus Grace from Cron
+            const effectiveCron = streak.graceCron || settings.defaultGraceCron;
+
+            if (effectiveCron) {
+                const lastGrant = streak.lastGraceGrantDate ? new Date(streak.lastGraceGrantDate).getTime() : Date.now();
+                // Only count if lastGrant is in the past (to avoid double counting on init)
+                if (streak.lastGraceGrantDate) {
+                    const bonus = CronHelper.getOccurrencesBetween(effectiveCron, lastGrant, now);
+                    if (bonus > 0) {
+                        streak.availableGrace = (streak.availableGrace || 0) + bonus;
+                        streak.lastGraceGrantDate = new Date(now).toISOString();
+                    }
+                } else {
+                    // First time seeing cron, initialize baseline
+                    streak.lastGraceGrantDate = new Date(now).toISOString();
+                }
+            }
+        }
+
         // --- 1. Missed Streak Logic (with grace/decay/tiers) ---
-        if (questData.progress?.streak && lastUpdated > 0) {
-            const missedCount = CronHelper.getOccurrencesBetween(freqExpression, lastUpdated, now);
+        if (questData.progress?.streak && lastCompletionTime > 0) {
+            const missedCount = CronHelper.getOccurrencesBetween(freqExpression, lastCompletionTime, now);
 
             if (missedCount > 1) {
                 const streak = questData.progress.streak;
-                const graceMax = settings.gracePeriodsPerCycle;
-                const graceUsed = streak.graceUsed ?? 0;
+                const defaultGrace = settings.gracePeriodsPerCycle ?? 1;
 
-                if (graceUsed < graceMax) {
-                    // Consume grace, streak survives
-                    streak.graceUsed = graceUsed + 1;
+                // Calculate actual missed cycles (subtracting the current one)
+                const actualMisses = missedCount - 1;
+                const currentGrace = streak.availableGrace ?? defaultGrace;
+
+                if (actualMisses <= currentGrace) {
+                    // Consume grace for each actual miss, streak survives
+                    streak.availableGrace = currentGrace - actualMisses;
                     // Don't reset current progress - user gets a pass
                 } else {
                     // Grace exhausted - apply decay or reset
                     const decay = settings.decayPercent;
 
                     if (decay > 0 && streak.current > 0) {
-                        // Decay: reduce streak by percentage
-                        const loss = Math.max(1, Math.floor(streak.current * (decay / 100)));
-                        streak.current = Math.max(0, streak.current - loss);
+                        // Decay: reduce streak by percentage iteratively for each missed cycle
+                        for (let i = 0; i < actualMisses; i++) {
+                            const loss = Math.max(1, Math.floor(streak.current * (decay / 100)));
+                            streak.current = Math.max(0, streak.current - loss);
+                            if (streak.current === 0) break;
+                        }
                     } else {
                         // Hard reset
                         streak.current = 0;
@@ -138,28 +177,28 @@ export class StreakLogic {
                         streak.tier = tier; // Persist calculated tier
                     }
 
-                    // Record miss timestamp
-                    streak.lastMissTimestamp = now;
+                    // Record miss date (human readable)
+                    streak.lastMissDate = new Date(now).toISOString();
 
-                    // Reset grace for new cycle
-                    streak.graceUsed = 0;
+                    // Reset grace for new cycle (Standard reset to default)
+                    streak.availableGrace = settings.gracePeriodsPerCycle ?? 1;
 
                     // Reset daily progress counter
                     questData.progress.current = 0;
                 }
             }
-        } else if (lastUpdated === 0) {
+        } else if (lastCompletionTime === 0) {
             questData.progress = { ...questData.progress, current: 0 };
         }
 
         // --- 2. Double-Dip Guard (Anti-Cheat) ---
-        const cyclesPassed = (lastUpdated > 0)
-            ? CronHelper.getOccurrencesBetween(freqExpression, lastUpdated, now)
+        const cyclesPassed = (lastCompletionTime > 0)
+            ? CronHelper.getOccurrencesBetween(freqExpression, lastCompletionTime, now)
             : 1;
 
         const freshCurrent = questData.progress?.current || 0;
 
-        if (cyclesPassed === 0 && lastUpdated > 0) {
+        if (cyclesPassed === 0 && lastCompletionTime > 0) {
             if (freshCurrent >= target) {
                 return {
                     updates: {},
@@ -167,7 +206,10 @@ export class StreakLogic {
                     xpGained: 0,
                     shouldDealDamage: false,
                     shouldBlock: true,
-                    blockReason: 'ALREADY_DONE_TODAY'
+                    blockReason: 'ALREADY_DONE_TODAY',
+                    blockMetadata: {
+                        nextResetTime: CronHelper.getNextOccurrence(freqExpression, now)
+                    }
                 };
             }
         } else if (cyclesPassed > 0) {
@@ -183,8 +225,15 @@ export class StreakLogic {
         if (!questData.progress) questData.progress = { current: 0, target };
 
         questData.progress.current = newCurrent;
-        questData.progress.lastUpdated = now;
+        if (!questData.progress) questData.progress = { current: 0, target };
+
+        questData.progress.current = newCurrent;
+        // Stop writing lastUpdated (legacy). Use lastDoneDate.
         questData.progress.lastDoneDate = new Date(now).toISOString();
+
+        // Remove legacy fields if they exist to clean up JSON
+        delete questData.progress.lastUpdated;
+        delete questData.routine;
 
         const isFinishedForCycle = newCurrent >= target;
 
@@ -214,8 +263,9 @@ export class StreakLogic {
                 // Increment lifetime completions (never resets)
                 streak.totalCompletions = (streak.totalCompletions || 0) + 1;
 
-                // Reset grace used on successful completion
-                streak.graceUsed = 0;
+                // Refill available grace (preserve surplus from cron)
+                const defaultGrace = settings.gracePeriodsPerCycle ?? 1;
+                streak.availableGrace = Math.max(streak.availableGrace || 0, defaultGrace);
             }
             if (newCurrent === target) {
                 stepIncrement = 1;

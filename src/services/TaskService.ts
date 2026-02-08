@@ -102,16 +102,23 @@ export class TaskService {
 
                 if (!questData || questData.meta.type !== 'HABIT') continue;
 
-                const lastUpdated = questData.progress?.lastUpdated || 0;
+                // Use lastDoneDate as source of truth
+                let lastCompletionTime = 0;
+                if (questData.progress?.lastDoneDate) {
+                    const d = new Date(questData.progress.lastDoneDate);
+                    if (!isNaN(d.getTime())) lastCompletionTime = d.getTime();
+                } else if (questData.progress?.lastUpdated) {
+                    lastCompletionTime = questData.progress.lastUpdated;
+                }
 
-                if (lastUpdated < startOfDay) {
+                if (lastCompletionTime < startOfDay) {
                     let streakBroken = false;
 
                     if (questData.progress?.streak) {
                         const startOfYesterday = startOfDay - (24 * 60 * 60 * 1000);
 
                         const wasFinished = (questData.progress.current || 0) >= (questData.progress.target || 1);
-                        const updatedYesterday = lastUpdated >= startOfYesterday;
+                        const updatedYesterday = lastCompletionTime >= startOfYesterday;
 
                         if (!updatedYesterday || !wasFinished) {
                             streakBroken = true;

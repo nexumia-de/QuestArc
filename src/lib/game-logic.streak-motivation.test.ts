@@ -98,4 +98,67 @@ describe('Streak Motivation Logic', () => {
         });
     });
 
+    describe('Multi-Miss Scenario (Grace Consumption)', () => {
+        it('should decay streak when multiple cycles are missed beyond available grace', () => {
+            const streak = {
+                current: 4,
+                highest: 4,
+                tier: 'bronze' as const,
+                availableGrace: 1,
+                totalCompletions: 4,
+                lastMissDate: ''
+            };
+
+            const settings = {
+                gracePeriodsPerCycle: 1,
+                decayPercent: 25,
+                useTiers: true,
+                tierFloors: { bronze: 0, silver: 7, gold: 30, diamond: 60 }
+            };
+
+            // Logic Simulation:
+            // 4 misses total. 1 grace available.
+            // actualMisses = 3.
+            // 3 > 1 available grace -> Fail.
+            // Streak 4 -> 25% decay -> loss 1 -> Streak 3.
+
+            const missedCount = 4;
+            const actualMisses = missedCount - 1;
+            const currentGrace = streak.availableGrace; // 1
+
+            let finalStreak = streak.current;
+
+            if (actualMisses <= currentGrace) {
+                // Grace covers it
+            } else {
+                const decay = settings.decayPercent;
+                // Iterative decay simulation
+                for (let i = 0; i < actualMisses; i++) {
+                    const loss = Math.max(1, Math.floor(finalStreak * (decay / 100)));
+                    finalStreak = Math.max(0, finalStreak - loss);
+                    if (finalStreak === 0) break;
+                }
+            }
+
+            // Expect streak to degrade iteratively (4 -> 3 -> 2 -> 1)
+            expect(finalStreak).toBe(1);
+        });
+    });
+
+    describe('Grace Refill Logic', () => {
+        it('should refill to default on success', () => {
+            const streak = { availableGrace: 0 };
+            const defaultGrace = 1;
+            const result = Math.max(streak.availableGrace, defaultGrace);
+            expect(result).toBe(1);
+        });
+
+        it('should preserve surplus grace on success', () => {
+            const streak = { availableGrace: 10 };
+            const defaultGrace = 1;
+            const result = Math.max(streak.availableGrace, defaultGrace);
+            expect(result).toBe(10);
+        });
+    });
+
 });

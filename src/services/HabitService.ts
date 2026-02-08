@@ -149,8 +149,9 @@ export class HabitService {
                     const freqFromTitle = FrequencyHelper.extractFrequencyFromText(task.title) ||
                         FrequencyHelper.extractFrequencyFromText(task.notes || '');
                     if (freqFromTitle) {
-                        if (!data.routine) data.routine = {};
-                        data.routine.frequency = freqFromTitle;
+                        // Write to meta.frequency instead of routine
+                        if (!data.meta) data.meta = {} as any;
+                        data.meta.frequency = freqFromTitle;
                     }
 
                     const newJson = JSON.stringify(data, null, 2);
@@ -173,7 +174,8 @@ export class HabitService {
                     titleFromData = formatTaskTitle(baseTitle, data.progress);
 
                     // 3. Add [Next: Day Time] tag using CronHelper (Matches StreakLogic)
-                    const freqExpression = (data.routine && data.routine.frequency) ? data.routine.frequency : 'daily';
+                    // Priority: meta.frequency -> routine.frequency -> 'daily'
+                    const freqExpression = data.meta?.frequency || data.routine?.frequency || 'daily';
                     const now = Date.now();
                     const nextMs = CronHelper.getNextOccurrence(freqExpression, now);
 

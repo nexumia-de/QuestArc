@@ -38,6 +38,7 @@ export function processTaskCompletion(
   taskUpdates?: Partial<Task>;
   shouldBlock?: boolean;
   blockReason?: string;
+  blockMetadata?: any;
   explicitDamage?: number;
 } {
   let damageDealt = 0;
@@ -90,7 +91,8 @@ export function processTaskCompletion(
         stepCompleted: false,
         leveledUp: false,
         shouldBlock: true,
-        blockReason: result.blockReason || 'BLOCKED'
+        blockReason: result.blockReason || 'BLOCKED',
+        blockMetadata: result.blockMetadata
       };
     }
 

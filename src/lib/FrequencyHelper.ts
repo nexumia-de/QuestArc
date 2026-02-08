@@ -13,8 +13,8 @@ export class FrequencyHelper {
      * 
      * Priority:
      * 1. [freq:...] tag in title (syncs to JSON)
-     * 2. questData.routine.frequency
-     * 3. questData.meta.frequency
+     * 2. questData.meta.frequency
+     * 3. questData.routine.frequency (legacy fallback)
      * 4. 'daily' (default)
      */
     static syncAndGetFrequency(questData: QuestTaskData, title: string): string {
@@ -23,12 +23,7 @@ export class FrequencyHelper {
         if (freqMatch && freqMatch[1]) {
             const titleFreq = freqMatch[1].trim();
             if (titleFreq) {
-                // Sync to both locations for consistency
-                if (!questData.routine) {
-                    questData.routine = { frequency: titleFreq, lastDone: null };
-                } else {
-                    questData.routine.frequency = titleFreq;
-                }
+                // Sync to meta.frequency
                 if (!questData.meta) {
                     questData.meta = {} as any;
                 }
@@ -37,8 +32,8 @@ export class FrequencyHelper {
             }
         }
 
-        // Fallback chain: routine.frequency -> meta.frequency -> 'daily'
-        return questData.routine?.frequency || questData.meta?.frequency || 'daily';
+        // Fallback chain: meta.frequency -> routine.frequency (legacy) -> 'daily'
+        return questData.meta?.frequency || questData.routine?.frequency || 'daily';
     }
 
     /**

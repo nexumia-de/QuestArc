@@ -102,11 +102,22 @@ describe('QuestArc v2 Parsers', () => {
             const raw = '[count:5] [freq:daily] Drink Water';
             const { title, data } = compileTaskData(raw);
 
-            expect(title).toBe('Drink Water (0/5)');
+            expect(title).toBe('Drink Water (0/5) 0/1 🔥');
             expect(data.meta.type).toBe('HABIT');
-            expect(data.routine?.frequency).toBe('daily');
+            // expect(data.routine?.frequency).toBe('daily'); // routine removed
+            expect(data.meta.frequency).toBe('daily');
             expect(data.progress?.target).toBe(5);
             expect(data.progress?.current).toBe(0);
+        });
+
+        it('should compile a Habit with complex cron', () => {
+            const raw = '[freq:0 1 * * 3] [count:2] Weekly Check';
+            const { title, data } = compileTaskData(raw);
+
+            // Expect (0/2) because count > 1
+            expect(title).toBe('Weekly Check (0/2)');
+            expect(data.meta.type).toBe('HABIT');
+            expect(data.meta.frequency).toBe('0 1 * * 3');
         });
 
         it('should append initial progress count to title for Grinds', () => {
@@ -121,7 +132,7 @@ describe('QuestArc v2 Parsers', () => {
             const raw = '[count:3] [freq:daily] Drink Water';
             const { title, data } = compileTaskData(raw);
 
-            expect(title).toBe('Drink Water (0/3)');
+            expect(title).toBe('Drink Water (0/3) 0/1 🔥');
             expect(data.progress?.target).toBe(3);
         });
     });

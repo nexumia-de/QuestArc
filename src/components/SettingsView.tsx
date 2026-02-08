@@ -129,7 +129,8 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
         gracePeriodsPerCycle: 1,
         decayPercent: 25,
         useTiers: true,
-        tierFloors: { bronze: 0, silver: 7, gold: 30, diamond: 60 }
+        tierFloors: { bronze: 0, silver: 7, gold: 30, diamond: 60 },
+        defaultGraceCron: ''
     };
     const getStreakValue = <K extends keyof StreakBehaviorConfig>(key: K): Required<StreakBehaviorConfig>[K] => {
         const val = props.settings?.streakBehavior?.[key];
@@ -303,6 +304,17 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
                                 onInput={(e) => handleUpdateStreakBehavior({ decayPercent: parseInt(e.currentTarget.value) || 0 })}
                             />
                             <span class="streak-hint">% lost per miss (0 = hard reset)</span>
+                        </div>
+
+                        <div class="streak-row">
+                            <label>Bonus Grace Schedule</label>
+                            <input
+                                type="text"
+                                placeholder="0 0 1 * *"
+                                value={getStreakValue('defaultGraceCron') || ''}
+                                onInput={(e) => handleUpdateStreakBehavior({ defaultGraceCron: e.currentTarget.value })}
+                            />
+                            <span class="streak-hint">Cron to earn extra grace (e.g. '0 0 1 * *')</span>
                         </div>
 
                         <div class="streak-row checkbox-row">

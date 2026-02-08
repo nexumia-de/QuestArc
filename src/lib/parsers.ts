@@ -163,7 +163,8 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
             version: 1,
             originalTitle,
             damage: meta.damage,
-            damageEvery: meta.damageEvery
+            damageEvery: meta.damageEvery,
+            frequency: meta.frequency // Added missing field
         }
     };
 
@@ -196,10 +197,10 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
     }
 
     if (type === 'HABIT') {
-        data.routine = {
-            frequency: meta.frequency,
-            lastDone: null
-        };
+        // Use meta.frequency instead of routine
+        // (routine is deprecated, we don't write it for new tasks)
+        // data.routine = { ... }; 
+
         if (meta.streakTarget) {
             data.progress!.streak = {
                 current: 0,

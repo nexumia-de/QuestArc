@@ -176,7 +176,21 @@ export class TaskCompletionHandler {
 
             // Show appropriate notification based on reason
             if (result.blockReason === 'ALREADY_DONE_TODAY') {
-                PluginService.showSnack('✅ Daily goal already completed for today!', 'SUCCESS');
+                let msg = '✅ Habit goal already completed for now!';
+                if (result.blockMetadata?.nextResetTime) {
+                    const nextDate = new Date(result.blockMetadata.nextResetTime);
+                    const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    // Check if tomorrow
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const isTomorrow = nextDate.getDate() === tomorrow.getDate() &&
+                        nextDate.getMonth() === tomorrow.getMonth() &&
+                        nextDate.getFullYear() === tomorrow.getFullYear();
+
+                    const dayStr = isTomorrow ? 'Tomorrow' : nextDate.toLocaleDateString([], { weekday: 'short' });
+                    msg += ` Next: ${dayStr} at ${timeStr}`;
+                }
+                PluginService.showSnack(msg, 'SUCCESS');
             } else {
                 PluginService.showSnack(`⛔ ${result.blockReason}`, 'ERROR');
             }

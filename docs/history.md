@@ -102,3 +102,4 @@
 | 098 | 2026-02-01 | Bug Fix: Zombie Quest State (Fix `isCompleted` update). | - | Antigravity |
 | 099 | 2026-02-01 | Feature: Frequency & Streak Logic (Double-Dip Guard + Sticky Streaks). | [./099/](./099/) | Antigravity |
 | 103 | 2026-02-08 | Feature: Streak Motivation System (Grace Periods, Decay, Tier Floors). | [./103/](./103/) | Antigravity |
+| 104 | 2026-02-08 | Advanced Grace System: Bankable Grace, Cron Accumulation, & Refill Logic. | [./104/](./104/) | Antigravity |
