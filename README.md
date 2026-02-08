@@ -91,15 +91,12 @@ src/
 
 ## Roadmap
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the full development roadmap.
-
-**Current Status:** Phase 1 - Core Engine (MVP 1)
+**Current Status:** v2.1 - Project Integration Phase
 
 **Upcoming Features:**
-- Story Editor (create custom quests)
-- Template Library (pre-built productivity journeys)
-- Import/Export (share stories)
-- Co-op Mode (collaborative boss battles)
+- Native Habit Integration (Sync with Super Productivity Habit Tab)
+- Co-op Mode (Collaborative boss battles)
+
 
 ## Contributing
 
@@ -111,8 +108,8 @@ MIT
 
 ## Support
 
-- Report bugs or new feature ideas: [GitHub Issues](https://codeberg.org/Nexumia/QuestArc/issues)
-- Super Productivity: [super-productivity.com](https://super-productivity.com)
+- Report bugs or feature ideas: [Codeberg Issues](https://codeberg.org/Nexumia/QuestArc/issues)
+- Documentation: [Syntax Guide](docs/SYNTAX_GUIDE.md)
 
 ---
 
