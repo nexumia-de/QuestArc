@@ -1,11 +1,56 @@
 export class CronHelper {
+    // Built-in frequency aliases (exported for settings UI)
+    static readonly BUILTIN_ALIASES: ReadonlyArray<{ alias: string; cron: string; description: string }> = [
+        { alias: 'daily', cron: '0 0 * * *', description: 'Every day at midnight' },
+        { alias: 'd', cron: '0 0 * * *', description: 'Short for daily' },
+        { alias: 'weekly', cron: '0 0 * * 1', description: 'Every Monday at midnight' },
+        { alias: 'w', cron: '0 0 * * 1', description: 'Short for weekly' },
+        { alias: 'weekdays', cron: '0 0 * * 1-5', description: 'Mon-Fri at midnight' },
+        { alias: 'weekends', cron: '0 0 * * 0,6', description: 'Sat & Sun at midnight' },
+        { alias: 'monthly', cron: '0 0 1 * *', description: '1st of each month at midnight' },
+        { alias: 'm', cron: '0 0 1 * *', description: 'Short for monthly' },
+        { alias: 'hourly', cron: '0 * * * *', description: 'Every hour at :00' },
+        { alias: 'h', cron: '0 * * * *', description: 'Short for hourly' },
+    ];
+
+    // Custom aliases can be passed in at runtime (from state)
+    private static customAliases: Array<{ alias: string; cron: string }> = [];
+
+    static setCustomAliases(aliases: Array<{ alias: string; cron: string }>) {
+        this.customAliases = aliases;
+    }
+
     /**
      * Parses a cron string into next valid date.
      * Supports standard 5-part cron: "min hour day month weekday"
-     * Also supports aliases: "daily", "weekly"
+     * Also supports aliases: "daily", "weekly", etc.
      */
     static getNextOccurrence(expression: string, fromDate: number = Date.now()): number | null {
         try {
+            // 1. Check for simple intervals "every X days" / "every X hours"
+            const lower = expression.toLowerCase().trim();
+            const dayMatch = lower.match(/^every\s+(\d+)\s+days?$/);
+            if (dayMatch && dayMatch[1]) {
+                const days = parseInt(dayMatch[1], 10);
+                const next = new Date(fromDate);
+                next.setDate(next.getDate() + days);
+                // Reset to start of that day? Or exact time?
+                // "Every 3 days" usually implies "Any time on that day". 
+                // But generally habit streak logic resets to midnight or preserves time.
+                // Let's preserve time for now, or reset to 00:00 if it feels more "cron-like".
+                // User complaint "Always next day" might mean they expect "3 days from NOW".
+                return next.getTime();
+            }
+
+            const hourMatch = lower.match(/^every\s+(\d+)\s+hours?$/);
+            if (hourMatch && hourMatch[1]) {
+                const hours = parseInt(hourMatch[1], 10);
+                const next = new Date(fromDate);
+                next.setHours(next.getHours() + hours);
+                return next.getTime();
+            }
+
+            // 2. Standard Cron Logic
             const expr = this.normalizeExpression(expression);
             if (!expr) return null;
 
@@ -60,9 +105,20 @@ export class CronHelper {
 
     private static normalizeExpression(expr: string): string[] | null {
         const lower = expr.toLowerCase().trim();
-        if (lower === 'daily') return ['0', '0', '*', '*', '*'];
-        if (lower === 'weekly') return ['0', '0', '*', '*', '1']; // Monday default
 
+        // 1. Check custom aliases first (user-defined take priority)
+        const customMatch = this.customAliases.find(a => a.alias.toLowerCase() === lower);
+        if (customMatch) {
+            return customMatch.cron.split(/\s+/);
+        }
+
+        // 2. Check built-in aliases
+        const builtinMatch = this.BUILTIN_ALIASES.find(a => a.alias === lower);
+        if (builtinMatch) {
+            return builtinMatch.cron.split(/\s+/);
+        }
+
+        // 3. Parse as raw cron expression
         const parts = lower.split(/\s+/);
         if (parts.length !== 5) return null;
         return parts;
@@ -129,6 +185,8 @@ export class CronHelper {
         }
 
         // Exact match
-        return parseInt(pattern, 10) === value;
+        const pVal = parseInt(pattern, 10);
+        if (pVal === 7 && value === 0) return true; // Handle 7 as Sunday (0)
+        return pVal === value;
     }
 }

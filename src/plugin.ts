@@ -12,6 +12,7 @@ import { TaskUndoHandler } from './handlers/TaskUndoHandler';
 import { MessageHandler } from './handlers/MessageHandler';
 import { ContextHandler } from './handlers/ContextHandler';
 import { HookName } from './constants';
+import { CronHelper } from './lib/cron';
 
 
 let state: QuestArcState;
@@ -72,6 +73,11 @@ async function init() {
           }
 
           PluginService.log.info('State loaded and migrated successfully');
+
+          // Apply custom frequency aliases to CronHelper
+          if (state.settings?.customFrequencyAliases) {
+            CronHelper.setCustomAliases(state.settings.customFrequencyAliases);
+          }
         }
       } catch (parseError) {
         PluginService.log.error('Failed to parse saved state:', parseError);

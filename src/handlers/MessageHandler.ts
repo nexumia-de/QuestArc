@@ -5,6 +5,7 @@ import { createInitialState } from '../lib/state/persistence'; // Correct path
 import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';
 import { QuestManagerService } from '../services/manager.service';
+import { CronHelper } from '../lib/cron';
 
 export class MessageHandler {
     static async handle(
@@ -242,6 +243,12 @@ export class MessageHandler {
                     ...state,
                     settings
                 });
+
+                // Sync custom frequency aliases to CronHelper
+                if (settings.customFrequencyAliases) {
+                    CronHelper.setCustomAliases(settings.customFrequencyAliases);
+                }
+
                 await saveCallback();
                 return { success: true };
             }

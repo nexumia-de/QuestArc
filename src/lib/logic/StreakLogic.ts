@@ -43,6 +43,7 @@ export class StreakLogic {
 
     static processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
         const now = Date.now();
+        PluginService.log.info(`[StreakLogic] DEBUG: Processing Habit "${cleanTitle}"`);
 
         // 0. Human Readable Date Override
         let resolvedLastUpdated = questData.progress?.lastUpdated || 0;
@@ -55,7 +56,24 @@ export class StreakLogic {
         const lastUpdated = resolvedLastUpdated;
 
         // Frequency Parsing
-        const freqExpression = questData.meta.frequency || 'daily';
+        // SYNC FREQUENCY: If title has [freq:...] tag, update JSON (Source of Truth) to prevent stale data
+        const freqRegex = /\[freq(?::(.*?))?\]/i;
+        const freqMatch = cleanTitle.match(freqRegex);
+        if (freqMatch && freqMatch[1]) {
+            const titleFreq = freqMatch[1].trim();
+            if (titleFreq) {
+                PluginService.log.info(`[StreakLogic] DEBUG: Found FREQ in title: "${titleFreq}"`);
+                // Update BOTH locations for consistency
+                if (!questData.routine) questData.routine = { frequency: titleFreq, lastDone: null };
+                else questData.routine.frequency = titleFreq;
+                if (!questData.meta) questData.meta = {} as any;
+                questData.meta.frequency = titleFreq;
+            }
+        }
+
+        // FIX: Read from routine.frequency (where compileTaskData stores it), fallback to meta.frequency, then daily
+        const freqExpression = questData.routine?.frequency || questData.meta?.frequency || 'daily';
+        PluginService.log.info(`[StreakLogic] DEBUG: Using freqExpression: "${freqExpression}"`);
         const target = questData.progress?.target || 1;
 
         // --- 1. Missed Streak Logic ---
@@ -143,8 +161,19 @@ export class StreakLogic {
             if (nextMs) {
                 const nextDate = new Date(nextMs);
                 const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const dayStr = nextDate.toLocaleDateString([], { weekday: 'short' });
-                nextRunTag = ` [Next: ${dayStr} ${timeStr}]`;
+
+                // If more than 7 days away, show date (DD.MM.) instead of weekday
+                const daysAway = (nextMs - now) / (1000 * 60 * 60 * 24);
+                let dateStr: string;
+                if (daysAway > 7) {
+                    // Format as DD.MM.
+                    const day = nextDate.getDate().toString().padStart(2, '0');
+                    const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                    dateStr = `${day}.${month}.`;
+                } else {
+                    dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
+                }
+                nextRunTag = ` [Next: ${dateStr} ${timeStr}]`;
             }
         }
 

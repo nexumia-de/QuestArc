@@ -16,10 +16,18 @@ export interface CustomTagConfig {
   isSystem?: boolean;
 }
 
+export interface FrequencyAliasConfig {
+  id: string;
+  alias: string; // e.g., "workdays"
+  cron: string;  // e.g., "0 0 * * 1-5"
+  isSystem?: boolean; // Built-in aliases are read-only
+}
+
 export interface QuestArcState {
   version: number; // Schema version for migrations
   settings: {
     customTags: CustomTagConfig[];
+    customFrequencyAliases?: FrequencyAliasConfig[]; // User-defined frequency aliases
   };
   profile: {
     level: number;

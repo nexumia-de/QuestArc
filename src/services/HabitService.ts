@@ -144,6 +144,19 @@ export class HabitService {
                     }
 
                     // Re-serialize
+                    // SYNC FREQUENCY: If title has [freq:...] tag, update JSON (Source of Truth)
+                    // Match parser logic: [freq:...] or [freq ...] or [freq] (though simple [freq] is daily)
+                    const freqRegex = /\[freq(?::(.*?))?\]/i;
+                    const freqMatch = task.title.match(freqRegex) || (task.notes || '').match(freqRegex);
+                    if (freqMatch && freqMatch[1]) {
+                        const titleFreq = freqMatch[1].trim();
+                        // If empty (just [freq]), default is daily. If contains value, use it.
+                        if (titleFreq) {
+                            if (!data.routine) data.routine = {};
+                            data.routine.frequency = titleFreq;
+                        }
+                    }
+
                     const newJson = JSON.stringify(data, null, 2);
                     // Replace the JSON block in notes
                     finalNotes = finalNotes.replace(match[0], `\`\`\`json\n${newJson}\n\`\`\``);
