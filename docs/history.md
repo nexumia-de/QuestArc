@@ -101,3 +101,4 @@
 | 097 | 2026-02-01 | Feature: Structure Enforcement (Auto-Finish & Blocking). | [./097/](./097/) | Antigravity |
 | 098 | 2026-02-01 | Bug Fix: Zombie Quest State (Fix `isCompleted` update). | - | Antigravity |
 | 099 | 2026-02-01 | Feature: Frequency & Streak Logic (Double-Dip Guard + Sticky Streaks). | [./099/](./099/) | Antigravity |
+| 103 | 2026-02-08 | Feature: Streak Motivation System (Grace Periods, Decay, Tier Floors). | [./103/](./103/) | Antigravity |

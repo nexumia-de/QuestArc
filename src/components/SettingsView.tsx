@@ -1,6 +1,6 @@
 import { Component, createSignal, For, Show } from 'solid-js';
 import { AppView } from '../hooks/useNavigation';
-import { QuestArcState, CustomTagConfig, FrequencyAliasConfig } from '../types/state';
+import { QuestArcState, CustomTagConfig, FrequencyAliasConfig, StreakBehaviorConfig } from '../types/state';
 import { CronHelper } from '../lib/cron';
 
 interface SettingsViewProps {
@@ -115,6 +115,27 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
         });
     };
 
+    // Streak Behavior Handler
+    const handleUpdateStreakBehavior = (updates: Partial<StreakBehaviorConfig>) => {
+        const current = props.settings?.streakBehavior || {};
+        props.onUpdateSettings({
+            ...props.settings!,
+            streakBehavior: { ...current, ...updates }
+        });
+    };
+
+    // Default values for streak behavior
+    const streakDefaults: Required<StreakBehaviorConfig> = {
+        gracePeriodsPerCycle: 1,
+        decayPercent: 25,
+        useTiers: true,
+        tierFloors: { bronze: 0, silver: 7, gold: 30, diamond: 60 }
+    };
+    const getStreakValue = <K extends keyof StreakBehaviorConfig>(key: K): Required<StreakBehaviorConfig>[K] => {
+        const val = props.settings?.streakBehavior?.[key];
+        return val !== undefined ? val as Required<StreakBehaviorConfig>[K] : streakDefaults[key];
+    };
+
     return (
         <section class="settings-view">
             <div class="settings-header">
@@ -122,141 +143,242 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
             </div>
 
             {/* Custom Damage Tags */}
-            <div class="settings-card">
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h3>Custom Damage Tags</h3>
-                        <p>Tasks with these tags deal specific damage to bosses.</p>
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>Custom Damage Tags</h3>
+                    <p>Tasks with these tags deal specific damage to bosses.</p>
+                </div>
+                <div class="settings-card">
+
+                    <div class="tags-list">
+                        <For each={props.settings?.customTags || []}>
+                            {(tagConfig) => (
+                                <div class="tag-row">
+                                    <div class="tag-name">
+                                        <span class="hash-prefix">#</span>
+                                        <span class={tagConfig.isSystem ? 'system-tag' : ''}>{tagConfig.tag.replace(/^#/, '')}</span>
+                                    </div>
+                                    <div class="tag-damage-input">
+                                        <label>Dmg:</label>
+                                        <input
+                                            type="number"
+                                            value={tagConfig.damage}
+                                            min="1"
+                                            onInput={(e) => handleUpdateTagDamage(tagConfig.id, parseInt(e.currentTarget.value) || 0)}
+                                        />
+                                    </div>
+                                    <Show when={!tagConfig.isSystem}>
+                                        <button class="delete-btn" onClick={() => handleDeleteTag(tagConfig.id)}>
+                                            🗑️
+                                        </button>
+                                    </Show>
+                                    <Show when={tagConfig.isSystem}>
+                                        <div class="lock-icon" title="System Tag (Cannot Delete)">🔒</div>
+                                    </Show>
+                                </div>
+                            )}
+                        </For>
                     </div>
-                </div>
 
-                <div class="tags-list">
-                    <For each={props.settings?.customTags || []}>
-                        {(tagConfig) => (
-                            <div class="tag-row">
-                                <div class="tag-name">
-                                    <span class="hash-prefix">#</span>
-                                    <span class={tagConfig.isSystem ? 'system-tag' : ''}>{tagConfig.tag.replace(/^#/, '')}</span>
-                                </div>
-                                <div class="tag-damage-input">
-                                    <label>Dmg:</label>
-                                    <input
-                                        type="number"
-                                        value={tagConfig.damage}
-                                        min="1"
-                                        onInput={(e) => handleUpdateTagDamage(tagConfig.id, parseInt(e.currentTarget.value) || 0)}
-                                    />
-                                </div>
-                                <Show when={!tagConfig.isSystem}>
-                                    <button class="delete-btn" onClick={() => handleDeleteTag(tagConfig.id)}>
-                                        🗑️
-                                    </button>
-                                </Show>
-                                <Show when={tagConfig.isSystem}>
-                                    <div class="lock-icon" title="System Tag (Cannot Delete)">🔒</div>
-                                </Show>
-                            </div>
-                        )}
-                    </For>
-                </div>
-
-                <div class="add-tag-form">
-                    <span class="input-prefix">#</span>
-                    <input
-                        type="text"
-                        placeholder="tag"
-                        value={newTag()}
-                        onInput={(e) => setNewTag(e.currentTarget.value)}
-                    />
-                    <input
-                        type="number"
-                        placeholder="Dmg"
-                        value={newTagDamage()}
-                        min="1"
-                        onInput={(e) => setNewTagDamage(parseInt(e.currentTarget.value) || 0)}
-                    />
-                    <button onClick={handleAddTag} disabled={!newTag().trim()}>Add</button>
+                    <div class="add-tag-form">
+                        <span class="input-prefix">#</span>
+                        <input
+                            type="text"
+                            placeholder="tag"
+                            value={newTag()}
+                            onInput={(e) => setNewTag(e.currentTarget.value)}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Dmg"
+                            value={newTagDamage()}
+                            min="1"
+                            onInput={(e) => setNewTagDamage(parseInt(e.currentTarget.value) || 0)}
+                        />
+                        <button onClick={handleAddTag} disabled={!newTag().trim()}>Add</button>
+                    </div>
                 </div>
             </div>
 
             {/* Frequency Aliases */}
-            <div class="settings-card">
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h3>Frequency Aliases</h3>
-                        <p>Use words like "daily" or "weekly" in [freq:...] tags. Custom aliases take priority.</p>
-                    </div>
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>Frequency Aliases</h3>
+                    <p>Use words like "daily" or "weekly" in [freq:...] tags. Custom aliases take priority.</p>
                 </div>
+                <div class="settings-card">
 
-                {/* Built-in Aliases (Read-only) */}
-                <div class="alias-section">
-                    <h4 class="alias-section-title">Built-in</h4>
-                    <div class="alias-list">
-                        <For each={builtinAliases}>
-                            {(alias) => (
-                                <div class="alias-row builtin">
-                                    <div class="alias-name">{alias.alias}</div>
-                                    <div class="alias-cron">{alias.cron}</div>
-                                    <div class="alias-desc">{alias.description}</div>
-                                    <div class="lock-icon" title="Built-in (read-only)">🔒</div>
-                                </div>
-                            )}
-                        </For>
-                    </div>
-                </div>
-
-                {/* Custom Aliases (Editable) */}
-                <div class="alias-section">
-                    <h4 class="alias-section-title">Custom</h4>
-                    <div class="alias-list">
-                        <For each={props.settings?.customFrequencyAliases || []}>
-                            {(aliasConfig) => (
-                                <div class="alias-row">
-                                    <input
-                                        type="text"
-                                        class="alias-name-input"
-                                        value={aliasConfig.alias}
-                                        onInput={(e) => handleUpdateAlias(aliasConfig.id, 'alias', e.currentTarget.value)}
-                                    />
-                                    <input
-                                        type="text"
-                                        class="alias-cron-input"
-                                        value={aliasConfig.cron}
-                                        onInput={(e) => handleUpdateAlias(aliasConfig.id, 'cron', e.currentTarget.value)}
-                                        placeholder="0 0 * * *"
-                                    />
-                                    <button class="delete-btn" onClick={() => handleDeleteAlias(aliasConfig.id)}>
-                                        🗑️
-                                    </button>
-                                </div>
-                            )}
-                        </For>
+                    {/* Built-in Aliases (Read-only) */}
+                    <div class="alias-section">
+                        <h4 class="alias-section-title">Built-in</h4>
+                        <div class="alias-list">
+                            <For each={builtinAliases}>
+                                {(alias) => (
+                                    <div class="alias-row builtin">
+                                        <div class="alias-name">{alias.alias}</div>
+                                        <div class="alias-cron">{alias.cron}</div>
+                                        <div class="alias-desc">{alias.description}</div>
+                                        <div class="lock-icon" title="Built-in (read-only)">🔒</div>
+                                    </div>
+                                )}
+                            </For>
+                        </div>
                     </div>
 
-                    <div class="add-alias-form">
-                        <input
-                            type="text"
-                            placeholder="alias"
-                            value={newAlias()}
-                            onInput={(e) => setNewAlias(e.currentTarget.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder="0 0 * * *"
-                            value={newAliasCron()}
-                            onInput={(e) => setNewAliasCron(e.currentTarget.value)}
-                        />
-                        <button onClick={handleAddAlias} disabled={!newAlias().trim() || !newAliasCron().trim()}>Add</button>
+                    {/* Custom Aliases (Editable) */}
+                    <div class="alias-section">
+                        <h4 class="alias-section-title">Custom</h4>
+                        <div class="alias-list">
+                            <For each={props.settings?.customFrequencyAliases || []}>
+                                {(aliasConfig) => (
+                                    <div class="alias-row">
+                                        <input
+                                            type="text"
+                                            class="alias-name-input"
+                                            value={aliasConfig.alias}
+                                            onInput={(e) => handleUpdateAlias(aliasConfig.id, 'alias', e.currentTarget.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            class="alias-cron-input"
+                                            value={aliasConfig.cron}
+                                            onInput={(e) => handleUpdateAlias(aliasConfig.id, 'cron', e.currentTarget.value)}
+                                            placeholder="0 0 * * *"
+                                        />
+                                        <button class="delete-btn" onClick={() => handleDeleteAlias(aliasConfig.id)}>
+                                            🗑️
+                                        </button>
+                                    </div>
+                                )}
+                            </For>
+                        </div>
+
+                        <div class="add-alias-form">
+                            <input
+                                type="text"
+                                placeholder="alias"
+                                value={newAlias()}
+                                onInput={(e) => setNewAlias(e.currentTarget.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="0 0 * * *"
+                                value={newAliasCron()}
+                                onInput={(e) => setNewAliasCron(e.currentTarget.value)}
+                            />
+                            <button onClick={handleAddAlias} disabled={!newAlias().trim() || !newAliasCron().trim()}>Add</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="settings-card">
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h3>Reset Game Progress</h3>
-                        <p>Clear all XP, levels, and history. This action cannot be undone.</p>
+            {/* Streak Behavior */}
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>🛡️ Streak Behavior</h3>
+                    <p>Configure how streaks handle missed cycles. More forgiving = more motivation!</p>
+                </div>
+                <div class="settings-card">
+
+                    <div class="streak-settings">
+                        <div class="streak-row">
+                            <label>Grace Periods per Cycle</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="10"
+                                value={getStreakValue('gracePeriodsPerCycle')}
+                                onInput={(e) => handleUpdateStreakBehavior({ gracePeriodsPerCycle: parseInt(e.currentTarget.value) || 0 })}
+                            />
+                            <span class="streak-hint">Free misses before decay</span>
+                        </div>
+
+                        <div class="streak-row">
+                            <label>Decay Percent</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={getStreakValue('decayPercent')}
+                                onInput={(e) => handleUpdateStreakBehavior({ decayPercent: parseInt(e.currentTarget.value) || 0 })}
+                            />
+                            <span class="streak-hint">% lost per miss (0 = hard reset)</span>
+                        </div>
+
+                        <div class="streak-row checkbox-row">
+                            <input
+                                type="checkbox"
+                                id="useTiers"
+                                checked={getStreakValue('useTiers')}
+                                onChange={(e) => handleUpdateStreakBehavior({ useTiers: e.currentTarget.checked })}
+                            />
+                            <label for="useTiers">Enable Tier Floors</label>
+                            <span class="streak-hint">Protect milestones (never drop below tier)</span>
+                        </div>
+
+                        <Show when={getStreakValue('useTiers')}>
+                            <div class="tier-grid">
+                                <div class="tier-item">
+                                    <span class="tier-badge bronze">🥉</span>
+                                    <span>Bronze Floor</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={(getStreakValue('tierFloors') as { bronze: number }).bronze}
+                                        onInput={(e) => handleUpdateStreakBehavior({
+                                            tierFloors: { ...getStreakValue('tierFloors') as object, bronze: parseInt(e.currentTarget.value) || 0 } as StreakBehaviorConfig['tierFloors']
+                                        })}
+                                    />
+                                </div>
+                                <div class="tier-item">
+                                    <span class="tier-badge silver">🥈</span>
+                                    <span>Silver Floor</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={(getStreakValue('tierFloors') as { silver: number }).silver}
+                                        onInput={(e) => handleUpdateStreakBehavior({
+                                            tierFloors: { ...getStreakValue('tierFloors') as object, silver: parseInt(e.currentTarget.value) || 0 } as StreakBehaviorConfig['tierFloors']
+                                        })}
+                                    />
+                                </div>
+                                <div class="tier-item">
+                                    <span class="tier-badge gold">🥇</span>
+                                    <span>Gold Floor</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={(getStreakValue('tierFloors') as { gold: number }).gold}
+                                        onInput={(e) => handleUpdateStreakBehavior({
+                                            tierFloors: { ...getStreakValue('tierFloors') as object, gold: parseInt(e.currentTarget.value) || 0 } as StreakBehaviorConfig['tierFloors']
+                                        })}
+                                    />
+                                </div>
+                                <div class="tier-item">
+                                    <span class="tier-badge diamond">💎</span>
+                                    <span>Diamond Floor</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={(getStreakValue('tierFloors') as { diamond: number }).diamond}
+                                        onInput={(e) => handleUpdateStreakBehavior({
+                                            tierFloors: { ...getStreakValue('tierFloors') as object, diamond: parseInt(e.currentTarget.value) || 0 } as StreakBehaviorConfig['tierFloors']
+                                        })}
+                                    />
+                                </div>
+                            </div>
+                        </Show>
                     </div>
+                </div>
+            </div>
+
+            {/* Reset */}
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>Reset Game Progress</h3>
+                    <p>Clear all XP, levels, and history. This action cannot be undone.</p>
+                </div>
+                <div class="settings-card">
                     <button
                         class={`reset-btn ${isResetConfirming() ? 'confirming' : ''}`}
                         onClick={handleReset}
@@ -360,8 +482,6 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
               /* Frequency Alias Styles */
               .alias-section {
                 margin-top: 1rem;
-                padding-top: 1rem;
-                border-top: 1px solid rgba(255,255,255,0.1);
               }
               .alias-section-title {
                 font-size: 0.9rem;
@@ -440,6 +560,79 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
                 opacity: 0.5;
                 cursor: not-allowed;
               }
+              
+              /* Streak Behavior Styles */
+              .streak-settings {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-top: 1rem;
+              }
+              .streak-row {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+              }
+              .streak-row label {
+                min-width: 180px;
+                font-weight: 500;
+              }
+              .streak-row input[type="number"] {
+                width: 80px;
+                padding: 6px 8px;
+                border-radius: 4px;
+                border: 1px solid rgba(255,255,255,0.2);
+                background: rgba(0,0,0,0.2);
+                color: white;
+                text-align: center;
+              }
+              .streak-row.checkbox-row {
+                gap: 0.5rem;
+              }
+              .streak-row.checkbox-row input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                accent-color: var(--accent-color);
+              }
+              .streak-row.checkbox-row label {
+                min-width: auto;
+              }
+              .streak-hint {
+                font-size: 0.85rem;
+                opacity: 0.6;
+                font-style: italic;
+              }
+              .tier-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+                background: rgba(255,255,255,0.03);
+                border-radius: 8px;
+              }
+              .tier-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              }
+              .tier-item input {
+                width: 60px;
+                padding: 4px 6px;
+                border-radius: 4px;
+                border: 1px solid rgba(255,255,255,0.2);
+                background: rgba(0,0,0,0.2);
+                color: white;
+                text-align: center;
+              }
+              .tier-badge {
+                font-size: 1.2rem;
+              }
+              .tier-badge.bronze { filter: sepia(1) saturate(2) hue-rotate(5deg); }
+              .tier-badge.silver { filter: brightness(1.2) saturate(0); }
+              .tier-badge.gold { filter: sepia(1) saturate(3) hue-rotate(15deg) brightness(1.1); }
+              .tier-badge.diamond { filter: hue-rotate(180deg) saturate(1.5); }
             `}</style>
         </section>
     );

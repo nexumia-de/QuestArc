@@ -23,11 +23,26 @@ export interface FrequencyAliasConfig {
   isSystem?: boolean; // Built-in aliases are read-only
 }
 
+export type StreakTier = 'bronze' | 'silver' | 'gold' | 'diamond';
+
+export interface StreakBehaviorConfig {
+  gracePeriodsPerCycle?: number;   // Default: 1 - free misses before decay
+  decayPercent?: number;           // Default: 25 - % of streak lost on miss
+  useTiers?: boolean;              // Default: true - enable milestone floors
+  tierFloors?: {
+    bronze: number;   // Default: 0
+    silver: number;   // Default: 7
+    gold: number;     // Default: 30
+    diamond: number;  // Default: 60
+  };
+}
+
 export interface QuestArcState {
   version: number; // Schema version for migrations
   settings: {
     customTags: CustomTagConfig[];
     customFrequencyAliases?: FrequencyAliasConfig[]; // User-defined frequency aliases
+    streakBehavior?: StreakBehaviorConfig; // Streak motivation settings
   };
   profile: {
     level: number;

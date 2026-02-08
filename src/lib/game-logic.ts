@@ -1,6 +1,6 @@
 import { QuestArcState, StoryStep } from '../types/state';
 import { QuestTaskData } from '../types/quest-v2';
-import { TaskType, Legacy } from '../constants';
+// Constants removed - no longer needed
 import { TaskStub } from '../types/plugin-api';
 
 // calculateDamage removed (deprecated)
@@ -79,7 +79,7 @@ export function processTaskCompletion(
       // If finished, fall through to full XP logic
     }
   } else if (type === 'HABIT') {
-    const result = processHabitProgress(questData, cleanTitle);
+    const result = processHabitProgress(questData, cleanTitle, state);
 
     // Check for block FIRST
     if (result.shouldBlock) {
@@ -304,6 +304,6 @@ function processGrindProgress(questData: QuestTaskData, cleanTitle: string) {
   return StreakLogic.processGrindProgress(questData, cleanTitle);
 }
 
-function processHabitProgress(questData: QuestTaskData, cleanTitle: string) {
-  return StreakLogic.processHabitProgress(questData, cleanTitle);
+function processHabitProgress(questData: QuestTaskData, cleanTitle: string, state: QuestArcState) {
+  return StreakLogic.processHabitProgress(questData, cleanTitle, state.settings?.streakBehavior);
 }

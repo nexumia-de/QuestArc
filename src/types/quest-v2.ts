@@ -28,6 +28,10 @@ export interface QuestTaskData {
             current: number;
             target?: number; // Optional target to complete something
             highest?: number;
+            tier?: 'bronze' | 'silver' | 'gold' | 'diamond'; // Milestone tier
+            graceUsed?: number;        // Shields consumed this cycle
+            totalCompletions?: number; // Lifetime count (never resets)
+            lastMissTimestamp?: number; // When streak was last reduced
         };
     };
 
