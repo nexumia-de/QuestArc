@@ -231,14 +231,19 @@ export class HabitService {
         // Filter tasks in this project
         const projectTasks = tasks.filter(t => t.projectId === projectId);
 
-        // precise match
-        const existing = projectTasks.find(t => t.title.trim() === groupName);
+        // Build the decorated title (with icon) for Inbox
+        const decoratedTitle = groupName === 'Inbox' ? `${INBOX_ICON} ${INBOX_TASK_TITLE}` : groupName;
+
+        // Check for existing: match either plain name or decorated name
+        const existing = projectTasks.find(t => {
+            const trimmedTitle = t.title.trim();
+            return trimmedTitle === groupName || trimmedTitle === decoratedTitle;
+        });
 
         if (existing) return existing.id;
 
         // Create new Group Task
-        // If it's Inbox, add icon
-        const title = groupName === 'Inbox' ? `${INBOX_ICON} ${INBOX_TASK_TITLE}` : groupName;
+        const title = decoratedTitle;
 
         const newTask = await PluginService.api.addTask({
             title: title,
