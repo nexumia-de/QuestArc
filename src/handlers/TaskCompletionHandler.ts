@@ -575,7 +575,7 @@ export class TaskCompletionHandler {
 
         // --- 3. AUTO-FINISH PARENT (Modified Location) ---
         // We run this LAST so we know if the subtask (Habit/Grind) was *actually* completed or kept open.
-        if (task.parentId && !state.activeStory.isCompleted) {
+        if (isQuestTask && task.parentId && !state.activeStory.isCompleted) {
             try {
                 // Determine effective status of CURRENT task
                 // If updates.isDone is explicitly defined, use it.
