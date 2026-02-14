@@ -30,16 +30,15 @@ Internal scratchpads or common training data are **subordinate** to the project 
 *   **Face (`src/app/App.tsx`):** Dumb UI. Ephemeral. Polls for state.
 *   *See `docs/ARCHITECTURE.md` for details.*
 
-### 3. The "Document-First" Workflow (MANDATORY)
-**You MUST follow this loop for EVERY feature or major change. NO EXCEPTIONS.**
+### 3. The "Agentic" Workflow (MANDATORY)
+**The Agent drives the process. You MUST follow this loop:**
 
-1.  **Read** `docs/history.md` to get the next ID (e.g., `043`).
-2.  **Create** `docs/<ID>/plan.md`.
-    *   *Wait for User Approval if the plan is complex.*
-3.  **Code** (Brain first, Face second).
-4.  **Create** `docs/<ID>/worklog.md`.
-    *   *Document what changed, what was verified, and any deviations from the plan.*
-5.  **Update** `docs/history.md`.
+1.  **Issue & Plan**: User selects an issue -> Agent proposes Plan in Chat.
+2.  **Branch**: Agent creates `feat/<ID>-slug`.
+3.  **Wipe Coding**: Agent implements changes (Mental "Vibe Coding").
+4.  **Docs**: Agent creates `docs/<ID>/plan.md` & `docs/<ID>/worklog.md`.
+5.  **Finish**: User reviews & pushes.
+6.  **History**: Agent updates `docs/history.md`.
     *   *Add the new row: `| <ID> | <Date> | <Summary> | [./<ID>/](./<ID>/) | Antigravity |`*
 
 ### 4. Definition of Done
