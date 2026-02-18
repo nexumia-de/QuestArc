@@ -105,3 +105,4 @@
 | 104 | 2026-02-08 | Advanced Grace System: Bankable Grace, Cron Accumulation, & Refill Logic. | [./104/](./104/) | Antigravity |
 | 105 | 2026-02-08 | DevOps: Fix Deploy Pipeline (Tag-based Versioning). | [./105/](./105/) | Antigravity |
 | 106 | 2026-02-14 | Bug Fix: Issue #8 Global Auto-Close restricted to QuestArc only. | [./106/](./106/) | Antigravity |
+| 107 | 2026-02-18 | Bug Fix: Streak reset to 0 after offline day (removed `checkDailyResets`). | [./107/](./107/) | Antigravity |
