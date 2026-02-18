@@ -92,13 +92,6 @@ function prepareTaskPayload(taskDef: any, stepTitle: string | undefined, project
         additionalFields.projectId = projectId;
     }
 
-    if (taskDef.isRepeating && taskDef.repeatCfg) {
-        additionalFields.taskRepeatCfg = {
-            repeatEvery: 1, // Default to 1
-            repeatCycle: taskDef.repeatCfg.repeatType || 'DAILY',
-            startDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
-        };
-    }
 
     return {
         title: `${taskDef.title} #QuestArc`,

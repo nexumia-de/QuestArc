@@ -94,13 +94,6 @@ export interface TaskDefinition {
   isAutoCreate: boolean;
   notes?: string;
 
-  // Recurring Task Fields
-  isRepeating?: boolean;
-  repeatCfg?: {
-    repeatEvery: number;
-    repeatType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
-  };
-
   // Requirement Fields
   isRequired?: boolean;
   requiredCount?: number;
