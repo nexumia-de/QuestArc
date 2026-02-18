@@ -13,6 +13,7 @@ export enum MESSAGE_TYPES {
   PAUSE_QUEST = 'PAUSE_QUEST',
   RESUME_QUEST = 'RESUME_QUEST',
   UPDATE_SETTINGS = 'UPDATE_SETTINGS',
+  SKIP_STEP = 'SKIP_STEP',
 }
 
 export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
@@ -81,4 +82,9 @@ export interface UpdateSettingsMessage extends BaseMessage {
   payload: { settings: QuestArcState['settings'] };
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage | PauseQuestMessage | ResumeQuestMessage | UpdateSettingsMessage;
+export interface SkipStepMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.SKIP_STEP;
+  payload?: null;
+}
+
+export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage | PauseQuestMessage | ResumeQuestMessage | UpdateSettingsMessage | SkipStepMessage;

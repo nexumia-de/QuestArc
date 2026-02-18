@@ -78,6 +78,38 @@ export interface TaskDefinition {
 }
 ```
 
+### QuestTaskData (Runtime Task Metadata)
+Stored in task notes as a JSON block. Parsed from title tags during compilation.
+
+```typescript
+interface QuestTaskData {
+  meta: {
+    type: 'SIMPLE' | 'GRIND' | 'HABIT' | 'BOSS';
+    version: number;
+    originalTitle: string;
+    sourceIndex?: number;
+    damage?: number;       // [dmg:N]
+    damageEvery?: number;  // [dmgevery:N]
+    frequency?: string;    // [freq:...]
+    persistent?: string | boolean; // [persistent] or [persistent:Group]
+    stack?: string;        // [stack:ID] — habit chain identifier for cross-step stacking
+  };
+  progress?: {
+    current: number;
+    target?: number;
+    lastDoneDate?: string;
+    streak?: {
+      current: number;
+      target?: number;
+      highest?: number;
+      tier?: 'bronze' | 'silver' | 'gold' | 'diamond';
+      totalCompletions?: number;
+      availableGrace?: number;
+    };
+  };
+}
+```
+
 ---
 
 ## Boss Configuration (`BossConfig`)

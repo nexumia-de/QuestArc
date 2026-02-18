@@ -20,6 +20,8 @@ export interface TaskNoteJSON {
         frequency?: string;
         originalTitle?: string;
         sourceIndex?: number;
+        persistent?: string | boolean;
+        stack?: string;
     };
     progress?: {
         current?: number;
@@ -28,11 +30,22 @@ export interface TaskNoteJSON {
             current: number;
             highest?: number;
             target?: number;
+            tier?: 'bronze' | 'silver' | 'gold' | 'diamond';
+            totalCompletions?: number;
+            availableGrace?: number;
+            graceCron?: string;
+            lastGraceGrantDate?: string;
+            lastMissDate?: string;
         };
         lastUpdated?: number;
         lastDoneDate?: string; // Human readable
     };
     reward?: {
         xp: number;
+    };
+    boss?: {
+        hp: number;
+        image?: string;
+        dmgPerHit?: number;
     };
 }

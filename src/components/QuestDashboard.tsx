@@ -11,7 +11,7 @@ export const QuestDashboard = () => {
     let importRef: HTMLTextAreaElement | undefined;
 
     // Use the hook for Brain communication
-    const { state: gameState, startQuest, pauseQuest, resumeQuest } = useQuestArc();
+    const { startQuest, pauseQuest, resumeQuest, skipStep } = useQuestArc();
 
     const refresh = async () => {
         setLoading(true);
@@ -62,6 +62,15 @@ export const QuestDashboard = () => {
         setLoading(true);
 
         await resumeQuest(pausedId, async () => {
+            await refresh();
+        });
+        setLoading(false);
+    };
+
+    const handleSkip = async () => {
+        if (!confirm('Skip this step? All incomplete tasks will be force-completed.')) return;
+        setLoading(true);
+        await skipStep(async () => {
             await refresh();
         });
         setLoading(false);
@@ -173,13 +182,23 @@ export const QuestDashboard = () => {
                                 </h3>
                                 <div class="active-badge">IN PROGRESS</div>
                             </div>
-                            <button
-                                onClick={handlePause}
-                                disabled={loading()}
-                                class="primary-btn"
-                            >
-                                Pause
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                    onClick={handleSkip}
+                                    disabled={loading()}
+                                    class="secondary-btn"
+                                    title="Skip to next step"
+                                >
+                                    ⏭️ Skip
+                                </button>
+                                <button
+                                    onClick={handlePause}
+                                    disabled={loading()}
+                                    class="primary-btn"
+                                >
+                                    Pause
+                                </button>
+                            </div>
                         </div>
                     </Show>
                 </section>

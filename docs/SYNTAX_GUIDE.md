@@ -105,6 +105,34 @@ Tasks in a Story can be marked to become persistent Habits in your **Grimoire** 
 *   `Run 5km [freq:weekly] [count:3] [persistent:Health]` -> Moves to "Health" group after 3 runs.
 *   `Read Book [freq:daily] [count:7] [persistent]` -> Moves to "Inbox" after 7 days.
 
+### F. Habit Stacking (Cross-Step Continuity)
+Habits can carry their streak across quest steps using the `[stack]` tag. When a step completes, the habit is cloned into the next step with its streak history intact but the new step's goal.
+
+**Syntax**: `[stack:ID]`
+
+| Component | Syntax | Description |
+| :--- | :--- | :--- |
+| **Stack ID** | `[stack:walk]` | Unique chain identifier. Habits with the same ID across steps are linked. |
+
+**What carries over**: `streak.current`, `streak.highest`, `streak.tier`, `streak.totalCompletions`, `streak.availableGrace`, `progress.lastDoneDate`
+
+**What resets**: `progress.current` (daily goal), `streak.target` (from new step's `[streak:N]`), task title (from new step)
+
+**Example** (escalating difficulty across steps):
+```
+📜 Build a Walking Habit
+├── Step 1: "Baby Steps"
+│   └── Walk 5 min [freq:daily] [streak:3] [persistent:Fitness] [stack:walk]
+├── Step 2: "Building Up"
+│   └── Walk 10 min [freq:daily] [streak:7] [persistent:Fitness] [stack:walk]
+└── Step 3: "Making It Stick"
+    └── Walk 15 min [freq:daily] [streak:14] [persistent:Fitness] [stack:walk]
+```
+
+> **Note**: `[stack:ID]` and `[persistent:Group]` are independent. `[stack]` handles mid-quest continuity; `[persistent]` handles post-quest Grimoire graduation.
+>
+> **Best Practice**: Only add the `[persistent]` tag to the **last step** of your habit chain. If you add it to every step, you will generate a new Grimoire habit for each variation (e.g., "Walk 5 min" AND "Walk 10 min").
+
 ---
 ## 4. Visual Indicators (Auto-Generated)
 
