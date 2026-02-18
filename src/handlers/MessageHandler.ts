@@ -6,6 +6,8 @@ import { PluginService } from '../services/PluginService';
 import { TaskService } from '../services/TaskService';
 import { QuestManagerService } from '../services/manager.service';
 import { CronHelper } from '../lib/cron';
+import { Symbol } from '../constants';
+import { CompilerService } from '../services/compiler.service';
 
 export class MessageHandler {
     static async handle(
@@ -251,6 +253,93 @@ export class MessageHandler {
 
                 await saveCallback();
                 return { success: true };
+            }
+
+            case MESSAGE_TYPES.SKIP_STEP: {
+                PluginService.log.info('[SkipStep] Skipping current step');
+
+                if (!state.activeStory?.id) {
+                    return { error: 'No active quest' };
+                }
+
+                try {
+                    const allTasks = await PluginService.api.getTasks();
+                    const allProjects = await PluginService.api.getAllProjects();
+
+                    // Find active quest project
+                    const activeProjectId = state.activeStory.id;
+                    const activeProject = allProjects.find(p => p.id === activeProjectId);
+                    if (!activeProject) return { error: 'Active project not found' };
+
+                    // Find the current root task (last undone root task in the project)
+                    const projectTasks = allTasks.filter(t => t.projectId === activeProjectId);
+                    const rootTasks = projectTasks.filter(t => !t.parentId);
+                    const currentRoot = rootTasks[rootTasks.length - 1];
+                    if (!currentRoot) return { error: 'No active step found' };
+
+                    // Force-complete all open subtasks
+                    const subtasks = projectTasks.filter(t => t.parentId === currentRoot.id);
+                    for (const sub of subtasks) {
+                        if (!sub.isDone) {
+                            await PluginService.api.updateTask(sub.id, { isDone: true });
+                            PluginService.log.info(`[SkipStep] Force-completed subtask: ${sub.title}`);
+                        }
+                    }
+
+                    // Force-complete the root task
+                    if (!currentRoot.isDone) {
+                        await PluginService.api.updateTask(currentRoot.id, { isDone: true });
+                        PluginService.log.info(`[SkipStep] Force-completed root: ${currentRoot.title}`);
+                    }
+
+                    // Find template project (📜 + same base title)
+                    const baseTitle = activeProject.title.replace(Symbol.QUEST_ACTIVE, '').trim();
+                    const templateProject = allProjects.find(p =>
+                        p.title.includes(Symbol.TEMPLATE) && p.title.replace(Symbol.TEMPLATE, '').trim() === baseTitle
+                    );
+
+                    if (!templateProject) {
+                        PluginService.log.warn('[SkipStep] No template found, cannot advance');
+                        return { error: 'Template project not found' };
+                    }
+
+                    // Determine next step index
+                    let sourceIndex = -1;
+                    try {
+                        const match = currentRoot.notes?.match(/```json\s*([\s\S]*?)\s*```/);
+                        if (match && match[1]) {
+                            const data = JSON.parse(match[1]);
+                            if (typeof data.meta.sourceIndex === 'number') {
+                                sourceIndex = data.meta.sourceIndex;
+                            }
+                        }
+                    } catch { /* ignore */ }
+
+                    const targetIndex = sourceIndex !== -1 ? sourceIndex + 1 : rootTasks.length;
+
+                    // Compile next task with stacking
+                    const nextFound = await CompilerService.compileNextTask(
+                        templateProject.id,
+                        activeProjectId,
+                        targetIndex
+                    );
+
+                    if (nextFound) {
+                        PluginService.log.info('[SkipStep] Next step created');
+                        PluginService.showSnack('Step skipped — Next step unlocked! ⏭️', 'SUCCESS');
+                    } else {
+                        PluginService.log.info('[SkipStep] No more steps — quest complete');
+                        state.activeStory.isCompleted = true;
+                        PluginService.showSnack('Quest completed! 🎉', 'SUCCESS');
+                    }
+
+                    updateState(state);
+                    await saveCallback();
+                    return state;
+                } catch (e: any) {
+                    PluginService.log.error('[SkipStep] Error:', e);
+                    return { error: e.message };
+                }
             }
 
             default:

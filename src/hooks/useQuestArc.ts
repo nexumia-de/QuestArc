@@ -200,6 +200,21 @@ export const useQuestArc = () => {
         }
     };
 
+    const skipStep = async (onSuccess?: () => void) => {
+        try {
+            const response = await MessageService.send<QuestArcState>(
+                MESSAGE_TYPES.SKIP_STEP
+            );
+            if (response) {
+                setState(response);
+                if (onSuccess) onSuccess();
+            }
+        } catch (error) {
+            logger.error('Skip step error:', error);
+            setActionError('Failed to skip step');
+        }
+    };
+
     return {
         state,
         actionError,
@@ -213,6 +228,7 @@ export const useQuestArc = () => {
         cancelQuest,
         pauseQuest,
         resumeQuest,
-        updateSettings
+        updateSettings,
+        skipStep
     };
 };

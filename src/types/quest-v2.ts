@@ -10,6 +10,7 @@ export interface QuestTaskData {
         damageEvery?: number; // Custom damage frequency (e.g. [dmgevery:1])
         frequency?: string; // [freq:...] value
         persistent?: string | boolean; // [persistent] value
+        stack?: string; // [stack:ID] — habit chain identifier for cross-step stacking
     };
 
     // For Story Steps (Parents)

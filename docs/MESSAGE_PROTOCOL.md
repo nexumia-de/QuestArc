@@ -20,6 +20,23 @@ Defined in `src/types/messages.ts`.
 **Payload:** `null`
 **Response:** `QuestArcState`
 
+### `UPDATE_SETTINGS`
+**Direction:** UI -> Brain
+**Purpose:** Update global settings (custom tags, frequency aliases, streak behavior).
+**Payload:**
+```typescript
+{
+  settings: QuestArcState['settings']
+}
+```
+**Response:** `QuestArcState`
+
+### `SKIP_STEP`
+**Direction:** UI -> Brain
+**Purpose:** Force-advance to the next quest step, even if not all subtasks are complete. Stacked habits carry their current streak forward. Used when a user is stuck on a streak target.
+**Payload:** `null`
+**Response:** `QuestArcState` (with `activeStory` set)
+
 ### `START_QUEST`
 **Direction:** UI -> Brain
 **Purpose:** Begin a specific story.

@@ -53,6 +53,16 @@ export function parseTaskType(title: string): {
         cleanTitleGlobal = cleanTitleGlobal.replace(persistentMatch[0], '').trim();
     }
 
+    // Parse Stack Tag (Global for all types)
+    const stackRegex = /\[stack:(\S+?)\]/i;
+    const stackMatch = cleanTitleGlobal.match(stackRegex);
+    let stack: string | undefined = undefined;
+
+    if (stackMatch && stackMatch[1]) {
+        stack = stackMatch[1].trim();
+        cleanTitleGlobal = cleanTitleGlobal.replace(stackMatch[0], '').trim();
+    }
+
     const freqRegex = /\[freq:([^\]]+)\]/i;
     const freqMatch = cleanTitleGlobal.match(freqRegex);
 
@@ -87,7 +97,8 @@ export function parseTaskType(title: string): {
                 target,
                 frequency, // Passes raw string (e.g., "daily", "weekly", "5 4 * * *")
                 streakTarget,
-                persistent // Added
+                persistent, // Added
+                stack // Added
             },
             cleanTitle: cleanTitle.replace(/\s+/g, ' ').trim()
         };
@@ -123,7 +134,8 @@ export function parseTaskType(title: string): {
                 target: parseInt(targetStr, 10),
                 damage,
                 damageEvery,
-                persistent // Added
+                persistent, // Added
+                stack // Added
             },
             cleanTitle: cleanTitleTemp.replace(/\s+/g, ' ').trim()
         };
@@ -143,7 +155,8 @@ export function parseTaskType(title: string): {
         type: 'SIMPLE',
         meta: {
             damage,
-            persistent // Added
+            persistent, // Added
+            stack // Added
         },
         cleanTitle: cleanSimpleTitle.trim()
     };
@@ -164,7 +177,9 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
             originalTitle,
             damage: meta.damage,
             damageEvery: meta.damageEvery,
-            frequency: meta.frequency // Added missing field
+            frequency: meta.frequency, // Added missing field
+            persistent: meta.persistent,
+            stack: meta.stack
         }
     };
 
@@ -225,7 +240,8 @@ export function compileTaskData(originalTitle: string): { title: string; data: Q
             let titleWithSuffix = `${cleanTitle} ${progressStr}`
 
             if (data.progress.streak && data.progress.streak.target) {
-                titleWithSuffix += ` 0/${data.progress.streak.target} 🔥`;
+                const currentStreak = data.progress.streak.current || 0;
+                titleWithSuffix += ` ${currentStreak}/${data.progress.streak.target} 🔥`;
             }
 
             return { title: titleWithSuffix, data };
@@ -251,6 +267,7 @@ export function cleanTaskTitle(title: string): string {
     // Match both "🔥 1/2" (old) and "1/2 🔥" (new) formats for backward compatibility
     clean = clean.replace(/(\s*🔥\s*\d+(\/\d+)?)|(\s*\d+(\/\d+)?\s*🔥)/g, '');
     clean = clean.replace(/\s*\(\d+\/\d+\)/g, '');
+    clean = clean.replace(/\s*\[stack:\S+?\]/gi, '');
     return clean.trim();
 }
 
