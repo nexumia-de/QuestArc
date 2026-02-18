@@ -28,11 +28,6 @@
         {
           "title": "Evening Review: What did I learn today?",
           "isAutoCreate": true,
-          "isRepeating": true,
-          "repeatCfg": {
-            "repeatEvery": 1,
-            "repeatType": "DAILY"
-          },
           "requiredCount": 3
         }
       ],

@@ -94,10 +94,6 @@ async function init() {
     }
 
     HeaderService.updateHeader(state);
-    HeaderService.updateHeader(state);
-
-    // Check for daily habit resets
-    await TaskService.checkDailyResets();
 
     PluginService.log.info('QuestArc initialized successfully');
   } catch (error) {
