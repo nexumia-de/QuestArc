@@ -15,8 +15,8 @@ Implemented habit stacking: habits with `[stack:ID]` persist streak data across 
 
 ### Compiler
 - **`src/services/compiler.service.ts`** — `extractStackData()` + streak injection in `cloneTask()`.
-  - Added **title regeneration** to reflect carried-over streak (e.g. `3/5 🔥`).
-  - Added **done-state carry-over**: If `lastDoneDate` indicates the task is still in cooldown (via `CronHelper`), the new task is marked `isDone=true` and gets the `[Next: Date Time]` tag appended.
+  - Added **title regeneration** to reflect carried-over streak/progress.
+  - **Progress Carry-over**: `progress.current` is now carried over instead of resetting to 0. This properly "stacks" progress (e.g. 50/100). The new task is deliberately kept *open* (`isDone=false`) in the next step, avoiding unintended auto-completion while preserving progress.
 
 ### Handler & UI
 - **`src/handlers/MessageHandler.ts`** — `SKIP_STEP` case: force-completes subtasks/root, finds template, calls `compileNextTask` with stacking.

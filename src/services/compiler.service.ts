@@ -3,7 +3,6 @@ import { Task } from '../types/plugin-api';
 import { PluginService } from './PluginService';
 import { NoteParser } from '../lib/parsers/NoteParser';
 import { QuestTaskData } from '../types/quest-v2';
-import { CronHelper } from '../lib/cron';
 
 export class CompilerService {
     /**
@@ -138,7 +137,6 @@ export class CompilerService {
     ) {
         // Parse special syntax (e.g. [XP:100]) using our parsers
         let { title: cleanTitle, data } = compileTaskData(originalTask.title);
-        let isDone = false;
 
         // Inject sourceIndex if provided
         if (sourceIndex !== undefined) {
@@ -163,9 +161,9 @@ export class CompilerService {
                     // Preserve new template's target
                     data.progress.streak.target = newStreakTarget;
                 }
-                // Keep new template's progress target, reset current to 0
+                // Keep new template's progress target, carry over current progress
                 data.progress.target = newProgressTarget;
-                data.progress.current = 0;
+                data.progress.current = oldProgress.current || 0;
 
                 PluginService.log.info(`[Compiler] Stacked '${data.meta.stack}': streak ${oldProgress.streak?.current ?? 0} -> new target ${newStreakTarget}`);
 
@@ -174,45 +172,14 @@ export class CompilerService {
                 let newTitle = baseTitle;
 
                 // Re-append count if needed
-                if (data.progress.target && data.progress.target > 1) {
+                if (data.progress.target && (data.progress.target > 1 || data.progress.current > 0)) {
+                    // Show progress if target > 1, OR if we carried over progress (even for target 1)
                     newTitle += ` (${data.progress.current}/${data.progress.target})`;
                 }
 
                 // Re-append streak
                 if (data.progress.streak && data.progress.streak.target) {
                     newTitle += ` ${data.progress.streak.current}/${data.progress.streak.target} 🔥`;
-                }
-
-                // Check if task is "done" for this cycle based on lastDoneDate
-                if (oldProgress.lastDoneDate) {
-                    const freq = data.meta.frequency || 'daily';
-                    const lastDoneTime = new Date(oldProgress.lastDoneDate).getTime();
-                    const nextRun = CronHelper.getNextOccurrence(freq, lastDoneTime);
-
-                    if (nextRun && nextRun > Date.now()) {
-                        // Still in cooldown -> Mark as done
-                        if (data.progress.target) {
-                            data.progress.current = data.progress.target;
-                            isDone = true;
-
-                            // Update title count to match "done" state
-                            newTitle = newTitle.replace(`(0/${data.progress.target})`, `(${data.progress.target}/${data.progress.target})`);
-                        }
-
-                        // Generate [Next: ...] tag
-                        const nextDate = new Date(nextRun);
-                        const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const daysAway = (nextRun - Date.now()) / (1000 * 60 * 60 * 24);
-                        let dateStr: string;
-                        if (daysAway > 7) {
-                            const day = nextDate.getDate().toString().padStart(2, '0');
-                            const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
-                            dateStr = `${day}.${month}.`;
-                        } else {
-                            dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
-                        }
-                        newTitle += ` [Next: ${dateStr} ${timeStr}]`;
-                    }
                 }
 
                 cleanTitle = newTitle;
@@ -236,8 +203,7 @@ export class CompilerService {
             title: `${cleanTitle}${titleSuffix}`,
             notes: finalNotes,
             projectId: targetProjectId,
-            parentId: parentId || undefined,
-            isDone: isDone
+            parentId: parentId || undefined
         });
 
         // Clone subtasks (pass stackData down for subtask habit matching)
