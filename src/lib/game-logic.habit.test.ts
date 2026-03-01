@@ -72,15 +72,17 @@ describe("Habit Logic & Looping Fix", () => {
       isDone: true, // It is already done
     };
 
-    // In soft mode (default), extra completion should NOT block — it's a bonus completion.
+    // In soft mode (default), extra completion on the SAME day should NOT block,
+    // but it should also NOT increment the visual bonus counter (silent pass-through).
     const result3 = processTaskCompletion(state, habitTask3);
 
     expect(result3.shouldBlock).toBeFalsy();
     expect(result3.isBonusCompletion).toBe(true);
     expect(result3.xpGained).toBe(0);
     expect(result3.damageDealt).toBe(0);
-    // Bonus completion now writes a title update showing the '+N🔥' counter
-    expect(result3.taskUpdates?.title).toContain("+1🔥");
+    // Silent pass-through only returns isDone: true
+    expect(result3.taskUpdates?.title).toBeUndefined();
+    expect(result3.taskUpdates?.isDone).toBe(true);
   });
 
   it("should generate a timestamp that is recent", () => {
@@ -276,5 +278,36 @@ describe("Scheduling: Soft Allow & Daily Floor", () => {
     expect(result.shouldBlock).toBeFalsy();
     expect(result.isBonusCompletion).toBeFalsy();
     expect(result.taskUpdates?.isDone).toBe(true);
+  });
+
+  it("visual bonus (+1🔥) is awarded for same-cycle completion on a DIFFERENT calendar day", () => {
+    // e.g. weekly habit checked on Monday, then checked again on Wednesday (same cycle, diff day)
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const questData = {
+      meta: { type: "HABIT", version: 1, originalTitle: "Weekly Yoga", frequency: "weekly" },
+      progress: {
+        current: 1,
+        target: 1,
+        lastDoneDate: yesterday, // done yesterday
+        streak: { current: 1, highest: 1, tier: "bronze", totalCompletions: 1, availableGrace: 1 },
+      },
+    };
+    const task: TaskStub = {
+      id: "visual-bonus-test",
+      title: `Weekly Yoga [freq:weekly]`,
+      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
+      isDone: true,
+      tagIds: [],
+    };
+
+    const state = createInitialState();
+    const result = processTaskCompletion(state, task);
+
+    expect(result.shouldBlock).toBeFalsy();
+    expect(result.isBonusCompletion).toBe(true);
+    expect(result.xpGained).toBe(0);
+    // Title SHOULD contain the visual bonus because it's a different day
+    expect(result.taskUpdates?.title).toContain("+1🔥");
+    expect(result.taskUpdates?.isDone).toBe(false); // stays open so user can check again tomorrow
   });
 });
