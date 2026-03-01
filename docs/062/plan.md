@@ -8,6 +8,7 @@ Replace the static "trending_up" arrow icon in the Global Plugin Header with a d
 > **API Limitation Workaround**: The Super Productivity API `registerHeaderButton` **does not support custom SVGs** (it only accepts Material Icon names).
 >
 > **Solution**: We will use a **DOM Injection** strategy:
+>
 > 1. Register the button with a unique placeholder icon (e.g., `crop_free`).
 > 2. Use a `MutationObserver` in `HeaderService` to watch the DOM.
 > 3. When the placeholder icon appears, strictly replace it with our custom generated SVG `<img>`.
@@ -40,7 +41,7 @@ Replace the static "trending_up" arrow icon in the Global Plugin Header with a d
 ## Verification Plan
 
 ### Manual Verification
+
 - **Visual Check**: Confirm the "crop_free" icon is explicitly replaced by the Circular XP icon.
 - **Alignment**: Confirm the injected `<img>` respects the button layout.
 - **Performance**: Ensure the observer doesn't cause lag or infinite loops.
-

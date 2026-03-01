@@ -1,10 +1,13 @@
 # Plan: Multi-Step "Heroic Story" Editor
 
 ## Goal
+
 Upgrade the UI to allow users to create "Stories" — a sequence of linked habit steps where each step evolves into the next upon completion.
 
 ## User Request
+
 The user wants a reactive interface to add multiple "Step" cards to a single Story.
+
 - Data Structure: `plugin.js` must store multi-step stories.
 - UI: Solid.js logic to manage steps signal and auto-linking `nextStepId`.
 - View: `index.html` (really `App.tsx`) to render step builder loop.
@@ -12,6 +15,7 @@ The user wants a reactive interface to add multiple "Step" cards to a single Sto
 ## Proposed Changes
 
 ### `src/app/App.tsx`
+
 - **Steps Management**:
   - Convert `newStep` signal to `steps` array signal.
   - Initial state: `[{ id: 1, title: '', target: 3, xp: 50 }]`.
@@ -26,9 +30,11 @@ The user wants a reactive interface to add multiple "Step" cards to a single Sto
   - "Add Next Habit Step" button.
 
 ### `src/plugin.ts`
+
 - **Verify `SAVE_STORY`**:
   - Ensure it accepts the full story object with the new steps structure. (Current implementation seems compatible, just need to verify validation logic).
 
 ## Verification
+
 - Create a multi-step story.
 - Verify in `plugin.ts` logs that the saved story has correct `nextStepId` linkages.

@@ -1,22 +1,22 @@
-import { QuestArcState, HeroStory } from './state';
+import { QuestArcState, HeroStory } from "./state";
 
 export enum MESSAGE_TYPES {
-  REQUEST_SYNC = 'REQUEST_SYNC',
-  DEV_RESET = 'DEV_RESET',
-  SAVE_STORY = 'SAVE_STORY',
-  START_QUEST = 'START_QUEST',
-  ADD_STEP_TASKS = 'ADD_STEP_TASKS',
-  ACKNOWLEDGE_COMPLETION = 'ACKNOWLEDGE_COMPLETION',
-  UPDATE_PROFILE = 'UPDATE_PROFILE',
-  DELETE_STORY = 'DELETE_STORY',
-  CANCEL_QUEST = 'CANCEL_QUEST',
-  PAUSE_QUEST = 'PAUSE_QUEST',
-  RESUME_QUEST = 'RESUME_QUEST',
-  UPDATE_SETTINGS = 'UPDATE_SETTINGS',
-  SKIP_STEP = 'SKIP_STEP',
+  REQUEST_SYNC = "REQUEST_SYNC",
+  DEV_RESET = "DEV_RESET",
+  SAVE_STORY = "SAVE_STORY",
+  START_QUEST = "START_QUEST",
+  ADD_STEP_TASKS = "ADD_STEP_TASKS",
+  ACKNOWLEDGE_COMPLETION = "ACKNOWLEDGE_COMPLETION",
+  UPDATE_PROFILE = "UPDATE_PROFILE",
+  DELETE_STORY = "DELETE_STORY",
+  CANCEL_QUEST = "CANCEL_QUEST",
+  PAUSE_QUEST = "PAUSE_QUEST",
+  RESUME_QUEST = "RESUME_QUEST",
+  UPDATE_SETTINGS = "UPDATE_SETTINGS",
+  SKIP_STEP = "SKIP_STEP",
 }
 
-export type MessageType = typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
+export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
 
 export interface BaseMessage {
   type: MessageType;
@@ -54,7 +54,7 @@ export interface AcknowledgeCompletionMessage extends BaseMessage {
 
 export interface UpdateProfileMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.UPDATE_PROFILE;
-  payload: { profile: Partial<QuestArcState['profile']> };
+  payload: { profile: Partial<QuestArcState["profile"]> };
 }
 
 export interface DeleteStoryMessage extends BaseMessage {
@@ -79,7 +79,7 @@ export interface ResumeQuestMessage extends BaseMessage {
 
 export interface UpdateSettingsMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.UPDATE_SETTINGS;
-  payload: { settings: QuestArcState['settings'] };
+  payload: { settings: QuestArcState["settings"] };
 }
 
 export interface SkipStepMessage extends BaseMessage {
@@ -87,4 +87,17 @@ export interface SkipStepMessage extends BaseMessage {
   payload?: null;
 }
 
-export type PluginMessage = RequestSyncMessage | DevResetMessage | SaveStoryMessage | StartQuestMessage | AddStepTasksMessage | AcknowledgeCompletionMessage | UpdateProfileMessage | DeleteStoryMessage | CancelQuestMessage | PauseQuestMessage | ResumeQuestMessage | UpdateSettingsMessage | SkipStepMessage;
+export type PluginMessage =
+  | RequestSyncMessage
+  | DevResetMessage
+  | SaveStoryMessage
+  | StartQuestMessage
+  | AddStepTasksMessage
+  | AcknowledgeCompletionMessage
+  | UpdateProfileMessage
+  | DeleteStoryMessage
+  | CancelQuestMessage
+  | PauseQuestMessage
+  | ResumeQuestMessage
+  | UpdateSettingsMessage
+  | SkipStepMessage;

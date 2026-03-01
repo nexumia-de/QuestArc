@@ -3,12 +3,14 @@
 **Goal:** Refactor `state-manager.ts` into smaller, focused modules to improve maintainability and adherence to Single Responsibility Principle.
 
 ## ⚠️ User Review Required
+
 > [!NOTE]
 > This refactor splits `state-manager.ts` into 5 files. All imports will need to be updated or a barrel file used. I will use a barrel file to minimize diffs in other files.
 
 ## 📂 Architecture Changes
 
 ### New File Structure (`src/lib/state/`)
+
 1.  `config.ts`: Constants and initial state configuration.
 2.  `persistence.ts`: `migrateState`, `ensureState`, `createInitialState`.
 3.  `validation.ts`: `validateState`.
@@ -40,9 +42,11 @@
 ## 📋 Step-by-Step Implementation
 
 ### 1. Create Directory
+
 - [ ] [NEW] `src/lib/state/`
 
 ### 2. Create Modules
+
 - [ ] [NEW] `src/lib/state/config.ts`: Move constants and initial state.
 - [ ] [NEW] `src/lib/state/persistence.ts`: Move `createInitialState`, `migrateState`, `ensureState`.
 - [ ] [NEW] `src/lib/state/validation.ts`: Move `validateState`.
@@ -50,8 +54,10 @@
 - [ ] [NEW] `src/lib/state/profile.ts`: Move `updateXp`.
 
 ### 3. Update Barrel File
+
 - [ ] [MODIFY] `src/lib/state-manager.ts`: Replace content with exports.
 
 ## 🧪 Verification
+
 - [ ] **Automated:** `npm run typecheck`
 - [ ] **Manual:** Run standard regression tests (load, save, complete task).

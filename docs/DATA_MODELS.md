@@ -2,7 +2,7 @@
 
 This document defines the core data structures used in QuestArc. These types are the "Source of Truth" for the application state.
 
-> **Note**: User content (Stories, Tasks) is created in **Projects** and **Tasks**. The models below represent the *Internal Game State* parsed from those user inputs.
+> **Note**: User content (Stories, Tasks) is created in **Projects** and **Tasks**. The models below represent the _Internal Game State_ parsed from those user inputs.
 
 ## Core State (`QuestArcState`)
 
@@ -10,16 +10,17 @@ The root state object managed by the Brain and persisted to storage.
 
 ```typescript
 export interface QuestArcState {
-  version: number;         // Schema version for migrations (e.g., 1)
-  profile: HeroProfile;    // Player stats
-  stories: HeroStory[];    // Cached List of available stories (parsed from Templates)
+  version: number; // Schema version for migrations (e.g., 1)
+  profile: HeroProfile; // Player stats
+  stories: HeroStory[]; // Cached List of available stories (parsed from Templates)
   completedStories: CompletedStory[]; // History
-  activeStory: ActiveStoryState;      // Currently running quest
-  activeBoss: ActiveBoss | null;      // Currently fighting boss
+  activeStory: ActiveStoryState; // Currently running quest
+  activeBoss: ActiveBoss | null; // Currently fighting boss
 }
 ```
 
 ### Hero Profile
+
 ```typescript
 interface HeroProfile {
   level: number;
@@ -43,56 +44,57 @@ The internal representation of a Quest, parsed from a **Project Template** (Titl
 
 ```typescript
 export interface HeroStory {
-  id: string;        // Derived from Project ID
-  title: string;     // Derived from Project Title
+  id: string; // Derived from Project ID
+  title: string; // Derived from Project Title
   steps: StoryStep[];
 }
 
 export interface StoryStep {
-  id: number;        // Step sequence ID (based on Task Order)
-  title?: string;    // Derived from Top-Level Task Title
+  id: number; // Step sequence ID (based on Task Order)
+  title?: string; // Derived from Top-Level Task Title
   xpReward: number;
   nextStepId?: number | null; // ID of the next generic step
 
   // Tasks that define this step's requirements
   // Parsed from Subtasks of the Top-Level Task
   tasksToCreate?: TaskDefinition[];
-  
+
   // What is required to finish this step?
   completion: CompletionRequirement;
 }
 
 export interface TaskDefinition {
-  title: string;          // Parsed from Subtask Title
-  isAutoCreate: boolean;  // usually true for required subtasks
+  title: string; // Parsed from Subtask Title
+  isAutoCreate: boolean; // usually true for required subtasks
   notes?: string;
   isRequired?: boolean;
   requiredCount?: number; // Parsed from [count:N]
-  
+
   // Recurring config parsed from [freq:...]
   isRepeating?: boolean;
   repeatCfg?: {
     repeatEvery: number;
-    repeatType: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+    repeatType: "DAILY" | "WEEKLY" | "MONTHLY";
   };
 }
 ```
 
 ### QuestTaskData (Runtime Task Metadata)
+
 Stored in task notes as a JSON block. Parsed from title tags during compilation.
 
 ```typescript
 interface QuestTaskData {
   meta: {
-    type: 'SIMPLE' | 'GRIND' | 'HABIT' | 'BOSS';
+    type: "SIMPLE" | "GRIND" | "HABIT" | "BOSS";
     version: number;
     originalTitle: string;
     sourceIndex?: number;
-    damage?: number;       // [dmg:N]
-    damageEvery?: number;  // [dmgevery:N]
-    frequency?: string;    // [freq:...]
+    damage?: number; // [dmg:N]
+    damageEvery?: number; // [dmgevery:N]
+    frequency?: string; // [freq:...]
     persistent?: string | boolean; // [persistent] or [persistent:Group]
-    stack?: string;        // [stack:ID] — habit chain identifier for cross-step stacking
+    stack?: string; // [stack:ID] — habit chain identifier for cross-step stacking
   };
   progress?: {
     current: number;
@@ -102,7 +104,7 @@ interface QuestTaskData {
       current: number;
       target?: number;
       highest?: number;
-      tier?: 'bronze' | 'silver' | 'gold' | 'diamond';
+      tier?: "bronze" | "silver" | "gold" | "diamond";
       totalCompletions?: number;
       availableGrace?: number;
     };
@@ -120,11 +122,11 @@ Defines a boss enemy that can appear in a step. Parsed from `⚔️` tags in tit
 export interface BossConfig {
   hp: number;
   maxHp: number;
-  
+
   // Rich Visuals
   name?: string;
-  image?: string;       // URL or Asset ID
-  themeColor?: string;  // Hex code for UI theming
+  image?: string; // URL or Asset ID
+  themeColor?: string; // Hex code for UI theming
 
   // Dynamic Damage Logic
   damageModifiers: Modifier[];
@@ -133,7 +135,7 @@ export interface BossConfig {
 
 export interface Modifier {
   trigger: {
-    type: 'tag' | 'project';
+    type: "tag" | "project";
     value: string; // ID of the tag/project
   };
   multiplier: number; // Damage multiplier (e.g., 2.0 for double damage)
@@ -145,20 +147,23 @@ export interface Modifier {
 ## Active State
 
 ### Active Story
+
 Tracks the user's progress through the currently running instance of a Story.
 
 ```typescript
 interface ActiveStoryState {
-  id: string | null;            // Project ID of the *Active* Project (copy of Template)
+  id: string | null; // Project ID of the *Active* Project (copy of Template)
   currentStepId: number;
   tasksCreatedForStepId?: number | null; // Tracks if we already spawned tasks for this step
   isCompleted?: boolean;
-  taskProgress: Record<string, number>;  // Map of TaskID -> Progress count
+  taskProgress: Record<string, number>; // Map of TaskID -> Progress count
 }
 ```
 
 ### Active Boss
+
 The runtime instance of a boss.
+
 ```typescript
 interface ActiveBoss {
   hp: number;

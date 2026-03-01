@@ -1,9 +1,11 @@
 # Worklog - Task 029
 
 ## 📝 Summary
+
 Refactored `state-manager.ts` into a modular `state/` directory with 5 focused files.
 
 ## ✅ Completed Tasks
+
 - [x] Created `src/lib/state/config.ts` (37 lines)
 - [x] Created `src/lib/state/persistence.ts` (106 lines)
 - [x] Created `src/lib/state/validation.ts` (18 lines)
@@ -13,5 +15,6 @@ Refactored `state-manager.ts` into a modular `state/` directory with 5 focused f
 - [x] Verified build (TypeScript Check) - No new errors.
 
 ## 📊 Metrics
+
 - **state-manager.ts**: Reduced from 257 to 5 lines (barrel file).
 - **Modularity**: Logic is now split by domain (persistence, story, profile, validation).

@@ -24,36 +24,39 @@ QuestArc is a plugin for [Super Productivity](https://super-productivity.com) th
 ## Quick Start
 
 1.  **Create a Story Template**:
-    *   Create a new Project in Super Productivity.
-    *   **Set the Project Icon**: Choose the **Bow & Arrow** (🏹).
-    *   **Set the Project Title**: Must start with `📜` (e.g., `📜 Morning Routine`).
-    *   Add Tasks (Steps) and Subtasks (Requirements).
-    *   *Tip: Use tags like `[freq:daily]` or `[count:5]` in titles for game logic. See [Syntax Guide](docs/SYNTAX_GUIDE.md) for full list.*
+    - Create a new Project in Super Productivity.
+    - **Set the Project Icon**: Choose the **Bow & Arrow** (🏹).
+    - **Set the Project Title**: Must start with `📜` (e.g., `📜 Morning Routine`).
+    - Add Tasks (Steps) and Subtasks (Requirements).
+    - _Tip: Use tags like `[freq:daily]` or `[count:5]` in titles for game logic. See [Syntax Guide](docs/SYNTAX_GUIDE.md) for full list._
 2.  **Play**:
-    *   Click "Start" on your new project to begin the quest.
-    *   Complete tasks to earn XP and damage bosses (when active).
+    - Click "Start" on your new project to begin the quest.
+    - Complete tasks to earn XP and damage bosses (when active).
 
 ## How It Works
 
 ### Creating Stories (The "Story Manager")
+
 QuestArc uses Super Productivity's native **Projects** as the "Story Editor".
 
 1.  **Preparation**: Set the Project Icon to **Bow** (🏹) to mark it as a QuestArc project.
 2.  **Template**: Start the Project Title with **Scroll** (`📜`) to define it as a Template.
-    *   *Example: `📜 Morning Routine`*
+    - _Example: `📜 Morning Routine`_
 3.  **Instance**: When you "Start" a story, the game creates a playable copy (e.g., `Morning Routine 🧭`).
 4.  **Syntax**: Define logic directly in Task Titles (see [Syntax Guide](docs/SYNTAX_GUIDE.md)).
-    *   `Drink Water [freq:daily]` -> Recurring Habit
-    *   `⚔️ Dragon [HP:500]` -> Boss Battle
+    - `Drink Water [freq:daily]` -> Recurring Habit
+    - `⚔️ Dragon [HP:500]` -> Boss Battle
 
 ### Game Mechanics
 
 **Boss Battles:**
+
 - Each boss has HP (hit points)
 - Completing tasks deals damage based on task duration and tags
 - Defeat the boss to earn XP and move to the next story step
 
 **XP & Leveling:**
+
 - Earn XP by completing story steps
 - Level up when you accumulate enough XP
 - XP requirement increases with each level (Level × 100)
@@ -94,9 +97,9 @@ src/
 **Current Status:** v2.1 - Project Integration Phase
 
 **Upcoming Features:**
+
 - Native Habit Integration (Sync with Super Productivity Habit Tab)
 - Co-op Mode (Collaborative boss battles)
-
 
 ## Contributing
 

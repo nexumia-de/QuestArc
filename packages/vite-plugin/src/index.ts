@@ -1,6 +1,6 @@
-import { Plugin } from 'vite';
-import path from 'path';
-import fs from 'fs';
+import { Plugin } from "vite";
+import path from "path";
+import fs from "fs";
 
 // Helper to inline chunks into JS content
 const inlineJsChunks = (js: string, distDir: string): string => {
@@ -10,7 +10,7 @@ const inlineJsChunks = (js: string, distDir: string): string => {
   // simple replace with callback is better if safe, or loop and update string.
   // The logic below replaces the *exact match string*.
 
-  // However, matchAll returns iterator. If we modify `js` inside the loop, subsequent matches might be wrong if we use indices? 
+  // However, matchAll returns iterator. If we modify `js` inside the loop, subsequent matches might be wrong if we use indices?
   // matchAll works on original string. `js.replace(match[0])` will replace the *first occurrence* of that import string.
   // Since imports are usually unique per file path, this is fine.
   // But if same file is imported twice (unlikely for top level static imports), replace would only replace first.
@@ -20,18 +20,20 @@ const inlineJsChunks = (js: string, distDir: string): string => {
 
   for (const match of chunkMatches) {
     const importedNames = match[1]; // e.g., "a as Te"
-    const chunkPath = match[2].replace('./', '');
+    const chunkPath = match[2].replace("./", "");
     const chunkFullPath = path.join(distDir, chunkPath);
 
     if (fs.existsSync(chunkFullPath)) {
-      let chunkContent = fs.readFileSync(chunkFullPath, 'utf8');
+      let chunkContent = fs.readFileSync(chunkFullPath, "utf8");
 
       // Parse the import to extract name mappings
       // import { a as x } from ... -> map[a] = x
       const importMap: Record<string, string> = {};
-      importedNames.split(',').forEach(part => {
+      importedNames.split(",").forEach((part) => {
         const trimmed = part.trim();
-        const asMatch = trimmed.match(/([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/);
+        const asMatch = trimmed.match(
+          /([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/,
+        );
         if (asMatch) {
           importMap[asMatch[1]] = asMatch[2];
         } else {
@@ -41,16 +43,18 @@ const inlineJsChunks = (js: string, distDir: string): string => {
 
       // Find the export statement in the chunk
       const exportMatch = chunkContent.match(/export\s*\{([^}]+)\}/);
-      let returnObject = '{}';
+      let returnObject = "{}";
 
       if (exportMatch) {
         const exports = exportMatch[1];
-        const exportParts = exports.split(',');
+        const exportParts = exports.split(",");
         const returnPairs: string[] = [];
 
-        exportParts.forEach(part => {
+        exportParts.forEach((part) => {
           const trimmed = part.trim();
-          const asMatch = trimmed.match(/([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/);
+          const asMatch = trimmed.match(
+            /([a-zA-Z0-9_$]+)\s+as\s+([a-zA-Z0-9_$]+)/,
+          );
 
           if (asMatch) {
             const [_, originalName, exportedAs] = asMatch;
@@ -61,18 +65,18 @@ const inlineJsChunks = (js: string, distDir: string): string => {
           }
         });
 
-        returnObject = `{ ${returnPairs.join(', ')} }`;
+        returnObject = `{ ${returnPairs.join(", ")} }`;
 
         // Remove the export statement from chunk
-        chunkContent = chunkContent.replace(/export\s*\{[^}]+\};?/, '');
+        chunkContent = chunkContent.replace(/export\s*\{[^}]+\};?/, "");
       }
 
       // Generate unique safe name for the chunk exports
-      const safeChunkName = '_' + chunkPath.replace(/[^a-zA-Z0-9]/g, '_');
+      const safeChunkName = "_" + chunkPath.replace(/[^a-zA-Z0-9]/g, "_");
 
       // Create declarations for imported vars
-      let variableDeclarations = '';
-      Object.keys(importMap).forEach(exportedAs => {
+      let variableDeclarations = "";
+      Object.keys(importMap).forEach((exportedAs) => {
         const localName = importMap[exportedAs];
         variableDeclarations += `const ${localName} = ${safeChunkName}.${exportedAs};\n`;
       });
@@ -105,65 +109,67 @@ export const superProductivityPlugin = (
   const { inlineAssets = true, copyTo } = options;
 
   return {
-    name: 'super-productivity-plugin',
+    name: "super-productivity-plugin",
     config: () => {
       return {
         build: {
-          outDir: 'dist',
+          outDir: "dist",
           emptyOutDir: true,
           rollupOptions: {
             input: {
-              plugin: path.resolve(process.cwd(), 'src/plugin.ts'),
-              ...(fs.existsSync(path.resolve(process.cwd(), 'src/index.html'))
-                ? { index: path.resolve(process.cwd(), 'src/index.html') }
+              plugin: path.resolve(process.cwd(), "src/plugin.ts"),
+              ...(fs.existsSync(path.resolve(process.cwd(), "src/index.html"))
+                ? { index: path.resolve(process.cwd(), "src/index.html") }
                 : {}),
             },
             output: {
-              entryFileNames: '[name].js',
-              chunkFileNames: '[name]-[hash].js',
-              assetFileNames: '[name].[ext]',
+              entryFileNames: "[name].js",
+              chunkFileNames: "[name]-[hash].js",
+              assetFileNames: "[name].[ext]",
             },
           },
           copyPublicDir: false,
         },
-        publicDir: 'src/assets',
+        publicDir: "src/assets",
       };
     },
     closeBundle: {
-      order: 'post',
+      order: "post",
       handler: () => {
-        const distDir = path.resolve(process.cwd(), 'dist');
+        const distDir = path.resolve(process.cwd(), "dist");
 
         // 1. Copy manifest.json
-        const manifestSrc = path.resolve(process.cwd(), 'src/manifest.json');
-        const manifestDest = path.join(distDir, 'manifest.json');
+        const manifestSrc = path.resolve(process.cwd(), "src/manifest.json");
+        const manifestDest = path.join(distDir, "manifest.json");
         if (fs.existsSync(manifestSrc)) {
-          if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+          if (!fs.existsSync(distDir))
+            fs.mkdirSync(distDir, { recursive: true });
           fs.copyFileSync(manifestSrc, manifestDest);
         }
 
         // 2. Copy icon.svg
-        const iconSrc = path.resolve(process.cwd(), 'src/assets/icon.svg');
-        const iconDest = path.join(distDir, 'icon.svg');
+        const iconSrc = path.resolve(process.cwd(), "src/assets/icon.svg");
+        const iconDest = path.join(distDir, "icon.svg");
         if (fs.existsSync(iconSrc)) {
-          if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
+          if (!fs.existsSync(distDir))
+            fs.mkdirSync(distDir, { recursive: true });
           fs.copyFileSync(iconSrc, iconDest);
         }
 
         // 3. Inline plugin.js dependencies (ALWAYS)
-        const pluginJsPath = path.join(distDir, 'plugin.js');
+        const pluginJsPath = path.join(distDir, "plugin.js");
         if (fs.existsSync(pluginJsPath)) {
-          let js = fs.readFileSync(pluginJsPath, 'utf8');
+          let js = fs.readFileSync(pluginJsPath, "utf8");
           js = inlineJsChunks(js, distDir);
           fs.writeFileSync(pluginJsPath, js);
-          console.log('✅ Inlined dependencies for plugin.js');
+          console.log("✅ Inlined dependencies for plugin.js");
         }
 
         // 4. Handle index.html and inlining (UI)
-        const htmlPath = path.join(distDir, 'index.html');
-        const nestedHtmlPath = path.join(distDir, 'src/index.html');
+        const htmlPath = path.join(distDir, "index.html");
+        const nestedHtmlPath = path.join(distDir, "src/index.html");
         if (fs.existsSync(nestedHtmlPath) && !fs.existsSync(htmlPath)) {
-          let htmlContent = fs.readFileSync(nestedHtmlPath, 'utf8');
+          let htmlContent = fs.readFileSync(nestedHtmlPath, "utf8");
           // Fix relative paths caused by moving file from src/ to root
           // e.g., "../index.js" -> "./index.js"
           htmlContent = htmlContent.replace(/src="\.\.\//g, 'src="./');
@@ -171,32 +177,39 @@ export const superProductivityPlugin = (
 
           fs.writeFileSync(htmlPath, htmlContent);
           try {
-            fs.rmSync(path.join(distDir, 'src'), { recursive: true, force: true });
-          } catch (e) { }
+            fs.rmSync(path.join(distDir, "src"), {
+              recursive: true,
+              force: true,
+            });
+          } catch (e) {}
         }
 
         if (inlineAssets && fs.existsSync(htmlPath)) {
-          let html = fs.readFileSync(htmlPath, 'utf8');
-          const jsPath = path.join(distDir, 'index.js');
-          const cssPath = path.join(distDir, 'index.css');
+          let html = fs.readFileSync(htmlPath, "utf8");
+          const jsPath = path.join(distDir, "index.js");
+          const cssPath = path.join(distDir, "index.css");
 
           if (fs.existsSync(jsPath)) {
-            let js = fs.readFileSync(jsPath, 'utf8');
+            let js = fs.readFileSync(jsPath, "utf8");
             js = inlineJsChunks(js, distDir);
 
-            html = html.replace(/<link rel="modulepreload"[^>]*>/g, '');
+            html = html.replace(/<link rel="modulepreload"[^>]*>/g, "");
 
             html = html.replace(
               /<script([^>]*)src="[^"]*index\.js"[^>]*><\/script>/g,
               (match, attrs) => {
-                const typeAttr = attrs.includes('type="module"') || match.includes('type="module"') ? 'type="module"' : '';
+                const typeAttr =
+                  attrs.includes('type="module"') ||
+                  match.includes('type="module"')
+                    ? 'type="module"'
+                    : "";
                 return `<script ${typeAttr}>${js}</script>`;
               },
             );
           }
 
           if (fs.existsSync(cssPath)) {
-            const css = fs.readFileSync(cssPath, 'utf8');
+            const css = fs.readFileSync(cssPath, "utf8");
             html = html.replace(
               /<link[^>]*rel="stylesheet"[^>]*href="[^"]*index\.css"[^>]*>/g,
               `<style>${css}</style>`,
@@ -204,7 +217,7 @@ export const superProductivityPlugin = (
           }
 
           fs.writeFileSync(htmlPath, html);
-          console.log('✅ Assets inlined successfully for index.html');
+          console.log("✅ Assets inlined successfully for index.html");
         }
 
         // 5. Copy to destination

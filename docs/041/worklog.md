@@ -1,6 +1,7 @@
 # Documentation Overhaul Worklog
 
 ## Changes
+
 - Created `DATA_MODELS.md` for schemas.
 - Created `MESSAGE_PROTOCOL.md` for IPC types.
 - Created `CONTRIBUTING.md` for workflow rules.

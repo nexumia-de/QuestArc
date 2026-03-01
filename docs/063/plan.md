@@ -14,14 +14,15 @@ Prevent XP farming by continuing to complete tasks after a quest is already mark
 
 ```typescript
 if (state.activeStory.isCompleted) {
-    PluginService.log.info('Task completed for completed quest. Ignoring.');
-    return;
+  PluginService.log.info("Task completed for completed quest. Ignoring.");
+  return;
 }
 ```
 
 ## Verification Plan
 
 ### Manual Verification
+
 1. Load the plugin with a quest near completion.
 2. Complete the final step of the quest.
    - Verify "QUEST COMPLETED!" and XP gain.
@@ -32,4 +33,5 @@ if (state.activeStory.isCompleted) {
    - NO "Level Up" (unless from legitimate sources, though this fix prevents the exploit).
 
 ### Automated Tests
+
 - Run `npm run build` to ensure type safety.

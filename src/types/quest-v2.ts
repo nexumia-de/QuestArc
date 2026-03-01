@@ -11,6 +11,8 @@ export interface QuestTaskData {
         frequency?: string; // [freq:...] value
         persistent?: string | boolean; // [persistent] value
         stack?: string; // [stack:ID] — habit chain identifier for cross-step stacking
+        shouldBlock?: boolean; // [shouldBlock:true] – opt-in hard block after target reached in cycle
+        minResetGranularity?: 'daily' | 'cycle'; // floor for blocking: 'daily' = 1x/day max (default), 'cycle' = per freq cycle
     };
 
     // For Story Steps (Parents)
@@ -24,6 +26,7 @@ export interface QuestTaskData {
         target?: number; // HP or Repetitions
         unit?: string;  // e.g., "HP"
         lastDoneDate?: string; // Human readable ISO date (manual override)
+        bonusCount?: number;   // Extra completions beyond target within current cycle (resets each cycle)
         streak?: {
             current: number;
             target?: number; // Optional target to complete something

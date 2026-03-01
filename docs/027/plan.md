@@ -3,18 +3,20 @@
 **Goal:** Refactor `EditorView.tsx` into smaller, focused components to improve maintainability and separate concerns.
 
 ## ⚠️ User Review Required
+
 > [!NOTE]
 > This is a pure refactor. No functionality changes are expected.
 
 ## 📂 Architecture Changes
 
 ### New File Structure
+
 - `src/components/editor/`
-    - `TaskEditor.tsx`: Handles the UI for defining tasks within a step.
-    - `CompletionRequirementEditor.tsx`: Handles the "Step Goal" UI (Tasks vs Boss).
-    - `StepBuilder.tsx`: A wrapper component for a single step, composing the above two.
+  - `TaskEditor.tsx`: Handles the UI for defining tasks within a step.
+  - `CompletionRequirementEditor.tsx`: Handles the "Step Goal" UI (Tasks vs Boss).
+  - `StepBuilder.tsx`: A wrapper component for a single step, composing the above two.
 - `src/hooks/`
-    - `useStoryEditor.ts`: Encapsulates all state logic (adding/removing steps, updating fields).
+  - `useStoryEditor.ts`: Encapsulates all state logic (adding/removing steps, updating fields).
 
 ### Component Responsibilities
 
@@ -43,21 +45,25 @@
 ## 📋 Step-by-Step Implementation
 
 ### 1. Extract Logic to Hook
+
 - [ ] [NEW] `src/hooks/useStoryEditor.ts`: Move all state manipulation logic here.
 
 ### 2. Create Sub-Components
+
 - [ ] [NEW] `src/components/editor/TaskEditor.tsx`: Extract task management UI.
 - [ ] [NEW] `src/components/editor/CompletionRequirementEditor.tsx`: Extract completion logic UI.
 - [ ] [NEW] `src/components/editor/StepBuilder.tsx`: Extract the individual step card.
 
 ### 3. Reassemble EditorView
+
 - [ ] [MODIFY] `src/components/EditorView.tsx`: Replace inline code with new components and hook.
 
 ## 🧪 Verification
+
 - [ ] **Automated:** `npm run typecheck`
 - [ ] **Manual:**
-    1.  Open the Story Editor.
-    2.  Create a multi-step story with tasks and boss completion.
-    3.  Verify all inputs work (typing, checkboxes, selects).
-    4.  Save and verify data is persisted correctly.
-    5.  Edit an existing story and verify data loads correctly.
+  1.  Open the Story Editor.
+  2.  Create a multi-step story with tasks and boss completion.
+  3.  Verify all inputs work (typing, checkboxes, selects).
+  4.  Save and verify data is persisted correctly.
+  5.  Edit an existing story and verify data loads correctly.

@@ -3,6 +3,7 @@
 ## Changes Made
 
 ### packages/vite-plugin/src/index.ts
+
 - **Integrated Code Inlining for `plugin.js`:**
   - Extended the Vite plugin to support inlining dependencies for the backend script (`plugin.js`), specifically to handle code splitting caused by shared libraries (`state-manager.ts`).
   - Previously, `plugin.js` retained `import` statements which caused "Cannot use import statement outside a module" errors in the host environment.
@@ -15,12 +16,14 @@
   - Updates to `index.html` processing to ensure all modulepreload links are removed, creating a truly single-file output for the iframe.
 
 ### Build Verification
+
 - **Rebuilt Plugin:** Ran `npm run build` in `packages/vite-plugin` to apply the changes.
 - **Rebuilt Project:** Ran `npm run build` in root.
-    - Verified output `dist/plugin.js` now contains `/* Inlined: state-manager... */` and uses the IIFE pattern.
-    - Verified no top-level `import` statements remain.
+  - Verified output `dist/plugin.js` now contains `/* Inlined: state-manager... */` and uses the IIFE pattern.
+  - Verified no top-level `import` statements remain.
 - **Packaged:** Ran `npm run package` successfully generating `quest-arc-v1.0.0.zip`.
 
 ## Results
+
 - **Fixed "Cannot use import statement outside a module":** `plugin.js` is now a self-contained script valid for the host.
 - **Fixed Black Screen:** The plugin initialization failure (caused by the import error) is resolved, so the Brain should now correctly initialize and serve state to the UI.

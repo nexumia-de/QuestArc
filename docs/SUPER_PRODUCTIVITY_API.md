@@ -1,5 +1,5 @@
 > [!NOTE]
-> This file is auto-generated from `@super-productivity/plugin-api/README.md`. 
+> This file is auto-generated from `@super-productivity/plugin-api/README.md`.
 > To update, run the workflow: `.agent/workflows/update-plugin-api-docs.md` or use the slash command `/update-plugin-api-docs`.
 
 # @super-productivity/plugin-api
@@ -21,23 +21,23 @@ import type {
   PluginAPI,
   PluginManifest,
   PluginHooks,
-} from '@super-productivity/plugin-api';
+} from "@super-productivity/plugin-api";
 
 // Your plugin code with full type support
 PluginAPI.registerHook(PluginHooks.TASK_COMPLETE, (taskData) => {
-  console.log('Task completed!', taskData);
+  console.log("Task completed!", taskData);
 
   PluginAPI.showSnack({
-    msg: 'Task completed successfully!',
-    type: 'SUCCESS',
-    ico: 'celebration',
+    msg: "Task completed successfully!",
+    type: "SUCCESS",
+    ico: "celebration",
   });
 });
 
 // Register a header button
 PluginAPI.registerHeaderButton({
-  label: 'My Plugin',
-  icon: 'extension',
+  label: "My Plugin",
+  icon: "extension",
   onClick: () => {
     PluginAPI.showIndexHtmlAsView();
   },
@@ -45,12 +45,12 @@ PluginAPI.registerHeaderButton({
 
 // Register a keyboard shortcut
 PluginAPI.registerShortcut({
-  id: 'my_shortcut',
-  label: 'My Custom Shortcut',
+  id: "my_shortcut",
+  label: "My Custom Shortcut",
   onExec: () => {
     PluginAPI.showSnack({
-      msg: 'Shortcut executed!',
-      type: 'SUCCESS',
+      msg: "Shortcut executed!",
+      type: "SUCCESS",
     });
   },
 });
@@ -101,13 +101,13 @@ PluginAPI.registerShortcut({
 
 ```typescript
 enum PluginHooks {
-  TASK_COMPLETE = 'taskComplete',
-  TASK_UPDATE = 'taskUpdate',
-  TASK_DELETE = 'taskDelete',
-  FINISH_DAY = 'finishDay',
-  LANGUAGE_CHANGE = 'languageChange',
-  PERSISTED_DATA_UPDATE = 'persistedDataUpdate',
-  ACTION = 'action',
+  TASK_COMPLETE = "taskComplete",
+  TASK_UPDATE = "taskUpdate",
+  TASK_DELETE = "taskDelete",
+  FINISH_DAY = "finishDay",
+  LANGUAGE_CHANGE = "languageChange",
+  PERSISTED_DATA_UPDATE = "persistedDataUpdate",
+  ACTION = "action",
 }
 ```
 
@@ -143,23 +143,23 @@ my-plugin/
 
 ```javascript
 // plugin.js
-console.log('My Plugin initializing...', PluginAPI);
+console.log("My Plugin initializing...", PluginAPI);
 
 // Register hook for task completion
 PluginAPI.registerHook(PluginAPI.Hooks.TASK_COMPLETE, function (taskData) {
-  console.log('Task completed!', taskData);
+  console.log("Task completed!", taskData);
 
   PluginAPI.showSnack({
-    msg: '🎉 Task completed!',
-    type: 'SUCCESS',
-    ico: 'celebration',
+    msg: "🎉 Task completed!",
+    type: "SUCCESS",
+    ico: "celebration",
   });
 });
 
 // Register header button
 PluginAPI.registerHeaderButton({
-  label: 'My Plugin',
-  icon: 'dashboard',
+  label: "My Plugin",
+  icon: "dashboard",
   onClick: function () {
     PluginAPI.showIndexHtmlAsView();
   },

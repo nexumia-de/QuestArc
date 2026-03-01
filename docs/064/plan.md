@@ -1,7 +1,9 @@
 # Simplify Header XP Icon
+
 The user wants to revert to a simpler state where the Header **ALWAYS** displays the Circular XP Icon with Level.
 
 ## Requirements
+
 - **Always Show XP Icon**: Remove logic that switches to Boss HP Skull.
 - **Icon**: Circular progress bar with Level number inside (existing SVG logic).
 - **Tooltip**: Hovering should show text "XP: [Current]/[Next]".
@@ -10,6 +12,7 @@ The user wants to revert to a simpler state where the Header **ALWAYS** displays
 ## Proposed Changes
 
 ### [HeaderService.ts](file:///home/deck/Projects/QuestArc/src/services/HeaderService.ts)
+
 - **Remove Boss Logic**: Delete the `if (state.activeBoss)` check in `updateHeader`.
 - **Registration**:
   - Register button ONCE with `icon: 'crop_free'` (placeholder).
@@ -21,11 +24,12 @@ The user wants to revert to a simpler state where the Header **ALWAYS** displays
     - **Issue**: The API doesn't allow updating the label after registration.
     - **Solution**: We must **update the Title/Tooltip** in the DOM manually if we want it to reflect dynamic changes without re-registering (which caused duplicates).
     - **Target**: Find the button and update `title` attribute or its text content if displayed.
-    - *Correction*: The user said "hovering should show". This implies a tooltip.
+    - _Correction_: The user said "hovering should show". This implies a tooltip.
     - We will update the button's `title` attribute or the `aria-label` / `matTooltip` if accessible.
-    - *Simpler*: Just set the button's `title` attribute on every update.
+    - _Simpler_: Just set the button's `title` attribute on every update.
 
 ## Restoration Plan
+
 1.  **Simplify `updateHeader`**: Remove boss branching. Always call `replacePlaceholderWithIcon`.
 2.  **Simplify `replacePlaceholderWithIcon`**:
     - Inject/Update SVG.
@@ -33,6 +37,7 @@ The user wants to revert to a simpler state where the Header **ALWAYS** displays
     - **Tooltip/Text**: Find the button, set `title` to `XP: 100/500`.
 
 ## Verification
+
 - Start app.
 - Verify Icon is Circle with Level.
 - Hover icon -> See XP stats.
