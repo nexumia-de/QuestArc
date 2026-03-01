@@ -377,6 +377,7 @@ export class StreakLogic {
             );
 
         const updates = {
+            isDone: false,
             title: newTitle,
             notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
         };
