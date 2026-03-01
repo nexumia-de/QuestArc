@@ -253,7 +253,10 @@ export class StreakLogic {
                     // Re-append the Next Run tag so it doesn't disappear
                     let nextRunTag = '';
                     if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
-                        nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime());
+                        // A silent pass-through means they double-tapped on the same day. 
+                        // It's 'finished' if current >= target. If they raised the target, it might be false.
+                        const isFinished = (questData.progress?.current || 0) >= target;
+                        nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime(), isFinished);
                     }
 
                     // Keep the current title, just ensure the tag is there
@@ -274,7 +277,7 @@ export class StreakLogic {
                 }
 
                 // Different day within the same cycle -> Visual Bonus (+1🔥)
-                return StreakLogic.applyBonusCompletion(questData, cleanTitle, new Date(now).toISOString(), freqExpression);
+                return StreakLogic.applyBonusCompletion(questData, cleanTitle, new Date(now).toISOString(), target, freqExpression);
             }
         } else if (cyclesPassed > 0) {
             if (questData.progress) {
@@ -384,15 +387,19 @@ export class StreakLogic {
      * Increments bonusCount, updates the title to show '+N🔥', persists JSON.
      * Does NOT increment streak.current or grant XP/damage.
      */
-    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string, now: string, freqExpression: string = 'none') {
+    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string, now: string, target: number, freqExpression: string = 'none') {
         if (!questData.progress) questData.progress = { current: 0 };
         questData.progress.bonusCount = (questData.progress.bonusCount || 0) + 1;
         questData.progress.lastDoneDate = now;
 
         // Re-append the Next Run tag so it doesn't disappear
         let nextRunTag = '';
-        if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
-            nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime());
+        // Pre-calculate next reset time for notes/title
+        if (freqExpression !== 'none') {
+            // For bonus completions, the cycle is usually finished. But if the user increased the 
+            // target mid-cycle, it might actually not be finished yet.
+            const isFinished = (questData.progress.current || 0) >= target;
+            nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime(), isFinished);
         }
 
         const newTitle =
@@ -419,8 +426,13 @@ export class StreakLogic {
 
     /**
      * Helper to format the [Next: Date Time] string consistently across paths.
+     * If isFinishedForCycle is false, it forces "Today" because the user still needs to check it again now.
      */
-    static formatNextRunTag(freqExpression: string, nowMs: number): string {
+    static formatNextRunTag(freqExpression: string, nowMs: number, isFinishedForCycle: boolean): string {
+        if (!isFinishedForCycle) {
+            return ` [Next: Today]`;
+        }
+
         const nextReset = CronHelper.getNextOccurrence(freqExpression, nowMs);
         if (!nextReset) return '';
 
