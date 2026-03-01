@@ -245,10 +245,14 @@ export class StreakLogic {
                 const today = new Date(now).toDateString();
 
                 if (lastDoneDay === today) {
-                    // Silent pass-through: user double-tapped it today. Result is just to keep it done.
+                    // Silent pass-through: user double-tapped it today. Result is to revert the optimistic checkbox.
+                    if (questData.progress) {
+                        questData.progress.lastDoneDate = new Date(now).toISOString();
+                    }
                     return {
                         updates: {
-                            isDone: true,
+                            isDone: false,
+                            notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
                         },
                         stepIncrement: 0,
                         xpGained: 0,
@@ -259,7 +263,7 @@ export class StreakLogic {
                 }
 
                 // Different day within the same cycle -> Visual Bonus (+1🔥)
-                return StreakLogic.applyBonusCompletion(questData, cleanTitle);
+                return StreakLogic.applyBonusCompletion(questData, cleanTitle, new Date(now).toISOString());
             }
         } else if (cyclesPassed > 0) {
             if (questData.progress) {
@@ -369,9 +373,10 @@ export class StreakLogic {
      * Increments bonusCount, updates the title to show '+N🔥', persists JSON.
      * Does NOT increment streak.current or grant XP/damage.
      */
-    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string) {
+    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string, now: string) {
         if (!questData.progress) questData.progress = { current: 0 };
         questData.progress.bonusCount = (questData.progress.bonusCount || 0) + 1;
+        questData.progress.lastDoneDate = now;
 
         const newTitle =
             formatTaskTitle(
