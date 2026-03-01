@@ -5,14 +5,14 @@
  * @remarks Checks for presence of profile, activeStory, and required numeric fields
  */
 export function validateState(state: any): boolean {
-    if (!state || typeof state !== 'object') {
-        return false;
-    }
+  if (!state || typeof state !== "object") {
+    return false;
+  }
 
-    return Boolean(
-        state.profile &&
-        state.activeStory &&
-        typeof state.profile.level === 'number' &&
-        typeof state.profile.xp === 'number'
-    );
+  return Boolean(
+    state.profile &&
+      state.activeStory &&
+      typeof state.profile.level === "number" &&
+      typeof state.profile.xp === "number",
+  );
 }

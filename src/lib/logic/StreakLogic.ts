@@ -26,6 +26,18 @@ const TIER_THRESHOLDS = {
     diamond: 90,
 };
 
+/** Result shape returned by processHabitProgress */
+export interface HabitProgressResult {
+    updates: Record<string, unknown>;
+    stepIncrement: number;
+    xpGained: number;
+    shouldDealDamage: boolean;
+    shouldBlock: boolean;
+    isBonusCompletion?: boolean;
+    blockReason?: string;
+    blockMetadata?: { nextResetTime: number | null };
+}
+
 export class StreakLogic {
 
     /**
@@ -86,10 +98,18 @@ export class StreakLogic {
     static processHabitProgress(
         questData: QuestTaskData,
         cleanTitle: string,
-        streakBehavior?: StreakBehaviorConfig
-    ) {
+        streakBehavior?: StreakBehaviorConfig,
+        globalSettings?: {
+            habitCompletionMode?: 'soft' | 'strict';
+            completionMinGranularity?: 'daily' | 'cycle';
+        },
+    ): HabitProgressResult {
         const now = Date.now();
         const settings = { ...DEFAULT_STREAK_BEHAVIOR, ...streakBehavior };
+
+        // Sync scheduling tags from title -> meta
+        FrequencyHelper.parseShouldBlock(questData, cleanTitle);
+        FrequencyHelper.parseMinResetGranularity(questData, cleanTitle);
 
         // Priority: progress.lastDoneDate (ISO) -> 0
         let lastCompletionTime = 0;
@@ -196,20 +216,53 @@ export class StreakLogic {
 
         if (cyclesPassed === 0 && lastCompletionTime > 0) {
             if (freshCurrent >= target) {
-                return {
-                    updates: {},
-                    stepIncrement: 0,
-                    xpGained: 0,
-                    shouldDealDamage: false,
-                    shouldBlock: true,
-                    blockReason: 'ALREADY_DONE_TODAY',
-                    blockMetadata: {
-                        nextResetTime: CronHelper.getNextOccurrence(freqExpression, now)
+                // --- Three-step blocking decision ---
+
+                // Step A: Hard block (per-task [shouldBlock:true] OR global strict mode)
+                const forceBlock =
+                    questData.meta.shouldBlock === true ||
+                    globalSettings?.habitCompletionMode === 'strict';
+
+                if (forceBlock) {
+                    return {
+                        updates: {},
+                        stepIncrement: 0,
+                        xpGained: 0,
+                        shouldDealDamage: false,
+                        shouldBlock: true,
+                        blockReason: 'ALREADY_DONE_TODAY',
+                        blockMetadata: {
+                            nextResetTime: CronHelper.getNextOccurrence(freqExpression, now)
+                        }
+                    };
+                }
+
+                // Step B: Daily-floor check
+                // Even sub-daily frequencies (hourly, every 30 min) are capped at
+                // 1 rewarding completion per calendar day by default.
+                const granularity =
+                    questData.meta.minResetGranularity ??
+                    globalSettings?.completionMinGranularity ??
+                    'daily'; // default: daily floor
+
+                if (granularity === 'daily') {
+                    const lastDoneDay = new Date(lastCompletionTime).toDateString();
+                    const today = new Date(now).toDateString();
+                    if (lastDoneDay === today) {
+                        // Bonus completion: increment bonusCount, update title, no streak/XP/damage
+                        return StreakLogic.applyBonusCompletion(questData, cleanTitle);
                     }
-                };
+                }
+
+                // Step C: Same-cycle but different day (e.g. weekly habit done Mon then Wed)
+                // OR granularity === 'cycle' without hard block -> soft bonus completion
+                return StreakLogic.applyBonusCompletion(questData, cleanTitle);
             }
         } else if (cyclesPassed > 0) {
-            if (questData.progress) questData.progress.current = 0;
+            if (questData.progress) {
+                questData.progress.current = 0;
+                questData.progress.bonusCount = 0; // Reset bonus counter on new cycle
+            }
         }
 
         // Re-read current
@@ -306,5 +359,35 @@ export class StreakLogic {
         };
 
         return { updates, stepIncrement, xpGained: 0, shouldDealDamage, shouldBlock: false };
+    }
+
+    /**
+     * Handles a bonus completion (target already met this cycle).
+     * Increments bonusCount, updates the title to show '+N🔥', persists JSON.
+     * Does NOT increment streak.current or grant XP/damage.
+     */
+    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string) {
+        if (!questData.progress) questData.progress = { current: 0 };
+        questData.progress.bonusCount = (questData.progress.bonusCount || 0) + 1;
+
+        const newTitle =
+            formatTaskTitle(
+                StreakLogic.stripDynamicTags(cleanTitle),
+                questData.progress,
+            );
+
+        const updates = {
+            title: newTitle,
+            notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
+        };
+
+        return {
+            updates,
+            stepIncrement: 0,
+            xpGained: 0,
+            shouldDealDamage: false,
+            shouldBlock: false,
+            isBonusCompletion: true,
+        };
     }
 }

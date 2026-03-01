@@ -5,26 +5,34 @@ I have fixed the issue where the icon from a template project was not being copi
 ## Changes
 
 ### 1. Compiler Service
+
 Updated `CompilerService.compileQuest` to:
+
 - Read the `icon` from the template project.
 - Pass the `icon` when creating the new project via `PluginAPI.addProject`.
 
 ### 2. Scanner Service
+
 Updated `ProjectScannerService` to:
+
 - Include the `icon` field in the `QuestProject` interface.
 - Populate the `icon` field when scanning projects.
 
 ### 3. Quest Dashboard & UI
+
 Updated `QuestDashboard.tsx` to:
+
 - Display the icon next to the active story title.
 - Display the icon next to available templates.
 
 ### 4. Type Definitions
+
 Updated `src/types/plugin-api.ts` to include `getTasksByProject` which was missing from the interface definition.
 
 ## Verification Results
 
 ### Automated Build
+
 Ran `npm run build` and it passed successfully.
 
 ```

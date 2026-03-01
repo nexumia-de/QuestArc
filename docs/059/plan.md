@@ -8,6 +8,7 @@
 ## Proposed Changes
 
 ### Context Investigation
+
 - The finding is that `NavBar` uses `left: 50%` + `transform` which can be inconsistent with the `margin: 0 auto` used by the main app container, especially with scrollbars.
 - `box-sizing` is likely missing, causing padding to affect width.
 
@@ -26,5 +27,6 @@
 ## Verification Plan
 
 ### Manual Verification
+
 - Run the app and visually verify the footer is centered.
 - Use `browser_subagent` to capture a screenshot to confirm alignment.

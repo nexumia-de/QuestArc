@@ -5,8 +5,8 @@ export interface CompletedStory extends HeroStory {
 export interface AvatarConfig {
   skinColor: string;
   bgColor: string;
-  eyes: 'neutral' | 'happy' | 'tired' | 'focus' | 'angry';
-  mouth: 'neutral' | 'smile' | 'frown' | 'surprised';
+  eyes: "neutral" | "happy" | "tired" | "focus" | "angry";
+  mouth: "neutral" | "smile" | "frown" | "surprised";
 }
 
 export interface CustomTagConfig {
@@ -19,21 +19,21 @@ export interface CustomTagConfig {
 export interface FrequencyAliasConfig {
   id: string;
   alias: string; // e.g., "workdays"
-  cron: string;  // e.g., "0 0 * * 1-5"
+  cron: string; // e.g., "0 0 * * 1-5"
   isSystem?: boolean; // Built-in aliases are read-only
 }
 
-export type StreakTier = 'bronze' | 'silver' | 'gold' | 'diamond';
+export type StreakTier = "bronze" | "silver" | "gold" | "diamond";
 
 export interface StreakBehaviorConfig {
-  gracePeriodsPerCycle?: number;   // Default: 1 - free misses before decay
-  decayPercent?: number;           // Default: 25 - % of streak lost on miss
-  useTiers?: boolean;              // Default: true - enable milestone floors
+  gracePeriodsPerCycle?: number; // Default: 1 - free misses before decay
+  decayPercent?: number; // Default: 25 - % of streak lost on miss
+  useTiers?: boolean; // Default: true - enable milestone floors
   tierFloors?: {
-    bronze: number;   // Default: 0
-    silver: number;   // Default: 7
-    gold: number;     // Default: 30
-    diamond: number;  // Default: 60
+    bronze: number; // Default: 0
+    silver: number; // Default: 7
+    gold: number; // Default: 30
+    diamond: number; // Default: 60
   };
   defaultGraceCron?: string; // Optional: Cron schedule for bonus grace accumulation
 }
@@ -44,6 +44,8 @@ export interface QuestArcState {
     customTags: CustomTagConfig[];
     customFrequencyAliases?: FrequencyAliasConfig[]; // User-defined frequency aliases
     streakBehavior?: StreakBehaviorConfig; // Streak motivation settings
+    habitCompletionMode?: 'soft' | 'strict'; // 'soft' = Habitica-style bonus completions (default), 'strict' = hard block
+    completionMinGranularity?: 'daily' | 'cycle'; // Global floor: 'daily' = max 1x reward per calendar day (default), 'cycle' = per freq cycle
   };
   profile: {
     level: number;
@@ -99,7 +101,7 @@ export interface TaskDefinition {
   requiredCount?: number;
 }
 
-export type CompletionType = 'tasks_completed' | 'boss_defeat';
+export type CompletionType = "tasks_completed" | "boss_defeat";
 
 export interface CompletionRequirement {
   type: CompletionType;
@@ -121,8 +123,8 @@ export interface StoryStep {
   // Visual / Narrative Fields
   flavor_text?: string;
   summary_text?: string; // For collapsed mode
-  story_icon?: string;   // Custom icon/emoji
-  display_mode?: 'visible' | 'collapsed' | 'tooltip';
+  story_icon?: string; // Custom icon/emoji
+  display_mode?: "visible" | "collapsed" | "tooltip";
   environment_theme?: string;
 }
 

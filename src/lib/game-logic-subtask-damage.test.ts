@@ -1,159 +1,199 @@
-import { describe, it, expect } from 'vitest';
-import { processTaskCompletion } from './game-logic';
-import { createInitialState } from './state/persistence';
-import { StoryStep } from '../types/state';
+import { describe, it, expect } from "vitest";
+import { processTaskCompletion } from "./game-logic";
+import { createInitialState } from "./state/persistence";
+import { StoryStep } from "../types/state";
 
-describe('Boss Logic Rules - Subtasks', () => {
+describe("Boss Logic Rules - Subtasks", () => {
+  const bossStep: StoryStep = {
+    id: 1,
+    title: "Boss Battle",
+    completion: {
+      type: "boss_defeat",
+    },
+    xpReward: 100,
+  };
 
-    const bossStep: StoryStep = {
-        id: 1,
-        title: 'Boss Battle',
-        completion: {
-            type: 'boss_defeat'
-        },
-        xpReward: 100
+  it("should deal damage if Subtask WITHOUT tag has Parent WITH tag", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+
+    const parentTask = {
+      tagIds: [],
+      title: "Parent Task #QuestArc",
+      notes: "",
     };
 
-    it('should deal damage if Subtask WITHOUT tag has Parent WITH tag', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Subtask",
+        notes: "",
+      } as any,
+      bossStep,
+      parentTask,
+    );
 
-        const parentTask = {
-            tagIds: [],
-            title: 'Parent Task #QuestArc',
-            notes: ''
-        };
+    expect(result.damageDealt).toBeGreaterThan(0);
+    expect(result.newState.activeBoss!.hp).toBeLessThan(100);
+  });
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Subtask',
-            notes: ''
-        } as any, bossStep, parentTask);
+  it("should NOT deal damage if Subtask WITHOUT tag has Parent WITHOUT tag", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBeGreaterThan(0);
-        expect(result.newState.activeBoss!.hp).toBeLessThan(100);
-    });
+    const parentTask = {
+      tagIds: [],
+      title: "Parent Task",
+      notes: "",
+    };
 
-    it('should NOT deal damage if Subtask WITHOUT tag has Parent WITHOUT tag', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Subtask",
+        notes: "",
+      } as any,
+      bossStep,
+      parentTask,
+    );
 
-        const parentTask = {
-            tagIds: [],
-            title: 'Parent Task',
-            notes: ''
-        };
+    expect(result.damageDealt).toBe(0);
+    expect(result.newState.activeBoss!.hp).toBe(100);
+  });
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Subtask',
-            notes: ''
-        } as any, bossStep, parentTask);
+  it("should deal damage if Subtask WITH tag has Parent WITHOUT tag", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBe(0);
-        expect(result.newState.activeBoss!.hp).toBe(100);
-    });
+    const parentTask = {
+      tagIds: [],
+      title: "Parent Task",
+      notes: "",
+    };
 
-    it('should deal damage if Subtask WITH tag has Parent WITHOUT tag', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Subtask #QuestArc",
+        notes: "",
+      } as any,
+      bossStep,
+      parentTask,
+    );
 
-        const parentTask = {
-            tagIds: [],
-            title: 'Parent Task',
-            notes: ''
-        };
+    expect(result.damageDealt).toBeGreaterThan(0);
+  });
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Subtask #QuestArc',
-            notes: ''
-        } as any, bossStep, parentTask);
+  it("should DEAL damage if DEEP subtask (Level 2) has Root Ancestor WITH tag", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBeGreaterThan(0);
-    });
+    // Root Task has #QuestArc
+    const rootTask = {
+      tagIds: [],
+      title: "Root Task #QuestArc",
+      notes: "",
+    };
 
-    it('should DEAL damage if DEEP subtask (Level 2) has Root Ancestor WITH tag', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    // We simulate passing the rootTask found via recursion
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Deep Subtask",
+        notes: "",
+      } as any,
+      bossStep,
+      rootTask,
+    );
 
-        // Root Task has #QuestArc
-        const rootTask = {
-            tagIds: [],
-            title: 'Root Task #QuestArc',
-            notes: ''
-        };
+    expect(result.damageDealt).toBeGreaterThan(0);
+  });
 
-        // We simulate passing the rootTask found via recursion
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Deep Subtask',
-            notes: ''
-        } as any, bossStep, rootTask);
+  it("should NOT deal damage if subtask has no tagged root ancestor", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBeGreaterThan(0);
-    });
+    const rootTask = {
+      tagIds: [],
+      title: "Root Task", // No Tag
+      notes: "",
+    };
 
-    it('should NOT deal damage if subtask has no tagged root ancestor', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Deep Subtask",
+        notes: "",
+      } as any,
+      bossStep,
+      rootTask,
+    );
 
-        const rootTask = {
-            tagIds: [],
-            title: 'Root Task', // No Tag
-            notes: ''
-        };
+    expect(result.damageDealt).toBe(0);
+  });
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Deep Subtask',
-            notes: ''
-        } as any, bossStep, rootTask);
+  it("should deal damage if Root Task WITH tag (no parent)", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBe(0);
-    });
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Root Task #QuestArc",
+        notes: "",
+      } as any,
+      bossStep,
+      undefined,
+    ); // No parent
 
-    it('should deal damage if Root Task WITH tag (no parent)', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    expect(result.damageDealt).toBeGreaterThan(0);
+  });
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Root Task #QuestArc',
-            notes: ''
-        } as any, bossStep, undefined); // No parent
+  it("should NOT deal damage if Root Task WITHOUT tag (no parent)", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        expect(result.damageDealt).toBeGreaterThan(0);
-    });
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Root Task",
+        notes: "",
+      } as any,
+      bossStep,
+      undefined,
+    ); // No parent
 
-    it('should NOT deal damage if Root Task WITHOUT tag (no parent)', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    expect(result.damageDealt).toBe(0);
+  });
+  it("should DEAL damage if task belongs to Quest Project (isQuestTask=true), even without tags", () => {
+    let state = createInitialState();
+    state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
 
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Root Task',
-            notes: ''
-        } as any, bossStep, undefined); // No parent
+    const rootTask = {
+      tagIds: [],
+      title: "Untagged Root Task",
+      notes: "",
+    };
 
-        expect(result.damageDealt).toBe(0);
-    });
-    it('should DEAL damage if task belongs to Quest Project (isQuestTask=true), even without tags', () => {
-        let state = createInitialState();
-        state.activeBoss = { hp: 100, maxHp: 100, isDead: false };
+    const result = processTaskCompletion(
+      state,
+      {
+        tagIds: [],
+        title: "Untagged Subtask",
+        notes: "",
+      } as any,
+      bossStep,
+      rootTask,
+      true,
+    ); // isQuestTask = true
 
-        const rootTask = {
-            tagIds: [],
-            title: 'Untagged Root Task',
-            notes: ''
-        };
-
-        const result = processTaskCompletion(state, {
-            tagIds: [],
-            title: 'Untagged Subtask',
-            notes: ''
-        } as any, bossStep, rootTask, true); // isQuestTask = true
-
-        expect(result.damageDealt).toBeGreaterThan(0);
-    });
+    expect(result.damageDealt).toBeGreaterThan(0);
+  });
 });

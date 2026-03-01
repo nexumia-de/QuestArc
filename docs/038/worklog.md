@@ -3,11 +3,13 @@
 ## Quest Dashboard Clear
 
 ### Objectives
+
 - Clear dashboard state after quest completion.
 - Ensure "Current Story Step" is hidden when no quest is active.
 - Verify "New Quest" flow still works.
 
 ### Work Log
+
 - [x] Created plan.md
 - [x] Updated `QuestArcState` to allow nullable active story ID.
 - [x] Updated `MessageHandler` to clear active story ID on completion.

@@ -12,17 +12,23 @@
   --hp-color: #ef4444;
   --hp-empty: #fee2e2;
   --xp-empty: #fef3c7;
-  --shadow-sm: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.20);
+  --shadow-sm:
+    0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12),
+    0 1px 3px 0 rgba(0, 0, 0, 0.2);
   /* Material Shadows */
-  --shadow-md: 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.12), 0 1px 8px 0 rgba(0, 0, 0, 0.20);
-  --shadow-lg: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.20);
+  --shadow-md:
+    0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.12),
+    0 1px 8px 0 rgba(0, 0, 0, 0.2);
+  --shadow-lg:
+    0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12),
+    0 3px 5px -1px rgba(0, 0, 0, 0.2);
 }
 
 /* Robust Dark Mode Detection */
-[data-theme='dark'],
+[data-theme="dark"],
 .dark-theme,
-:root[class*='dark'],
-body[class*='dark'] {
+:root[class*="dark"],
+body[class*="dark"] {
   --bg: #121212;
   /* Material Dark Background */
   --text: #e0e0e0;
@@ -43,7 +49,7 @@ body[class*='dark'] {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([class*='light']) {
+  :root:not([data-theme="light"]):not([class*="light"]) {
     --bg: #121212;
     --text: #e0e0e0;
     --text-muted: #a0a0a0;
@@ -55,7 +61,11 @@ body[class*='dark'] {
 }
 
 .app {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -83,7 +93,7 @@ body[class*='dark'] {
   overflow: hidden;
 }
 
-[data-theme='dark'] .quest-header {
+[data-theme="dark"] .quest-header {
   background: linear-gradient(145deg, #1e1e1e, #1a1a1a);
   border-color: #333;
 }
@@ -110,7 +120,7 @@ body[class*='dark'] {
   box-shadow: var(--shadow-sm);
 }
 
-[data-theme='dark'] .avatar-wrapper {
+[data-theme="dark"] .avatar-wrapper {
   border-color: rgba(255, 255, 255, 0.1);
   background: #121212;
 }
@@ -142,7 +152,7 @@ body[class*='dark'] {
   letter-spacing: -0.05em;
 }
 
-[data-theme='dark'] .hud-level-text {
+[data-theme="dark"] .hud-level-text {
   background: linear-gradient(135deg, #818cf8, #c7d2fe);
   background-clip: text;
   -webkit-background-clip: text;
@@ -151,7 +161,7 @@ body[class*='dark'] {
 
 .hud-xp-text {
   font-size: 0.85rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   /* or fallback monospace */
   color: var(--text-muted);
   font-weight: 500;
@@ -229,7 +239,6 @@ body[class*='dark'] {
   /* Matched easing */
 }
 
-
 /* .step-card styles moved to DashboardView.css */
 
 /* .active-quest h2 moved to DashboardView.css */
@@ -268,8 +277,6 @@ body[class*='dark'] {
   align-items: center;
   height: 100vh;
 }
-
-
 
 /* Editor Styles */
 .primary-btn,
@@ -451,7 +458,7 @@ body[class*='dark'] {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.85rem;
   background: var(--bg);
   color: var(--text);
@@ -498,7 +505,6 @@ body[class*='dark'] {
   display: flex;
   align-items: center;
 }
-
 
 .button-row button {
   flex: 1;
@@ -584,13 +590,12 @@ body[class*='dark'] {
   text-transform: uppercase;
 }
 
-[data-theme='dark'] .active-badge {
+[data-theme="dark"] .active-badge {
   background: rgba(34, 197, 94, 0.2);
   color: #4ade80;
 }
 
 /* Step Builder Styles */
-
 
 /* Clean Editor Enhancements */
 
@@ -803,7 +808,6 @@ input[type="number"]:focus {
   outline: none;
   border-color: var(--primary);
 }
-
 
 /* Small Button (e.g., + Add Task) */
 .small-btn {
@@ -1126,7 +1130,7 @@ input[type="number"]:focus {
   --skin-color: #ffe4c4;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --avatar-bg-start: #1e1b4b;
   --avatar-bg-end: #4338ca;
   --avatar-border: #6366f1;
@@ -1155,7 +1159,7 @@ input[type="number"]:focus {
   line-height: 1;
 }
 
-[data-theme='dark'] .hud-level-text {
+[data-theme="dark"] .hud-level-text {
   background: linear-gradient(135deg, #818cf8, #c7d2fe);
   background-clip: text;
   -webkit-background-clip: text;
@@ -1163,7 +1167,7 @@ input[type="number"]:focus {
 }
 
 .hud-values {
-  font-family: 'SF Mono', 'Roboto Mono', monospace;
+  font-family: "SF Mono", "Roboto Mono", monospace;
   font-size: 0.8rem;
   opacity: 0.8;
 }
@@ -1232,7 +1236,7 @@ input[type="number"]:focus {
   flex: 0 0 80px;
 }
 
-[data-theme='dark'] .icon-input-group input {
+[data-theme="dark"] .icon-input-group input {
   text-align: center;
 }
 
@@ -1296,7 +1300,7 @@ input[type="number"]:focus {
   color: var(--text-muted);
 }
 
-[data-theme='dark'] .step-card {
+[data-theme="dark"] .step-card {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
   border-color: rgba(255, 255, 255, 0.05);
 }
@@ -1311,7 +1315,11 @@ input[type="number"]:focus {
 
 .step-card.themed-step {
   border-left: 4px solid var(--theme-color);
-  background: linear-gradient(to right, color-mix(in srgb, var(--theme-color) 10%, transparent), transparent);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--theme-color) 10%, transparent),
+    transparent
+  );
 }
 
 .story-header-row {
@@ -1339,7 +1347,7 @@ input[type="number"]:focus {
 }
 
 .story-flavor-text {
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   font-style: italic;
   color: var(--text-muted);
   line-height: 1.6;
@@ -1414,15 +1422,15 @@ input[type="number"]:focus {
   padding: 1rem;
 }
 
-[data-theme='dark'] .story-details {
+[data-theme="dark"] .story-details {
   background: rgba(255, 255, 255, 0.03);
 }
 
-[data-theme='dark'] .story-summary {
+[data-theme="dark"] .story-summary {
   background: rgba(255, 255, 255, 0.05);
 }
 
-[data-theme='dark'] .story-summary:hover {
+[data-theme="dark"] .story-summary:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -1435,7 +1443,9 @@ input[type="number"]:focus {
   cursor: help;
   font-size: 1.5rem;
   opacity: 0.8;
-  transition: transform 0.2s, opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
   display: inline-block;
 }
 
@@ -1460,7 +1470,7 @@ input[type="number"]:focus {
   transition: opacity 0.3s;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   font-style: italic;
   font-size: 0.95rem;
   pointer-events: none;
@@ -1561,7 +1571,7 @@ input[type="number"]:focus {
   white-space: nowrap;
 }
 
-[data-theme='dark'] .task-progress {
+[data-theme="dark"] .task-progress {
   background: rgba(255, 255, 255, 0.1);
   color: #ccc;
 }
@@ -1587,7 +1597,7 @@ input[type="number"]:focus {
   transition: border-color 0.3s ease;
 }
 
-[data-theme='dark'] .boss-battle {
+[data-theme="dark"] .boss-battle {
   background: #450a0a;
 }
 
@@ -1597,11 +1607,10 @@ input[type="number"]:focus {
 }
 
 .boss-shake {
-  animation: boss-shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+  animation: boss-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes boss-shake {
-
   10%,
   90% {
     transform: translate3d(-1px, 0, 0);
@@ -1708,11 +1717,11 @@ input[type="number"]:focus {
 .quest-complete-content {
   text-align: center;
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(255, 215, 0, 0.5);
-  border: 2px solid #FFF;
+  border: 2px solid #fff;
   color: #000;
 }
 

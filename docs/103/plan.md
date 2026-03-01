@@ -92,6 +92,7 @@ if (missedCount > 1) {
 ```
 
 Add helper functions:
+
 - `getTierFloor(tier, floors)` - returns floor value for tier
 - `calculateTier(highest)` - returns tier based on highest streak
 
@@ -102,6 +103,7 @@ Add helper functions:
 #### [MODIFY] [SettingsView.tsx](file:///home/deck/Projects/QuestArc/src/components/SettingsView.tsx)
 
 Add a new "Streak Behavior" section with:
+
 - Number input for grace periods (default: 1)
 - Number input for decay percent (default: 25)
 - Toggle for tier floors (default: enabled)
@@ -111,15 +113,15 @@ Add a new "Streak Behavior" section with:
 
 ## Defaults (User-Configurable)
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `gracePeriodsPerCycle` | 1 | Free misses before decay kicks in |
-| `decayPercent` | 25 | Percentage of streak lost per miss (after grace) |
-| `useTiers` | true | Enable milestone floor protection |
-| `tierFloors.bronze` | 0 | Streak 1-6 resets to 0 |
-| `tierFloors.silver` | 7 | Streak 7-29 resets to 7 |
-| `tierFloors.gold` | 30 | Streak 30-89 resets to 30 |
-| `tierFloors.diamond` | 60 | Streak 90+ resets to 60 |
+| Setting                | Default | Description                                      |
+| ---------------------- | ------- | ------------------------------------------------ |
+| `gracePeriodsPerCycle` | 1       | Free misses before decay kicks in                |
+| `decayPercent`         | 25      | Percentage of streak lost per miss (after grace) |
+| `useTiers`             | true    | Enable milestone floor protection                |
+| `tierFloors.bronze`    | 0       | Streak 1-6 resets to 0                           |
+| `tierFloors.silver`    | 7       | Streak 7-29 resets to 7                          |
+| `tierFloors.gold`      | 30      | Streak 30-89 resets to 30                        |
+| `tierFloors.diamond`   | 60      | Streak 90+ resets to 60                          |
 
 ---
 
@@ -129,14 +131,15 @@ Add a new "Streak Behavior" section with:
 
 Extend [game-logic.streak.test.ts](file:///home/deck/Projects/QuestArc/src/lib/game-logic.streak.test.ts):
 
-| Test Case | Description |
-|-----------|-------------|
-| `should preserve streak when grace period available` | Miss 1 cycle, grace consumed, streak unchanged |
-| `should decay streak when grace exhausted` | Miss 2+ cycles, no grace, streak reduced by 25% |
-| `should enforce tier floor` | Silver streak (20) decays to max(15, 7) = 15 |
-| `should track totalCompletions across resets` | Lifetime count always increments |
+| Test Case                                            | Description                                     |
+| ---------------------------------------------------- | ----------------------------------------------- |
+| `should preserve streak when grace period available` | Miss 1 cycle, grace consumed, streak unchanged  |
+| `should decay streak when grace exhausted`           | Miss 2+ cycles, no grace, streak reduced by 25% |
+| `should enforce tier floor`                          | Silver streak (20) decays to max(15, 7) = 15    |
+| `should track totalCompletions across resets`        | Lifetime count always increments                |
 
 **Command:**
+
 ```bash
 npm run test -- --grep "Streak"
 ```
@@ -153,6 +156,7 @@ npm run test -- --grep "Streak"
 ## Summary
 
 Makes QuestArc more forgiving by:
+
 - ✅ 1 free "oops" per cycle (grace period)
 - ✅ 25% reduction instead of full reset (decay)
 - ✅ Milestone floors (tiers) protect achievements

@@ -1,6 +1,7 @@
 # Worklog: Remove Quest Board
 
 ## Changes
+
 - Deleted `StoryListView.tsx`, `StoryListView.css`, and `StoryCard.tsx`.
 - Removed "Quest Board" button from `NavBar.tsx`.
 - Removed `story-list` route from `ViewRouter.tsx`.
@@ -8,4 +9,5 @@
 - Updated `deleteStory` callback to redirect to `dashboard`.
 
 ## Verification
+
 - Ran `npm run build`. Build successful.

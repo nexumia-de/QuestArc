@@ -1,24 +1,27 @@
-import { QuestArcState } from './types/state';
-import { Task } from './types/plugin-api';
-import { createInitialState, migrateState, ensureState } from './lib/state/persistence';
-import { validateState } from './lib/state/validation';
-import { getCurrentStep } from './lib/plugin-utils';
-import { initializeBossIfNeeded } from './lib/game-logic';
-import { PluginService } from './services/PluginService';
-import { HeaderService } from './services/HeaderService';
-import { TaskService } from './services/TaskService';
-import { TaskCompletionHandler } from './handlers/TaskCompletionHandler';
-import { TaskUndoHandler } from './handlers/TaskUndoHandler';
-import { MessageHandler } from './handlers/MessageHandler';
-import { ContextHandler } from './handlers/ContextHandler';
-import { HookName } from './constants';
-import { CronHelper } from './lib/cron';
-
+import { QuestArcState } from "./types/state";
+import { Task } from "./types/plugin-api";
+import {
+  createInitialState,
+  migrateState,
+  ensureState,
+} from "./lib/state/persistence";
+import { validateState } from "./lib/state/validation";
+import { getCurrentStep } from "./lib/plugin-utils";
+import { initializeBossIfNeeded } from "./lib/game-logic";
+import { PluginService } from "./services/PluginService";
+import { HeaderService } from "./services/HeaderService";
+import { TaskService } from "./services/TaskService";
+import { TaskCompletionHandler } from "./handlers/TaskCompletionHandler";
+import { TaskUndoHandler } from "./handlers/TaskUndoHandler";
+import { MessageHandler } from "./handlers/MessageHandler";
+import { ContextHandler } from "./handlers/ContextHandler";
+import { HookName } from "./constants";
+import { CronHelper } from "./lib/cron";
 
 let state: QuestArcState;
 
 const api = PluginService.api;
-const updateChannel = new BroadcastChannel('quest-arc-updates');
+const updateChannel = new BroadcastChannel("quest-arc-updates");
 
 // Basic debounce implementation
 let saveTimeout: any = null;
@@ -29,7 +32,7 @@ async function saveState(newState?: QuestArcState) {
 
   // Always update header immediately for UI responsiveness
   HeaderService.updateHeader(state);
-  updateChannel.postMessage('UPDATE');
+  updateChannel.postMessage("UPDATE");
 
   // Cancel pending save
   if (saveTimeout) clearTimeout(saveTimeout);
@@ -39,7 +42,7 @@ async function saveState(newState?: QuestArcState) {
     try {
       await PluginService.saveState(JSON.stringify(state));
     } catch (e) {
-      PluginService.log.error('Failed to save state:', e);
+      PluginService.log.error("Failed to save state:", e);
     }
     saveTimeout = null;
   }, SAVE_DELAY);
@@ -47,7 +50,7 @@ async function saveState(newState?: QuestArcState) {
 
 async function init() {
   try {
-    PluginService.log.info('Plugin loading...');
+    PluginService.log.info("Plugin loading...");
     const saved = await PluginService.loadState();
 
     if (saved) {
@@ -55,7 +58,9 @@ async function init() {
         const parsed = JSON.parse(saved);
 
         if (!validateState(parsed)) {
-          PluginService.log.warn('Invalid state structure, resetting to initial state');
+          PluginService.log.warn(
+            "Invalid state structure, resetting to initial state",
+          );
           state = createInitialState();
         } else {
           state = ensureState(migrateState(parsed));
@@ -65,14 +70,13 @@ async function init() {
           // and that TaskHandler.handleTaskComplete expects a taskId.
           // This is a new hook registration, distinct from the existing TaskCompletionHandler.
 
-
           // Self-heal: Ensure boss is initialized if needed
           const currentStep = getCurrentStep(state);
           if (currentStep) {
             state = initializeBossIfNeeded(state, currentStep);
           }
 
-          PluginService.log.info('State loaded and migrated successfully');
+          PluginService.log.info("State loaded and migrated successfully");
 
           // Apply custom frequency aliases to CronHelper
           if (state.settings?.customFrequencyAliases) {
@@ -80,36 +84,42 @@ async function init() {
           }
         }
       } catch (parseError) {
-        PluginService.log.error('Failed to parse saved state:', parseError);
+        PluginService.log.error("Failed to parse saved state:", parseError);
         state = createInitialState();
       }
     } else {
       state = createInitialState();
-      PluginService.log.info('No saved state found, using initial state');
+      PluginService.log.info("No saved state found, using initial state");
       const currentStep = getCurrentStep(state);
       if (currentStep) {
-        await TaskService.createTasksForStep(currentStep, false, state.activeStory.id);
+        await TaskService.createTasksForStep(
+          currentStep,
+          false,
+          state.activeStory.id,
+        );
         state = initializeBossIfNeeded(state, currentStep);
       }
     }
 
     HeaderService.updateHeader(state);
 
-    PluginService.log.info('QuestArc initialized successfully');
+    PluginService.log.info("QuestArc initialized successfully");
   } catch (error) {
-    PluginService.log.error('Critical error during initialization:', error);
+    PluginService.log.error("Critical error during initialization:", error);
     state = createInitialState();
     HeaderService.updateHeader(state);
   }
 }
 
-
-
-import { TaskHookPayload } from './types/payloads';
+import { TaskHookPayload } from "./types/payloads";
 
 // Hooks
 api.registerHook(HookName.TASK_COMPLETE as any, async (payload: unknown) => {
-  await TaskCompletionHandler.handle(state, payload as TaskHookPayload | Task | string, saveState);
+  await TaskCompletionHandler.handle(
+    state,
+    payload as TaskHookPayload | Task | string,
+    saveState,
+  );
 });
 
 api.registerHook(HookName.TASK_UPDATE as any, async (payload: unknown) => {
@@ -129,10 +139,13 @@ api.registerHook(HookName.TASK_UPDATE as any, async (payload: unknown) => {
   await ContextHandler.handle(task.id, state, saveState);
 });
 
-api.registerHook(HookName.CURRENT_TASK_CHANGE as any, async (taskId: unknown) => {
-  // Proactive Boss Detection on Context Switch
-  await ContextHandler.handle(taskId as string | null, state, saveState);
-});
+api.registerHook(
+  HookName.CURRENT_TASK_CHANGE as any,
+  async (taskId: unknown) => {
+    // Proactive Boss Detection on Context Switch
+    await ContextHandler.handle(taskId as string | null, state, saveState);
+  },
+);
 
 // UI Communication
 if (api.onMessage) {
@@ -140,12 +153,14 @@ if (api.onMessage) {
     return MessageHandler.handle(
       message,
       state,
-      (newState) => { state = newState; },
-      () => saveState()
+      (newState) => {
+        state = newState;
+      },
+      () => saveState(),
     );
   });
 } else {
-  PluginService.log.warn('onMessage not available!');
+  PluginService.log.warn("onMessage not available!");
 }
 
 // Entry point

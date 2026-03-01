@@ -13,26 +13,28 @@ The goal is to ensure that damage dealt to the Active Boss via Custom Tags (e.g.
 
 #### [MODIFY] [TaskCompletionHandler.ts](file:///home/deck/Projects/QuestArc/src/handlers/TaskCompletionHandler.ts)
 
--   Modify the "Update Boss Task" section at the end of `handle()`.
--   Add logic: If `finalDamage > 0` AND `bossTaskId` is missing AND we have an `activeStory.id`:
-    -   Call `BossService.scanProjectForBoss(activeStory.id)` to find the boss task in the active quest.
-    -   If found, use its `taskId` and `originalTitle` to proceed with `BossService.updateBossHp`.
+- Modify the "Update Boss Task" section at the end of `handle()`.
+- Add logic: If `finalDamage > 0` AND `bossTaskId` is missing AND we have an `activeStory.id`:
+  - Call `BossService.scanProjectForBoss(activeStory.id)` to find the boss task in the active quest.
+  - If found, use its `taskId` and `originalTitle` to proceed with `BossService.updateBossHp`.
 
 ## Verification Plan
 
 ### Automated Tests
--   We cannot easily unit test this integration (TaskContext + API calls) without extensive mocking, but the logic is straightforward API orchestration.
--   We will rely on Manual Verification.
+
+- We cannot easily unit test this integration (TaskContext + API calls) without extensive mocking, but the logic is straightforward API orchestration.
+- We will rely on Manual Verification.
 
 ### Manual Verification
+
 1.  **Setup**:
-    -   Ensure an Active Quest is running (with a Boss Task, e.g., "Boss 100/100").
-    -   Ensure a Custom Tag is configured (e.g., `#test` -> 10 dmg).
+    - Ensure an Active Quest is running (with a Boss Task, e.g., "Boss 100/100").
+    - Ensure a Custom Tag is configured (e.g., `#test` -> 10 dmg).
 2.  **Action**:
-    -   Go to **Inbox** (or a different project).
-    -   Create a task "Test Task #test".
-    -   Complete the task.
+    - Go to **Inbox** (or a different project).
+    - Create a task "Test Task #test".
+    - Complete the task.
 3.  **Expectation**:
-    -   Toast notification: "💥 Dealt 10 damage...".
-    -   Boss Bar (Header/Dashboard): Updates to 90/100.
-    -   **CRITICAL**: Go to the **Quest Project**. The Boss Task title should now read "Boss 90/100 ❤️".
+    - Toast notification: "💥 Dealt 10 damage...".
+    - Boss Bar (Header/Dashboard): Updates to 90/100.
+    - **CRITICAL**: Go to the **Quest Project**. The Boss Task title should now read "Boss 90/100 ❤️".

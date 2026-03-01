@@ -1,10 +1,10 @@
-import { Component, Show } from 'solid-js';
-import { useQuestArc } from '../hooks/useQuestArc';
-import { useNavigation } from '../hooks/useNavigation';
-import Header from '../components/Header';
-import NavBar from '../components/NavBar';
-import ViewRouter from '../components/ViewRouter';
-import './App.css';
+import { Component, Show } from "solid-js";
+import { useQuestArc } from "../hooks/useQuestArc";
+import { useNavigation } from "../hooks/useNavigation";
+import Header from "../components/Header";
+import NavBar from "../components/NavBar";
+import ViewRouter from "../components/ViewRouter";
+import "./App.css";
 
 const App: Component = () => {
   const {
@@ -18,13 +18,11 @@ const App: Component = () => {
     setActionError,
     deleteStory,
     cancelQuest,
-    updateSettings
+    updateSettings,
   } = useQuestArc();
 
-  const { view, setView, editingStory, goToDashboard, goToEditor } = useNavigation();
-
-
-
+  const { view, setView, editingStory, goToDashboard, goToEditor } =
+    useNavigation();
 
   const startQuestWrapper = async (storyId: string) => {
     await startQuest(storyId, () => {
@@ -38,13 +36,11 @@ const App: Component = () => {
     });
   };
 
-
-
   const handleImportStory = async (json: any) => {
     try {
       // Basic validation
       if (!json.title || !Array.isArray(json.steps)) {
-        alert('Invalid story file format.');
+        alert("Invalid story file format.");
         return;
       }
 
@@ -55,21 +51,21 @@ const App: Component = () => {
         // trigger a refresh by just waiting? saveStory already refreshes.
       });
     } catch (err) {
-      console.error('Error importing story:', err);
-      alert('Failed to parse story file.');
+      console.error("Error importing story:", err);
+      alert("Failed to parse story file.");
     }
   };
 
   return (
     <div class="app">
-      <Show when={state()} fallback={<div class="loading">Loading QuestArc...</div>}>
+      <Show
+        when={state()}
+        fallback={<div class="loading">Loading QuestArc...</div>}
+      >
         {(s) => (
           <main class="app-main">
-            <Show when={view() !== 'settings' && view() !== 'editor'}>
-              <Header
-                profile={s().profile}
-                activeBoss={s().activeBoss}
-              />
+            <Show when={view() !== "settings" && view() !== "editor"}>
+              <Header profile={s().profile} activeBoss={s().activeBoss} />
             </Show>
 
             <ViewRouter
@@ -84,17 +80,18 @@ const App: Component = () => {
                 addStepTasks,
                 handleAcknowledgeCompletion,
                 startQuest: startQuestWrapper,
-                handleDeleteStory: (storyId: string) => deleteStory(storyId, goToDashboard),
+                handleDeleteStory: (storyId: string) =>
+                  deleteStory(storyId, goToDashboard),
                 handleUpdateSettings: updateSettings,
 
                 handleImportStory,
                 resetGame: resetGameWrapper,
                 clearErrorMessage: () => setActionError(null),
-                cancelQuest
+                cancelQuest,
               }}
             />
 
-            <Show when={view() !== 'editor'}>
+            <Show when={view() !== "editor"}>
               <NavBar currentView={view()} onNavigate={setView} />
             </Show>
           </main>
@@ -102,6 +99,6 @@ const App: Component = () => {
       </Show>
     </div>
   );
-}
+};
 
 export default App;

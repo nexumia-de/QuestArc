@@ -3,6 +3,7 @@
 **Goal:** Refactor `App.tsx` by extracting messaging logic, state synchronization, and navigation into reusable hooks and services.
 
 ## ⚠️ User Review Required
+
 > [!NOTE]
 > This refactor will not change functionality but will significantly reduce line count in `App.tsx`.
 > I will specifically fix the `streakProgress` lint error during this refactor.
@@ -10,11 +11,12 @@
 ## 📂 Architecture Changes
 
 ### New File Structure
+
 - `src/services/`
-    - `MessageService.ts`: `sendMessage` - Typed wrapper around `postMessage`.
+  - `MessageService.ts`: `sendMessage` - Typed wrapper around `postMessage`.
 - `src/hooks/`
-    - `useStateSync.ts`: Encapsulates `hasStateChanged`, initial sync, and polling interval.
-    - `useNavigation.ts`: Encapsulates `view`, `editingStory`, and navigation functions.
+  - `useStateSync.ts`: Encapsulates `hasStateChanged`, initial sync, and polling interval.
+  - `useNavigation.ts`: Encapsulates `view`, `editingStory`, and navigation functions.
 
 ### Component Responsibilities
 
@@ -42,19 +44,23 @@
 ## 📋 Step-by-Step Implementation
 
 ### 1. Extract Services
+
 - [ ] [NEW] `src/services/MessageService.ts`: Move `sendMessage` logic here.
 
 ### 2. Extract Hooks
+
 - [ ] [NEW] `src/hooks/useStateSync.ts`: Move polling and state diffing logic here. **Fix streakProgress error.**
 - [ ] [NEW] `src/hooks/useNavigation.ts`: Move view and editing state logic here.
 
 ### 3. Refactor App.tsx
+
 - [ ] [MODIFY] `src/App.tsx`: Refactor to use new hooks and services.
 
 ## 🧪 Verification
+
 - [ ] **Automated:** `npm run typecheck` (Should finally pass!).
 - [ ] **Manual:**
-    - Verify loading screen.
-    - Verify Dashboard shows up.
-    - Verify Navigation between tabs.
-    - Verify Reset button works.
+  - Verify loading screen.
+  - Verify Dashboard shows up.
+  - Verify Navigation between tabs.
+  - Verify Reset button works.

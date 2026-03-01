@@ -15,20 +15,21 @@ Allow users to export stories to JSON files and import them back. This facilitat
 #### [App.tsx](file:///home/deck/Projects/QuestArc/src/app/App.tsx)
 
 - Update `handleImportStory` -> `importStoryFromData(json: any)`:
-    - Removes UI logic (file picker).
-    - Accepts parsed JSON object.
-    - Validates and Saves.
+  - Removes UI logic (file picker).
+  - Accepts parsed JSON object.
+  - Validates and Saves.
 
 ### Components
 
 #### [NEW] [ImportDialog.tsx](file:///home/deck/Projects/QuestArc/src/components/common/ImportDialog.tsx)
+
 - Modal component.
 - Props: `isOpen`, `onClose`, `onImport(json: any)`.
 - UI:
-    - Textarea for pasting JSON.
-    - "Import from Text" button.
-    - Divider.
-    - "Upload JSON File" button (triggers hidden file input).
+  - Textarea for pasting JSON.
+  - "Import from Text" button.
+  - Divider.
+  - "Upload JSON File" button (triggers hidden file input).
 
 #### [StoryListView.tsx](file:///home/deck/Projects/QuestArc/src/components/StoryListView.tsx)
 
@@ -37,14 +38,15 @@ Allow users to export stories to JSON files and import them back. This facilitat
 - "Import" button opens this dialog.
 
 - Add `handleExportStory` function:
-    - Takes `HeroStory` object.
-    - Triggers browser download of JSON file.
-    - **FALLBACK**: Wrapper for native file system is unreliable in this env. Will implement a `ExportDialog` that shows the JSON in a textarea for manual copy/paste if download fails (or as default if we just switch to it).
-    - Current Plan: **Switch to Export Dialog** as primary method to ensure reliability.
+  - Takes `HeroStory` object.
+  - Triggers browser download of JSON file.
+  - **FALLBACK**: Wrapper for native file system is unreliable in this env. Will implement a `ExportDialog` that shows the JSON in a textarea for manual copy/paste if download fails (or as default if we just switch to it).
+  - Current Plan: **Switch to Export Dialog** as primary method to ensure reliability.
 
 ### Components
 
 #### [NEW] [ExportDialog.tsx](file:///home/deck/Projects/QuestArc/src/components/common/ExportDialog.tsx)
+
 - Modal component.
 - Props: `isOpen`, `onClose`, `story`.
 - Body: Textarea with `JSON.stringify(story)`.
@@ -69,9 +71,11 @@ Allow users to export stories to JSON files and import them back. This facilitat
 ## Verification Plan
 
 ### Automated Tests
+
 - N/A (UI heavy functionality).
 
 ### Manual Verification
+
 1.  **Export**:
     - Create a new story.
     - Click "Export" icon.

@@ -3,7 +3,7 @@
  * Provides consistent logging interface for both plugin and UI contexts
  */
 
-const LOG_PREFIX = 'QuestArc:';
+const LOG_PREFIX = "QuestArc:";
 
 export const logger = {
   debug(message: string, ...args: any[]): void {
