@@ -249,8 +249,47 @@ export class StreakLogic {
                     if (questData.progress) {
                         questData.progress.lastDoneDate = new Date(now).toISOString();
                     }
+
+                    // Re-append the Next Run tag so it doesn't disappear
+                    let nextRunTag = '';
+                    if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
+                        const nextReset = CronHelper.getNextOccurrence(freqExpression, new Date(now).getTime());
+                        if (nextReset) {
+                            const nextDate = new Date(nextReset);
+                            const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            let dateStr;
+
+                            const tomorrow = new Date(now);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            const isTomorrow = nextDate.getDate() === tomorrow.getDate() &&
+                                nextDate.getMonth() === tomorrow.getMonth() &&
+                                nextDate.getFullYear() === tomorrow.getFullYear();
+
+                            const isToday = nextDate.getDate() === new Date(now).getDate() &&
+                                nextDate.getMonth() === new Date(now).getMonth() &&
+                                nextDate.getFullYear() === new Date(now).getFullYear();
+
+                            if (isToday) {
+                                dateStr = 'Today';
+                            } else if (isTomorrow) {
+                                dateStr = 'Tomorrow';
+                            } else if (nextDate.getTime() - new Date(now).getTime() > 7 * 24 * 60 * 60 * 1000) {
+                                const day = nextDate.getDate().toString().padStart(2, '0');
+                                const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                                dateStr = `${day}.${month}.`;
+                            } else {
+                                dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
+                            }
+                            nextRunTag = ` [Next: ${dateStr} ${timeStr}]`;
+                        }
+                    }
+
+                    // Keep the current title, just ensure the tag is there
+                    const newTitle = formatTaskTitle(StreakLogic.stripDynamicTags(cleanTitle), questData.progress) + nextRunTag;
+
                     return {
                         updates: {
+                            title: newTitle,
                             isDone: false,
                             notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
                         },
@@ -263,7 +302,7 @@ export class StreakLogic {
                 }
 
                 // Different day within the same cycle -> Visual Bonus (+1🔥)
-                return StreakLogic.applyBonusCompletion(questData, cleanTitle, new Date(now).toISOString());
+                return StreakLogic.applyBonusCompletion(questData, cleanTitle, new Date(now).toISOString(), freqExpression);
             }
         } else if (cyclesPassed > 0) {
             if (questData.progress) {
@@ -373,16 +412,50 @@ export class StreakLogic {
      * Increments bonusCount, updates the title to show '+N🔥', persists JSON.
      * Does NOT increment streak.current or grant XP/damage.
      */
-    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string, now: string) {
+    static applyBonusCompletion(questData: QuestTaskData, cleanTitle: string, now: string, freqExpression: string = 'none') {
         if (!questData.progress) questData.progress = { current: 0 };
         questData.progress.bonusCount = (questData.progress.bonusCount || 0) + 1;
         questData.progress.lastDoneDate = now;
+
+        // Re-append the Next Run tag so it doesn't disappear
+        let nextRunTag = '';
+        if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
+            const nextReset = CronHelper.getNextOccurrence(freqExpression, new Date(now).getTime());
+            if (nextReset) {
+                const nextDate = new Date(nextReset);
+                const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let dateStr;
+
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const isTomorrow = nextDate.getDate() === tomorrow.getDate() &&
+                    nextDate.getMonth() === tomorrow.getMonth() &&
+                    nextDate.getFullYear() === tomorrow.getFullYear();
+
+                const isToday = nextDate.getDate() === new Date(now).getDate() &&
+                    nextDate.getMonth() === new Date(now).getMonth() &&
+                    nextDate.getFullYear() === new Date(now).getFullYear();
+
+                if (isToday) {
+                    dateStr = 'Today';
+                } else if (isTomorrow) {
+                    dateStr = 'Tomorrow';
+                } else if (nextDate.getTime() - new Date(now).getTime() > 7 * 24 * 60 * 60 * 1000) {
+                    const day = nextDate.getDate().toString().padStart(2, '0');
+                    const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                    dateStr = `${day}.${month}.`;
+                } else {
+                    dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
+                }
+                nextRunTag = ` [Next: ${dateStr} ${timeStr}]`;
+            }
+        }
 
         const newTitle =
             formatTaskTitle(
                 StreakLogic.stripDynamicTags(cleanTitle),
                 questData.progress,
-            );
+            ) + nextRunTag;
 
         const updates = {
             isDone: false,

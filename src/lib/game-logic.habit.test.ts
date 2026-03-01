@@ -80,8 +80,10 @@ describe("Habit Logic & Looping Fix", () => {
     expect(result3.isBonusCompletion).toBe(true);
     expect(result3.xpGained).toBe(0);
     expect(result3.damageDealt).toBe(0);
-    // Silent pass-through only returns isDone: false to revert optimistic checkbox
-    expect(result3.taskUpdates?.title).toBeUndefined();
+    // Silent pass-through updates the title ONLY to preserve the [Next: Date] tag,
+    // it does NOT append the '+N🔥' bonus string
+    expect(result3.taskUpdates?.title).not.toContain("+1🔥");
+    expect(result3.taskUpdates?.title).toContain("[Next:");
     expect(result3.taskUpdates?.isDone).toBe(false);
   });
 
