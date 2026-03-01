@@ -253,35 +253,7 @@ export class StreakLogic {
                     // Re-append the Next Run tag so it doesn't disappear
                     let nextRunTag = '';
                     if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
-                        const nextReset = CronHelper.getNextOccurrence(freqExpression, new Date(now).getTime());
-                        if (nextReset) {
-                            const nextDate = new Date(nextReset);
-                            const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            let dateStr;
-
-                            const tomorrow = new Date(now);
-                            tomorrow.setDate(tomorrow.getDate() + 1);
-                            const isTomorrow = nextDate.getDate() === tomorrow.getDate() &&
-                                nextDate.getMonth() === tomorrow.getMonth() &&
-                                nextDate.getFullYear() === tomorrow.getFullYear();
-
-                            const isToday = nextDate.getDate() === new Date(now).getDate() &&
-                                nextDate.getMonth() === new Date(now).getMonth() &&
-                                nextDate.getFullYear() === new Date(now).getFullYear();
-
-                            if (isToday) {
-                                dateStr = 'Today';
-                            } else if (isTomorrow) {
-                                dateStr = 'Tomorrow';
-                            } else if (nextDate.getTime() - new Date(now).getTime() > 7 * 24 * 60 * 60 * 1000) {
-                                const day = nextDate.getDate().toString().padStart(2, '0');
-                                const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
-                                dateStr = `${day}.${month}.`;
-                            } else {
-                                dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
-                            }
-                            nextRunTag = ` [Next: ${dateStr} ${timeStr}]`;
-                        }
+                        nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime());
                     }
 
                     // Keep the current title, just ensure the tag is there
@@ -420,35 +392,7 @@ export class StreakLogic {
         // Re-append the Next Run tag so it doesn't disappear
         let nextRunTag = '';
         if (questData.meta.type === 'HABIT' && freqExpression !== 'none') {
-            const nextReset = CronHelper.getNextOccurrence(freqExpression, new Date(now).getTime());
-            if (nextReset) {
-                const nextDate = new Date(nextReset);
-                const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                let dateStr;
-
-                const tomorrow = new Date(now);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const isTomorrow = nextDate.getDate() === tomorrow.getDate() &&
-                    nextDate.getMonth() === tomorrow.getMonth() &&
-                    nextDate.getFullYear() === tomorrow.getFullYear();
-
-                const isToday = nextDate.getDate() === new Date(now).getDate() &&
-                    nextDate.getMonth() === new Date(now).getMonth() &&
-                    nextDate.getFullYear() === new Date(now).getFullYear();
-
-                if (isToday) {
-                    dateStr = 'Today';
-                } else if (isTomorrow) {
-                    dateStr = 'Tomorrow';
-                } else if (nextDate.getTime() - new Date(now).getTime() > 7 * 24 * 60 * 60 * 1000) {
-                    const day = nextDate.getDate().toString().padStart(2, '0');
-                    const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
-                    dateStr = `${day}.${month}.`;
-                } else {
-                    dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
-                }
-                nextRunTag = ` [Next: ${dateStr} ${timeStr}]`;
-            }
+            nextRunTag = StreakLogic.formatNextRunTag(freqExpression, new Date(now).getTime());
         }
 
         const newTitle =
@@ -471,5 +415,43 @@ export class StreakLogic {
             shouldBlock: false,
             isBonusCompletion: true,
         };
+    }
+
+    /**
+     * Helper to format the [Next: Date Time] string consistently across paths.
+     */
+    static formatNextRunTag(freqExpression: string, nowMs: number): string {
+        const nextReset = CronHelper.getNextOccurrence(freqExpression, nowMs);
+        if (!nextReset) return '';
+
+        const nextDate = new Date(nextReset);
+        const timeStr = nextDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const today = new Date(nowMs);
+        const tomorrow = new Date(nowMs);
+        tomorrow.setDate(today.getDate() + 1);
+
+        const isToday = today.toDateString() === nextDate.toDateString();
+        const isTomorrow = tomorrow.toDateString() === nextDate.toDateString();
+
+        let dateStr: string;
+        if (isToday) {
+            dateStr = 'Today';
+        } else if (isTomorrow) {
+            dateStr = 'Tomorrow';
+        } else {
+            const daysAway = (nextReset - nowMs) / (1000 * 60 * 60 * 24);
+            if (daysAway > 7) {
+                // More than 7 days away -> DD.MM.
+                const day = nextDate.getDate().toString().padStart(2, '0');
+                const month = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+                dateStr = `${day}.${month}.`;
+            } else {
+                // Within next 7 days (1-7 days away) -> 'Mon', 'Tue'
+                dateStr = nextDate.toLocaleDateString([], { weekday: 'short' });
+            }
+        }
+
+        return ` [Next: ${dateStr} ${timeStr}]`;
     }
 }
