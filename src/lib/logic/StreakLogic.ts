@@ -237,25 +237,28 @@ export class StreakLogic {
                     };
                 }
 
-                // Step B: Daily-floor check
-                // Even sub-daily frequencies (hourly, every 30 min) are capped at
-                // 1 rewarding completion per calendar day by default.
-                const granularity =
-                    questData.meta.minResetGranularity ??
-                    globalSettings?.completionMinGranularity ??
-                    'daily'; // default: daily floor
+                // The user checked it again in the same cycle. We differentiate:
+                // 1) Same Calendar Day -> Silent pass-through (isDone: true, no counter increase)
+                // 2) Different Calendar Day -> Visual bonus (+1🔥 counter)
 
-                if (granularity === 'daily') {
-                    const lastDoneDay = new Date(lastCompletionTime).toDateString();
-                    const today = new Date(now).toDateString();
-                    if (lastDoneDay === today) {
-                        // Bonus completion: increment bonusCount, update title, no streak/XP/damage
-                        return StreakLogic.applyBonusCompletion(questData, cleanTitle);
-                    }
+                const lastDoneDay = new Date(lastCompletionTime).toDateString();
+                const today = new Date(now).toDateString();
+
+                if (lastDoneDay === today) {
+                    // Silent pass-through: user double-tapped it today. Result is just to keep it done.
+                    return {
+                        updates: {
+                            isDone: true,
+                        },
+                        stepIncrement: 0,
+                        xpGained: 0,
+                        shouldDealDamage: false,
+                        shouldBlock: false,
+                        isBonusCompletion: true,
+                    };
                 }
 
-                // Step C: Same-cycle but different day (e.g. weekly habit done Mon then Wed)
-                // OR granularity === 'cycle' without hard block -> soft bonus completion
+                // Different day within the same cycle -> Visual Bonus (+1🔥)
                 return StreakLogic.applyBonusCompletion(questData, cleanTitle);
             }
         } else if (cyclesPassed > 0) {
