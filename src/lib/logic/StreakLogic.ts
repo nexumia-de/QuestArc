@@ -91,8 +91,7 @@ export class StreakLogic {
         const now = Date.now();
         const settings = { ...DEFAULT_STREAK_BEHAVIOR, ...streakBehavior };
 
-        // 0. Resolve Time Source of Truth
-        // Priority: progress.lastDoneDate (ISO) -> progress.lastUpdated (Legacy TS) -> 0
+        // Priority: progress.lastDoneDate (ISO) -> 0
         let lastCompletionTime = 0;
 
         if (questData.progress?.lastDoneDate) {
@@ -100,9 +99,6 @@ export class StreakLogic {
             if (!isNaN(date.getTime())) {
                 lastCompletionTime = date.getTime();
             }
-        } else if (questData.progress?.lastUpdated) {
-            // Legacy Fallback
-            lastCompletionTime = questData.progress.lastUpdated;
         }
 
         // Frequency Parsing (using shared helper for consistency)
@@ -112,7 +108,7 @@ export class StreakLogic {
         // --- 0. Grace Initialization & Accumulation ---
         if (questData.progress?.streak) {
             const streak = questData.progress.streak;
-            // Ensure availableGrace is initialized (Migration from graceUsed or new)
+            // Ensure availableGrace is initialized
             if (streak.availableGrace === undefined) {
                 streak.availableGrace = settings.gracePeriodsPerCycle ?? 1;
             }
@@ -228,12 +224,7 @@ export class StreakLogic {
         if (!questData.progress) questData.progress = { current: 0, target };
 
         questData.progress.current = newCurrent;
-        // Stop writing lastUpdated (legacy). Use lastDoneDate.
         questData.progress.lastDoneDate = new Date(now).toISOString();
-
-        // Remove legacy fields if they exist to clean up JSON
-        delete questData.progress.lastUpdated;
-        delete questData.routine;
 
         const isFinishedForCycle = newCurrent >= target;
 

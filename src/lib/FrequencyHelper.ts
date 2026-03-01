@@ -32,8 +32,8 @@ export class FrequencyHelper {
             }
         }
 
-        // Fallback chain: meta.frequency -> routine.frequency (legacy) -> 'daily'
-        return questData.meta?.frequency || questData.routine?.frequency || 'daily';
+        // Fallback chain: meta.frequency -> 'daily'
+        return questData.meta?.frequency || 'daily';
     }
 
     /**
