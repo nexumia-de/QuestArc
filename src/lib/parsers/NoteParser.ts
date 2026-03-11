@@ -60,30 +60,11 @@ export class NoteParser {
       // But for now, let's allow Title 'Boss [HP:100]' to override 'HABIT'.
       // The above check handles strict overrides.
 
-      // CRITICAL FIX: Ensure persistent metadata from other plugins (like HabiticaSync) survives compilations
-      // even if QuestArc re-compiles the task from the title.
+      // SAFE FIX: Only inject Habitica-specific fields that compiled.meta would never know about.
+      // Do NOT spread compiled.meta into finalData.meta — that overwrites QuestArc's JSON state
+      // (like lastDoneDate, progress counters, streak data) which breaks condition checks!
       const finalData = json as unknown as QuestTaskData;
-      if (compiled.meta) {
-         // If compiled has new fields from title (like target changes), we want them, 
-         // but we MUST NOT lose fields like `habiticaCounterUp` or `persistent` or `originalTitle`
-         finalData.meta = { ...finalData.meta, ...compiled.meta };
-         // Restore known custom fields that compiled.meta would overwrite with undefined
-         if (json.meta) {
-           if (json.meta.persistent !== undefined) finalData.meta.persistent = json.meta.persistent;
-           if (json.meta.originalTitle !== undefined) finalData.meta.originalTitle = json.meta.originalTitle;
-           if (json.meta.habiticaCounterUp !== undefined) finalData.meta.habiticaCounterUp = json.meta.habiticaCounterUp;
-         }
-      }
-      
       return finalData;
-    }
-
-    // If there was JSON but it failed type match, or no JSON at all:
-    // We still want to preserve custom meta if we're overwriting from Title.
-    if (json && json.meta) {
-       if (json.meta.persistent !== undefined) compiled.meta.persistent = json.meta.persistent;
-       if (json.meta.originalTitle !== undefined) compiled.meta.originalTitle = json.meta.originalTitle;
-       if (json.meta.habiticaCounterUp !== undefined) compiled.meta.habiticaCounterUp = json.meta.habiticaCounterUp;
     }
 
     return compiled;
