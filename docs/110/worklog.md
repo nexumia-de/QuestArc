@@ -13,18 +13,18 @@ Replaced the hard Double-Dip Block in `StreakLogic.processHabitProgress` with a 
 
 ## Files Modified
 
-| File | Change |
-|---|---|
-| `src/types/quest-v2.ts` | Added `shouldBlock?`, `minResetGranularity?` to `meta`, added `bonusCount?` to `progress` |
-| `src/types/state.ts` | Added `habitCompletionMode?`, `completionMinGranularity?` to `settings` |
-| `src/lib/FrequencyHelper.ts` | Added `parseShouldBlock`, `parseMinResetGranularity`, `isShorterThanOneDay` |
-| `src/lib/logic/StreakLogic.ts` | Added three-step blocking, `applyBonusCompletion`, and `HabitProgressResult` interface |
-| `src/lib/game-logic.ts` | Wired globalSettings, passed through `isBonusCompletion` and `taskUpdates` for bonuses |
-| `src/lib/parsers.ts` | Extended `formatTaskTitle` to append `+N🔥` and `cleanTaskTitle` to remove it |
-| `src/lib/state/persistence.ts` | Added default values for settings in `ensureState` |
-| `src/components/SettingsView.tsx` | New "Habit Completion Behavior" settings section |
-| `docs/questarc.md` | Documented new tags `[shouldBlock:true]`, `[minReset:daily|cycle]` |
-| `src/lib/game-logic.habit.test.ts` | Updated assertions and added 7 new test cases for bonus completion logic |
+| File                               | Change                                                                                    |
+| ---------------------------------- | ----------------------------------------------------------------------------------------- | ------- |
+| `src/types/quest-v2.ts`            | Added `shouldBlock?`, `minResetGranularity?` to `meta`, added `bonusCount?` to `progress` |
+| `src/types/state.ts`               | Added `habitCompletionMode?`, `completionMinGranularity?` to `settings`                   |
+| `src/lib/FrequencyHelper.ts`       | Added `parseShouldBlock`, `parseMinResetGranularity`, `isShorterThanOneDay`               |
+| `src/lib/logic/StreakLogic.ts`     | Added three-step blocking, `applyBonusCompletion`, and `HabitProgressResult` interface    |
+| `src/lib/game-logic.ts`            | Wired globalSettings, passed through `isBonusCompletion` and `taskUpdates` for bonuses    |
+| `src/lib/parsers.ts`               | Extended `formatTaskTitle` to append `+N🔥` and `cleanTaskTitle` to remove it             |
+| `src/lib/state/persistence.ts`     | Added default values for settings in `ensureState`                                        |
+| `src/components/SettingsView.tsx`  | New "Habit Completion Behavior" settings section                                          |
+| `docs/questarc.md`                 | Documented new tags `[shouldBlock:true]`, `[minReset:daily                                | cycle]` |
+| `src/lib/game-logic.habit.test.ts` | Updated assertions and added 7 new test cases for bonus completion logic                  |
 
 ---
 
@@ -38,12 +38,12 @@ Replaced the hard Double-Dip Block in `StreakLogic.processHabitProgress` with a 
 
 ## Behavior Change Summary
 
-| Scenario | Before | After |
-|---|---|---|
-| `[freq:daily]`, 2nd completion same day | ❌ Block dialog | ✅ Silent (task stays done, no visual counter) |
-| `[freq:weekly]`, 2nd completion same day | ❌ Block dialog | ✅ Silent (task stays done, no visual counter) |
-| `[freq:weekly]`, 2nd completion diff. day | ❌ Block dialog | ✅ Visual Bonus (`+1🔥` counter, task reopened) |
-| `[freq:daily] [shouldBlock:true]`, 2nd completion | ❌ Block dialog | ❌ Block dialog (opt-in) |
-| Global `strict` mode, 2nd completion | ❌ Block dialog | ❌ Block dialog (opt-in) |
-| Sub-daily freq (hourly), 2nd attempt same day | N/A | ✅ Silent (task stays done, daily floor) |
-| Sub-daily freq `[minReset:cycle]`, 2nd attempt | N/A | ✅ Visual Bonus (`+1🔥` counter, task reopened) |
+| Scenario                                          | Before          | After                                           |
+| ------------------------------------------------- | --------------- | ----------------------------------------------- |
+| `[freq:daily]`, 2nd completion same day           | ❌ Block dialog | ✅ Silent (task stays done, no visual counter)  |
+| `[freq:weekly]`, 2nd completion same day          | ❌ Block dialog | ✅ Silent (task stays done, no visual counter)  |
+| `[freq:weekly]`, 2nd completion diff. day         | ❌ Block dialog | ✅ Visual Bonus (`+1🔥` counter, task reopened) |
+| `[freq:daily] [shouldBlock:true]`, 2nd completion | ❌ Block dialog | ❌ Block dialog (opt-in)                        |
+| Global `strict` mode, 2nd completion              | ❌ Block dialog | ❌ Block dialog (opt-in)                        |
+| Sub-daily freq (hourly), 2nd attempt same day     | N/A             | ✅ Silent (task stays done, daily floor)        |
+| Sub-daily freq `[minReset:cycle]`, 2nd attempt    | N/A             | ✅ Visual Bonus (`+1🔥` counter, task reopened) |

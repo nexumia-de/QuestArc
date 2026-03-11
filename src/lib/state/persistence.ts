@@ -120,10 +120,10 @@ export function ensureState(state: any): QuestArcState {
 
   // Ensure scheduling mode defaults (Habitica-style Option A)
   if (newState.settings.habitCompletionMode === undefined) {
-    newState.settings.habitCompletionMode = 'soft';
+    newState.settings.habitCompletionMode = "soft";
   }
   if (newState.settings.completionMinGranularity === undefined) {
-    newState.settings.completionMinGranularity = 'daily';
+    newState.settings.completionMinGranularity = "daily";
   }
 
   // Ensure #questarc system tag exists
