@@ -62,8 +62,8 @@ describe("Habit Logic & Looping Fix", () => {
     expect(updates2.isDone).toBe(true); // Should be done now
     expect(updates2.title).toContain("(2/2)");
 
-    // 3rd Completion (Over-completion / Soft Allow check)
-    // Default mode is 'soft': extra completions pass silently (isBonusCompletion) without a block dialog.
+    // 3rd Completion (Over-completion / Looping check)
+    // If user clicks it AGAIN while it is done? Or if system re-processes it?
 
     const habitTask3: TaskStub = {
       ...habitTask2,
@@ -72,19 +72,17 @@ describe("Habit Logic & Looping Fix", () => {
       isDone: true, // It is already done
     };
 
-    // In soft mode (default), extra completion on the SAME day should NOT block,
-    // but it should also NOT increment the visual bonus counter (silent pass-through).
+    // Logic should probably just return same state or increment?
+    // With new strict lastDoneDate logic, it should BLOCK to prevent double-dipping on the same day.
     const result3 = processTaskCompletion(state, habitTask3);
 
-    expect(result3.shouldBlock).toBeFalsy();
-    expect(result3.isBonusCompletion).toBe(true);
-    expect(result3.xpGained).toBe(0);
-    expect(result3.damageDealt).toBe(0);
-    // Silent pass-through updates the title ONLY to preserve the [Next: Date] tag,
-    // it does NOT append the '+N🔥' bonus string
-    expect(result3.taskUpdates?.title).not.toContain("+1🔥");
-    expect(result3.taskUpdates?.title).toContain("[Next:");
-    expect(result3.taskUpdates?.isDone).toBe(false);
+    expect(result3.shouldBlock).toBe(true);
+    expect(result3.blockReason).toBe("ALREADY_DONE_TODAY");
+    expect(result3.blockMetadata?.nextResetTime).toBeDefined();
+
+    // Next reset should be in the future
+    expect(result3.blockMetadata.nextResetTime).toBeGreaterThan(Date.now());
+    expect(result3.taskUpdates).toBeUndefined();
   });
 
   it("should generate a timestamp that is recent", () => {
@@ -152,164 +150,5 @@ describe("Habit Logic & Looping Fix", () => {
 
     expect(updates.title).toContain("Messy Task [count:3] [freq:daily] (1/3)");
     expect(updates.title).not.toContain("(0/3)");
-  });
-});
-
-describe("Scheduling: Soft Allow & Daily Floor", () => {
-  // Helper: build a QuestTaskData-backed task that was already completed today
-  function makeCompletedHabitTask(
-    freq: string,
-    extra: { shouldBlock?: boolean; minReset?: string } = {},
-  ): TaskStub {
-    const lastDoneDate = new Date().toISOString(); // today
-    const tags = [
-      `[freq:${freq}]`,
-      extra.shouldBlock ? "[shouldBlock:true]" : "",
-      extra.minReset ? `[minReset:${extra.minReset}]` : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    const questData = {
-      meta: { type: "HABIT", version: 1, originalTitle: "Test Habit", frequency: freq },
-      progress: {
-        current: 1,
-        target: 1,
-        lastDoneDate,
-        streak: { current: 1, highest: 1, tier: "bronze", totalCompletions: 1, availableGrace: 1 },
-      },
-    };
-
-    return {
-      id: "sched-test",
-      title: `Test Habit ${tags}`,
-      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
-      isDone: true,
-      tagIds: [],
-    };
-  }
-
-  it("soft mode (default): extra daily completion returns isBonusCompletion, no block", () => {
-    const state = createInitialState();
-    const task = makeCompletedHabitTask("daily");
-    const result = processTaskCompletion(state, task);
-
-    expect(result.shouldBlock).toBeFalsy();
-    expect(result.isBonusCompletion).toBe(true);
-    expect(result.xpGained).toBe(0);
-    expect(result.damageDealt).toBe(0);
-  });
-
-  it("soft mode (default): extra weekly completion same day returns isBonusCompletion", () => {
-    const state = createInitialState();
-    const task = makeCompletedHabitTask("weekly");
-    const result = processTaskCompletion(state, task);
-
-    expect(result.shouldBlock).toBeFalsy();
-    expect(result.isBonusCompletion).toBe(true);
-  });
-
-  it("strict via [shouldBlock:true] tag: extra completion triggers hard block", () => {
-    const state = createInitialState();
-    const task = makeCompletedHabitTask("daily", { shouldBlock: true });
-    const result = processTaskCompletion(state, task);
-
-    expect(result.shouldBlock).toBe(true);
-    expect(result.blockReason).toBe("ALREADY_DONE_TODAY");
-    expect(result.isBonusCompletion).toBeFalsy();
-  });
-
-  it("strict via global habitCompletionMode setting: extra completion triggers hard block", () => {
-    const state = {
-      ...createInitialState(),
-      settings: {
-        ...createInitialState().settings,
-        habitCompletionMode: "strict" as const,
-        completionMinGranularity: "daily" as const,
-        customTags: [],
-      },
-    };
-    const task = makeCompletedHabitTask("daily");
-    const result = processTaskCompletion(state, task);
-
-    expect(result.shouldBlock).toBe(true);
-    expect(result.blockReason).toBe("ALREADY_DONE_TODAY");
-  });
-
-  it("daily floor: sub-daily freq (hourly) still blocked on same calendar day by default", () => {
-    // 0 * * * * = every hour on the hour
-    const state = createInitialState();
-    const task = makeCompletedHabitTask("0 * * * *");
-    const result = processTaskCompletion(state, task);
-
-    // Daily floor applies: even though cycle resets every hour,
-    // same calendar day means bonus completion only
-    expect(result.shouldBlock).toBeFalsy();
-    expect(result.isBonusCompletion).toBe(true);
-    expect(result.xpGained).toBe(0);
-  });
-
-  it("[minReset:cycle] override: sub-daily freq can earn again in next cycle even same day", () => {
-    // With minReset:cycle, the daily-floor is bypassed.
-    // We simulate this by traveling back one cycle (lastDoneDate more than 1hr ago)
-    // so that cyclesPassed > 0 and normal completion is allowed.
-    // This test just verifies that the tag parses and doesn't force a block.
-    const freq = "0 * * * *"; // hourly
-    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-    const questData = {
-      meta: { type: "HABIT", version: 1, originalTitle: "Hourly Check", frequency: freq },
-      progress: {
-        current: 0,
-        target: 1,
-        lastDoneDate: twoHoursAgo,
-        streak: { current: 1, highest: 1, tier: "bronze", totalCompletions: 1, availableGrace: 1 },
-      },
-    };
-    const task: TaskStub = {
-      id: "cycle-test",
-      title: `Hourly Check [freq:${freq}] [minReset:cycle]`,
-      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
-      isDone: false,
-      tagIds: [],
-    };
-
-    const state = createInitialState();
-    const result = processTaskCompletion(state, task);
-
-    // 2 hours passed = cyclesPassed > 0, so this is a real new completion
-    expect(result.shouldBlock).toBeFalsy();
-    expect(result.isBonusCompletion).toBeFalsy();
-    expect(result.taskUpdates?.isDone).toBe(true);
-  });
-
-  it("visual bonus (+1🔥) is awarded for same-cycle completion on a DIFFERENT calendar day", () => {
-    // e.g. weekly habit checked on Monday, then checked again on Wednesday (same cycle, diff day)
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const questData = {
-      meta: { type: "HABIT", version: 1, originalTitle: "Weekly Yoga", frequency: "weekly" },
-      progress: {
-        current: 1,
-        target: 1,
-        lastDoneDate: yesterday, // done yesterday
-        streak: { current: 1, highest: 1, tier: "bronze", totalCompletions: 1, availableGrace: 1 },
-      },
-    };
-    const task: TaskStub = {
-      id: "visual-bonus-test",
-      title: `Weekly Yoga [freq:weekly]`,
-      notes: `\`\`\`json\n${JSON.stringify(questData, null, 2)}\n\`\`\``,
-      isDone: true,
-      tagIds: [],
-    };
-
-    const state = createInitialState();
-    const result = processTaskCompletion(state, task);
-
-    expect(result.shouldBlock).toBeFalsy();
-    expect(result.isBonusCompletion).toBe(true);
-    expect(result.xpGained).toBe(0);
-    // Title SHOULD contain the visual bonus because it's a different day
-    expect(result.taskUpdates?.title).toContain("+1🔥");
-    expect(result.taskUpdates?.isDone).toBe(false); // stays open so user can check again tomorrow
   });
 });

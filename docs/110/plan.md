@@ -21,6 +21,7 @@ Additionally, a **Daily-Floor** prevents sub-daily habits from being gamed, and 
 ### FrequencyHelper
 
 New static methods added:
+
 - `parseShouldBlock(questData, title)` – syncs `[shouldBlock:true]` tag into `meta`.
 - `parseMinResetGranularity(questData, title)` – syncs `[minReset:daily|cycle]` tag into `meta`.
 - `isShorterThanOneDay(freq)` – heuristic for detecting sub-daily CRON expressions (utility, not yet called in main flow).
@@ -31,11 +32,13 @@ New static methods added:
 Tags are now synced from title to meta at the top of the function.
 
 **Old Double-Dip Guard** (hard block):
+
 ```
 cyclesPassed === 0 && current >= target -> shouldBlock: true
 ```
 
 **New Three-Step Decision**:
+
 1. **Step A (Hard Block)**: only if `[shouldBlock:true]` on task OR global `strict` mode.
 2. **Step B (Daily Floor)**: if today is same calendar day as last completion → `isBonusCompletion: true` (soft pass-through).
 3. **Step C (Soft Allow)**: otherwise (weekly done Mon+Wed) → `isBonusCompletion: true`.
@@ -53,6 +56,7 @@ cyclesPassed === 0 && current >= target -> shouldBlock: true
 ### SettingsView.tsx
 
 New "🗓️ Habit Completion Behavior" section with:
+
 - **Completion Mode**: Soft 🌿 / Strict 🔒 toggle buttons.
 - **Min Reset Granularity**: Daily / Cycle dropdown.
 

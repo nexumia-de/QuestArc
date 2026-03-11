@@ -137,7 +137,7 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
   };
 
   // Habit Completion Mode Handler
-  const handleSetCompletionMode = (mode: 'soft' | 'strict') => {
+  const handleSetCompletionMode = (mode: "soft" | "strict") => {
     props.onUpdateSettings({
       ...props.settings!,
       habitCompletionMode: mode,
@@ -145,7 +145,7 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
   };
 
   // Completion Granularity Handler
-  const handleSetCompletionGranularity = (granularity: 'daily' | 'cycle') => {
+  const handleSetCompletionGranularity = (granularity: "daily" | "cycle") => {
     props.onUpdateSettings({
       ...props.settings!,
       completionMinGranularity: granularity,
@@ -513,34 +513,34 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
         <div class="section-header">
           <h3>🗓️ Habit Completion Behavior</h3>
           <p>
-            Control what happens when a habit is completed more than once in a cycle.
+            Control what happens when a habit is completed more than once in a
+            cycle.
           </p>
         </div>
         <div class="settings-card">
           <div class="streak-settings">
-
             <div class="streak-row">
               <label>Completion Mode</label>
               <div class="mode-toggle">
                 <button
-                  class={`mode-btn ${(props.settings?.habitCompletionMode ?? 'soft') === 'soft' ? 'active' : ''}`}
-                  onClick={() => handleSetCompletionMode('soft')}
+                  class={`mode-btn ${(props.settings?.habitCompletionMode ?? "soft") === "soft" ? "active" : ""}`}
+                  onClick={() => handleSetCompletionMode("soft")}
                   title="Extra completions are silently allowed – no reward, no error (Habitica-style)"
                 >
                   🌿 Soft
                 </button>
                 <button
-                  class={`mode-btn ${props.settings?.habitCompletionMode === 'strict' ? 'active' : ''}`}
-                  onClick={() => handleSetCompletionMode('strict')}
+                  class={`mode-btn ${props.settings?.habitCompletionMode === "strict" ? "active" : ""}`}
+                  onClick={() => handleSetCompletionMode("strict")}
                   title="Extra completions are blocked with an error dialog"
                 >
                   🔒 Strict
                 </button>
               </div>
               <span class="streak-hint">
-                {(props.settings?.habitCompletionMode ?? 'soft') === 'soft'
-                  ? 'Extra completions pass silently (no XP / damage)'
-                  : 'Extra completions show a block dialog'}
+                {(props.settings?.habitCompletionMode ?? "soft") === "soft"
+                  ? "Extra completions pass silently (no XP / damage)"
+                  : "Extra completions show a block dialog"}
               </span>
             </div>
 
@@ -548,10 +548,10 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
               <label>Min Reset Granularity</label>
               <select
                 class="granularity-select"
-                value={props.settings?.completionMinGranularity ?? 'daily'}
+                value={props.settings?.completionMinGranularity ?? "daily"}
                 onChange={(e) =>
                   handleSetCompletionGranularity(
-                    e.currentTarget.value as 'daily' | 'cycle',
+                    e.currentTarget.value as "daily" | "cycle",
                   )
                 }
               >
@@ -559,12 +559,12 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
                 <option value="cycle">Cycle (1 reward per freq cycle)</option>
               </select>
               <span class="streak-hint">
-                {(props.settings?.completionMinGranularity ?? 'daily') === 'daily'
-                  ? 'Sub-daily habits (hourly, etc.) still earn at most once per day'
-                  : 'Sub-daily habits earn for every completed freq cycle'}
+                {(props.settings?.completionMinGranularity ?? "daily") ===
+                "daily"
+                  ? "Sub-daily habits (hourly, etc.) still earn at most once per day"
+                  : "Sub-daily habits earn for every completed freq cycle"}
               </span>
             </div>
-
           </div>
         </div>
       </div>
@@ -584,9 +584,9 @@ const SettingsView: Component<SettingsViewProps> = (props) => {
             style={
               isResetConfirming()
                 ? {
-                  "border-color": "var(--hp-color)",
-                  color: "var(--hp-color)",
-                }
+                    "border-color": "var(--hp-color)",
+                    color: "var(--hp-color)",
+                  }
                 : {}
             }
           >

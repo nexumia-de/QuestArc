@@ -44,8 +44,8 @@ export interface QuestArcState {
     customTags: CustomTagConfig[];
     customFrequencyAliases?: FrequencyAliasConfig[]; // User-defined frequency aliases
     streakBehavior?: StreakBehaviorConfig; // Streak motivation settings
-    habitCompletionMode?: 'soft' | 'strict'; // 'soft' = Habitica-style bonus completions (default), 'strict' = hard block
-    completionMinGranularity?: 'daily' | 'cycle'; // Global floor: 'daily' = max 1x reward per calendar day (default), 'cycle' = per freq cycle
+    habitCompletionMode?: "soft" | "strict"; // 'soft' = Habitica-style bonus completions (default), 'strict' = hard block
+    completionMinGranularity?: "daily" | "cycle"; // Global floor: 'daily' = max 1x reward per calendar day (default), 'cycle' = per freq cycle
   };
   profile: {
     level: number;

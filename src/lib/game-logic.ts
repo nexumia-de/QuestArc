@@ -126,9 +126,10 @@ export function processTaskCompletion(
         leveledUp: false,
         shouldBlock: false,
         isBonusCompletion: true,
-        taskUpdates: Object.keys(result.updates || {}).length > 0
-          ? (result.updates as Partial<Task>)
-          : undefined,
+        taskUpdates:
+          Object.keys(result.updates || {}).length > 0
+            ? (result.updates as Partial<Task>)
+            : undefined,
       };
     }
 
