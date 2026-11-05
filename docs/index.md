@@ -15,6 +15,8 @@ links. Change history is in [log.md](log.md).
 
 # Design
 
+- [Behaviour](behaviour.md) - Every screen, flow and text, host-neutral, and where each lands in Super Productivity and Pensum.
+- [Journey design](journey-design.md) - The path, station states, last seven days, calm and game variant, accessibility; mockups.
 - [Data model](data-model.md) - Engine input (snapshot), choice records as one plugin-data key each, the game view and events, what Pensum reads and writes.
 - [Story format 3](story-format.md) - Journeys as JSON: stages with plan, schedule, condition, guardian, story texts and nugget; text keys; schema check; versions.
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, HP, graduation, calm mode, with worked examples.

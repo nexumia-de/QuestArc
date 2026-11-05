@@ -113,8 +113,10 @@ instance ticked off on Tuesday evening still counts for Monday
   it), the best run, the total completions, and whether the current run
   has an open gap.
 - After the run ends (second miss in a row), the engine sets
-  `offerFallback`: the previous, smaller stage is offered for hard days.
-  Nothing else happens.
+  `offerFallback`: the user is told that on hard days doing the previous,
+  smaller stage's action and ticking off the task counts as a completion
+  ([behaviour](behaviour.md), flow D). No task or record changes; nothing
+  else happens.
 
 **Example C.** Due daily. Days 1–4 done, day 5 missed, days 6–7 done:
 current run 6 completions, one gap, best run 6. Day 8 and 9 missed: the
