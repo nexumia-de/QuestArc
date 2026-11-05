@@ -76,8 +76,9 @@ On a normal desktop or the phone, `flatpak run --command=gjs
 
 Needed beyond the package registries; tested 2026-11-05:
 
-| Host                              | For                                                        | State   |
-| --------------------------------- | ---------------------------------------------------------- | ------- |
-| `github.com`                      | Git, Super Productivity source for the facts and API types | allowed |
-| `dl.flathub.org`                  | GNOME runtime for the gjs check                            | allowed |
-| `test-app.super-productivity.com` | Trying the plugin ZIP in the real app with throwaway data  | blocked |
+| Host                                                                              | For                                                                                                                       | State   |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `github.com`                                                                      | Git, Super Productivity source for the facts and API types                                                                | allowed |
+| `dl.flathub.org`                                                                  | GNOME runtime for the gjs check                                                                                           | allowed |
+| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk` | Research: nature.com answers but article pages go through a bot check; full texts come from PubMed Central and Europe PMC | allowed |
+| `test-app.super-productivity.com`                                                 | Trying the plugin ZIP in the real app with throwaway data                                                                 | blocked |
