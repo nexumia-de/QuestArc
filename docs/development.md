@@ -76,9 +76,13 @@ On a normal desktop or the phone, `flatpak run --command=gjs
 
 Needed beyond the package registries; tested 2026-11-05:
 
-| Host                                                                              | For                                                                                                                       | State   |
-| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `github.com`                                                                      | Git, Super Productivity source for the facts and API types                                                                | allowed |
-| `dl.flathub.org`                                                                  | GNOME runtime for the gjs check                                                                                           | allowed |
-| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk` | Research: nature.com answers but article pages go through a bot check; full texts come from PubMed Central and Europe PMC | allowed |
-| `test-app.super-productivity.com`                                                 | Trying the plugin ZIP in the real app with throwaway data                                                                 | blocked |
+| Host                                                                               | For                                                                                                          | State           |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------- |
+| `github.com`                                                                       | Git, Super Productivity source for the facts and API types                                                   | allowed         |
+| `dl.flathub.org`                                                                   | GNOME runtime for the gjs check                                                                              | allowed         |
+| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`  | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API | allowed         |
+| `doi.org`, `api.crossref.org`                                                      | Research: DOI metadata from Crossref                                                                         | allowed         |
+| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org` | Research: open full texts in university and author repositories                                              | allowed         |
+| `www.europarl.europa.eu`                                                           | Research: status of EU legislation (Digital Fairness Act)                                                    | allowed         |
+| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                     | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead     | refused by site |
+| `test-app.super-productivity.com`                                                  | Trying the plugin ZIP in the real app with throwaway data                                                    | blocked         |
