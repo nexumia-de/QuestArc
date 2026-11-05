@@ -39,7 +39,10 @@ below are MIT, Apache-2.0 or BlueOak-1.0.0 and compatible with it.
 | `@types/node`       | 22.20.5 | MIT        | Types for tests and scripts   |
 
 TypeScript stays on 6.0 because typescript-eslint 8 supports TypeScript
-below 6.1; TypeScript 7 is the new native compiler.
+below 6.1; TypeScript 7 is the new native compiler. Dependabot ignores
+major updates of `typescript` and of `@types/node` (which follows the
+Node version in `.nvmrc`); lift the TypeScript rule when typescript-eslint
+supports TypeScript 7.
 
 ## Overrides
 
