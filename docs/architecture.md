@@ -104,36 +104,16 @@ proof first (spike issue): `gjs` in `org.gnome.Platform//51`, and a start
 time on the phone that does not slow Pensum down. If the spike fails, a
 Python port must pass the same test vectors.
 
-## Game rules (draft)
+## Game rules
 
-Starting points from the prototypes and the [design rules](psychology.md);
-the approved version goes into `docs/game-rules.md` (issue #11).
-
-- **XP:** a fixed amount per completed stage task. The draft formula
-  based on time spent (`10 + round(7 * sqrt(minutes))`) is open: the
-  evidence review advises against tying rewards to performance measures,
-  so #11 decides whether time counts at all.
-- **Level:** `floor(sqrt(totalXp / 50)) + 1`; cosmetic only (titles,
-  looks), never power.
-- **Stages:** one plan "After X, I will Y" with an anchor, a condition
-  (`days` n of m, `count`, `time_spent`), an optional guardian, story
-  text and a learning nugget. The next stage starts when the user accepts
-  it; the previous stage is the fallback for hard days.
-- **Never miss twice:** one missed day keeps the run; two in a row end the
-  run, never the journey. Conditions count days done within a window.
-  Misses count only on days the recurring task was due; a short backfill
-  window and pauses are not misses.
-- **Welcome back:** the first completion after a miss gives a fixed bonus
-  guardian hit in RPG mode and a friendly line in calm mode.
-- **Guardians:** fixed HP; damage is the XP of tasks bound to the journey
-  since the stage was accepted.
-- **HP (RPG mode only):** from the last 7 days; every second consecutive
-  miss costs HP; recovers by itself as the window moves. No death.
-- **Graduation:** by the weekly automaticity answer ("I do this
-  automatically", 1–7), steady completion and reminders already off; not
-  by a day count. The user decides; check-ins after two and six weeks.
-- **Not planned:** gold and shop, random rewards, login bonuses,
-  leaderboards, money commitments.
+The exact rules and numbers are in [game rules](game-rules.md) (decided
+2026-11-05, #11): only the current stage's task counts, 10 XP per
+completion and 10 for a welcome back, cosmetic levels, never miss twice
+over due days with a one-day backfill window, guardians worn down by the
+stage's XP, HP only in RPG mode and self-recovering, graduation by three
+high weekly answers, 80 % completion and reminders already off. Not
+planned: gold and shop, random rewards, login bonuses, leaderboards,
+money commitments.
 
 ## Risks
 
@@ -142,8 +122,8 @@ milestones.
 
 - **Plugins cannot create recurring tasks.** Accepting a stage should set
   up a recurring task, but the plugin API offers no way to create a repeat
-  config ([facts](super-productivity-facts.md)). Options and decision:
-  issue "Decide how the plugin sets up a stage's recurring task".
+  config ([facts](super-productivity-facts.md)). Decided:
+  [recurring-task setup](decisions/recurring-task-setup.md).
 - **Missed days leave no data.** Super Productivity creates an instance
   only on days a recurring task is due; a missed day is the absence of a
   done instance. The engine must know the repeat schedule exactly
@@ -164,8 +144,8 @@ milestones.
 - **Compressed plugin data.** Super Productivity stores long plugin data
   as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single
-  instances are deleted, derived XP and progress drop. Either accepted and
-  explained, or a small amount of state is stored after all.
+  instances are deleted, derived XP and progress drop. Decided: finished
+  stages are kept as checkpoints ([deleted history](decisions/deleted-history.md)).
 - **Large archives.** Every evaluation reads the whole archive; with years
   of data the GJS route in Pensum may become slow.
 - **Testing in the real host.** Unit tests do not show whether the plugin
