@@ -38,3 +38,17 @@ Nothing third-party is bundled into the plugin or the engine.
 
 TypeScript stays on 6.0 because typescript-eslint 8 supports TypeScript
 below 6.1; TypeScript 7 is the new native compiler.
+
+## Overrides
+
+- `minimatch` 11.0.4 (BlueOak-1.0.0, permissive) instead of 10.2.6, which ESLint and
+  typescript-eslint pull in: 10.2.6 has a moderate denial-of-service
+  advisory (GHSA-g3hv-75wg-m249). Development only; lint was checked to
+  still report errors. `npm audit` is clean.
+
+## Runtime
+
+Node 22.23.4 (`.nvmrc`) for development and CI. GitHub Actions:
+`actions/checkout` v7.0.1, `actions/setup-node` v7.1.0,
+`actions/upload-artifact` v7.0.2, `softprops/action-gh-release` v3.0.4,
+each pinned to its commit SHA.

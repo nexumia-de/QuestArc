@@ -1,0 +1,38 @@
+# Publishes a release for a tag v<version>: runs all checks, builds the
+# plugin ZIP and attaches it with its SHA-256 to a GitHub release. The tag
+# must match the version in packages/plugin/src/manifest.json.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Tag matches the manifest version
+        run: |
+          version=$(node -p "require('./packages/plugin/src/manifest.json').version")
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match manifest version $version"; exit 1; }
+      - run: npm ci
+      - run: npm run check
+      - name: Checksum
+        working-directory: packages/plugin/dist
+        run: sha256sum questarc-*.zip > SHA256SUMS
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          files: |
+            packages/plugin/dist/questarc-*.zip
+            packages/plugin/dist/SHA256SUMS
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
