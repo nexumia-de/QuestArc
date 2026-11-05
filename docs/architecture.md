@@ -142,6 +142,20 @@ milestones.
   done instance. The engine must know the repeat schedule exactly
   (weekdays, start date, every n days) to tell a miss from a free day, the
   same way in both hosts.
+- **Repeat data is subtler than it looks** ([facts](super-productivity-facts.md)):
+  at most one instance per config is created, for the newest occurrence;
+  with `skipOverdue` (on by default for simple schedules) past instances
+  are skipped or deleted; archiving clears `dueDay`, so the day comes from
+  the instance id (`rpt_<cfgId>_<day>`) or `created`; deleting a repeat
+  config clears `repeatCfgId` on all its tasks, so a stage must not be
+  bound by `repeatCfgId` alone; "won't do" tasks are `isDone` too and must
+  not count.
+- **Newest plugin API not released yet.** `getDayContext`, `dataChanged`
+  and `dayChange` came after 19.3.1, and the npm package of the API types
+  is from 2025. QuestArc either waits for the release or falls back for
+  older versions; the types come from the pinned upstream commit.
+- **Compressed plugin data.** Super Productivity stores long plugin data
+  as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single
   instances are deleted, derived XP and progress drop. Either accepted and
   explained, or a small amount of state is stored after all.
