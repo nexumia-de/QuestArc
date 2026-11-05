@@ -69,6 +69,39 @@ commit; `scripts/update-sp-plugin-api.sh <commit>` replaces them. Keep
 the commit in that package's README and in
 [Super Productivity facts](super-productivity-facts.md) the same.
 
+## Engine and test vectors
+
+The engine (`packages/engine/src`) has one job per file:
+
+| File             | Job                                                              |
+| ---------------- | ---------------------------------------------------------------- |
+| `types/*.ts`     | Input (snapshot), journey and output (game view) types           |
+| `days.ts`        | Logical days, date arithmetic, ISO weeks                         |
+| `schedule.ts`    | Supported repeat schedules and their occurrences                 |
+| `choices.ts`     | Parsing the choice records                                       |
+| `binding.ts`     | A stage's repeat config and its instances                        |
+| `completions.ts` | Which day a completion counts for, minutes tracked               |
+| `timeline.ts`    | Due days, misses, runs, welcome backs                            |
+| `conditions.ts`  | Stage conditions                                                 |
+| `xp.ts`          | XP and level                                                     |
+| `run.ts`         | One journey run: stations, current stage, guardians, checkpoints |
+| `validate.ts`    | Structural check of journeys                                     |
+| `evaluate.ts`    | The whole game view                                              |
+| `diff.ts`        | Events between two views                                         |
+| `cli-gjs.ts`     | The gjs wrapper (`evaluate`, `diff`, `batch` requests on stdin)  |
+
+Test vectors (`packages/engine/vectors/*.json`) hold every worked example
+of the [game rules](game-rules.md) and the edge cases from the
+[Super Productivity facts](super-productivity-facts.md). A vector names a
+snapshot (`input`, or `before` and `after` for events) and only the
+fields it checks (`expect`); journeys written as `"$test-daily"` come
+from `vectors/journeys/`. `test/vectors.test.ts` runs them in Node,
+`test/vectors-gjs.test.ts` through `dist/engine-cli.mjs` in gjs when
+`QUESTARC_GJS` names a gjs command. CI installs Ubuntu's `gjs` and sets
+it; locally, use the runtime Pensum uses (below) through a small script
+that wraps the `bwrap` command, and set `QUESTARC_GJS` to it. A change
+to a game rule changes its vector in the same commit.
+
 ## Engine in gjs
 
 `flatpak run` does not work in the cloud container (no session

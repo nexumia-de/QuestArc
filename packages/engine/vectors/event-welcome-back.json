@@ -1,0 +1,104 @@
+{
+  "name": "The first completion after a miss is a welcome back with 20 XP",
+  "rule": "game-rules \u00a75",
+  "kind": "diff",
+  "before": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "after": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": [
+    {
+      "key": "event.welcome-back",
+      "params": {
+        "xp": 20
+      }
+    },
+    {
+      "key": "event.guardian-damaged",
+      "params": {
+        "damage": 20
+      }
+    }
+  ]
+}

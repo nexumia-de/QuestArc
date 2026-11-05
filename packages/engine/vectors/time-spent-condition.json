@@ -1,0 +1,78 @@
+{
+  "name": "time_spent counts minutes tracked since acceptance",
+  "rule": "game-rules \u00a74",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-03",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgC_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793703600000,
+        "doneOn": 1793725200000,
+        "timeSpentOnDay": {
+          "2026-11-02": 600000,
+          "2026-11-03": 1200000
+        }
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-11-03"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-11-03",
+        "repeatCfgId": "cfgC"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-02",
+        "xp": 50,
+        "damage": 50
+      },
+      "stage-done:r1:b": {
+        "day": "2026-11-03",
+        "xp": 30,
+        "damage": 30
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "position": {
+        "stage": 2,
+        "progress": 0.6666666666666666
+      },
+      "stations": [
+        {
+          "state": "done"
+        },
+        {
+          "state": "done"
+        },
+        {
+          "state": "current",
+          "progress": 0.6666666666666666
+        }
+      ]
+    }
+  }
+}

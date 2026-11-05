@@ -1,0 +1,88 @@
+{
+  "name": "Every 2 days: days in between are never due",
+  "rule": "game-rules \u00a72, due days",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-10",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgE_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgE",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgE_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgE",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      },
+      {
+        "id": "rpt_cfgE_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgE",
+        "created": 1793962800000,
+        "doneOn": 1793984400000
+      },
+      {
+        "id": "rpt_cfgE_2026-11-08",
+        "isDone": true,
+        "repeatCfgId": "cfgE",
+        "created": 1794135600000,
+        "doneOn": 1794157200000
+      },
+      {
+        "id": "rpt_cfgE_2026-11-10",
+        "isDone": true,
+        "repeatCfgId": "cfgE",
+        "created": 1794308400000,
+        "doneOn": 1794330000000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgE",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 2,
+        "startDate": "2026-11-02"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgE_2026-11-02",
+        "repeatCfgId": "cfgE"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "run": {
+            "current": 5,
+            "best": 5,
+            "gap": false
+          },
+          "welcomeBacks": 0
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

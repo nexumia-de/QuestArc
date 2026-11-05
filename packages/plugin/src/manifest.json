@@ -7,7 +7,13 @@
   "description": "Habits as journeys: walk a path of small habit steps, calm by default with an optional RPG layer.",
   "author": "nexumia",
   "hooks": [],
-  "permissions": ["getTasks", "getArchivedTasks", "showIndexHtmlAsView"],
+  "permissions": [
+    "getAppState",
+    "getArchivedTasks",
+    "loadSyncedData",
+    "listSyncedDataKeys",
+    "showIndexHtmlAsView"
+  ],
   "dataSharing": [],
   "iFrame": true,
   "icon": "icon.svg"

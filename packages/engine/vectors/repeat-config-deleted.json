@@ -1,0 +1,51 @@
+{
+  "name": "Deleting the repeat config unbinds the stage",
+  "rule": "decisions/recurring-task-setup.md",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": null,
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 0,
+    "active": {
+      "stations": [
+        {
+          "state": "unbound",
+          "progress": 0,
+          "xp": 0
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

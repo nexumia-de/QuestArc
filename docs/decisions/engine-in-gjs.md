@@ -41,6 +41,15 @@ Both runtimes returned identical results.
 Go: Pensum runs the engine through gjs; no Python port. The engine stays
 dependency-free and host-free so this keeps working.
 
+## Later finding
+
+The first wrapper opened `/dev/stdin` as a file. That fails when stdin is
+a socket instead of a pipe (Node's child processes use sockets): gjs
+reported "No such device or address". The wrapper now reads stdin as a
+stream (`GioUnix.InputStream` on fd 0, GLib 2.80 or newer), which works
+with pipes and sockets. All test vectors give identical results in Node
+and in gjs 1.90.1 from GNOME 51.
+
 ## Open
 
 - Measurement on the phone (aarch64), with the engine archive of the

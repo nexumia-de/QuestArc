@@ -1,0 +1,78 @@
+{
+  "name": "The newest open run is active, older open runs are paused, ended runs are finished",
+  "rule": "data-model \u00a72",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-05"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-05"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-05",
+        "repeatCfgId": "cfgA"
+      },
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r0": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "run:r9": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "run-end:r9": {
+        "day": "2026-11-04",
+        "reason": "abandoned"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "mode": "rpg",
+    "active": {
+      "runId": "r1"
+    },
+    "paused": [
+      {
+        "runId": "r0",
+        "paused": true
+      }
+    ],
+    "finished": [
+      {
+        "runId": "r9"
+      }
+    ]
+  }
+}

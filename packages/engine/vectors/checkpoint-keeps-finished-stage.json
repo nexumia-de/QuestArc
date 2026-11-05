@@ -1,0 +1,80 @@
+{
+  "name": "A finished stage keeps its XP from the checkpoint although its tasks are gone",
+  "rule": "decisions/deleted-history.md",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgB_2026-11-10",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1794308400000,
+        "doneOn": 1794330000000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-10"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-11-10",
+        "repeatCfgId": "cfgB"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-10",
+        "xp": 70,
+        "damage": 70
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 80,
+    "active": {
+      "position": {
+        "stage": 1
+      },
+      "stations": [
+        {
+          "stageId": "a",
+          "state": "done",
+          "xp": 70,
+          "doneDay": "2026-11-10",
+          "guardian": {
+            "damage": 70,
+            "defeated": false
+          }
+        },
+        {
+          "stageId": "b",
+          "state": "current",
+          "xp": 10,
+          "completions": 1,
+          "progress": 0.3333333333333333
+        },
+        {
+          "stageId": "c",
+          "state": "ahead"
+        }
+      ]
+    }
+  }
+}
