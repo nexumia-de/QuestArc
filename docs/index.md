@@ -15,6 +15,7 @@ links. Change history is in [log.md](log.md).
 
 # Design
 
+- [Story format 3](story-format.md) - Journeys as JSON: stages with plan, schedule, condition, guardian, story texts and nugget; text keys; schema check; versions.
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, HP, graduation, calm mode, with worked examples.
 
 - [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; changes to the design rules; open gaps.

@@ -1,0 +1,56 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "example-walking",
+  "version": 1,
+  "title": "example-walking.title",
+  "description": "example-walking.description",
+  "why": "example-walking.why",
+  "stages": [
+    {
+      "id": "shoes",
+      "plan": {
+        "anchor": "example-walking.shoes.anchor",
+        "action": "example-walking.shoes.action",
+        "place": "example-walking.shoes.place"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "example-walking.shoes.arrival",
+        "accept": "example-walking.shoes.accept"
+      },
+      "nugget": "example-walking.shoes.nugget"
+    },
+    {
+      "id": "walk-5",
+      "plan": {
+        "anchor": "example-walking.walk-5.anchor",
+        "action": "example-walking.walk-5.action"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "example-walking.walk-5.arrival",
+        "accept": "example-walking.walk-5.accept"
+      },
+      "nugget": "example-walking.walk-5.nugget"
+    },
+    {
+      "id": "walk-15",
+      "plan": {
+        "anchor": "example-walking.walk-15.anchor",
+        "action": "example-walking.walk-15.action"
+      },
+      "schedule": { "type": "weekdays", "days": ["mon", "tue", "wed", "thu", "fri"] },
+      "condition": { "type": "days", "n": 8, "of": 10 },
+      "guardian": { "name": "example-walking.walk-15.guardian", "hp": 100 },
+      "story": {
+        "arrival": "example-walking.walk-15.arrival",
+        "accept": "example-walking.walk-15.accept"
+      },
+      "nugget": "example-walking.walk-15.nugget"
+    }
+  ],
+  "ending": { "story": "example-walking.ending" }
+}

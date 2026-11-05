@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nexumia-de/QuestArc/content/schema/journey.schema.json",
+  "title": "QuestArc journey (story format 3)",
+  "description": "A journey: a sequence of habit stages that start tiny and grow. Texts are i18n keys resolved in content/i18n/<lang>.json. See docs/story-format.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "version", "title", "description", "stages"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": 3 },
+    "id": { "$ref": "#/$defs/id" },
+    "version": { "type": "integer", "minimum": 1 },
+    "title": { "$ref": "#/$defs/textKey" },
+    "description": { "$ref": "#/$defs/textKey" },
+    "why": {
+      "$ref": "#/$defs/textKey",
+      "description": "Prompt shown when asking for the user's own reason."
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 12,
+      "items": { "$ref": "#/$defs/stage" }
+    },
+    "ending": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["story"],
+      "properties": { "story": { "$ref": "#/$defs/textKey" } }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 40 },
+    "textKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$"
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "plan", "schedule", "condition"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["anchor", "action"],
+          "description": "After <anchor>, I will <action> [at <place>].",
+          "properties": {
+            "anchor": { "$ref": "#/$defs/textKey" },
+            "action": { "$ref": "#/$defs/textKey" },
+            "place": { "$ref": "#/$defs/textKey" }
+          }
+        },
+        "schedule": { "$ref": "#/$defs/schedule" },
+        "condition": { "$ref": "#/$defs/condition" },
+        "guardian": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "hp"],
+          "properties": {
+            "name": { "$ref": "#/$defs/textKey" },
+            "hp": { "type": "integer", "minimum": 10, "maximum": 1000 }
+          }
+        },
+        "story": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "arrival": { "$ref": "#/$defs/textKey" },
+            "accept": { "$ref": "#/$defs/textKey" }
+          }
+        },
+        "nugget": { "$ref": "#/$defs/textKey" }
+      }
+    },
+    "schedule": {
+      "description": "Suggested schedule; the bound repeat config must be one of the supported kinds (docs/game-rules.md, due days).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": { "type": { "const": "daily" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "n"],
+          "properties": {
+            "type": { "const": "everyNDays" },
+            "n": { "type": "integer", "minimum": 2, "maximum": 7 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "days"],
+          "properties": {
+            "type": { "const": "weekdays" },
+            "days": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] }
+            }
+          }
+        }
+      ]
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "n", "of"],
+          "properties": {
+            "type": { "const": "days" },
+            "n": { "type": "integer", "minimum": 1, "maximum": 30 },
+            "of": { "type": "integer", "minimum": 1, "maximum": 30 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "n"],
+          "properties": {
+            "type": { "const": "count" },
+            "n": { "type": "integer", "minimum": 1, "maximum": 100 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "minutes"],
+          "properties": {
+            "type": { "const": "time_spent" },
+            "minutes": { "type": "integer", "minimum": 1, "maximum": 6000 }
+          }
+        }
+      ]
+    }
+  }
+}
