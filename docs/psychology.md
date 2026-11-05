@@ -50,8 +50,9 @@ punishment and comparison often backfire.
    guardians show completed stage tasks, nothing else. Nothing grows for
    opening the app.
 9. **Weekly look back.** Once a week the journey shows the last days, the
-   total and best runs, and asks one question: "I do this automatically"
-   (1–7). The answers drive graduation and reminder fading.
+   total and best runs, and asks one question,
+   the validated single item of the automaticity index with the habit filled
+   in: "Walking after lunch is something I do automatically" (1–7). The answers drive graduation and reminder fading.
 10. **Misses count against the user's own schedule.** A day is missed only
     if the recurring task was due that day. A task done late for yesterday
     (within a short backfill window) counts for yesterday.
