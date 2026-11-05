@@ -1,0 +1,14 @@
+{
+  "id": "questarc",
+  "name": "QuestArc",
+  "version": "3.0.0",
+  "manifestVersion": 1,
+  "minSupVersion": "19.3.0",
+  "description": "Habits as journeys: walk a path of small habit steps, calm by default with an optional RPG layer.",
+  "author": "nexumia",
+  "hooks": [],
+  "permissions": ["getTasks", "getArchivedTasks", "showIndexHtmlAsView"],
+  "dataSharing": [],
+  "iFrame": true,
+  "icon": "icon.svg"
+}

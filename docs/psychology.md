@@ -8,28 +8,28 @@ generated:
   at: 2026-11-05
 sources:
   - id: lally2010
-    title: "Lally, van Jaarsveld, Potts, Wardle (2010): How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology 40(6), 998–1009"
+    title: 'Lally, van Jaarsveld, Potts, Wardle (2010): How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology 40(6), 998–1009'
     url: https://doi.org/10.1002/ejsp.674
   - id: gollwitzer2006
-    title: "Gollwitzer, Sheeran (2006): Implementation intentions and goal achievement: A meta-analysis of effects and processes. Advances in Experimental Social Psychology 38, 69–119"
+    title: 'Gollwitzer, Sheeran (2006): Implementation intentions and goal achievement: A meta-analysis of effects and processes. Advances in Experimental Social Psychology 38, 69–119'
     url: https://doi.org/10.1016/S0065-2601(06)38002-1
   - id: fogg2019
-    title: "Fogg (2019): Tiny Habits: The Small Changes That Change Everything. Houghton Mifflin Harcourt"
+    title: 'Fogg (2019): Tiny Habits: The Small Changes That Change Everything. Houghton Mifflin Harcourt'
   - id: ryan2000
-    title: "Ryan, Deci (2000): Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist 55(1), 68–78"
+    title: 'Ryan, Deci (2000): Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist 55(1), 68–78'
     url: https://doi.org/10.1037/0003-066X.55.1.68
   - id: deci1999
-    title: "Deci, Koestner, Ryan (1999): A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. Psychological Bulletin 125(6), 627–668"
+    title: 'Deci, Koestner, Ryan (1999): A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. Psychological Bulletin 125(6), 627–668'
     url: https://doi.org/10.1037/0033-2909.125.6.627
   - id: hamari2014
-    title: "Hamari, Koivisto, Sarsa (2014): Does gamification work? A literature review of empirical studies on gamification. HICSS 2014"
+    title: 'Hamari, Koivisto, Sarsa (2014): Does gamification work? A literature review of empirical studies on gamification. HICSS 2014'
     url: https://doi.org/10.1109/HICSS.2014.377
   - id: marlatt1985
-    title: "Marlatt, Gordon (1985): Relapse Prevention. Guilford Press (abstinence violation effect)"
+    title: 'Marlatt, Gordon (1985): Relapse Prevention. Guilford Press (abstinence violation effect)'
   - id: amabile2011
-    title: "Amabile, Kramer (2011): The Progress Principle. Harvard Business Review Press"
+    title: 'Amabile, Kramer (2011): The Progress Principle. Harvard Business Review Press'
   - id: dai2014
-    title: "Dai, Milkman, Riis (2014): The fresh start effect: Temporal landmarks motivate aspirational behavior. Management Science 60(10), 2563–2582"
+    title: 'Dai, Milkman, Riis (2014): The fresh start effect: Temporal landmarks motivate aspirational behavior. Management Science 60(10), 2563–2582'
     url: https://doi.org/10.1287/mnsc.2014.1901
 ---
 

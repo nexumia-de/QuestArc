@@ -1,0 +1,36 @@
+{
+  "name": "questarc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Habits as journeys, for Super Productivity and Pensum",
+  "type": "module",
+  "workspaces": [
+    "packages/sp-plugin-api",
+    "packages/engine",
+    "packages/plugin"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "npm run build -w @questarc/engine && npm run build -w @questarc/plugin",
+    "test": "npm test -w @questarc/engine",
+    "typecheck": "npm run typecheck -w @questarc/engine && npm run typecheck -w @questarc/plugin",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "fflate": "0.8.3",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  }
+}

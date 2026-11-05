@@ -25,5 +25,14 @@ QuestArc runs in two places with the same game and the same data:
   API and data QuestArc relies on.
 - [All documents](docs/index.md).
 
+## Development
+
+```sh
+npm ci
+npm run check
+```
+
+Details in [development](docs/development.md).
+
 Work items are [issues](https://github.com/nexumia-de/QuestArc/issues) in
 [milestones](https://github.com/nexumia-de/QuestArc/milestones).
