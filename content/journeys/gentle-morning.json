@@ -1,0 +1,71 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "gentle-morning",
+  "version": 1,
+  "title": "gentle-morning.title",
+  "description": "gentle-morning.description",
+  "why": "gentle-morning.why",
+  "stages": [
+    {
+      "id": "water",
+      "plan": {
+        "anchor": "gentle-morning.anchor",
+        "action": "gentle-morning.water.action",
+        "place": "gentle-morning.water.place"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "gentle-morning.water.arrival",
+        "accept": "gentle-morning.water.accept"
+      },
+      "nugget": "gentle-morning.water.nugget"
+    },
+    {
+      "id": "stretch-1",
+      "plan": {
+        "anchor": "gentle-morning.anchor",
+        "action": "gentle-morning.stretch-1.action"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "gentle-morning.stretch-1.arrival",
+        "accept": "gentle-morning.stretch-1.accept"
+      },
+      "nugget": "gentle-morning.stretch-1.nugget"
+    },
+    {
+      "id": "stretch-5",
+      "plan": {
+        "anchor": "gentle-morning.anchor",
+        "action": "gentle-morning.stretch-5.action"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "guardian": { "name": "gentle-morning.stretch-5.guardian", "hp": 100 },
+      "story": {
+        "arrival": "gentle-morning.stretch-5.arrival",
+        "accept": "gentle-morning.stretch-5.accept"
+      },
+      "nugget": "gentle-morning.stretch-5.nugget"
+    },
+    {
+      "id": "plan-day",
+      "plan": {
+        "anchor": "gentle-morning.anchor",
+        "action": "gentle-morning.plan-day.action"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 8, "of": 10 },
+      "guardian": { "name": "gentle-morning.plan-day.guardian", "hp": 150 },
+      "story": {
+        "arrival": "gentle-morning.plan-day.arrival",
+        "accept": "gentle-morning.plan-day.accept"
+      },
+      "nugget": "gentle-morning.plan-day.nugget"
+    }
+  ],
+  "ending": { "story": "gentle-morning.ending" }
+}

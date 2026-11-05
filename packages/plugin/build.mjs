@@ -1,6 +1,6 @@
 // Builds the plugin into dist/ and packs dist/questarc-<version>.zip:
 // plugin.js (classic script, run by Super Productivity via new Function),
-// index.html with the view's script inlined (iframe plugins get no other
+// index.html with the view's script and style inlined (iframe plugins get no other
 // files), manifest.json and icon.svg.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -18,10 +18,10 @@ await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'p
 
 const view = await build({ ...common, entryPoints: ['src/ui/main.ts'], write: false });
 const script = view.outputFiles[0].text.replaceAll('</script', '<\\/script');
-const html = readFileSync('src/ui/index.html', 'utf8').replace(
-  '<!-- QUESTARC_SCRIPT -->',
-  () => `<script>\n${script}</script>`,
-);
+const style = readFileSync('src/ui/style.css', 'utf8');
+const html = readFileSync('src/ui/index.html', 'utf8')
+  .replace('<!-- QUESTARC_STYLE -->', () => `<style>\n${style}</style>`)
+  .replace('<!-- QUESTARC_SCRIPT -->', () => `<script>\n${script}</script>`);
 writeFileSync(join(files, 'index.html'), html);
 
 for (const name of ['manifest.json', 'icon.svg'])

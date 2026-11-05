@@ -10,14 +10,14 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 ## Layout
 
-| Path                      | Job                                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs` |
-| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                              |
-| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, iframe view `ui/`, packing                          |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                             |
-| `content/`                | Journeys and i18n texts (empty until the story format exists)                                          |
-| `scripts/`                | Maintenance scripts                                                                                    |
+| Path                      | Job                                                                                                                     |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                  |
+| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                               |
+| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/` |
+| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                              |
+| `content/`                | Journeys (`journeys/`), texts for journeys, UI and messages (`i18n/`), schema and example                               |
+| `scripts/`                | Maintenance scripts                                                                                                     |
 
 ## Commands
 
@@ -30,7 +30,8 @@ npm run check
 
 `check` runs, in this order: `format:check` (Prettier), `lint` (ESLint;
 the engine has extra rules: no clock, no `Math.random`, no console, no
-host globals), `typecheck`, `test` (Vitest, engine), `build`.
+host globals), `typecheck`, `test` (Vitest: engine, then the plugin's
+adapter against a fake plugin API in `packages/plugin/test/`), `build`.
 
 ## CI and releases
 
@@ -53,13 +54,44 @@ host globals), `typecheck`, `test` (Vitest, engine), `build`.
 
 - `plugin.js` as a classic script (IIFE): Super Productivity runs it with
   `new Function`, so it must not contain `import`.
-- `index.html` with the view's script inlined: iframe plugins get no other
-  files from the ZIP.
+- `index.html` with the view's script and `style.css` inlined: iframe
+  plugins get no other files from the ZIP.
 - `dist/questarc-<version>.zip` with `manifest.json`, `plugin.js`,
   `index.html` and `icon.svg`, packed with fflate.
 
 Install it in Super Productivity: Settings → Plugins → Choose Plugin File.
 Use test data, not real tasks.
+
+The plugin's files, one job each:
+
+| Path            | Job                                                                                                                                                                                                      |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                               |
+| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `messages`, `host` (API subset)                                             |
+| `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n), `plan` (sentences), `content` (built-in journeys)                                                                                            |
+| `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `dom`, `screen` (types), `screens/` (one file per screen), `style.css` |
+| `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                        |
+
+## Preview and screenshots
+
+Super Productivity's test host is blocked in the cloud environment (see
+below), so the view is checked in a preview page: `preview/host.ts` runs
+the real adapter on demo data (`preview/demo.ts`, never real tasks) with
+a fake plugin API, and loads the built view in an iframe that talks to it
+the way Super Productivity's bridge does. Theme variables for light and
+dark are transcribed from Super Productivity's styles (`preview/theme.ts`).
+
+```sh
+npm run screenshots -w @questarc/plugin
+```
+
+This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
+at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
+horizontal overflow. Demos: `welcome`, `empty`, `walking`; `empty:Settings`
+clicks the button named "Settings" first. It uses the Playwright and
+Chromium that the cloud environment provides (not a dependency of the
+repository); open `dist/preview/index.html?demo=walking&theme=dark` in any
+browser to look at it by hand.
 
 ## Plugin API types
 

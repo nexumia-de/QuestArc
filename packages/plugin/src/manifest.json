@@ -6,12 +6,24 @@
   "minSupVersion": "19.3.0",
   "description": "Habits as journeys: walk a path of small habit steps, calm by default with an optional RPG layer.",
   "author": "nexumia",
-  "hooks": [],
+  "hooks": [
+    "dataChanged",
+    "dayChange",
+    "persistedDataChanged",
+    "finishDay",
+    "taskComplete",
+    "taskUpdate",
+    "taskDelete",
+    "anyTaskUpdate"
+  ],
   "permissions": [
     "getAppState",
     "getArchivedTasks",
+    "getDayContext",
     "loadSyncedData",
     "listSyncedDataKeys",
+    "persistDataSynced",
+    "showSnack",
     "showIndexHtmlAsView"
   ],
   "dataSharing": [],

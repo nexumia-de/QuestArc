@@ -134,14 +134,22 @@ habit, not how often you open QuestArc."
 The user ticks off the stage's task in the task list as usual. Within a
 second QuestArc shows a short message (snack or toast):
 
-| Event                        | Calm                                        | With game                                      |
-| ---------------------------- | ------------------------------------------- | ---------------------------------------------- |
-| completion                   | "Walk after lunch: done. 4 of 5 this week." | "+10 XP · 4 of 5 this week."                   |
-| first completion after a gap | "Welcome back. Your run goes on."           | "Welcome back! +20 XP, the guardian staggers." |
-| condition met                | "Station reached: you can continue."        | same, plus "Level 3" when it changes           |
-| guardian defeated            | —                                           | "The Grey Afternoon is gone."                  |
+| Event                        | Calm                                         | With game                                                                                    |
+| ---------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| completion                   | "Drink a glass of water: done. 4 of 5 days." | "+10 XP · 4 of 5 days."                                                                      |
+| first completion after a gap | "Welcome back. Your run goes on."            | "Welcome back! +20 XP, the guardian staggers." (without a guardian: "Welcome back! +20 XP.") |
+| several at once (sync)       | "3 days done. 4 of 5 days."                  | "3 days done · 4 of 5 days."                                                                 |
+| condition met                | "Station reached: you can continue."         | same, plus "Level 3." when it changes                                                        |
+| guardian defeated            | —                                            | "The Heavy Blanket is gone."                                                                 |
 
-Messages after a sync with many changes are summed up in one.
+The events of one change are joined into one message, so messages after
+a sync with many changes are summed up in one. The progress ("4 of 5
+days") is the current condition: days, times or minutes.
+
+All texts of screens and messages are in `content/i18n/en.json` (keys
+`ui.*` and `event.*`; a message key ends in `.calm` or `.rpg` when the
+modes differ), next to the journeys' texts, so Pensum can use the same
+words.
 
 ### B. Set up the task
 

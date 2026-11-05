@@ -1,0 +1,112 @@
+// Preview of the view outside Super Productivity (docs/development.md,
+// preview): a fake plugin API with demo data, the real adapter (brain) and
+// the built view in an iframe that talks to it the way Super Productivity's
+// bridge does. Query: ?demo=welcome|empty|walking&theme=light|dark.
+import type { Hooks } from '@questarc/sp-plugin-api';
+
+import { createBrain } from '../src/adapter/brain';
+import { localDay } from '../src/adapter/day';
+import type { HostApi } from '../src/adapter/host';
+import { handleMessage } from '../src/adapter/messages';
+import { messageFor } from '../src/adapter/snacks';
+import { builtInJourneys } from '../src/shared/content';
+import { demoData, type Scenario } from './demo';
+import { themeCss } from './theme';
+
+declare const VIEW_HTML: string;
+
+const params = new URLSearchParams(location.search);
+const scenario = (params.get('demo') ?? 'walking') as Scenario;
+const theme = params.get('theme') === 'dark' ? 'dark' : 'light';
+const today = localDay(new Date());
+const demo = demoData(scenario, today);
+const hooks = new Map<string, (() => void)[]>();
+const snacks = document.getElementById('snacks') as HTMLElement;
+
+const api: HostApi & Record<string, unknown> = {
+  getAppState: async () => ({ tasks: demo.tasks, taskRepeatCfgs: demo.repeatCfgs }) as never,
+  getArchivedTasks: async () => [],
+  getDayContext: async () => ({ todayStr: today, startOfNextDayDiffMs: 0 }),
+  listSyncedDataKeys: async () =>
+    Object.keys(demo.data)
+      .filter((k) => demo.data[k])
+      .sort(),
+  loadSyncedData: async (key?: string) => demo.data[key ?? ''] ?? null,
+  persistDataSynced: async (value: string, key?: string) => {
+    demo.data[key ?? ''] = value;
+    for (const fire of hooks.get('persistedDataChanged') ?? []) fire();
+  },
+  showSnack: ({ msg }) => {
+    snacks.textContent = msg;
+  },
+  registerHook: (hook: Hooks, handler: () => void) => {
+    hooks.set(hook, [...(hooks.get(hook) ?? []), handler]);
+  },
+};
+
+const brain = createBrain({
+  api,
+  journeys: builtInJourneys,
+  onEvents: (events, view, journeys) => {
+    const msg = messageFor(events, view, journeys);
+    if (msg) api.showSnack({ msg });
+  },
+});
+
+document.documentElement.style.cssText = '';
+const style = document.createElement('style');
+style.textContent = `${themeCss(theme)} body{background:var(--bg)}`;
+document.head.append(style);
+
+// The iframe's PluginAPI: every call goes to this page, like Super
+// Productivity's injected shim (docs/super-productivity-facts.md §1).
+const shim = `<script>
+(() => {
+  let id = 0; const pending = new Map(); const hookHandlers = new Map();
+  addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === 'PLUGIN_API_RESPONSE' && pending.has(d.callId)) { pending.get(d.callId).resolve(d.result); pending.delete(d.callId); }
+    if (d.type === 'PLUGIN_API_ERROR' && pending.has(d.callId)) { pending.get(d.callId).reject(new Error(d.error)); pending.delete(d.callId); }
+    if (d.type === 'PLUGIN_HOOK_EVENT') (hookHandlers.get(d.hook) || []).forEach((h) => h(d.payload));
+  });
+  const call = (method, args) => new Promise((resolve, reject) => {
+    id += 1; pending.set(id, { resolve, reject });
+    parent.postMessage({ type: 'PLUGIN_API_CALL', method, args, callId: id }, '*');
+  });
+  window.PluginAPI = new Proxy({}, { get: (_, method) => method === 'registerHook'
+    ? (hook, handler) => { hookHandlers.set(hook, [...(hookHandlers.get(hook) || []), handler]); return call('registerHook', [hook]); }
+    : (...args) => call(method, args) });
+})();
+</script><style>${themeCss(theme)}</style>`;
+
+const frame = document.getElementById('view') as HTMLIFrameElement;
+frame.srcdoc = VIEW_HTML.replace(/<head>/i, `<head>${shim}`);
+
+addEventListener('message', async (event: MessageEvent) => {
+  const data = event.data as Record<string, unknown>;
+  const reply = (message: Record<string, unknown>) =>
+    (event.source as Window | null)?.postMessage(message, '*');
+  if (data.type === 'PLUGIN_MESSAGE') {
+    try {
+      const result = await handleMessage(brain, data.message);
+      reply({ type: 'PLUGIN_MESSAGE_RESPONSE', messageId: data.messageId, result });
+    } catch (error) {
+      reply({ type: 'PLUGIN_MESSAGE_ERROR', messageId: data.messageId, error: String(error) });
+    }
+  } else if (data.type === 'PLUGIN_API_CALL') {
+    const method = data.method as string;
+    const args = data.args as unknown[];
+    if (method === 'registerHook') {
+      const hook = args[0] as string;
+      api.registerHook(hook as Hooks, () => reply({ type: 'PLUGIN_HOOK_EVENT', hook }));
+      reply({ type: 'PLUGIN_API_RESPONSE', callId: data.callId, result: undefined });
+      return;
+    }
+    const fn = api[method];
+    if (typeof fn !== 'function') {
+      reply({ type: 'PLUGIN_API_ERROR', callId: data.callId, error: `${method} not in preview` });
+      return;
+    }
+    reply({ type: 'PLUGIN_API_RESPONSE', callId: data.callId, result: await fn(...args) });
+  }
+});

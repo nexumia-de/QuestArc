@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "npm run build -w @questarc/engine && npm run build -w @questarc/plugin",
-    "test": "npm test -w @questarc/engine",
+    "test": "npm test -w @questarc/engine && npm test -w @questarc/plugin",
     "typecheck": "npm run typecheck -w @questarc/engine && npm run typecheck -w @questarc/plugin",
     "lint": "eslint .",
     "format": "prettier --write .",

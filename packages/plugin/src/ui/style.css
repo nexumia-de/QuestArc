@@ -1,0 +1,289 @@
+/*
+ * QuestArc's view in Super Productivity's look (issue #30). Colours, fonts,
+ * spacing and radii come only from the theme variables Super Productivity
+ * copies into plugin views (docs/super-productivity-facts.md §7); the
+ * fallbacks are its light defaults. Light and dark follow the app because
+ * the variables do. Class names start with qa-.
+ */
+/*
+ * No color-scheme here: when it differs from the app's, Chromium paints the
+ * frame with an opaque canvas, which hides the app's background.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  color: var(--text-color, rgb(44, 44, 44));
+  font-family: var(--font-primary-stack, system-ui, sans-serif);
+  font-size: var(--font-size-md, 14px);
+  line-height: var(--line-height-normal, 1.5);
+}
+
+.qa-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.qa-header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-half, 4px);
+  min-height: 56px;
+  padding: var(--s-half, 4px) var(--s, 8px);
+  border-bottom: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+}
+
+.qa-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg, 16px);
+  font-weight: var(--font-weight-semibold, 600);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qa-header-spacer {
+  width: 44px;
+  flex: none;
+}
+
+.qa-main {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--s2, 16px);
+}
+
+.qa-main > * {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.qa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s, 8px);
+  padding: var(--s, 8px) var(--s2, 16px) var(--s2, 16px);
+  border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+}
+
+.qa-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2, 16px);
+}
+
+.qa-stack > p {
+  margin: 0;
+}
+
+.qa-heading {
+  margin: 0;
+  font-size: var(--font-size-xl, 18px);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.qa-section-title {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size-md, 14px);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.qa-muted {
+  color: var(--text-color-muted, rgba(44, 44, 44, 0.66));
+}
+
+.qa-small {
+  margin: 0;
+  font-size: var(--font-size-sm, 12px);
+}
+
+.qa-plan {
+  margin: 0;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+/* Buttons: at least 44 × 44 px (touch). */
+.qa-btn,
+.qa-icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill, 9999px);
+  font: inherit;
+  cursor: pointer;
+}
+
+.qa-btn {
+  padding: 0 var(--s3, 24px);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.qa-btn-primary {
+  flex: 1;
+  max-width: 400px;
+  background: var(--c-primary, #6495ed);
+  color: var(--button-primary-label, #fff);
+}
+
+.qa-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  background: transparent;
+  color: inherit;
+}
+
+.qa-btn:hover,
+.qa-icon-btn:hover {
+  background-image: linear-gradient(
+    var(--state-hover, rgba(0, 0, 0, 0.06)),
+    var(--state-hover, rgba(0, 0, 0, 0.06))
+  );
+}
+
+.qa-btn:focus-visible,
+.qa-icon-btn:focus-visible,
+.qa-card-button:focus-visible,
+.qa-option:focus-within {
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, #6495ed);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
+.qa-icon {
+  fill: currentColor;
+}
+
+.qa-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s, 8px);
+  margin: 0;
+  padding: var(--s2, 16px);
+  border-radius: var(--card-border-radius, 8px);
+  background: var(--bg-lighter, #fff);
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.2));
+  color: inherit;
+}
+
+.qa-card > p {
+  margin: 0;
+}
+
+.qa-card-button {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.qa-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2, 16px);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.qa-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s, 8px);
+  margin: 0;
+  padding-inline-start: var(--s3, 24px);
+}
+
+.qa-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s, 8px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.qa-fieldset > legend {
+  margin-bottom: var(--s, 8px);
+}
+
+.qa-option {
+  display: flex;
+  align-items: center;
+  gap: var(--s2, 16px);
+  min-height: 56px;
+  padding: var(--s, 8px) var(--s2, 16px);
+  border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+  border-radius: var(--card-border-radius, 8px);
+  cursor: pointer;
+}
+
+.qa-option:has(input:checked) {
+  border-color: var(--c-primary, #6495ed);
+}
+
+.qa-option input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--c-primary, #6495ed);
+}
+
+.qa-option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.qa-option-title {
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.qa-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s, 8px);
+  padding-block: var(--s4, 32px);
+  text-align: center;
+}
+
+.qa-empty > p {
+  max-width: 32em;
+  margin: 0;
+}
+
+.qa-chip {
+  align-self: flex-start;
+  margin: 0;
+  padding: var(--s-half, 4px) calc(1.5 * var(--s, 8px));
+  border: 1px solid var(--chip-outline-color, var(--divider-color, rgba(0, 0, 0, 0.12)));
+  border-radius: var(--radius-pill, 9999px);
+  font-size: var(--font-size-sm, 12px);
+}
+
+.qa-callout {
+  margin: 0 auto var(--s2, 16px);
+  padding: var(--s, 8px) var(--s2, 16px);
+  border-inline-start: 4px solid var(--color-warning, #ff9800);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-darker, rgb(235, 235, 235));
+}
