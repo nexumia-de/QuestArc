@@ -99,10 +99,10 @@ to 2.x or to workarounds.
 
 **Goal**: the same journey on the phone, native in Pensum.
 
-**Exit criteria**: tracked in Pensum's repository as its own milestone,
-started after Pensum's M2 (repeating tasks). Read-only first: journey
-page, level, toasts, game layer switch in preferences; then accepting a
-stage on the phone with the same choice records.
+**Exit criteria**: tracked in Pensum's repository (nexumia-de/pensum#38,
+#39, #40), started after Pensum's M2 (repeating tasks). Read-only first:
+journey page, level, toasts, game layer switch in preferences; then
+accepting a stage on the phone with the same choice records.
 
 # M5 – More journeys
 
