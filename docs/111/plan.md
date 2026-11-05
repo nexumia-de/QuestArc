@@ -10,7 +10,7 @@ This is the master plan. Each phase below becomes its own task folder
 ## ⚠️ User Review Required
 
 > [!IMPORTANT]
-> Open decisions are collected in [Decisions for the owner](#decisions-for-the-owner).
+> Decisions are recorded in [Decisions](#5-decisions-owner-2026-11-05).
 > Phase 3 changes where QuestArc keeps its data. Stories started with 2.x
 > need a migration or a clean break (decision D1).
 
@@ -216,17 +216,20 @@ Companions (cosmetic, from consistency of a tag), focus sessions as a
 stage condition (time spent is already in the data), story editor and
 sharing of story JSON, cooperation if a serverless way exists.
 
-## 5. Decisions for the owner
+## 5. Decisions (owner, 2026-11-05)
 
-| #   | Question                                                                                                | Proposal                                                                                            |
-| --- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| D1  | Do others use QuestArc 2.x, or only you?                                                                | Only you → clean break with a one-time import of running stories; others → migration code           |
-| D2  | What is a habit: SP recurring tasks, SP's habit counters (`simpleCounter`), or both?                    | Recurring tasks for stages ("walk daily"); counters only later for negative habits                  |
-| D3  | Keep HP?                                                                                                | Yes, but only in RPG mode and derived from the last 7 days as above                                 |
-| D4  | Drop gold and the shop for now?                                                                         | Yes                                                                                                 |
-| D5  | Planning in GitHub issues and milestones like the other apps, with `docs/<ID>/` for plans and worklogs? | Yes; this plan becomes the milestones `M0`–`M5`                                                     |
-| D6  | Phosh toolkit rules for QuestArc?                                                                       | Only English, knowledge in `docs/`, pinned dependencies, PR and CI rules; not the GTK/Flatpak rules |
-| D7  | Keep GoVenture and HeroicRPG?                                                                           | Archive both on Codeberg with a note pointing here                                                  |
+| #   | Question                   | Decision                                                                                                                    |
+| --- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Others using QuestArc 2.x? | Probably nobody (2.x is not working well and was untouched for months): clean break, one-time import of a running story     |
+| D2  | What is a habit?           | Super Productivity's recurring tasks (`taskRepeatCfg`); its habit counters do not fit                                       |
+| D3  | Keep HP?                   | Only in RPG mode, derived from the last 7 days, recovers by itself                                                          |
+| D4  | Gold and shop?             | Dropped for now                                                                                                             |
+| D5  | Planning?                  | GitHub issues and milestones as in the other apps; `docs/<ID>/` keeps plans and worklogs; goals in [roadmap](../roadmap.md) |
+| D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules                |
+| D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                               |
+
+The owner also wants a journey like in other habit RPGs: progress shown
+as travel along a path. It is designed in the [roadmap](../roadmap.md#the-journey).
 
 ## 🧪 Verification
 
