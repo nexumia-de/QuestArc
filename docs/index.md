@@ -15,7 +15,8 @@ links. Change history is in [log.md](log.md).
 
 # Design
 
-- [Psychology of habit building](psychology.md) - What helps (tiny steps, anchors, visible progress, autonomy, fresh starts), what backfires, and nine design rules.
+- [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; changes to the design rules; open gaps.
+- [Design rules from habit psychology](psychology.md) - 27 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
 
 # Super Productivity
 

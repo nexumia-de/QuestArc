@@ -1,151 +1,121 @@
 ---
 type: Concept
-title: Psychology of habit building
-description: What research says helps people build habits, what backfires, and the design rules that follow for a habit app with an optional game layer.
+title: Design rules from habit psychology
+description: The rules QuestArc follows so that it helps people build habits that last; each rule is backed by the evidence review, which holds the sources and the strength of the evidence.
 tags: [psychology, habits, gamification, design]
-generated:
-  by: claude-code/2.1.318
-  at: 2026-11-05
-sources:
-  - id: lally2010
-    title: 'Lally, van Jaarsveld, Potts, Wardle (2010): How are habits formed: Modelling habit formation in the real world. European Journal of Social Psychology 40(6), 998–1009'
-    url: https://doi.org/10.1002/ejsp.674
-  - id: gollwitzer2006
-    title: 'Gollwitzer, Sheeran (2006): Implementation intentions and goal achievement: A meta-analysis of effects and processes. Advances in Experimental Social Psychology 38, 69–119'
-    url: https://doi.org/10.1016/S0065-2601(06)38002-1
-  - id: fogg2019
-    title: 'Fogg (2019): Tiny Habits: The Small Changes That Change Everything. Houghton Mifflin Harcourt'
-  - id: ryan2000
-    title: 'Ryan, Deci (2000): Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist 55(1), 68–78'
-    url: https://doi.org/10.1037/0003-066X.55.1.68
-  - id: deci1999
-    title: 'Deci, Koestner, Ryan (1999): A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. Psychological Bulletin 125(6), 627–668'
-    url: https://doi.org/10.1037/0033-2909.125.6.627
-  - id: hamari2014
-    title: 'Hamari, Koivisto, Sarsa (2014): Does gamification work? A literature review of empirical studies on gamification. HICSS 2014'
-    url: https://doi.org/10.1109/HICSS.2014.377
-  - id: marlatt1985
-    title: 'Marlatt, Gordon (1985): Relapse Prevention. Guilford Press (abstinence violation effect)'
-  - id: amabile2011
-    title: 'Amabile, Kramer (2011): The Progress Principle. Harvard Business Review Press'
-  - id: dai2014
-    title: 'Dai, Milkman, Riis (2014): The fresh start effect: Temporal landmarks motivate aspirational behavior. Management Science 60(10), 2563–2582'
-    url: https://doi.org/10.1287/mnsc.2014.1901
+generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
 
-# Psychology of habit building
+# Design rules from habit psychology
 
 QuestArc exists to help people build habits that last, in Super
 Productivity and in Pensum. The game layer serves that goal and must
-never work against it. This page collects the research the design rests on. The sources were cited from the
-literature, not re-read for this page; check a claim against its source
-before relying on exact numbers.
+never work against it. Every rule below comes from the
+[evidence review](research.md), which cites the studies, rates how strong
+the evidence is and lists what is still unknown. Where the evidence is
+thin, the rule says so.
 
-## What helps
+The short version of the evidence: habits form by **repeating one small
+action in the same situation**. In studies this took a median of about
+two months, but anything from a few days to most of a year; one missed
+day did no measurable harm. Game elements help a little and fade;
+punishment and comparison often backfire.
 
-### Start tiny, grow step by step
+## The habit itself
 
-Habits form through repetition in a stable context, not through
-willpower. In a real-world study, the time until a behaviour became
-automatic had a median of 66 days, with a range from 18 to 254 days
-across people[^lally2010]. Very small starting behaviours that grow
-over time are easier to repeat than ambitious ones[^fogg2019].
+1. **Start tiny, grow in stages.** A journey starts with a step too small
+   to fail and offers the next, larger stage only when the current one has
+   become easy. Stages are short, and the distance to the next station is
+   always visible.
+2. **Every stage is one plan: "After X, I will Y."** The plan names the
+   anchor (an existing routine or a fixed time; both work), the action and
+   optionally the place. The same anchor stays across the stages of a
+   journey.
+3. **One active journey.** Several plans at once weaken each other, so
+   one journey runs at a time; it can be paused to start another.
+4. **No day count is promised.** Texts say "most simple habits take about
+   two to five months, and it varies a lot", never "21 days" or "66 days".
+5. **The user's own reason.** Each journey starts by asking why the user
+   wants this habit, in their words. QuestArc shows that reason at
+   stations and after a miss. Generic motivational quotes are not used.
+6. **Optional: a quick plan check (WOOP).** At the start of a journey the
+   user may name the wish, the best outcome, the main obstacle and the
+   plan for it. Optional, because its effect is small.
+7. **Optional: "pair it with".** Each stage may name something the user
+   enjoys only while doing the habit (a podcast only while walking).
 
-**Rule:** a story is a habit plan that starts with a step too small to
-fail ("put the running shoes by the door") and unlocks the next, larger
-step only after the current one has become easy.
+## Progress and feedback
 
-### Anchor each step to a moment
+8. **Progress shown is real progress.** The journey, XP, level and
+   guardians show completed stage tasks, nothing else. Nothing grows for
+   opening the app.
+9. **Weekly look back.** Once a week the journey shows the last days, the
+   total and best runs, and asks one question,
+   the validated single item of the automaticity index with the habit filled
+   in: "Walking after lunch is something I do automatically" (1–7). The answers drive graduation and reminder fading.
+10. **Misses count against the user's own schedule.** A day is missed only
+    if the recurring task was due that day. A task done late for yesterday
+    (within a short backfill window) counts for yesterday.
 
-Plans of the form "after X, I do Y" (implementation intentions) clearly
-improve goal attainment compared with plain goals; a meta-analysis
-found a medium-to-large effect[^gollwitzer2006].
+## Missing days
 
-**Rule:** every step names its anchor ("after morning coffee"), not
-only the action.
+11. **Never miss twice.** One missed day changes nothing. A second miss in
+    a row ends the current run, but never the journey, and offers the
+    previous, smaller stage as the fallback for hard days, without any
+    penalty.
+12. **A miss is a neutral gap.** No red marks, no counter falling to zero,
+    no "you failed". The view shows total and best runs.
+13. **Welcome back.** The first completion after a miss gets a fixed,
+    friendly acknowledgement: a line in calm mode, an extra guardian hit in
+    RPG mode. This was the strongest single mechanic in the largest study.
+14. **Pause.** The user can pause a journey (illness, travel); paused days
+    are not misses.
+15. **Kind words only.** All texts are autonomy-supportive ("you could"),
+    never controlling ("you must") or blaming.
+16. **No permanent failure.** HP (RPG mode only) reflects the last seven
+    days, recovers by itself and never takes anything away.
 
-### Make real progress visible
+## Game layer
 
-Seeing progress on meaningful work is one of the strongest everyday
-motivators[^amabile2011].
+17. **Calm by default.** The game layer is opt-in and can be switched off
+    at any time without losing anything.
+18. **Fixed rewards only.** XP and guardian damage follow fixed rules. No
+    random rewards, loot boxes, login bonuses or paid extras.
+19. **Levels are cosmetic.** They unlock titles and looks, never power.
+20. **Story is seasoning.** Story texts at stations add flavour; the habit
+    works without them. Kept short and skippable.
+21. **Cooperation, never rankings.** No leaderboards and no comparison
+    with others. This is a values choice: competition showed the most
+    lasting effect in one trial, but harms those who fall behind.
 
-**Rule:** XP, levels and boss bars show real progress on the user's own
-steps. They never grow for opening the app or for activity without
-meaning.
+## Learning nuggets and reminders
 
-### Let people choose
+22. **One learning nugget per station.** A short, concrete "try this"
+    technique that fits the stage (choosing an anchor, making the step
+    smaller, planning for a hard day, why one miss is fine). Shown in the
+    app when the user arrives at a station, never as a push message, and
+    never the same one twice.
+23. **Reminders restate the plan and fade.** A reminder repeats the user's
+    own plan ("after lunch: walk 15 minutes"). As the weekly answers rise,
+    reminders go from daily to weekly to off, and QuestArc says so ("you
+    won't need me for this one").
 
-Motivation lasts when people feel autonomous, competent and related to
-others (self-determination theory)[^ryan2000].
+## When a habit is done
 
-**Rule:** the calm mode is the default and the game layer is opt-in.
-The user chooses stories, pace and difficulty, and can switch modes at
-any time.
+24. **Habits stay.** The recurring task is the user's; QuestArc never
+    deletes or ends it. After a journey, its last habit keeps running as a
+    normal task and appears on the shelf as maintained.
+25. **Graduation by automaticity, not days.** A habit can graduate when
+    the weekly answer stays high (for example 6 of 7 for three weeks in a
+    row), completion is steady and reminders are already off without a
+    drop. The user decides: keep it repeating quietly or end it. QuestArc
+    checks in two and six weeks later, and one tap brings it back. The
+    threshold is a design choice; no study defines it.
 
-### Use fresh starts
+## Honesty and privacy
 
-People are more willing to start or restart goals at temporal landmarks
-such as a new week, month or birthday[^dai2014].
-
-**Rule:** after a break, offer a restart at the next landmark ("start
-fresh on Monday?") instead of showing what was lost.
-
-## What backfires
-
-### Punishment and broken streaks
-
-After a slip, people often drop the goal altogether ("now it does not
-matter anyway", the abstinence violation effect)[^marlatt1985]. Missing
-a single day did not materially affect habit formation in the study
-above[^lally2010], so harsh consequences buy nothing.
-
-**Rules:**
-
-- No permanent failure: a story or boss can always be resumed.
-- "Never miss twice" instead of all-or-nothing streaks; a missed day
-  does not reset progress.
-- Losing HP is mild, optional, and recoverable by doing the next step.
-
-### Rewards that replace the real reason
-
-Expected tangible rewards for an activity people already find
-interesting can reduce their own interest in it[^deci1999]. Studies of
-gamification report mostly positive but mixed and context-dependent
-results, and novelty effects that fade[^hamari2014].
-
-**Rules:**
-
-- Points support the user's own reason; each story starts by asking
-  why the user wants this habit and shows that reason again at
-  milestones.
-- No loot boxes, random rewards or daily login bonuses.
-- The design must still work once the novelty of the game layer is
-  gone, which is why the calm mode has to stand on its own.
-
-### Comparing with others
-
-Leaderboards motivate those near the top and discourage the rest.
-
-**Rule:** social features are cooperative (a small party fights one
-boss together), never ranked.
-
-### Apps that never let go
-
-A habit that has become automatic no longer needs tracking.
-
-**Rule:** a habit can graduate. Once a step has been done reliably for
-long enough, the app suggests retiring it from daily tracking, and it
-moves to a trophy shelf. The app should become less necessary over
-time, not more.
-
-## Design rules at a glance
-
-1. Stories are habit plans: tiny first step, grow when easy.
-2. Every step has an anchor moment.
-3. Progress shown is real progress.
-4. Calm mode by default, game layer opt-in.
-5. No permanent failure; never miss twice; mild, optional HP loss.
-6. Restart offers at fresh-start landmarks.
-7. The user's own reason stays visible; no random or login rewards.
-8. Cooperation, never rankings.
-9. Habits graduate.
+26. **Say how it works.** A page "How QuestArc motivates you" explains
+    these rules in plain words.
+27. **Success is the user's habit, not app use.** QuestArc collects no
+    usage data. The measures that matter (steady completion over months,
+    the weekly answer) are shown only to the user.
