@@ -15,7 +15,7 @@ goals. The architecture and the reasons behind it are in
 [plan 111](111/plan.md); the design rules come from
 [psychology](psychology.md). Work on the lowest open milestone first.
 
-Pace: about 2 hours a week. Every milestone ends with something that
+Milestones have no dates. Every milestone ends with something that
 works and green CI, so a pause never leaves a broken state.
 
 # The journey
@@ -32,8 +32,11 @@ The heart of QuestArc 3.0. A **journey** is a story drawn as a path:
 - At the end of some stretches waits a **guardian** (boss). Work on the
   journey's tasks wears it down.
 - Reaching a station tells the next piece of the story. The next stage
-  starts only when the user accepts it; accepting creates its recurring
-  task.
+  starts only when the user accepts it; accepting sets up its recurring
+  task. Super Productivity's plugin API cannot create repeat configs
+  today (`PluginCreateTaskData` has no repeat field, the repeat actions
+  are not in `ALLOWED_PLUGIN_ACTIONS`); how the plugin does this is an
+  open decision in M1.
 - Finished journeys stay on a shelf of completed journeys; habits that
   became automatic graduate there.
 
@@ -89,7 +92,8 @@ they are, with a one-time import of a running story); one built-in
 journey; accepting a stage creates its recurring task; journey view,
 level in the header, toasts after completing tasks, calm and RPG mode;
 QuestArc no longer writes into titles, notes or project names; release
-3.0.0 on GitHub; used by the owner for two weeks.
+3.0.0 on GitHub; the owner uses it every day without falling back
+to 2.x or to workarounds.
 
 # M4 – Journey in Pensum
 
