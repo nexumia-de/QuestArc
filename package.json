@@ -1,45 +1,36 @@
 {
-  "name": "quest-arc",
-  "version": "1.0.1",
-  "description": "Gamify your productivity with epic stories and boss battles - A Super Productivity Plugin",
+  "name": "questarc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Habits as journeys, for Super Productivity and Pensum",
   "type": "module",
   "workspaces": [
-    "packages/vite-plugin"
+    "packages/sp-plugin-api",
+    "packages/engine",
+    "packages/plugin"
   ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest",
+    "build": "npm run build -w @questarc/engine && npm run build -w @questarc/plugin",
+    "test": "npm test -w @questarc/engine",
+    "typecheck": "npm run typecheck -w @questarc/engine && npm run typecheck -w @questarc/plugin",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
-    "package": "node scripts/build-plugin.js",
-    "deploy": "npm run build",
-    "release": "standard-version"
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "^0.8.10",
-    "@super-productivity/plugin-api": "*",
-    "@super-productivity/vite-plugin": "file:./packages/vite-plugin",
-    "@typescript-eslint/eslint-plugin": "^8.48.0",
-    "@typescript-eslint/parser": "^8.48.0",
-    "archiver": "^7.0.1",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-solid": "^0.14.5",
-    "globals": "^17.3.0",
-    "jsdom": "^27.2.0",
-    "lightningcss": "^1.30.2",
-    "prettier": "^3.6.2",
-    "solid-js": "^1.9.10",
-    "standard-version": "^9.5.0",
-    "terser": "^5.44.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0",
-    "vite": "^7.2.4",
-    "vite-plugin-solid": "^2.11.10",
-    "vitest": "^4.0.14"
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "fflate": "0.8.3",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
   }
 }

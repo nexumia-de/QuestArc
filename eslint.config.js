@@ -1,30 +1,37 @@
-import js from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
-import solid from "eslint-plugin-solid";
-import eslintConfigPrettier from "eslint-config-prettier";
-import prettierPlugin from "eslint-plugin-prettier";
+import js from '@eslint/js';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "node_modules", "public"] },
+  { ignores: ['**/dist/', 'packages/sp-plugin-api/src/'] },
+  js.configs.recommended,
+  ...tseslint.configs.strict,
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        sourceType: "module",
-      },
-    },
-    plugins: {
-      solid: solid,
-      prettier: prettierPlugin,
-    },
+    files: ['**/*.mjs', 'eslint.config.js'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    // The engine is pure: no clock, no machine time zone, no logging, no
+    // host globals (docs/architecture.md). Time comes in as input.
+    files: ['packages/engine/src/**/*.ts'],
     rules: {
-      ...solid.configs.typescript.rules,
-      "prettier/prettier": "warn",
+      'no-console': 'error',
+      'no-restricted-globals': ['error', 'window', 'document', 'process', 'PluginAPI'],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message: 'The engine gets the time as input.',
+        },
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: 'The engine gets the time as input.',
+        },
+        {
+          selector: "CallExpression[callee.object.name='Math'][callee.property.name='random']",
+          message: 'The engine is deterministic.',
+        },
+      ],
     },
   },
-  eslintConfigPrettier,
 );

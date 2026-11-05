@@ -1,0 +1,15 @@
+{
+  "name": "@questarc/plugin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "QuestArc as a Super Productivity plugin",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@questarc/engine": "*",
+    "@questarc/sp-plugin-api": "*"
+  }
+}

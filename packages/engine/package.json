@@ -1,0 +1,15 @@
+{
+  "name": "@questarc/engine",
+  "version": "0.0.0",
+  "private": true,
+  "description": "QuestArc's pure game engine: derives the game from Super Productivity task data",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p ."
+  }
+}

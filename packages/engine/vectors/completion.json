@@ -1,0 +1,32 @@
+{
+  "name": "Completed tasks exclude won't-do tasks and sum their time",
+  "input": {
+    "todayStr": "2026-11-05",
+    "tasks": [
+      {
+        "id": "a",
+        "isDone": true,
+        "doneOn": 1762336800000,
+        "timeSpentOnDay": { "2026-11-04": 600000, "2026-11-05": 1200000 }
+      },
+      {
+        "id": "b",
+        "isDone": true,
+        "doneOn": 1762340400000,
+        "wontDoOn": 1762340400000,
+        "timeSpentOnDay": { "2026-11-05": 300000 }
+      },
+      {
+        "id": "c",
+        "isDone": false,
+        "timeSpentOnDay": { "2026-11-05": 900000 }
+      },
+      { "id": "d", "isDone": true, "doneOn": 1762344000000 }
+    ]
+  },
+  "expected": {
+    "todayStr": "2026-11-05",
+    "completedTasks": 2,
+    "timeSpentMs": 1800000
+  }
+}
