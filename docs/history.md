@@ -109,3 +109,4 @@
 | 108 | 2026-02-18 | Remove auto-scheduling logic (`taskRepeatCfg`/`startDate`). | [./108/](./108/) | Antigravity |
 | 109 | 2026-02-18 | Feature: Habit Stacking (`[stack:ID]` tag, streak carry-over, Skip Step). | [./109/](./109/) | Antigravity |
 | 110 | 2026-03-01 | Feature: Habitica-style Scheduling (Soft Allow, Daily Floor, `[shouldBlock:true]`, Settings). | [./110/](./110/) | Antigravity |
+| 111 | 2026-11-05 | Plan: shared engine for Super Productivity and Pensum, derived game state, psychology rules, phases 0–5. | [./111/](./111/) | Claude Code |
