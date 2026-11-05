@@ -27,19 +27,82 @@ and its test vectors together.
 
 ## 2. Days
 
-- Days are Super Productivity's logical days (`todayStr` and the
-  day-start offset from `getDayContext()`).
-- A **due day** is a day on which the bound recurring task was scheduled
-  by its repeat config. How due days are computed for each repeat
-  setting is specified in issue #48. Days that are not due never count
-  as misses.
-- A completion counts for the day its instance was due (taken from the
-  instance id `rpt_<cfgId>_<day>`, or `created`), not the day it was
-  ticked off. **Backfill window:** a completion counts for its due day if
-  it was ticked off by the end of the next logical day; later ones count
-  for the day they were ticked off.
-- **Paused days** (between a pause and a resume record) are not due.
-- A due day is **missed** when it is over and has no counting completion.
+### Logical days
+
+- Days are Super Productivity's logical days. The engine gets
+  `todayStr`, the day-start offset `startOfNextDayDiffMs` (both from
+  `getDayContext()`) and the user's IANA time zone as input.
+- The logical day of a timestamp `t` is the calendar date of
+  `t − startOfNextDayDiffMs` in that time zone (`Intl.DateTimeFormat`,
+  which Node and gjs both support with the same results). Daylight-saving
+  changes are handled by the time zone database, never by adding 24 hours.
+
+### Due days (issue #48)
+
+A stage may only be bound to a recurring task whose schedule QuestArc can
+compute exactly. Supported repeat configs:
+
+| Schedule        | Repeat config                                              | Due days                                                 |
+| --------------- | ---------------------------------------------------------- | -------------------------------------------------------- |
+| Daily           | `repeatCycle: DAILY`, `repeatEvery: 1`                     | every day                                                |
+| Every n days    | `repeatCycle: DAILY`, `repeatEvery: n` (2–7)               | `startDate` + k·n days                                   |
+| Chosen weekdays | `repeatCycle: WEEKLY`, `repeatEvery: 1`, `monday`…`sunday` | the marked weekdays (Monday to Friday is one case of it) |
+
+Everything else (monthly, yearly, every n weeks, `repeatFromCompletionDate`,
+`waitForCompletion`) is not offered for a stage: the stage dialog asks
+for one of the supported schedules. Habits that happen less than weekly
+are not what journeys are for.
+
+A day `d` is due when all of these hold:
+
+1. `d` is on or after the day the stage was accepted and on or after the
+   config's `startDate`, and on or before `repeatUntilDay` if set;
+2. the schedule above has an occurrence on `d`;
+3. `d` is not in the config's `deletedInstanceDates` (the user skipped
+   that occurrence in Super Productivity's repeat dialog: a planned skip,
+   not a miss);
+4. `d` is not inside a pause (below).
+
+### Pauses
+
+- A QuestArc pause (pause and resume records) makes its days not due.
+- A **paused repeat config** in Super Productivity (`isPaused`) carries no
+  dates. When a host sees the bound config change between paused and not
+  paused, it writes a pause or resume record for that day. While the
+  config is paused and no record says since when, the days after the last
+  counting completion are treated as paused. Both rules err on the side of
+  the user: a pause never turns into misses.
+
+### Which day a completion counts for
+
+- An instance with an id `rpt_<cfgId>_<YYYY-MM-DD>` belongs to that day.
+  The first task of a config (an existing task turned into a recurring
+  one) has its own id: it belongs to its `dueDay` if present, otherwise to
+  the logical day of `doneOn`. Archived tasks have no `dueDay`, so the id
+  is the main source.
+- **Backfill window:** a completion counts for its due day if it was
+  ticked off (`doneOn`) by the end of the next logical day. A later
+  completion counts for the logical day it was ticked off.
+- A completion on a day that is not due still counts (XP, `count`,
+  `time_spent`, guardians), but cannot fill or break a run.
+- Deleting a done instance removes its completion; finished stages are
+  protected by checkpoints ([deleted history](decisions/deleted-history.md)).
+
+### Missed days
+
+A due day is **missed** when the backfill window for it has passed (the
+end of the next logical day) and it has no counting completion. Today and
+yesterday are therefore never missed yet.
+
+**Example A.** Chosen weekdays Monday, Wednesday, Friday. The user does
+Monday, misses Wednesday, does Friday: one gap, the run continues. The
+next Monday is missed too: Wednesday and Monday are consecutive due days,
+so the run ends; Tuesday and Thursday never counted.
+
+**Example B.** Daily, day start 04:00, time zone Europe/Berlin. A walk
+ticked off at 01:30 on Tuesday belongs to Monday's logical day. Monday's
+instance ticked off on Tuesday evening still counts for Monday
+(backfill); ticked off on Wednesday it counts for Wednesday.
 
 ## 3. Runs: never miss twice
 
@@ -53,7 +116,7 @@ and its test vectors together.
   `offerFallback`: the previous, smaller stage is offered for hard days.
   Nothing else happens.
 
-**Example A.** Due daily. Days 1–4 done, day 5 missed, days 6–7 done:
+**Example C.** Due daily. Days 1–4 done, day 5 missed, days 6–7 done:
 current run 6 completions, one gap, best run 6. Day 8 and 9 missed: the
 run ends with 6, `offerFallback` is set, best run stays 6, total 6.
 
@@ -72,7 +135,7 @@ Only due days since the stage was accepted are looked at. Progress for
 the journey view: `days` → completions in the window ÷ n (capped at 1);
 `count` → completions ÷ n; `time_spent` → minutes ÷ n.
 
-**Example B.** `days` 5 of 7, due daily, stage accepted on day 1. Days
+**Example D.** `days` 5 of 7, due daily, stage accepted on day 1. Days
 1, 2, 4, 5, 6 done, 3 and 7 missed: the last 7 due days hold 5
 completions → met on day 6.
 
@@ -94,7 +157,7 @@ completions → met on day 6.
   ([deleted history](decisions/deleted-history.md)) + XP derived for the
   current stage.
 
-**Example C.** Example A's stage: 6 completions × 10 = 60 XP, plus 10 for
+**Example E.** Example C's stage: 6 completions × 10 = 60 XP, plus 10 for
 the welcome back on day 6 = 70 XP → level 2.
 
 ## 6. Guardians
@@ -108,7 +171,7 @@ the welcome back on day 6 = 70 XP → level 2.
   condition; an undefeated guardian simply stays on the path and can be
   defeated later in the stage.
 
-**Example D.** Guardian HP 100 in Example A's stage: 70 damage after day 7. Day 10 is the first completion after the misses: 10 + 10 welcome back
+**Example F.** Guardian HP 100 in Example C's stage: 70 damage after day 7. Day 10 is the first completion after the misses: 10 + 10 welcome back
 = 90. Day 11: 100, the guardian is defeated.
 
 ## 7. HP (RPG mode only)

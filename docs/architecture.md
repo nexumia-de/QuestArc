@@ -125,10 +125,9 @@ milestones.
   config ([facts](super-productivity-facts.md)). Decided:
   [recurring-task setup](decisions/recurring-task-setup.md).
 - **Missed days leave no data.** Super Productivity creates an instance
-  only on days a recurring task is due; a missed day is the absence of a
-  done instance. The engine must know the repeat schedule exactly
-  (weekdays, start date, every n days) to tell a miss from a free day, the
-  same way in both hosts.
+  only on days a recurring task is due, so the engine computes due days
+  itself. Decided: only daily, every n days and chosen weekdays are
+  allowed for a stage ([game rules](game-rules.md#due-days-issue-48)).
 - **Repeat data is subtler than it looks** ([facts](super-productivity-facts.md)):
   at most one instance per config is created, for the newest occurrence;
   with `skipOverdue` (on by default for simple schedules) past instances
