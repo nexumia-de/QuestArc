@@ -1,27 +1,30 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { evaluate } from '../src';
+import { diff, evaluate } from '../src';
 import type { GameView, Snapshot } from '../src';
+import { loadVectors, mismatches } from './vector-support';
 
-interface Vector {
-  name: string;
-  input: Snapshot;
-  expected: GameView;
-}
+const vectors = loadVectors();
 
-const dir = join(import.meta.dirname, '..', 'vectors');
-const vectors: Vector[] = readdirSync(dir)
-  .filter((file) => file.endsWith('.json'))
-  .map((file) => JSON.parse(readFileSync(join(dir, file), 'utf8')) as Vector);
-
-describe('test vectors', () => {
+describe('test vectors in Node', () => {
   it('exist', () => {
-    expect(vectors.length).toBeGreaterThan(0);
+    expect(vectors.length).toBeGreaterThan(20);
   });
 
-  it.each(vectors.map((v) => [v.name, v] as const))('%s', (_name, vector) => {
-    expect(evaluate(vector.input)).toEqual(vector.expected);
+  it.each(vectors.map((v) => [v.file, v] as const))('%s', (_file, vector) => {
+    const actual =
+      vector.kind === 'diff'
+        ? diff(evaluate(vector.before as Snapshot), evaluate(vector.after as Snapshot))
+        : evaluate(vector.input as Snapshot);
+    expect(mismatches(vector.expect, actual)).toEqual([]);
+  });
+
+  it('are deterministic', () => {
+    for (const vector of vectors) {
+      if (vector.kind !== 'evaluate') continue;
+      const a: GameView = evaluate(vector.input as Snapshot);
+      const b: GameView = evaluate(structuredClone(vector.input) as Snapshot);
+      expect(b).toEqual(a);
+    }
   });
 });

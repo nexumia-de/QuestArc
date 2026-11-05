@@ -1,0 +1,117 @@
+{
+  "name": "Example C/E: one miss is a gap, two in a row end the run; welcome back earns 10",
+  "rule": "game-rules \u00a73, \u00a75 (Example C, E)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-12",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-07",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794049200000,
+        "doneOn": 1794070800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-08",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794135600000,
+        "doneOn": 1794157200000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 70,
+    "level": 2,
+    "active": {
+      "offerFallback": true,
+      "position": {
+        "stage": 0
+      },
+      "stations": [
+        {
+          "stageId": "a",
+          "state": "current",
+          "xp": 70,
+          "completions": 6,
+          "welcomeBacks": 1,
+          "run": {
+            "current": 0,
+            "best": 6,
+            "total": 6,
+            "gap": false
+          },
+          "guardian": {
+            "hp": 100,
+            "damage": 70,
+            "defeated": false
+          }
+        },
+        {
+          "stageId": "b",
+          "state": "ahead"
+        },
+        {
+          "stageId": "c",
+          "state": "ahead"
+        }
+      ]
+    }
+  }
+}

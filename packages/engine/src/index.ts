@@ -1,4 +1,9 @@
-export type { Snapshot, SnapshotTask } from './snapshot';
-export type { GameView } from './evaluate';
+export type { DayContext, Snapshot, SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
+export type { Condition, Journey, Schedule, Stage, Weekday } from './types/journey';
+export type { GameView, RunView, StationRun, StationState, StationView } from './types/view';
+export type { GameEvent } from './diff';
 export { evaluate } from './evaluate';
-export { isCompleted, timeSpentMs } from './completion';
+export { diff } from './diff';
+export { journeyErrors, isJourney } from './validate';
+export { isSupported } from './schedule';
+export { isoWeek } from './days';

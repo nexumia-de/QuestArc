@@ -8,6 +8,14 @@ updates:
     schedule:
       interval: weekly
     versioning-strategy: increase
+    ignore:
+      # Node types follow the Node version in .nvmrc (22).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # typescript-eslint supports TypeScript below 6.1; TypeScript 7 (the
+      # native compiler) waits until it does (docs/dependencies.md).
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     groups:
       dev-dependencies:
         dependency-type: development

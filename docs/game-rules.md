@@ -84,7 +84,10 @@ A day `d` is due when all of these hold:
   ticked off (`doneOn`) by the end of the next logical day. A later
   completion counts for the logical day it was ticked off.
 - A completion on a day that is not due still counts (XP, `count`,
-  `time_spent`, guardians), but cannot fill or break a run.
+  `time_spent`, guardians) and ends a series of misses, but does not
+  lengthen a run.
+- **At most one completion counts per day**, also when two instances of
+  the task were ticked off for the same day.
 - Deleting a done instance removes its completion; finished stages are
   protected by checkpoints ([deleted history](decisions/deleted-history.md)).
 
@@ -95,9 +98,10 @@ end of the next logical day) and it has no counting completion. Today and
 yesterday are therefore never missed yet.
 
 **Example A.** Chosen weekdays Monday, Wednesday, Friday. The user does
-Monday, misses Wednesday, does Friday: one gap, the run continues. The
-next Monday is missed too: Wednesday and Monday are consecutive due days,
-so the run ends; Tuesday and Thursday never counted.
+Monday, misses Wednesday, does Friday: one gap, the run continues and
+Friday is a welcome back. The next week they do Monday, then miss
+Wednesday and Friday: those are consecutive due days, so the run ends;
+Tuesday and Thursday never counted.
 
 **Example B.** Daily, day start 04:00, time zone Europe/Berlin. A walk
 ticked off at 01:30 on Tuesday belongs to Monday's logical day. Monday's

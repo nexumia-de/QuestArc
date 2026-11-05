@@ -1,0 +1,73 @@
+{
+  "name": "Logical days across the spring daylight-saving change with day start 04:00",
+  "rule": "game-rules \u00a72, logical days",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-03-30",
+      "startOfNextDayDiffMs": 14400000,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-03-28",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1774695600000,
+        "doneOn": 1774744200000
+      },
+      {
+        "id": "rpt_cfgA_2026-03-29",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1774778400000,
+        "doneOn": 1774819800000
+      },
+      {
+        "id": "rpt_cfgA_2026-03-30",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1774864800000,
+        "doneOn": 1774834200000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-03-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-03-28"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-03-28"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-03-28",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "completions": 3,
+          "run": {
+            "current": 3,
+            "gap": false
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "name": "Example A: only due weekdays count; two missed due days in a row end the run",
+  "rule": "game-rules \u00a72 (Example A)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-15",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgW_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgW_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1793962800000,
+        "doneOn": 1793984400000
+      },
+      {
+        "id": "rpt_cfgW_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1794222000000,
+        "doneOn": 1794243600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgW",
+        "repeatCycle": "WEEKLY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01",
+        "monday": true,
+        "wednesday": true,
+        "friday": true
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgW_2026-11-02",
+        "repeatCfgId": "cfgW"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 40,
+    "active": {
+      "offerFallback": true,
+      "stations": [
+        {
+          "completions": 3,
+          "welcomeBacks": 1,
+          "run": {
+            "current": 0,
+            "best": 3,
+            "total": 3,
+            "gap": false
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

@@ -112,25 +112,30 @@ overwrite each other. Most records are written once and never changed.
 
 ## 3. Engine output
 
+The types are in `packages/engine/src/types/view.ts`; in short:
+
 ```ts
 interface GameView {
-  mode: 'calm' | 'rpg';
-  totalXp: number; // 0 in calm mode views, still computed
+  todayStr: string;
+  mode: 'calm' | 'rpg'; // from the settings record; calm by default
+  totalXp: number; // computed in both modes, shown only with the game
   level: number;
-  hp?: number; // RPG mode only
-  active?: RunView;
-  paused: RunView[];
-  shelf: { finished: RunView[]; graduated: HabitView[]; maintained: HabitView[] };
+  active?: RunView; // the newest open run
+  paused: RunView[]; // other open runs
+  finished: RunView[]; // runs with a run-end record (the shelf)
+  problems: string[]; // records and journeys the engine could not use
 }
 
 interface RunView {
   runId: string;
   journeyId: string;
-  stations: StationView[];
-  position: { stage: number; progress: number }; // index, 0..1 within it
+  startDay: string;
   why?: string;
-  checkinDue: boolean;
-  offerFallback: boolean;
+  stations: StationView[];
+  position: { stage: number; progress: number }; // current station, 0..1
+  paused: boolean; // by a pause record or a paused repeat config
+  checkinDue: boolean; // weekly question not answered this ISO week
+  offerFallback: boolean; // second miss in a row, not yet followed by a completion
 }
 
 interface StationView {
@@ -138,15 +143,25 @@ interface StationView {
   state: 'done' | 'met' | 'current' | 'unbound' | 'unsupported-repeat' | 'ahead';
   progress: number; // 0..1
   run: { current: number; best: number; total: number; gap: boolean };
+  xp: number; // earned in this stage; from the checkpoint once done
+  completions: number; // days with a counting completion
+  welcomeBacks: number;
+  acceptedDay?: string;
+  doneDay?: string;
   guardian?: { hp: number; damage: number; defeated: boolean };
-  graduation?: 'qualifies' | 'graduated' | 'check-in-due' | 'bring-back';
 }
 ```
 
-`diff(before, after)` returns events with an i18n key and parameters
-(XP gained, level up, welcome back, station reached, condition met,
-guardian damaged or defeated, fallback offered, habit can graduate); see
-issue #23. All numbers follow the [game rules](game-rules.md).
+When the user accepts the next stage, the host writes the current
+station's `xp` and guardian `damage` into the checkpoint record.
+
+`diff(before, after)` returns events `{ key, params }` for toasts:
+`event.completion`, `event.welcome-back`, `event.progress-summary` (more
+than one new completion at once, e.g. after a sync),
+`event.station-reached`, `event.guardian-damaged`,
+`event.guardian-defeated`, `event.fallback-offered`, `event.level-up`.
+HP and graduation follow with issue #22. All numbers follow the
+[game rules](game-rules.md).
 
 ## 4. Pensum
 

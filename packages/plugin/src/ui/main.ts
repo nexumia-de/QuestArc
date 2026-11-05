@@ -13,7 +13,11 @@ const show = (text: string): void => {
 loadSnapshot()
   .then((snapshot) => {
     const view = evaluate(snapshot);
-    show(`Engine check for ${view.todayStr}: ${view.completedTasks} completed tasks.`);
+    show(
+      view.active
+        ? `Engine check for ${view.todayStr}: journey ${view.active.journeyId}, level ${view.level}.`
+        : `Engine check for ${view.todayStr}: no journey started yet.`,
+    );
   })
   .catch((error: unknown) => {
     show(`Could not read your tasks: ${String(error)}`);

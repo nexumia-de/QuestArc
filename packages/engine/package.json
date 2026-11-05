@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "test": "vitest run",
+    "test": "node build.mjs && vitest run",
     "typecheck": "tsc --noEmit -p ."
   }
 }

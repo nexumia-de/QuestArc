@@ -1,0 +1,81 @@
+{
+  "name": "A completion on a free day earns XP and breaks a series of misses, but does not lengthen the run",
+  "rule": "game-rules \u00a72",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-10",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgW_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgW_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      },
+      {
+        "id": "rpt_cfgW_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgW",
+        "created": 1794222000000,
+        "doneOn": 1794243600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgW",
+        "repeatCycle": "WEEKLY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01",
+        "monday": true,
+        "wednesday": true,
+        "friday": true
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgW_2026-11-02",
+        "repeatCfgId": "cfgW"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 50,
+    "active": {
+      "offerFallback": false,
+      "stations": [
+        {
+          "completions": 3,
+          "welcomeBacks": 2,
+          "run": {
+            "current": 2,
+            "best": 2,
+            "total": 3,
+            "gap": false
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "name": "Example B: day start 04:00, backfill until the end of the next day",
+  "rule": "game-rules \u00a72 (Example B)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-13",
+      "startOfNextDayDiffMs": 14400000,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794222000000,
+        "doneOn": 1794270600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-10",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794308400000,
+        "doneOn": 1794423600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-11",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794394800000,
+        "doneOn": 1794567600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-09",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 40,
+    "active": {
+      "stations": [
+        {
+          "completions": 3,
+          "welcomeBacks": 1,
+          "run": {
+            "current": 3,
+            "best": 3,
+            "total": 3,
+            "gap": false
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

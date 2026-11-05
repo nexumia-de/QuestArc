@@ -1,0 +1,120 @@
+{
+  "name": "Example F: welcome back after the run ended, guardian defeated at 100",
+  "rule": "game-rules \u00a76 (Example F)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-12",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-07",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794049200000,
+        "doneOn": 1794070800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-08",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794135600000,
+        "doneOn": 1794157200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-11",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794394800000,
+        "doneOn": 1794416400000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-12",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794481200000,
+        "doneOn": 1794502800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 100,
+    "level": 2,
+    "active": {
+      "offerFallback": false,
+      "stations": [
+        {
+          "stageId": "a",
+          "xp": 100,
+          "welcomeBacks": 2,
+          "completions": 8,
+          "run": {
+            "current": 2,
+            "best": 6,
+            "total": 8,
+            "gap": false
+          },
+          "guardian": {
+            "damage": 100,
+            "defeated": true
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}

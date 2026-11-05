@@ -1,0 +1,92 @@
+{
+  "name": "Example D: 5 completions in the last 7 due days meet the condition",
+  "rule": "game-rules \u00a74 (Example D)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-07",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793876400000,
+        "doneOn": 1793898000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793962800000,
+        "doneOn": 1793984400000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-07",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794049200000,
+        "doneOn": 1794070800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "position": {
+        "stage": 0,
+        "progress": 1
+      },
+      "stations": [
+        {
+          "state": "met",
+          "progress": 1,
+          "run": {
+            "current": 5,
+            "gap": false
+          }
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}
