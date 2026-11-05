@@ -74,8 +74,8 @@ The [design rules](psychology.md) apply. In short:
 
 ## Versions and changes
 
-- `format` changes only when the structure changes; the engine reads
-  format 3 and converts later formats' predecessors when it loads them.
+- `format` changes only when the structure changes. The engine reads
+  format 3; a later format comes with a converter from format 3.
 - When a journey's content changes (`version` raised) while someone walks
   it:
   - finished stages keep their checkpoints

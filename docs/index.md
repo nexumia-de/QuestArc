@@ -15,6 +15,7 @@ links. Change history is in [log.md](log.md).
 
 # Design
 
+- [Data model](data-model.md) - Engine input (snapshot), choice records as one plugin-data key each, the game view and events, what Pensum reads and writes.
 - [Story format 3](story-format.md) - Journeys as JSON: stages with plan, schedule, condition, guardian, story texts and nugget; text keys; schema check; versions.
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, HP, graduation, calm mode, with worked examples.
 
