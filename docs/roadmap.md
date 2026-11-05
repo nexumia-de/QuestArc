@@ -12,7 +12,7 @@ Work items are [issues](https://github.com/nexumia-de/QuestArc/issues),
 grouped by [milestones](https://github.com/nexumia-de/QuestArc/milestones);
 issues without a milestone are the backlog. This file keeps only the
 goals. The architecture and the reasons behind it are in
-[plan 111](111/plan.md); the design rules come from
+[architecture](architecture.md); the design rules come from
 [psychology](psychology.md). Work on the lowest open milestone first.
 
 Milestones have no dates. Every milestone ends with something that
@@ -34,9 +34,8 @@ The heart of QuestArc 3.0. A **journey** is a story drawn as a path:
 - Reaching a station tells the next piece of the story. The next stage
   starts only when the user accepts it; accepting sets up its recurring
   task. Super Productivity's plugin API cannot create repeat configs
-  today (`PluginCreateTaskData` has no repeat field, the repeat actions
-  are not in `ALLOWED_PLUGIN_ACTIONS`); how the plugin does this is an
-  open decision in M1.
+  ([facts](super-productivity-facts.md)); how the plugin does this is
+  decided in _Rules on paper_.
 - Finished journeys stay on a shelf of completed journeys; habits that
   became automatic graduate there.
 
@@ -47,55 +46,64 @@ borrows that idea, nothing of their content or look.
 Both hosts draw the same journey: the plugin with SVG in Super
 Productivity's theme, Pensum with GTK in libadwaita's look.
 
-# M0 – Foundation
+# Foundation
 
-**Goal**: QuestArc lives on GitHub and its checks are green, before
-anything is rebuilt.
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/1)
 
-**Exit criteria**: GitHub Actions run build, lint, typecheck and tests on
-every pull request and publish the plugin ZIP for tags; the existing
-tests pass and `tsc` is clean; README and manifest point to GitHub;
-tags `v1.0.0`…`2.2.0` are on GitHub; GoVenture and HeroicRPG are archived
-on Codeberg with a note pointing here.
+**Goal**: a clean start for 3.0 with green checks, and the one technical
+risk that could change the architecture tested first.
 
-# M1 – Rules on paper
+**Exit criteria**: the repository holds only the 3.0 documents and a new
+skeleton (workspace with `packages/engine` and the plugin, built from
+Super Productivity's current plugin starter); GitHub Actions build, lint,
+typecheck and test every pull request and publish releases from tags;
+dependencies pinned with Dependabot; a `LICENSE` file; agent rules for
+3.0; the GJS spike decided how Pensum runs the engine; 2.x tags on
+GitHub; GoVenture and HeroicRPG archived on Codeberg.
+
+# Rules on paper
+
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/2)
 
 **Goal**: everything the engine and both hosts must do is written down
-and approved by the owner.
+and approved by the owner, starting with the open risks.
 
-**Exit criteria**: `docs/game-rules.md` (XP, level, stage conditions,
-never miss twice, guardians, optional HP, graduation, worked examples);
-`docs/data-model.md` (snapshot input, choice records with one plugin-data
-key each, story format 3); `docs/behaviour.md` (screens incl. the
-journey, flows, texts, actions, and where each lands in Super
-Productivity and in Pensum); Super Productivity facts verified in its
-source (archived tasks, repeat configs, day start).
+**Exit criteria**: [Super Productivity facts](super-productivity-facts.md)
+complete for the current release; decision on setting up recurring
+tasks from the plugin, with a request to Super Productivity for an API
+sent through the owner; rules for missed days (repeat schedules) and for
+deleted history; `docs/game-rules.md`, `docs/story-format.md` with a
+schema, `docs/data-model.md`, `docs/behaviour.md` and the journey
+mockups approved.
 
-# M2 – Engine
+# Engine
 
-**Goal**: one pure TypeScript engine computes the whole game from task
-data, the same in Super Productivity and in GNOME's JavaScript runtime.
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/3)
 
-**Exit criteria**: a spike proved the engine runs in `gjs` from the GNOME
-51 runtime fast enough on the phone (or the fallback is decided);
-`packages/engine` computes level, journey position, stage conditions,
-guardians and graduation; shared test vectors pass in Node and in `gjs`;
-`engine.mjs` and its command-line wrapper are built in CI.
+**Goal**: one pure TypeScript engine computes what the first journey
+needs from task data, the same in Node and in GNOME's JavaScript runtime.
 
-# M3 – First journey in Super Productivity (QuestArc 3.0)
+**Exit criteria**: logical days, XP and level, stage conditions with
+never miss twice, journey position and guardians, events for toasts,
+journey validation; shared test vectors pass in Node and in `gjs`; the
+engine archive for Pensum is built in CI.
 
-**Goal**: the owner walks a real journey every day in Super
-Productivity.
+# First journey in Super Productivity
 
-**Exit criteria**: clean break from 2.x (old quest projects are left as
-they are, with a one-time import of a running story); one built-in
-journey; accepting a stage creates its recurring task; journey view,
-level in the header, toasts after completing tasks, calm and RPG mode;
-QuestArc no longer writes into titles, notes or project names; release
-3.0.0 on GitHub; the owner uses it every day without falling back
-to 2.x or to workarounds.
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/4)
 
-# M4 – Journey in Pensum
+**Goal**: the owner walks a real journey every day in Super Productivity
+with QuestArc 3.0.
+
+**Exit criteria**: plugin adapter on the engine; one built-in journey;
+starting a journey and accepting stages; journey view, level in the
+header, toasts, calm and RPG mode, shelf; a test inside a running Super
+Productivity; QuestArc never writes into titles, notes or project names;
+release 3.0.0; the owner uses it every day without workarounds.
+
+# Journey in Pensum
+
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/5)
 
 **Goal**: the same journey on the phone, native in Pensum.
 
@@ -104,18 +112,19 @@ to 2.x or to workarounds.
 journey page, level, toasts, game layer switch in preferences; then
 accepting a stage on the phone with the same choice records.
 
-# M5 – More journeys
+# More journeys
 
-**Goal**: enough journeys for a few months, and the parts of the game
-that need time to matter.
+[Milestone](https://github.com/nexumia-de/QuestArc/milestone/6)
 
-**Exit criteria**: three to five built-in journeys written along the
-psychology rules; shelf of finished journeys and graduated habits; HP in
-RPG mode; German texts; import and export of journeys as JSON so users
-can write and share their own.
+**Goal**: more journeys and the parts of the game that only matter after
+a while.
 
-# Later (backlog)
+**Exit criteria**: more built-in journeys written along the psychology
+rules; HP in RPG mode; graduation; German texts; import and export of
+journeys as JSON so users can write and share their own.
 
-A world map that links journeys into regions; companions that reflect
-the consistency of one area; focus sessions as a stage condition (time
-spent is already in the data); cooperation if it works without a server.
+# Backlog
+
+Issues without a milestone: a world map that links journeys into
+regions; companions that reflect the consistency of one area; focus
+sessions as a stage condition; cooperation if it works without a server.
