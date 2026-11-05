@@ -96,8 +96,11 @@ engine archive for Pensum is built in CI.
 with QuestArc 3.0.
 
 **Exit criteria**: plugin adapter on the engine; one built-in journey;
-starting a journey and accepting stages; journey view, level in the
-header, toasts, calm and RPG mode, shelf; a test inside a running Super
+starting a journey (own "why", self-chosen start date) and accepting
+stages; journey view, level in the header, toasts, calm and RPG mode,
+shelf; weekly look back with the automaticity question; welcome back
+after a miss; fallback to the previous stage and pause; learning nuggets
+at stations; the page "How QuestArc motivates you"; a test inside a running Super
 Productivity; QuestArc never writes into titles, notes or project names;
 release 3.0.0; the owner uses it every day without workarounds.
 
@@ -120,7 +123,8 @@ accepting a stage on the phone with the same choice records.
 a while.
 
 **Exit criteria**: more built-in journeys written along the psychology
-rules; HP in RPG mode; graduation; German texts; import and export of
+rules; HP in RPG mode; graduation by automaticity; "pair it with";
+optional plan check (WOOP); reminders that fade; German texts; import and export of
 journeys as JSON so users can write and share their own.
 
 # Backlog

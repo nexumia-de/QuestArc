@@ -106,27 +106,34 @@ Python port must pass the same test vectors.
 
 ## Game rules (draft)
 
-Starting points from the prototypes and the psychology rules; the
-approved version goes into `docs/game-rules.md`.
+Starting points from the prototypes and the [design rules](psychology.md);
+the approved version goes into `docs/game-rules.md` (issue #11).
 
-- **XP per completed task:** `10 + round(7 * sqrt(minutes))`, minutes =
-  time spent, else estimate, else 0, capped at 120.
+- **XP:** a fixed amount per completed stage task. The draft formula
+  based on time spent (`10 + round(7 * sqrt(minutes))`) is open: the
+  evidence review advises against tying rewards to performance measures,
+  so #11 decides whether time counts at all.
 - **Level:** `floor(sqrt(totalXp / 50)) + 1`; cosmetic only (titles,
-  themes), never power.
-- **Stages:** a habit with an anchor ("after …"), a condition (`days` n of
-  m, `count`, `time_spent`), an optional guardian and story text. The next
-  stage starts when the user accepts it.
-- **Never miss twice:** one missed day keeps the streak; two in a row end
-  it. Conditions count days done within a window instead of an unbroken
-  run.
+  looks), never power.
+- **Stages:** one plan "After X, I will Y" with an anchor, a condition
+  (`days` n of m, `count`, `time_spent`), an optional guardian, story
+  text and a learning nugget. The next stage starts when the user accepts
+  it; the previous stage is the fallback for hard days.
+- **Never miss twice:** one missed day keeps the run; two in a row end the
+  run, never the journey. Conditions count days done within a window.
+  Misses count only on days the recurring task was due; a short backfill
+  window and pauses are not misses.
+- **Welcome back:** the first completion after a miss gives a fixed bonus
+  guardian hit in RPG mode and a friendly line in calm mode.
 - **Guardians:** fixed HP; damage is the XP of tasks bound to the journey
   since the stage was accepted.
 - **HP (RPG mode only):** from the last 7 days; every second consecutive
   miss costs HP; recovers by itself as the window moves. No death.
-- **Graduation:** a habit done on ≥ 90 % of days over the last 30 can
-  leave the daily list and go to the shelf.
+- **Graduation:** by the weekly automaticity answer ("I do this
+  automatically", 1–7), steady completion and reminders already off; not
+  by a day count. The user decides; check-ins after two and six weeks.
 - **Not planned:** gold and shop, random rewards, login bonuses,
-  leaderboards.
+  leaderboards, money commitments.
 
 ## Risks
 
@@ -167,14 +174,17 @@ milestones.
 
 ## Decisions (owner, 2026-11-05)
 
-| #   | Question                   | Decision                                                                                                     |
-| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| D1  | Others using QuestArc 2.x? | Probably nobody; clean break                                                                                 |
-| D2  | What is a habit?           | Super Productivity's recurring tasks (`taskRepeatCfg`); its habit counters do not fit                        |
-| D3  | Keep HP?                   | Only in RPG mode, derived from the last 7 days, recovers by itself                                           |
-| D4  | Gold and shop?             | Dropped for now                                                                                              |
-| D5  | Planning?                  | GitHub issues and milestones as in the other apps; goals in the [roadmap](roadmap.md)                        |
-| D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules |
-| D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                |
-| D8  | Build on 2.x code?         | No: start from scratch and work only from these documents; 2.x stays in git history; no import of 2.x quests |
-| D9  | Journey                    | Progress shown as travel along a path, QuestArc's own design ([roadmap](roadmap.md#the-journey))             |
+| #   | Question                   | Decision                                                                                                                                                                                                         |
+| --- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Others using QuestArc 2.x? | Probably nobody; clean break                                                                                                                                                                                     |
+| D2  | What is a habit?           | Super Productivity's recurring tasks (`taskRepeatCfg`); its habit counters do not fit                                                                                                                            |
+| D3  | Keep HP?                   | Only in RPG mode, derived from the last 7 days, recovers by itself                                                                                                                                               |
+| D4  | Gold and shop?             | Dropped for now                                                                                                                                                                                                  |
+| D5  | Planning?                  | GitHub issues and milestones as in the other apps; goals in the [roadmap](roadmap.md)                                                                                                                            |
+| D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules                                                                                                     |
+| D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                                                                                                                    |
+| D8  | Build on 2.x code?         | No: start from scratch and work only from these documents; 2.x stays in git history; no import of 2.x quests                                                                                                     |
+| D9  | Journey                    | Progress shown as travel along a path, QuestArc's own design ([roadmap](roadmap.md#the-journey))                                                                                                                 |
+| D10 | Journeys at once           | One active journey; it can be paused to start another                                                                                                                                                            |
+| D11 | Habits after a journey     | They stay: QuestArc never deletes or ends a recurring task; graduation is offered by automaticity, the user decides                                                                                              |
+| D12 | Evidence-based rules       | The [design rules](psychology.md) follow the [evidence review](research.md); no telemetry, so no A/B tests and success shown only to the user; a supporter digest needs sharing and waits with cooperation (#45) |
