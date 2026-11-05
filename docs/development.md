@@ -32,6 +32,21 @@ npm run check
 the engine has extra rules: no clock, no `Math.random`, no console, no
 host globals), `typecheck`, `test` (Vitest, engine), `build`.
 
+## CI and releases
+
+- `.github/workflows/ci.yml` runs `npm ci` and `npm run check` on every
+  pull request and push to `main` (job `check`, the required check in
+  `.github/rulesets/main.json`; the owner imports the ruleset) and keeps
+  the plugin ZIP as an artifact.
+- `.github/workflows/release.yml` runs on tags `v<version>`: the tag must
+  match `packages/plugin/src/manifest.json`; it runs the checks and
+  attaches the ZIP and `SHA256SUMS` to a GitHub release (a tag with `-`
+  makes a pre-release).
+- Dependabot opens weekly pull requests for npm packages and GitHub
+  Actions; actions are pinned to a commit SHA with the release as a
+  comment.
+- Node is pinned in `.nvmrc`.
+
 ## Plugin build
 
 `packages/plugin/build.mjs` uses esbuild:

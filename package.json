@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Habits as journeys, for Super Productivity and Pensum",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "workspaces": [
     "packages/sp-plugin-api",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "22.20.5",
+    "ajv": "8.20.0",
     "esbuild": "0.28.2",
     "eslint": "10.14.0",
     "fflate": "0.8.3",
@@ -32,5 +34,8 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.1.0"
+  },
+  "overrides": {
+    "minimatch": "11.0.4"
   }
 }

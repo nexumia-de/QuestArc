@@ -1,0 +1,80 @@
+@../phosh-toolkit/AGENTS.md
+
+# QuestArc
+
+Habits as journeys: a habit grows in small stages along a path, calm by
+default with an optional game layer. One pure game engine, two hosts: a
+plugin for [Super Productivity](https://super-productivity.com) and a
+game page in [Pensum](https://github.com/nexumia-de/pensum), the native
+Phosh app on the same data. Knowledge of this repository:
+[docs/index.md](docs/index.md).
+
+## Which shared rules apply
+
+QuestArc is a Super Productivity plugin and an engine, not a GTK app
+(decision D6 in [docs/architecture.md](docs/architecture.md)). Of the
+shared rules in ../phosh-toolkit/AGENTS.md these apply: English,
+knowledge in `docs/`, network access, pinned dependencies, licences of
+dependencies, planning with issues and milestones, code structure, no
+copy-paste between apps, pull requests and CI. These do **not** apply:
+app id and `.desktop`/metainfo, Flatpak, GTK/libadwaita UI and design
+rules, changelog fragments and `release.toml`, REUSE. The UI rules for
+360 px, touch targets and accessibility apply through
+[docs/behaviour.md](docs/behaviour.md) instead.
+
+## Work only from the documents
+
+- QuestArc 3.0 is built from scratch from `docs/`; the 2.x code in git
+  history is not a source (decision D8).
+- Before a change, read the documents it touches:
+  [game rules](docs/game-rules.md), [design rules](docs/psychology.md),
+  [data model](docs/data-model.md), [story format](docs/story-format.md),
+  [behaviour](docs/behaviour.md), [journey design](docs/journey-design.md),
+  [Super Productivity facts](docs/super-productivity-facts.md).
+- A change to a rule changes the document, its test vectors and the code
+  in the same pull request. Never let code and documents disagree.
+
+## Architecture rules
+
+- **Derive, don't count.** XP, level, progress, runs, guardians and HP are
+  computed by the engine from task data every time. Only choice records
+  are stored ([data model](docs/data-model.md)), one plugin-data key
+  each.
+- **The engine is pure** (`packages/engine`): no clock, no machine time
+  zone, no randomness, no logging, no host API; ESLint enforces it. Every
+  rule has a test vector in `packages/engine/vectors/` that must pass in
+  Node and in gjs.
+- **The user's tasks stay the user's.** Never write into task titles or
+  notes, never rename projects, never reopen or delete tasks, never end a
+  repeat config. Change a task only when the user asks for exactly that.
+- **No telemetry, no third-party services, no network requests** from the
+  plugin.
+- Super Productivity facts come from its source at a recorded commit; the
+  plugin API types are the copy in `packages/sp-plugin-api` (MIT, do not
+  edit; update with `scripts/update-sp-plugin-api.sh`).
+- Logs name ids and counts, never task titles, notes or the user's own
+  reason.
+
+## Design rules
+
+The 27 [design rules](docs/psychology.md) are binding, among them: calm
+mode by default; fixed rewards only, never announced before they are
+earned; no random rewards, login bonuses or rankings; a missed day is a
+neutral gap, never red, never blamed; autonomy-supportive texts; no
+generic motivational quotes; no promised number of days.
+
+## Before committing
+
+1. `npm run check` (format, lint, typecheck, tests, build) passes.
+2. Documents, `docs/index.md` and `docs/log.md` updated in the same
+   commit.
+3. New dependencies pinned exactly and listed with their licence in
+   [docs/dependencies.md](docs/dependencies.md).
+4. Screens checked at 360 × 720 and at a desktop size when the UI
+   changed.
+
+## Releases
+
+A tag `v<version>` matching `packages/plugin/src/manifest.json` runs the
+release workflow (plugin ZIP and checksum on a GitHub release). The
+owner tags releases; agents do not.

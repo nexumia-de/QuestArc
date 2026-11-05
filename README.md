@@ -36,3 +36,10 @@ Details in [development](docs/development.md).
 
 Work items are [issues](https://github.com/nexumia-de/QuestArc/issues) in
 [milestones](https://github.com/nexumia-de/QuestArc/milestones).
+
+## Licence
+
+QuestArc is free software under the GNU Affero General Public License,
+version 3 or later ([LICENSE](LICENSE)), © 2026 suitably. The copy of
+Super Productivity's plugin API types in `packages/sp-plugin-api` keeps
+its MIT licence.
