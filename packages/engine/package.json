@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "QuestArc's pure game engine: derives the game from Super Productivity task data",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Habits as journeys, for Super Productivity and Pensum",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "workspaces": [
     "packages/sp-plugin-api",

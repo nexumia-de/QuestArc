@@ -14,7 +14,9 @@ rest. Licences read from each package's `package.json` in
 
 ## Shipped
 
-Nothing third-party is bundled into the plugin or the engine.
+QuestArc itself is AGPL-3.0-or-later ([LICENSE](../LICENSE)). Nothing
+third-party is bundled into the plugin or the engine; all dependencies
+below are MIT, Apache-2.0 or BlueOak-1.0.0 and compatible with it.
 
 | Copy in the repository   | Version / source                         | Licence | Holder          |
 | ------------------------ | ---------------------------------------- | ------- | --------------- |
