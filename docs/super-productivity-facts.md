@@ -389,6 +389,28 @@ history clone (the given checkout is shallow, 50 commits)[^sp]:
   `request` with `allowedHosts`; `50db311c` `finishDay` hook fixed (dead
   before).
 
+## 10. Seen in the web app (19.3.1, 2026-11-06)
+
+Checked by running the plugin in `app.super-productivity.com`
+(`packages/plugin/e2e/real-app.mjs`), not from the source:
+
+- An uploaded plugin is installed disabled; it runs after its switch in
+  Settings → Plugins is turned on. The app also adds a side-menu entry for
+  plugins with a view.
+- The task panel has no "Repeat" entry: a task becomes recurring through
+  **Schedule Task → Repeat**, which opens "Make task recurring" with
+  "Every day" preselected; saving sets `repeatCfgId` and fires the task
+  hooks, so plugin.js picks it up within a few seconds.
+- 19.3.1 rejects the `dataChanged` and `dayChange` hooks (they are newer);
+  the other hooks, `onMessage`, the header button and the task context
+  menu entry work.
+- Up to an app width of 600 px the app shows a bottom navigation whose
+  round add button reaches about 36 px into the plugin's view
+  (`src/app/core-ui/mobile-bottom-nav/`, `XS_BREAKPOINT` in
+  `layout.service.ts` at `c5eb3f6`); the task opens as a bottom sheet.
+- The in-app community plugin list still shows a "QuestArc" entry with
+  the 2.x description (quests, badges, hero profile).
+
 ## Consequences for QuestArc (from the facts above)
 
 - Store stage ↔ repeat-config bindings in plugin data, but also record the

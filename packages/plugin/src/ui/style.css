@@ -777,3 +777,19 @@ body {
 .qa-prose section > p {
   margin: var(--s-half, 4px) 0 0;
 }
+
+/*
+ * Up to 600 px Super Productivity shows its bottom navigation with a
+ * round add button that reaches about 36 px into this view
+ * (mobile-bottom-nav at c5eb3f6). Keep the main action above it.
+ */
+@media (max-width: 600px) {
+  .qa-actions,
+  .qa-main:last-child {
+    padding-bottom: calc(var(--s2, 16px) + 40px);
+  }
+
+  .qa-main-fill:last-child {
+    padding-bottom: 40px;
+  }
+}
