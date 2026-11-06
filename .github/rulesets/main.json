@@ -35,6 +35,10 @@
           {
             "context": "check",
             "integration_id": 15368
+          },
+          {
+            "context": "real-app",
+            "integration_id": 15368
           }
         ]
       }

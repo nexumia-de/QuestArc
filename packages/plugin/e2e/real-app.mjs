@@ -6,8 +6,11 @@
 //
 //   node e2e/real-app.mjs [width height]
 //
-// Uses the Playwright of the environment; behind a proxy it uses
-// HTTPS_PROXY. Not part of npm run check: it needs the live app (#50).
+// QUESTARC_SP_URL picks the app: by default the live web app; CI runs
+// Super Productivity's Docker image at a pinned digest on localhost
+// (.github/workflows/real-app.yml). The live app goes through
+// HTTPS_PROXY when it is set; a local app never does. Uses the
+// Playwright of the environment.
 import { mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
@@ -15,7 +18,8 @@ import { join, resolve } from 'node:path';
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
-const BASE = 'https://app.super-productivity.com/';
+const BASE = process.env.QUESTARC_SP_URL ?? 'https://app.super-productivity.com/';
+const local = /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(BASE);
 const ZIP = resolve('dist', 'questarc-3.0.0.zip');
 const OUT = resolve('dist', 'real-app');
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
@@ -26,7 +30,8 @@ const expect = (ok, what) => {
   console.log(`ok: ${what}`);
 };
 
-const proxy = process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {};
+const proxy =
+  process.env.HTTPS_PROXY && !local ? { proxy: { server: process.env.HTTPS_PROXY } } : {};
 const browser = await chromium.launch(proxy);
 const page = await browser.newPage({ viewport: { width, height } });
 const shot = (name) => page.screenshot({ path: join(OUT, `${width}-${name}.png`) });
