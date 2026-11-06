@@ -1,11 +1,12 @@
 // Preview of the view outside Super Productivity (docs/development.md,
 // preview): a fake plugin API with demo data, the real adapter (brain) and
 // the built view in an iframe that talks to it the way Super Productivity's
-// bridge does. Query: ?demo=welcome|empty|walking&theme=light|dark.
+// bridge does. Query: ?demo=<scenario in preview/demo.ts>&theme=light|dark.
 import type { Hooks } from '@questarc/sp-plugin-api';
 
 import { createBrain } from '../src/adapter/brain';
 import { localDay } from '../src/adapter/day';
+import { registerHooks } from '../src/adapter/hooks';
 import type { HostApi } from '../src/adapter/host';
 import { handleMessage } from '../src/adapter/messages';
 import { messageFor } from '../src/adapter/snacks';
@@ -16,7 +17,7 @@ import { themeCss } from './theme';
 declare const VIEW_HTML: string;
 
 const params = new URLSearchParams(location.search);
-const scenario = (params.get('demo') ?? 'walking') as Scenario;
+const scenario = (params.get('demo') ?? 'journey') as Scenario;
 const theme = params.get('theme') === 'dark' ? 'dark' : 'light';
 const today = localDay(new Date());
 const demo = demoData(scenario, today);
@@ -34,15 +35,51 @@ const api: HostApi & Record<string, unknown> = {
   loadSyncedData: async (key?: string) => demo.data[key ?? ''] ?? null,
   persistDataSynced: async (value: string, key?: string) => {
     demo.data[key ?? ''] = value;
-    for (const fire of hooks.get('persistedDataChanged') ?? []) fire();
+    fire('persistedDataChanged');
   },
   showSnack: ({ msg }) => {
     snacks.textContent = msg;
   },
-  registerHook: (hook: Hooks, handler: () => void) => {
-    hooks.set(hook, [...(hooks.get(hook) ?? []), handler]);
+  registerHook: (hook: Hooks, handler: (payload: never) => void) => {
+    hooks.set(hook, [...(hooks.get(hook) ?? []), () => handler(undefined as never)]);
+  },
+  addTask: async ({ title }: { title: string }) => {
+    const id = `task-${Object.keys(demo.tasks).length + 1}`;
+    demo.tasks[id] = { id, title, isDone: false, timeSpentOnDay: {} } as never;
+    fire('dataChanged');
+    return id;
+  },
+  selectTask: async (id: string) => {
+    snacks.textContent = `Opened task ${id}`;
   },
 };
+
+const fire = (hook: string) => {
+  for (const handler of hooks.get(hook) ?? []) handler();
+};
+
+/** Helpers for trying flows by hand in the browser console. */
+Object.assign(window, {
+  preview: {
+    data: demo,
+    /** Gives a task a daily repeat, as the user would in Super Productivity. */
+    setRepeat: (taskId: string, cfg: Record<string, unknown> = {}) => {
+      const id = `cfg-${taskId}`;
+      demo.repeatCfgs[id] = {
+        id,
+        title: demo.tasks[taskId]?.title,
+        isPaused: false,
+        repeatCycle: 'DAILY',
+        repeatEvery: 1,
+        startDate: today,
+        ...cfg,
+      };
+      const task = demo.tasks[taskId];
+      if (task) task.repeatCfgId = id;
+      fire('dataChanged');
+    },
+  },
+});
 
 const brain = createBrain({
   api,
@@ -53,6 +90,7 @@ const brain = createBrain({
   },
 });
 
+registerHooks(api, brain.refresh);
 document.documentElement.style.cssText = '';
 const style = document.createElement('style');
 style.textContent = `${themeCss(theme)} body{background:var(--bg)}`;

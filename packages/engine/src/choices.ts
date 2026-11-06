@@ -14,6 +14,13 @@ export interface RunRecord {
   readonly why?: string;
 }
 
+/** A stage's task; `day` is when it was bound (counting starts then at the latest). */
+export interface Binding {
+  readonly taskId: string;
+  readonly repeatCfgId?: string;
+  readonly day?: string;
+}
+
 export interface Choices {
   readonly mode: 'calm' | 'rpg';
   readonly runs: readonly RunRecord[];
@@ -22,7 +29,7 @@ export interface Choices {
   /** `${runId}:${stageId}` → accepted day */
   readonly accepted: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` → binding */
-  readonly bindings: ReadonlyMap<string, { taskId: string; repeatCfgId?: string }>;
+  readonly bindings: ReadonlyMap<string, Binding>;
   /** `${runId}:${stageId}` → checkpoint */
   readonly checkpoints: ReadonlyMap<string, { day: string; xp: number; damage: number }>;
   /** runId → pause/resume actions sorted by day */
@@ -47,7 +54,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const runs: RunRecord[] = [];
   const runEnds = new Map<string, string>();
   const accepted = new Map<string, string>();
-  const bindings = new Map<string, { taskId: string; repeatCfgId?: string }>();
+  const bindings = new Map<string, Binding>();
   const checkpoints = new Map<string, { day: string; xp: number; damage: number }>();
   const pauses = new Map<string, { day: string; action: 'pause' | 'resume' }[]>();
   const checkins = new Set<string>();
@@ -94,6 +101,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         bindings.set(`${parts[1]}:${parts[2]}`, {
           taskId,
           ...(repeatCfgId ? { repeatCfgId } : {}),
+          ...(isDay(value.day) ? { day: value.day } : {}),
         });
       } else bad();
     } else if (kind === 'stage-done' && parts.length === 3) {

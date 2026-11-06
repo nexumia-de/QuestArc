@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
 const out = join('dist', 'screenshots');
 mkdirSync(out, { recursive: true });
 const page = pathToFileURL(resolve('dist', 'preview', 'index.html')).href;
-const shots = (process.argv[2] ?? 'welcome,empty,walking').split(',');
+const shots = (process.argv[2] ?? 'welcome,empty,journey,journey-rpg,met,unbound').split(',');
 const sizes = [
   ['phone', 360, 720],
   ['desktop', 1000, 700],

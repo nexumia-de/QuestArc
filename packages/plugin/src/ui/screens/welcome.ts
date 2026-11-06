@@ -5,7 +5,7 @@ import { modeChoice } from './mode-choice';
 
 /** Screen 1, first start: what QuestArc does, calm or with game. */
 export const welcomeScreen = (ctx: Context): Screen => {
-  let mode: 'calm' | 'rpg' = 'calm';
+  const mode = (ctx.draft.mode as 'calm' | 'rpg' | undefined) ?? 'calm';
   const start = async () => {
     await ctx.write({ settings: { mode } });
     ctx.reset({ name: 'home' });
@@ -21,7 +21,7 @@ export const welcomeScreen = (ctx: Context): Screen => {
       h('p', {}, t('ui.welcome.what')),
       h('p', {}, t('ui.welcome.how')),
       modeChoice(mode, (m) => {
-        mode = m;
+        ctx.draft.mode = m;
       }),
     ),
     actions: [

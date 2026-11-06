@@ -78,7 +78,8 @@ Super Productivity's test host is blocked in the cloud environment (see
 below), so the view is checked in a preview page: `preview/host.ts` runs
 the real adapter on demo data (`preview/demo.ts`, never real tasks) with
 a fake plugin API, and loads the built view in an iframe that talks to it
-the way Super Productivity's bridge does. Theme variables for light and
+the way Super Productivity's bridge does, and registers the same hooks
+plugin.js does. Theme variables for light and
 dark are transcribed from Super Productivity's styles (`preview/theme.ts`).
 
 ```sh
@@ -87,8 +88,11 @@ npm run screenshots -w @questarc/plugin
 
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
-horizontal overflow. Demos: `welcome`, `empty`, `walking`; `empty:Settings`
-clicks the button named "Settings" first. It uses the Playwright and
+horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
+`journey`, `journey-rpg`, `met`, `unbound`; `empty:Settings` clicks the
+button named "Settings" first. In the browser console,
+`preview.setRepeat('<task id>')` gives a task a daily repeat, as the user
+would in Super Productivity, to try flow B by hand. It uses the Playwright and
 Chromium that the cloud environment provides (not a dependency of the
 repository); open `dist/preview/index.html?demo=walking&theme=dark` in any
 browser to look at it by hand.

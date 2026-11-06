@@ -20,5 +20,16 @@ export const previewScreen = (ctx: Context, journeyId: string): Screen => {
         ...journey.stages.map((stage) => h('li', {}, planSentence(stage))),
       ),
     ),
+    actions: [
+      h(
+        'button',
+        {
+          class: 'qa-btn qa-btn-primary',
+          type: 'button',
+          onclick: () => ctx.go({ name: 'start', journeyId: journey.id }),
+        },
+        t('ui.preview.start'),
+      ),
+    ],
   };
 };

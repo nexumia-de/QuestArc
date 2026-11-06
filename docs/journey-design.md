@@ -61,15 +61,16 @@ dark style.
 
 ## Last seven due days
 
-A row of marks in the card, oldest left:
+A row of marks in the card, oldest left; the engine reports them as
+`lastDays` of the current station ([data model](data-model.md) §3):
 
-| Day        | Mark                                 |
-| ---------- | ------------------------------------ |
-| done       | filled circle                        |
-| gap (miss) | hollow grey circle with a dash       |
-| today      | dashed ring                          |
-| not due    | not shown (only due days are listed) |
-| paused     | two short bars                       |
+| Day        | Mark                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------- |
+| done       | filled circle                                                                          |
+| gap (miss) | hollow grey circle with a dash                                                         |
+| open       | dashed ring (today, or yesterday not yet ticked off: still inside the backfill window) |
+| not due    | not shown (only due days are listed)                                                   |
+| paused     | two short bars                                                                         |
 
 Weekday letters below each mark. A gap is grey, never red, and no count
 falls to zero; the run text ("Run 4 · best 6") stays next to the marks.

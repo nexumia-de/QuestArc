@@ -12,24 +12,27 @@ import { screenFor } from './screens';
  */
 export const createApp = (root: HTMLElement, client: Client) => {
   let state: State | undefined;
-  let stack: Route[] = [];
+  let stack: { route: Route; draft: Record<string, unknown> }[] = [];
   let error: string | undefined;
 
+  const entry = (route: Route) => ({ route, draft: {} });
   const firstRoute = (s: State): Route =>
     'settings' in s.records ? { name: 'home' } : { name: 'welcome' };
 
   const context = (s: State): Context => ({
     state: s,
+    draft: stack.at(-1)?.draft ?? {},
     go: (route) => {
-      stack = [...stack, route];
+      stack = [...stack, entry(route)];
       render(true);
     },
     back: () => {
       if (stack.length > 1) stack = stack.slice(0, -1);
       render(true);
     },
+    redraw: () => render(false),
     reset: (route) => {
-      stack = [route];
+      stack = [entry(route)];
       render(true);
     },
     write: async (records) => {
@@ -77,14 +80,22 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   const render = (navigated: boolean): void => {
     if (!state) return;
-    if (stack.length === 0) stack = [firstRoute(state)];
+    if (stack.length === 0) stack = [entry(firstRoute(state))];
     const ctx = context(state);
-    const screen = screenFor(stack[stack.length - 1] as Route, ctx);
-    const previous = root.querySelector('.qa-main');
-    const scrollTop = navigated ? 0 : (previous?.scrollTop ?? 0);
+    const current = stack.at(-1);
+    if (!current) return;
+    const screen = screenFor(current.route, ctx);
+    // A redraw keeps the scroll positions of the page and of inner
+    // scrolling parts (marked with data-scroll-key); navigation resets them.
+    const kept = new Map<string, number>();
+    if (!navigated) {
+      for (const el of root.querySelectorAll<HTMLElement>('.qa-main, [data-scroll-key]')) {
+        kept.set(el.dataset.scrollKey ?? 'main', el.scrollTop);
+      }
+    }
     const main = h(
       'main',
-      { class: 'qa-main' },
+      { class: screen.layout === 'fill' ? 'qa-main qa-main-fill' : 'qa-main' },
       error ? h('p', { class: 'qa-callout', role: 'alert' }, error) : null,
       screen.body,
     );
@@ -93,14 +104,18 @@ export const createApp = (root: HTMLElement, client: Client) => {
       main,
       ...(screen.actions?.length ? [h('footer', { class: 'qa-actions' }, ...screen.actions)] : []),
     );
-    main.scrollTop = scrollTop;
+    for (const el of root.querySelectorAll<HTMLElement>('.qa-main, [data-scroll-key]')) {
+      el.scrollTop = kept.get(el.dataset.scrollKey ?? 'main') ?? 0;
+    }
+    if (navigated) screen.onShow?.();
   };
 
   const update = (next: State): void => {
-    const changed = !state || next.revision !== state.revision;
+    const first = !state;
+    const changed = first || next.revision !== state?.revision;
     state = next;
     error = undefined;
-    if (changed) render(false);
+    if (changed) render(first);
   };
 
   return {

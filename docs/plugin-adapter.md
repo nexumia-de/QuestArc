@@ -74,6 +74,13 @@ asks again 300 ms after a hook fires in the view (so plugin.js has marked
 its data stale first), when the page becomes visible, and every 5 s as a
 fallback; it redraws only when the revision changed.
 
+## Task context menu
+
+"Use for current QuestArc station" (Super Productivity 19.2.0 and newer)
+binds the chosen task to the active journey's current stage
+(`adapter/context-menu.ts`). A task that does not repeat yet is bound too;
+the stage waits until the user sets its repeat.
+
 ## Not yet
 
 - Writing pause records when the bound repeat config is paused or resumed

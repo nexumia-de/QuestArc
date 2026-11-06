@@ -1,11 +1,13 @@
-import { findStage, planSentence, progressText } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
+import { stationCard } from '../journey/card';
+import { journeyPath, scrollFor } from '../journey/path';
 import type { Context, Screen } from '../screen';
 
 /**
- * Screen 4, the journey. Until the drawn path arrives (#36) it shows the
- * current station as text; with no journey, the empty state.
+ * Screen 4, the journey (docs/behaviour.md): the path, opened scrolled to
+ * the current station, and the current station's card with its main
+ * action. With no journey, the empty state.
  */
 export const homeScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
@@ -33,24 +35,49 @@ export const homeScreen = (ctx: Context): Screen => {
       ],
     };
   }
+
+  const rpg = view.mode === 'rpg';
   const station = run.stations[run.position.stage];
-  const stage = station && findStage(journeys, run.journeyId, station.stageId);
+  const scroller = h(
+    'div',
+    { class: 'qa-path-scroll', 'data-scroll-key': 'path' },
+    journeyPath({ run, journey, rpg, onStation: (index) => ctx.go({ name: 'station', index }) }),
+  ) as HTMLElement;
+
+  const action = (label: string, route: Parameters<Context['go']>[0]) =>
+    h(
+      'button',
+      { class: 'qa-btn qa-btn-primary', type: 'button', onclick: () => ctx.go(route) },
+      label,
+    );
+  const actions =
+    station?.state === 'met'
+      ? [action(t('ui.action.continue'), { name: 'continue' })]
+      : station?.state === 'unbound' || station?.state === 'unsupported-repeat'
+        ? [
+            action(t(station.state === 'unbound' ? 'ui.action.setup' : 'ui.action.change-repeat'), {
+              name: 'setup',
+            }),
+          ]
+        : [];
+
   return {
     title: t(journey.title),
+    layout: 'fill',
     body: h(
       'div',
-      { class: 'qa-stack' },
-      view.mode === 'rpg'
-        ? h('p', { class: 'qa-chip' }, t('ui.level', { level: view.level }))
-        : null,
-      stage && station
-        ? h(
-            'section',
-            { class: 'qa-card' },
-            h('p', { class: 'qa-plan' }, planSentence(stage)),
-            h('p', { class: 'qa-muted' }, progressText(stage, station)),
-          )
-        : null,
+      { class: 'qa-journey' },
+      rpg ? h('p', { class: 'qa-chip qa-level' }, t('ui.level', { level: view.level })) : null,
+      scroller,
+      stationCard(run, journey, rpg, view.todayStr) ?? null,
     ),
+    actions,
+    onShow: () => {
+      scroller.scrollTop = scrollFor(
+        run.position.stage,
+        run.stations.length,
+        scroller.clientHeight,
+      );
+    },
   };
 };

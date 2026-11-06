@@ -24,7 +24,10 @@
     "listSyncedDataKeys",
     "persistDataSynced",
     "showSnack",
-    "showIndexHtmlAsView"
+    "showIndexHtmlAsView",
+    "addTask",
+    "selectTask",
+    "registerTaskContextMenuEntry"
   ],
   "dataSharing": [],
   "iFrame": true,

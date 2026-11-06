@@ -40,6 +40,18 @@ export interface StationView {
   readonly acceptedDay?: string;
   readonly doneDay?: string;
   readonly guardian?: { readonly hp: number; readonly damage: number; readonly defeated: boolean };
+  /** Current stage only: the last 7 due (or paused) days, oldest first. */
+  readonly lastDays?: readonly DayMark[];
+}
+
+/**
+ * One day in the row of the last seven due days (docs/journey-design.md):
+ * done, a gap (missed), open (today or yesterday, still inside the
+ * backfill window) or paused (scheduled, but inside a pause).
+ */
+export interface DayMark {
+  readonly day: string;
+  readonly mark: 'done' | 'gap' | 'open' | 'paused';
 }
 
 export interface StationRun {

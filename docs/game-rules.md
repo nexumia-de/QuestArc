@@ -55,8 +55,10 @@ are not what journeys are for.
 
 A day `d` is due when all of these hold:
 
-1. `d` is on or after the day the stage was accepted and on or after the
-   config's `startDate`, and on or before `repeatUntilDay` if set;
+1. `d` is on or after the day the stage was accepted, on or after the day
+   its task was bound (the binding record's `day`: the station waits
+   until it has a task, so days before are neither due nor missed), on or
+   after the config's `startDate`, and on or before `repeatUntilDay` if set;
 2. the schedule above has an occurrence on `d`;
 3. `d` is not in the config's `deletedInstanceDates` (the user skipped
    that occurrence in Super Productivity's repeat dialog: a planned skip,
@@ -137,7 +139,7 @@ to accept the next stage. Conditions (from the story format):
 | `count` n      | at least n completions since the stage was accepted       | —       |
 | `time_spent` n | at least n minutes tracked on the stage's task since then | —       |
 
-Only due days since the stage was accepted are looked at. Progress for
+Only due days since the stage was accepted (and its task bound) are looked at. Progress for
 the journey view: `days` → completions in the window ÷ n (capped at 1);
 `count` → completions ÷ n; `time_spent` → minutes ÷ n.
 

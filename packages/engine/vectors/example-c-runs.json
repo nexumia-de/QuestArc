@@ -1,6 +1,6 @@
 {
   "name": "Example C/E: one miss is a gap, two in a row end the run; welcome back earns 10",
-  "rule": "game-rules \u00a73, \u00a75 (Example C, E)",
+  "rule": "game-rules \u00a73, \u00a75 (Example C, E), journey-design (last seven due days)",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -101,7 +101,37 @@
             "hp": 100,
             "damage": 70,
             "defeated": false
-          }
+          },
+          "lastDays": [
+            {
+              "day": "2026-11-06",
+              "mark": "gap"
+            },
+            {
+              "day": "2026-11-07",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-08",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-09",
+              "mark": "gap"
+            },
+            {
+              "day": "2026-11-10",
+              "mark": "gap"
+            },
+            {
+              "day": "2026-11-11",
+              "mark": "open"
+            },
+            {
+              "day": "2026-11-12",
+              "mark": "open"
+            }
+          ]
         },
         {
           "stageId": "b",
