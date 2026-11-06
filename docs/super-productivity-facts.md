@@ -418,13 +418,20 @@ Checked by running the plugin in `app.super-productivity.com`
   another, `_loadEnabledPlugins`), after switching a plugin on and after a
   re-upload (`reloadPlugin` tears the runtime down, then activates it
   again) (`plugin.service.ts` at `c5eb3f6`)[^sp].
-- The plugin's `icon.svg` is shown in the side menu and the page header
-  through `PluginIconComponent`, whose CSS sets `fill: currentColor` on
-  the `<svg>` root; that overrides a `fill="none"` there, so an outline
-  icon gets filled in. Shapes must set `fill` on themselves (`fill="none"`
-  on strokes). The sanitizer keeps only presentation attributes, no
-  `style` or `class` (`plugin-icon.component.ts`,
-  `sanitize-svg-icon.util.ts` at `c5eb3f6`)[^sp].
+- Plugin icons: a header button takes only a Material icon name
+  (`<mat-icon>{{ button.icon }}</mat-icon>`, `plugin-header-btns.component.ts`).
+  The side-menu entry of a view plugin gets `manifest.icon || 'extension'`
+  (`plugin-runner.ts`); when the ZIP holds a file of that name, it is used
+  as an SVG, otherwise the name is used as a Material icon
+  (`magic-nav-config.service.ts`, `_buildPluginItems`). The plugin card in
+  Settings → Plugins shows only an SVG and falls back to the puzzle icon.
+  An SVG is drawn under `fill: currentColor` on its `<svg>` root
+  (`plugin-icon.component.ts`), which fills outline paths unless every
+  shape sets its own `fill`; the sanitizer keeps only presentation
+  attributes (`sanitize-svg-icon.util.ts`) (all at `c5eb3f6`)[^sp].
+  Checked in 19.3.1: after an update from a ZIP with `icon.svg` to one with
+  `"icon": "route"`, the side menu and page header show the Material icon,
+  also after a reload.
 - Uploading the ZIP of a plugin that is already installed (same `id`)
   replaces it: the plugin stays enabled and its plugin data stays.
   **Remove** on the plugin's card deletes its plugin data. Checked in the

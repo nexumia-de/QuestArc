@@ -61,7 +61,8 @@ adapter against a fake plugin API in `packages/plugin/test/`), `build`.
 - `index.html` with the view's script and `style.css` inlined: iframe
   plugins get no other files from the ZIP.
 - `dist/questarc-<version>.zip` with `manifest.json`, `plugin.js`,
-  `index.html` and `icon.svg`, packed with fflate.
+  and `index.html`, packed with fflate. No `icon.svg`: the manifest's
+  `"icon": "route"` is a Material icon name.
 
 Install it in Super Productivity: Settings → Plugins → Choose Plugin File.
 Use test data, not real tasks.

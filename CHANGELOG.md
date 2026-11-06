@@ -13,9 +13,9 @@ plugin ZIP.
   check, and the reason when reading your data failed. The message now
   goes away as soon as QuestArc answers, and it spans the whole width
   above the journey.
-- A new icon in Super Productivity's side menu and page header: four
-  stations leading to a pennant. The old one was drawn filled in and
-  looked like a blob.
+- One icon everywhere: the side menu and the page header now show the
+  same route icon as the button at the top right, instead of a drawn
+  icon that looked like a blob.
 - In dark mode the unselected choice ("With game", start day) no longer
   shows as a white disc.
 
