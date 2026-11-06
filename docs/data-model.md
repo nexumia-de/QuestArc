@@ -76,26 +76,30 @@ it as the entity `questarc:<key>` and resolves sync conflicts per key
 (last writer wins), so records written on different devices never
 overwrite each other. Most records are written once and never changed.
 
-| Key                                   | Value                                                             | Written when                                                                                      |
-| ------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `settings`                            | `{ mode: "calm" \| "rpg" }`                                       | onboarding, settings                                                                              |
-| `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? , woop? }`           | a journey is started (own "why", optional plan check)                                             |
-| `run-end:<runId>`                     | `{ day, reason: "finished" \| "abandoned" }`                      | the last stage is done, or the user ends the journey                                              |
-| `stage:<runId>:<stageId>`             | `{ acceptedDay }`                                                 | the user accepts a stage                                                                          |
-| `binding:<runId>:<stageId>`           | `{ taskId, repeatCfgId, day }`                                    | a recurring task is bound or rebound                                                              |
-| `stage-done:<runId>:<stageId>`        | `{ day, xp, damage }`                                             | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md)) |
-| `pause:<runId>:<day>`                 | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }` | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                |
-| `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                 | the weekly question is answered                                                                   |
-| `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                | the user graduates a habit                                                                        |
-| `journey:<journeyId>`                 | a story-format-3 journey                                          | the user imports or writes a journey                                                              |
+| Key                                   | Value                                                                     | Written when                                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `settings`                            | `{ mode: "calm" \| "rpg" }`                                               | onboarding, settings                                                                                 |
+| `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? , woop? }`                   | a journey is started (own "why", optional plan check)                                                |
+| `run-end:<runId>`                     | `{ day, reason: "finished" \| "abandoned" }`                              | the last stage is done, or the user ends the journey                                                 |
+| `stage:<runId>:<stageId>`             | `{ acceptedDay }`                                                         | the user accepts a stage                                                                             |
+| `binding:<runId>:<stageId>`           | `{ taskId, repeatCfgId?, day }`; `day`: due days start then at the latest | a recurring task is bound or rebound; `repeatCfgId` is missing while a new task waits for its repeat |
+| `stage-done:<runId>:<stageId>`        | `{ day, xp, damage }`                                                     | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
+| `pause:<runId>:<day>`                 | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }`         | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                   |
+| `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
+| `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
+| `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 
 - **Run ids** are random identifiers made by the host when a journey
   starts (`crypto.randomUUID()`); the engine never makes ids. A run is one
   walk through a journey, so a journey can be walked again later.
-- **Active journey:** the newest run without a `run-end` record. If two
-  devices start different journeys before syncing, the one with the later
-  `startDay` (then the larger run id) is active and the other counts as
-  paused; nothing is lost.
+- **Active journey:** the open run (no `run-end` record) that was started
+  or resumed last: the later of its `startDay` and its last `resume`
+  record. On the same day a run that is not paused wins, then the larger
+  run id. Starting a journey writes a `pause` record for the journey that
+  was active; resuming one writes a `resume` record for it and a `pause`
+  record for the active one, so a waiting journey's days are never
+  misses. If two devices start different journeys before syncing, both
+  stay open and one is active; nothing is lost.
 - **Withdrawing a record** (undo an acceptance, bring a graduated habit
   back, remove an imported journey): write an empty string to its key.
   `listSyncedDataKeys` lists only non-empty keys, and the engine ignores
@@ -149,6 +153,8 @@ interface StationView {
   acceptedDay?: string;
   doneDay?: string;
   guardian?: { hp: number; damage: number; defeated: boolean };
+  // current stage only: the last 7 due or paused days, oldest first
+  lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
 ```
 

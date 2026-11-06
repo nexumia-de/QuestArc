@@ -62,8 +62,9 @@ the journey is in [journey design](journey-design.md).
 
 ### 4. Journey (home)
 
-- Top: journey title; in RPG mode level and HP; menu (Pause, End
-  journey, Settings).
+- Top: journey title; in RPG mode level and HP; menu (Pause or Resume,
+  End journey, Shelf, Settings). **End journey** happens at once and
+  offers **Undo** (it writes one record, withdrawn by Undo).
 - Middle: the path ([journey design](journey-design.md)), scrolled to the
   current station; finished stations below, coming ones above.
 - Bottom card, the current station:
@@ -82,8 +83,13 @@ the journey is in [journey design](journey-design.md).
 | current, condition not met      | none: the habit is done in the task list            |
 | met                             | **Continue** (flow C)                               |
 
-- A banner on top of the card when needed: paused, weekly look back due,
-  fallback offered, habit can graduate.
+- A banner on top of the card when needed: paused (with **Resume**, or a
+  note that the repeat is paused in Super Productivity), a hard week
+  (flow D, with the user's reason), weekly look back due (**Answer**), the
+  station's learning nugget once on arrival (**Got it**), habit can
+  graduate (later, #22). Dismissing a banner and skipping the weekly
+  question are remembered on the device only; they are not choices.
+- The card also shows the user's own reason, if they gave one.
 - Tapping any station opens its details (screen 5).
 
 ### 5. Station details
@@ -114,6 +120,8 @@ the journey is in [journey design](journey-design.md).
 
 - Mode: Calm / With game.
 - "How QuestArc motivates you".
+- **Remove QuestArc's data**: withdraws all of QuestArc's records, never
+  tasks; it cannot be undone, so it asks first, in place.
 - Data: "QuestArc stores only your choices (journeys, accepted stages,
   answers) with your Super Productivity data. Removing the plugin deletes
   them on all your devices."
@@ -134,14 +142,22 @@ habit, not how often you open QuestArc."
 The user ticks off the stage's task in the task list as usual. Within a
 second QuestArc shows a short message (snack or toast):
 
-| Event                        | Calm                                        | With game                                      |
-| ---------------------------- | ------------------------------------------- | ---------------------------------------------- |
-| completion                   | "Walk after lunch: done. 4 of 5 this week." | "+10 XP · 4 of 5 this week."                   |
-| first completion after a gap | "Welcome back. Your run goes on."           | "Welcome back! +20 XP, the guardian staggers." |
-| condition met                | "Station reached: you can continue."        | same, plus "Level 3" when it changes           |
-| guardian defeated            | —                                           | "The Grey Afternoon is gone."                  |
+| Event                        | Calm                                         | With game                                                                                    |
+| ---------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| completion                   | "Drink a glass of water: done. 4 of 5 days." | "+10 XP · 4 of 5 days."                                                                      |
+| first completion after a gap | "Welcome back. Your run goes on."            | "Welcome back! +20 XP, the guardian staggers." (without a guardian: "Welcome back! +20 XP.") |
+| several at once (sync)       | "3 days done. 4 of 5 days."                  | "3 days done · 4 of 5 days."                                                                 |
+| condition met                | "Station reached: you can continue."         | same, plus "Level 3." when it changes                                                        |
+| guardian defeated            | —                                            | "The Heavy Blanket is gone."                                                                 |
 
-Messages after a sync with many changes are summed up in one.
+The events of one change are joined into one message, so messages after
+a sync with many changes are summed up in one. The progress ("4 of 5
+days") is the current condition: days, times or minutes.
+
+All texts of screens and messages are in `content/i18n/en.json` (keys
+`ui.*` and `event.*`; a message key ends in `.calm` or `.rpg` when the
+modes differ), next to the journeys' texts, so Pensum can use the same
+words.
 
 ### B. Set up the task
 
@@ -205,12 +221,12 @@ same effect.
 
 ## Where it lands in each host
 
-| Part               | Super Productivity plugin                       | Pensum                                       |
-| ------------------ | ----------------------------------------------- | -------------------------------------------- |
-| Entry and level    | header button (level in RPG, path icon in calm) | header bar of the main window                |
-| Journey (home)     | plugin view (`showIndexHtmlAsView`)             | sidebar page; details pushed with swipe back |
-| Station details    | page inside the view                            | pushed page                                  |
-| Bound task actions | task context menu "Use for current station"     | row menu "Use for current station"           |
-| Messages           | snack (`showSnack`)                             | toast                                        |
-| Settings           | plugin settings view                            | preferences                                  |
-| Main actions       | bottom of the view                              | bottom bar (thumb reach)                     |
+| Part               | Super Productivity plugin                                                                                                                             | Pensum                                       |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Entry and level    | header button with the path icon; the level is in the view's header (Super Productivity cannot change a header button's label after it is registered) | header bar of the main window                |
+| Journey (home)     | plugin view (`showIndexHtmlAsView`)                                                                                                                   | sidebar page; details pushed with swipe back |
+| Station details    | page inside the view                                                                                                                                  | pushed page                                  |
+| Bound task actions | task context menu "Use for current station"                                                                                                           | row menu "Use for current station"           |
+| Messages           | snack (`showSnack`)                                                                                                                                   | toast                                        |
+| Settings           | plugin settings view                                                                                                                                  | preferences                                  |
+| Main actions       | bottom of the view                                                                                                                                    | bottom bar (thumb reach)                     |

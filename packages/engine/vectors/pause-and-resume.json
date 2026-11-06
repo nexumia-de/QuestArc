@@ -1,6 +1,6 @@
 {
   "name": "After a resume, days are due again",
-  "rule": "game-rules \u00a72, pauses",
+  "rule": "game-rules \u00a72, pauses, journey-design (last seven due days)",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -72,7 +72,37 @@
             "current": 3,
             "gap": false
           },
-          "welcomeBacks": 1
+          "welcomeBacks": 1,
+          "lastDays": [
+            {
+              "day": "2026-11-05",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-11-06",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-11-07",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-11-08",
+              "mark": "gap"
+            },
+            {
+              "day": "2026-11-09",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-10",
+              "mark": "open"
+            },
+            {
+              "day": "2026-11-11",
+              "mark": "open"
+            }
+          ]
         },
         {},
         {}

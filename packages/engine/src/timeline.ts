@@ -1,6 +1,7 @@
 import { addDays, dayRange } from './days';
 import { isScheduled } from './schedule';
 import type { SnapshotRepeatCfg } from './types/snapshot';
+import type { DayMark } from './types/view';
 
 /**
  * Due days, misses, runs and welcome backs of one stage
@@ -14,7 +15,11 @@ export interface Timeline {
   readonly welcomeBacks: number;
   /** The run ended with a second consecutive miss and has not resumed. */
   readonly offerFallback: boolean;
+  /** The last 7 scheduled days that were due or paused, oldest first. */
+  readonly lastDays: readonly DayMark[];
 }
+
+const LAST_DAYS = 7;
 
 /** Whether `day` lies in a pause: [pause, resume) from the records. */
 const pausedBy = (
@@ -47,12 +52,13 @@ export const buildTimeline = (input: {
     cfg.isPaused === true && !openRecordPause && day > lastCredit;
   const deleted = new Set(cfg.deletedInstanceDates ?? []);
 
-  const isDue = (day: string): boolean =>
-    isScheduled(cfg, day) && !deleted.has(day) && !recordPaused(day) && !cfgPaused(day);
+  const isPlanned = (day: string): boolean => isScheduled(cfg, day) && !deleted.has(day);
+  const isPaused = (day: string): boolean => recordPaused(day) || cfgPaused(day);
   // Today and yesterday are still inside the backfill window.
   const missedBefore = addDays(today, -1);
 
   const dueDays: string[] = [];
+  const marks: DayMark[] = [];
   let current = 0;
   let best = 0;
   let consecutiveMisses = 0;
@@ -60,8 +66,19 @@ export const buildTimeline = (input: {
   let welcomeBacks = 0;
 
   for (const day of dayRange(acceptedDay, today)) {
-    const due = isDue(day);
+    const planned = isPlanned(day);
+    const due = planned && !isPaused(day);
     if (due) dueDays.push(day);
+    if (planned) {
+      const mark = !due
+        ? 'paused'
+        : credited.has(day)
+          ? 'done'
+          : day < missedBefore
+            ? 'gap'
+            : 'open';
+      marks.push({ day, mark });
+    }
     if (credited.has(day)) {
       if (missSinceCredit) welcomeBacks += 1;
       missSinceCredit = false;
@@ -80,5 +97,6 @@ export const buildTimeline = (input: {
     run: { current, best, total: credited.size, gap: consecutiveMisses === 1 },
     welcomeBacks,
     offerFallback: consecutiveMisses >= 2,
+    lastDays: marks.slice(-LAST_DAYS),
   };
 };

@@ -78,7 +78,12 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     // changed under a running walk), it counts from the last finished stage.
     const acceptedDay = choices.accepted.get(key(stage.id)) ?? lastDoneDay;
     const base = { stageId: stage.id, acceptedDay, xp: 0, completions: 0, welcomeBacks: 0 };
-    const binding = resolveBinding(choices.bindings.get(key(stage.id)), ctx.tasks, ctx.repeatCfgs);
+    const bindingRecord = choices.bindings.get(key(stage.id));
+    const binding = resolveBinding(bindingRecord, ctx.tasks, ctx.repeatCfgs);
+    // The station waits until its task is bound: days before that are
+    // neither due nor missed (game rules §2).
+    const countFrom =
+      bindingRecord?.day && bindingRecord.day > acceptedDay ? bindingRecord.day : acceptedDay;
     const guardianOf = (damage: number): Pick<StationView, 'guardian'> =>
       stage.guardian
         ? { guardian: { hp: stage.guardian.hp, damage, defeated: damage >= stage.guardian.hp } }
@@ -98,18 +103,18 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       };
     }
 
-    const credited = creditedDays(
-      binding.tasks,
-      binding.cfg.id,
-      acceptedDay,
+    const credited = creditedDays(binding.tasks, binding.cfg.id, countFrom, today, ctx.logicalDay);
+    const timeline = buildTimeline({
+      cfg: binding.cfg,
+      acceptedDay: countFrom,
       today,
-      ctx.logicalDay,
-    );
-    const timeline = buildTimeline({ cfg: binding.cfg, acceptedDay, today, credited, pauses });
+      credited,
+      pauses,
+    });
     const condition = conditionProgress(stage.condition, {
       dueDays: timeline.dueDays,
       credited,
-      minutes: minutesTracked(binding.tasks, acceptedDay, today),
+      minutes: minutesTracked(binding.tasks, countFrom, today),
     });
     const xp = stageXp(credited.size, timeline.welcomeBacks);
     offerFallback = timeline.offerFallback;
@@ -127,6 +132,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       completions: credited.size,
       welcomeBacks: timeline.welcomeBacks,
       ...guardianOf(xp),
+      lastDays: timeline.lastDays,
     };
   });
 

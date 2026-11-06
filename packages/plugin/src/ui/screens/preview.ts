@@ -1,0 +1,35 @@
+import { planSentence } from '../../shared/plan';
+import { t } from '../../shared/texts';
+import { h } from '../dom';
+import type { Context, Screen } from '../screen';
+
+/** Screen 2, preview: every station of a journey as a plan sentence. */
+export const previewScreen = (ctx: Context, journeyId: string): Screen => {
+  const journey = ctx.state.journeys.find((j) => j.id === journeyId);
+  if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+  return {
+    title: t(journey.title),
+    body: h(
+      'div',
+      { class: 'qa-stack' },
+      h('p', {}, t(journey.description)),
+      h('h2', { class: 'qa-section-title' }, t('ui.preview.stations')),
+      h(
+        'ol',
+        { class: 'qa-steps' },
+        ...journey.stages.map((stage) => h('li', {}, planSentence(stage))),
+      ),
+    ),
+    actions: [
+      h(
+        'button',
+        {
+          class: 'qa-btn qa-btn-primary',
+          type: 'button',
+          onclick: () => ctx.go({ name: 'start', journeyId: journey.id }),
+        },
+        t('ui.preview.start'),
+      ),
+    ],
+  };
+};

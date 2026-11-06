@@ -1,4 +1,4 @@
-import { parseChoices } from './choices';
+import { parseChoices, type RunRecord } from './choices';
 import { makeLogicalDay } from './days';
 import { buildRun } from './run';
 import type { Journey } from './types/journey';
@@ -37,10 +37,25 @@ export const evaluate = (snapshot: Snapshot): GameView => {
 
   const open: RunView[] = [];
   const finished: RunView[] = [];
-  // Newest start first; on equal days the larger run id, so devices that
-  // started journeys concurrently agree on the active one.
+  // The active run is the one started or resumed last (data model §2):
+  // newest activation day first, then a run that is not paused, then the
+  // larger run id, so devices that changed runs concurrently agree.
+  const activation = (run: RunRecord): string => {
+    const resumes = (choices.pauses.get(run.runId) ?? []).filter(
+      (p) => p.action === 'resume' && p.day <= today,
+    );
+    const last = resumes.at(-1)?.day ?? '';
+    return last > run.startDay ? last : run.startDay;
+  };
+  const pausedNow = (run: RunRecord): number =>
+    (choices.pauses.get(run.runId) ?? []).filter((p) => p.day <= today).at(-1)?.action === 'pause'
+      ? 1
+      : 0;
   const runs = [...choices.runs].sort(
-    (a, b) => b.startDay.localeCompare(a.startDay) || b.runId.localeCompare(a.runId),
+    (a, b) =>
+      activation(b).localeCompare(activation(a)) ||
+      pausedNow(a) - pausedNow(b) ||
+      b.runId.localeCompare(a.runId),
   );
   for (const run of runs) {
     const journey = journeys.get(run.journeyId);

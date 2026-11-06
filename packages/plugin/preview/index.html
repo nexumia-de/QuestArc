@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuestArc preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      #view {
+        flex: 1;
+        width: 100%;
+        border: 0;
+      }
+      #snacks:empty {
+        display: none;
+      }
+      #snacks {
+        position: fixed;
+        inset: auto 8px 88px;
+        padding: 12px 16px;
+        border-radius: 4px;
+        background: #323232;
+        color: #fff;
+        font: 14px sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="view" title="QuestArc"></iframe>
+    <div id="snacks" role="status"></div>
+    <!-- PREVIEW_SCRIPT -->
+  </body>
+</html>

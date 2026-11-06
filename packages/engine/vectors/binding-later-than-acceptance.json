@@ -1,0 +1,87 @@
+{
+  "name": "Days before the task was bound are neither due nor missed",
+  "rule": "game-rules \u00a72, due days (the binding day)",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-10",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "UTC"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgB_2026-11-08",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1794139200000,
+        "doneOn": 1794139200000
+      },
+      {
+        "id": "rpt_cfgB_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1794225600000,
+        "doneOn": 1794225600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgB_2026-11-08",
+        "repeatCfgId": "cfgB",
+        "day": "2026-11-08"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "offerFallback": false,
+      "stations": [
+        {
+          "state": "current",
+          "acceptedDay": "2026-11-02",
+          "completions": 2,
+          "welcomeBacks": 0,
+          "run": {
+            "current": 2,
+            "best": 2,
+            "total": 2,
+            "gap": false
+          },
+          "lastDays": [
+            {
+              "day": "2026-11-08",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-09",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-10",
+              "mark": "open"
+            }
+          ]
+        },
+        {},
+        {}
+      ]
+    }
+  }
+}
