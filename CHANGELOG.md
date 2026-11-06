@@ -5,6 +5,20 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/QuestArc/releases) with the
 plugin ZIP.
 
+## 3.0.1
+
+- Clearer messages when QuestArc cannot load: "QuestArc is starting"
+  while Super Productivity is still loading it (after starting the app,
+  an update or switching it on), "QuestArc is not running" with what to
+  check, and the reason when reading your data failed. The message now
+  goes away as soon as QuestArc answers, and it spans the whole width
+  above the journey.
+- One icon everywhere: the side menu and the page header now show the
+  same route icon as the button at the top right, instead of a drawn
+  icon that looked like a blob.
+- In dark mode the unselected choice ("With game", start day) no longer
+  shows as a white disc.
+
 ## 3.0.0
 
 A new start: QuestArc 3.0 is rebuilt from scratch and does not read 2.x

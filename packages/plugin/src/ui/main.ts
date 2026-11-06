@@ -3,25 +3,39 @@
 // a change, when the window comes back, and every few seconds as a fallback.
 import type { Hooks } from '@questarc/sp-plugin-api';
 
-import { t } from '../shared/texts';
 import { createApp } from './app';
 import { createClient } from './client';
+import { loadErrorText } from './load-error';
 
 const POLL_MS = 5000;
 const HOOK_DELAY_MS = 300;
+/** Retry sooner while plugin.js is starting. */
+const STARTING_RETRY_MS = 1000;
 
 const root = document.getElementById('app') ?? document.body;
 const client = createClient();
 const app = createApp(root, client);
 
 let loading = false;
+let failingSince: number | undefined;
+let retry: ReturnType<typeof setTimeout> | undefined;
 const load = async (): Promise<void> => {
   if (loading) return;
   loading = true;
   try {
     app.update(await client.get());
-  } catch {
-    app.showError(t('ui.error.load'));
+    failingSince = undefined;
+  } catch (error) {
+    failingSince ??= Date.now();
+    const shown = loadErrorText(error, Date.now() - failingSince);
+    app.showError(shown.text, shown.detail);
+    // One quick retry at a time; the regular polling goes on as well.
+    if (shown.problem === 'starting' && retry === undefined) {
+      retry = setTimeout(() => {
+        retry = undefined;
+        void load();
+      }, STARTING_RETRY_MS);
+    }
   } finally {
     loading = false;
   }

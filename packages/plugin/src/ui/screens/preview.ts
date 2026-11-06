@@ -6,7 +6,7 @@ import type { Context, Screen } from '../screen';
 /** Screen 2, preview: every station of a journey as a plan sentence. */
 export const previewScreen = (ctx: Context, journeyId: string): Screen => {
   const journey = ctx.state.journeys.find((j) => j.id === journeyId);
-  if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+  if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   return {
     title: t(journey.title),
     body: h(

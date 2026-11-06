@@ -202,6 +202,10 @@
   "ui.settings.motivates": "How QuestArc motivates you",
   "ui.settings.data.title": "Your data",
   "ui.settings.data.text": "QuestArc stores only your choices (journeys, accepted stages, answers) with your Super Productivity data. Removing the plugin deletes them on all your devices.",
-  "ui.error.load": "QuestArc could not read your data. Try closing and opening this page again.",
+  "ui.error.starting": "QuestArc is starting. This page updates by itself in a moment.",
+  "ui.error.not-running": "QuestArc is not running. Check that it is switched on in Settings → Plugins, then reload Super Productivity.",
+  "ui.error.failed": "QuestArc could not read your data. It tries again every few seconds. If this message stays, reload Super Productivity.",
+  "ui.error.details": "Details: {reason}",
+  "ui.error.gone": "This page is out of date: the journey or station changed. Go back to continue.",
   "ui.error.write": "QuestArc could not save this. Please try again."
 }

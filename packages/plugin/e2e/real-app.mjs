@@ -11,7 +11,7 @@
 // (.github/workflows/real-app.yml). The live app goes through
 // HTTPS_PROXY when it is set; a local app never does. Uses the
 // Playwright of the environment.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 
@@ -20,7 +20,8 @@ const { chromium } = require('playwright');
 
 const BASE = process.env.QUESTARC_SP_URL ?? 'https://app.super-productivity.com/';
 const local = /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(BASE);
-const ZIP = resolve('dist', 'questarc-3.0.0.zip');
+const { version } = JSON.parse(readFileSync(resolve('src', 'manifest.json'), 'utf8'));
+const ZIP = resolve('dist', `questarc-${version}.zip`);
 const OUT = resolve('dist', 'real-app');
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 mkdirSync(OUT, { recursive: true });

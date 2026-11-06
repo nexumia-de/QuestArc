@@ -13,7 +13,7 @@ import { screenFor } from './screens';
 export const createApp = (root: HTMLElement, client: Client) => {
   let state: State | undefined;
   let stack: { route: Route; draft: Record<string, unknown> }[] = [];
-  let error: string | undefined;
+  let error: { text: string; detail?: string } | undefined;
   let menuOpen = false;
 
   const entry = (route: Route) => ({ route, draft: {} });
@@ -42,7 +42,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
       try {
         update(await client.write(records));
       } catch {
-        error = t('ui.error.write');
+        error = { text: t('ui.error.write') };
         render(false);
       }
     },
@@ -139,6 +139,14 @@ export const createApp = (root: HTMLElement, client: Client) => {
       screen.menu ? menuButton(screen.menu, ctx) : settingsButton(screen, ctx),
     ) as HTMLElement;
 
+  const callout = (e: { text: string; detail?: string }): Node =>
+    h(
+      'div',
+      { class: 'qa-callout', role: 'alert' },
+      h('p', {}, e.text),
+      e.detail ? h('p', { class: 'qa-callout-detail qa-muted' }, e.detail) : null,
+    );
+
   const render = (navigated: boolean): void => {
     if (!state) return;
     if (stack.length === 0) stack = [entry(firstRoute(state))];
@@ -157,11 +165,13 @@ export const createApp = (root: HTMLElement, client: Client) => {
     const main = h(
       'main',
       { class: screen.layout === 'fill' ? 'qa-main qa-main-fill' : 'qa-main' },
-      error ? h('p', { class: 'qa-callout', role: 'alert' }, error) : null,
       screen.body,
     );
+    // The message sits between header and screen, so it spans the full
+    // width also on screens that fill the page (the journey).
     root.replaceChildren(
       header(screen, ctx),
+      ...(error ? [h('div', { class: 'qa-alert-bar' }, callout(error))] : []),
       main,
       ...(screen.actions?.length ? [h('footer', { class: 'qa-actions' }, ...screen.actions)] : []),
     );
@@ -173,7 +183,9 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   const update = (next: State): void => {
     const first = !state;
-    const changed = first || next.revision !== state?.revision;
+    // A shown error goes as soon as an answer comes, even when the data
+    // did not change in between.
+    const changed = first || next.revision !== state?.revision || error !== undefined;
     state = next;
     error = undefined;
     if (changed) render(first);
@@ -181,10 +193,10 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   return {
     update,
-    showError: (text: string) => {
-      error = text;
+    showError: (text: string, detail?: string) => {
+      error = { text, ...(detail ? { detail } : {}) };
       if (state) render(false);
-      else root.replaceChildren(h('p', { class: 'qa-callout', role: 'alert' }, text));
+      else root.replaceChildren(callout(error));
     },
     back: () => {
       if (menuOpen) {

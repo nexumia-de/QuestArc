@@ -1,7 +1,8 @@
 // Builds the plugin into dist/ and packs dist/questarc-<version>.zip:
 // plugin.js (classic script, run by Super Productivity via new Function),
 // index.html with the view's script and style inlined (iframe plugins get no other
-// files), manifest.json and icon.svg.
+// files) and manifest.json. The icon is Material's "route", named in the
+// manifest: Super Productivity uses a name without a file as a Material icon.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build } from 'esbuild';
@@ -24,12 +25,11 @@ const html = readFileSync('src/ui/index.html', 'utf8')
   .replace('<!-- QUESTARC_SCRIPT -->', () => `<script>\n${script}</script>`);
 writeFileSync(join(files, 'index.html'), html);
 
-for (const name of ['manifest.json', 'icon.svg'])
-  copyFileSync(join('src', name), join(files, name));
+copyFileSync(join('src', 'manifest.json'), join(files, 'manifest.json'));
 
 const { version } = JSON.parse(readFileSync('src/manifest.json', 'utf8'));
 const entries = Object.fromEntries(
-  ['manifest.json', 'plugin.js', 'index.html', 'icon.svg'].map((name) => [
+  ['manifest.json', 'plugin.js', 'index.html'].map((name) => [
     name,
     readFileSync(join(files, name)),
   ]),

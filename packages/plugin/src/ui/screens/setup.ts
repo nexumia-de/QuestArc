@@ -22,7 +22,7 @@ export const setupScreen = (ctx: Context): Screen => {
   const station = run?.stations[index];
   const stage = journey?.stages[index];
   if (!run || !journey || !station || !stage) {
-    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   }
   if (station.state !== 'unbound' && station.state !== 'unsupported-repeat') {
     // Bound in the meantime (the repeat was set): back to the journey.

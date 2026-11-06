@@ -241,12 +241,34 @@ body {
   border-color: var(--c-primary, #6495ed);
 }
 
-.qa-option input {
+/*
+ * Drawn from theme colours: without a color-scheme on the view (see the
+ * top), Chromium paints native radios light, so an unselected one shows
+ * as a white disc in dark mode.
+ */
+.qa-option input[type='radio'] {
+  appearance: none;
+  box-sizing: border-box;
   width: 20px;
+  min-width: 20px;
+  max-width: 20px;
   height: 20px;
   margin: 0;
+  padding: 0;
   flex: none;
-  accent-color: var(--c-primary, #6495ed);
+  border: 2px solid var(--text-color-muted, rgba(44, 44, 44, 0.66));
+  border-radius: 50%;
+  background: transparent;
+}
+
+.qa-option input[type='radio']:checked {
+  border-color: var(--c-primary, #6495ed);
+  background: radial-gradient(circle, var(--c-primary, #6495ed) 0 4px, transparent 4.5px);
+}
+
+.qa-option input[type='radio']:focus-visible {
+  outline: 2px solid var(--c-primary, #6495ed);
+  outline-offset: 2px;
 }
 
 .qa-option-text {
@@ -287,6 +309,29 @@ body {
   border-inline-start: 4px solid var(--color-warning, #ff9800);
   border-radius: var(--radius-sm, 6px);
   background: var(--bg-darker, rgb(235, 235, 235));
+}
+
+.qa-callout p {
+  margin: 0;
+}
+
+.qa-alert-bar {
+  flex: none;
+  padding: var(--s, 8px) var(--s2, 16px) 0;
+}
+
+.qa-alert-bar > .qa-callout {
+  max-width: 720px;
+  margin-bottom: 0;
+}
+
+.qa-callout p + p {
+  margin-top: var(--s, 8px);
+}
+
+.qa-callout-detail {
+  font-size: var(--font-size-sm, 12px);
+  overflow-wrap: anywhere;
 }
 
 .qa-overline {

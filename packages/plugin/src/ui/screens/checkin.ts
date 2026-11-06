@@ -19,7 +19,7 @@ export const checkinScreen = (ctx: Context): Screen => {
   const station = run?.stations[run.position.stage];
   const stage = journey?.stages[run?.position.stage ?? 0];
   if (!run || !station || !stage)
-    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   const week = isoWeek(view.todayStr);
   const habit = t('ui.checkin.habit', {
     action: capitalise(t(stage.plan.action)),

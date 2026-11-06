@@ -18,7 +18,7 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
   const stage = journey?.stages[index];
   const station = run?.stations[index];
   if (!run || !journey || !stage || !station) {
-    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   }
   const rpg = view.mode === 'rpg';
   const reached = station.state !== 'ahead';

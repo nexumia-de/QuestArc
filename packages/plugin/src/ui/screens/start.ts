@@ -14,7 +14,7 @@ type StartChoice = 'today' | 'monday' | 'month' | 'date';
 export const startScreen = (ctx: Context, journeyId: string): Screen => {
   const { view, journeys } = ctx.state;
   const journey = journeys.find((j) => j.id === journeyId);
-  if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+  if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   const today = view.todayStr;
   const choice = (ctx.draft.when as StartChoice | undefined) ?? 'today';
   const picked = (ctx.draft.date as string | undefined) ?? today;
