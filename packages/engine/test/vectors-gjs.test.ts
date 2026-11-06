@@ -55,4 +55,22 @@ describe.skipIf(!gjs)('test vectors in gjs', () => {
     });
     expect(failures).toEqual([]);
   });
+
+  it('answers actions by name, the way Pensum writes records', () => {
+    const answer = JSON.parse(
+      execFileSync(gjs as string, ['-m', cli], {
+        input: JSON.stringify({
+          batch: [
+            { action: { name: 'endJourney', args: ['r', '2026-11-06'] } },
+            { action: { name: 'nope', args: [] } },
+          ],
+        }),
+        encoding: 'utf8',
+      }),
+    ) as unknown[];
+    expect(answer).toEqual([
+      { 'run-end:r': { day: '2026-11-06', reason: 'abandoned' } },
+      { error: 'unknown action nope' },
+    ]);
+  });
 });

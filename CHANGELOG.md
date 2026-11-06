@@ -5,6 +5,16 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/QuestArc/releases) with the
 plugin ZIP.
 
+## 3.1.0
+
+- New journey **First Things First**, for work: on workdays, from writing
+  down the one task that matters most to 45 quiet minutes on it, email
+  and chat in one block and a short look back at yesterday.
+- Journeys written by others show their author ("Written by …") in the
+  list and the preview. Anyone can write a journey, alone or with an AI
+  agent, and publish it by pull request; see
+  [Writing a journey](docs/authoring-journeys.md).
+
 ## 3.0.1
 
 - Clearer messages when QuestArc cannot load: "QuestArc is starting"

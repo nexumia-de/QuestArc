@@ -70,6 +70,10 @@ interface SnapshotRepeatCfg {
 
 ## 2. Choice records
 
+Which records a user action writes is defined once, in the engine
+(`packages/engine/src/actions.ts`): the plugin imports the functions,
+Pensum calls them through `engine-cli.mjs`.
+
 Each record is its own plugin-data key, written with
 `persistDataSynced(JSON.stringify(value), key)`. Super Productivity stores
 it as the entity `questarc:<key>` and resolves sync conflicts per key

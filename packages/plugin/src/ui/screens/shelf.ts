@@ -1,6 +1,6 @@
 import type { RunView } from '@questarc/engine';
 
-import { resumeJourney } from '../../shared/actions';
+import { resumeJourney } from '@questarc/engine';
 import { planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';

@@ -4,11 +4,13 @@
  * from stdin and prints the answer as JSON:
  *   { "evaluate": Snapshot }                 → GameView
  *   { "diff": { "before": GameView, "after": GameView } } → GameEvent[]
+ *   { "action": { "name": "startJourney", "args": [ … ] } } → record changes
  *   { "batch": [request, …] }                → [answer, …]
  * Run with `gjs -m engine-cli.mjs < request.json`.
  */
 import GioUnix from 'gi://GioUnix';
 
+import { actions } from './actions';
 import { diff } from './diff';
 import { evaluate } from './evaluate';
 import type { Snapshot } from './types/snapshot';
@@ -16,12 +18,22 @@ import type { GameView } from './types/view';
 
 declare const print: (text: string) => void;
 
+type Action = { name: keyof typeof actions; args: unknown[] };
 type Request =
-  { evaluate: Snapshot } | { diff: { before: GameView; after: GameView } } | { batch: Request[] };
+  | { evaluate: Snapshot }
+  | { diff: { before: GameView; after: GameView } }
+  | { action: Action }
+  | { batch: Request[] };
+
+const act = ({ name, args }: Action): unknown => {
+  const fn = Object.hasOwn(actions, name) ? (actions[name] as (...a: unknown[]) => unknown) : null;
+  return fn ? fn(...args) : { error: `unknown action ${String(name)}` };
+};
 
 const answer = (request: Request): unknown => {
   if ('evaluate' in request) return evaluate(request.evaluate);
   if ('diff' in request) return diff(request.diff.before, request.diff.after);
+  if ('action' in request) return act(request.action);
   if ('batch' in request) return request.batch.map(answer);
   return { error: 'unknown request' };
 };

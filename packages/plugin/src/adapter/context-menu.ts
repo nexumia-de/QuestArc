@@ -1,4 +1,4 @@
-import { bindStage } from '../shared/actions';
+import { bindStage } from '@questarc/engine';
 import { capitalise } from '../shared/plan';
 import { t } from '../shared/texts';
 import type { Brain } from './brain';
