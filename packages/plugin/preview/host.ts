@@ -58,10 +58,20 @@ const fire = (hook: string) => {
   for (const handler of hooks.get(hook) ?? []) handler();
 };
 
+let failWith: string | null = null;
+
 /** Helpers for trying flows by hand in the browser console. */
 Object.assign(window, {
   preview: {
     data: demo,
+    /**
+     * Answers the view's requests with this error until called with null,
+     * as Super Productivity does while plugin.js is not loaded
+     * ("Plugin questarc not found or not loaded").
+     */
+    failMessages: (error: string | null) => {
+      failWith = error;
+    },
     /** Gives a task a daily repeat, as the user would in Super Productivity. */
     setRepeat: (taskId: string, cfg: Record<string, unknown> = {}) => {
       const id = `cfg-${taskId}`;
@@ -125,6 +135,10 @@ addEventListener('message', async (event: MessageEvent) => {
   const reply = (message: Record<string, unknown>) =>
     (event.source as Window | null)?.postMessage(message, '*');
   if (data.type === 'PLUGIN_MESSAGE') {
+    if (failWith !== null) {
+      reply({ type: 'PLUGIN_MESSAGE_ERROR', messageId: data.messageId, error: failWith });
+      return;
+    }
     try {
       const result = await handleMessage(brain, data.message);
       reply({ type: 'PLUGIN_MESSAGE_RESPONSE', messageId: data.messageId, result });

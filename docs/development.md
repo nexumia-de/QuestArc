@@ -95,6 +95,10 @@ at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
 `journey`, `journey-rpg`, `met`, `unbound`; `empty:Settings` clicks the
 button named "Settings" first. In the browser console,
+`preview.failMessages('Plugin questarc not found or not loaded')` makes
+the view's requests fail as they do while plugin.js is not loaded
+(`preview.failMessages(null)` ends it; any other text shows the "could
+not read" message with details).
 `preview.setRepeat('<task id>')` gives a task a daily repeat, as the user
 would in Super Productivity, to try flow B by hand. It uses Playwright
 1.63.0 (a development dependency; in the cloud environment its Chromium is

@@ -13,7 +13,7 @@ export const pickTaskScreen = (ctx: Context): Screen => {
   const journey = run && journeys.find((j) => j.id === run.journeyId);
   const stage = run && journey?.stages[run.position.stage];
   const app = appState(ctx);
-  if (!run || !stage) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.load')) };
+  if (!run || !stage) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
 
   const tasks = app ? Object.values(app.tasks) : [];
   const choices = app

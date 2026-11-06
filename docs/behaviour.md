@@ -213,12 +213,19 @@ same effect.
 
 ### G. Problems
 
-| Situation                                      | What the user sees                                                                           |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| the bound repeat was deleted                   | Station unbound: "The task for this station is gone." **Set up the task**                    |
-| Super Productivity older than the plugin needs | "QuestArc needs Super Productivity 19.3 or newer."                                           |
-| journey definition changed while walking       | Nothing, unless the current stage was removed: "This journey was updated; you continue at …" |
-| no journey yet                                 | Empty state with **Choose a journey**                                                        |
+| Situation                                                  | What the user sees                                                                                                                                        |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the bound repeat was deleted                               | Station unbound: "The task for this station is gone." **Set up the task**                                                                                 |
+| Super Productivity older than the plugin needs             | "QuestArc needs Super Productivity 19.3 or newer."                                                                                                        |
+| journey definition changed while walking                   | Nothing, unless the current stage was removed: "This journey was updated; you continue at …"                                                              |
+| no journey yet                                             | Empty state with **Choose a journey**                                                                                                                     |
+| plugin.js not running yet (app start, update, switched on) | "QuestArc is starting. This page updates by itself in a moment." The view retries every second                                                            |
+| plugin.js still not answering after 20 s                   | "QuestArc is not running. Check that it is switched on in Settings → Plugins, then reload Super Productivity."                                            |
+| plugin.js answers with an error                            | "QuestArc could not read your data. It tries again every few seconds. If this message stays, reload Super Productivity." and "Details: …" with the reason |
+| a page whose journey or station is gone                    | "This page is out of date: the journey or station changed. Go back to continue."                                                                          |
+
+These messages stand between the header and the screen and go away with
+the first answer, also when the data did not change in between.
 
 ## Where it lands in each host
 

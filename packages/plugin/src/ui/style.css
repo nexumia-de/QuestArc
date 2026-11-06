@@ -289,6 +289,29 @@ body {
   background: var(--bg-darker, rgb(235, 235, 235));
 }
 
+.qa-callout p {
+  margin: 0;
+}
+
+.qa-alert-bar {
+  flex: none;
+  padding: var(--s, 8px) var(--s2, 16px) 0;
+}
+
+.qa-alert-bar > .qa-callout {
+  max-width: 720px;
+  margin-bottom: 0;
+}
+
+.qa-callout p + p {
+  margin-top: var(--s, 8px);
+}
+
+.qa-callout-detail {
+  font-size: var(--font-size-sm, 12px);
+  overflow-wrap: anywhere;
+}
+
 .qa-overline {
   margin: 0;
   color: var(--text-color-muted, rgba(44, 44, 44, 0.66));

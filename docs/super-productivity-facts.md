@@ -410,6 +410,14 @@ Checked by running the plugin in `app.super-productivity.com`
   `layout.service.ts` at `c5eb3f6`); the task opens as a bottom sheet.
 - The in-app community plugin list still shows a "QuestArc" entry with
   the 2.x description (quests, badges, hero profile).
+- While plugin.js is not loaded, a view's `PLUGIN_MESSAGE` is answered
+  with `PLUGIN_MESSAGE_ERROR` and the text "Plugin <id> not found or not
+  loaded" (`PluginRunner.sendMessageToPlugin`), or "Plugin <id> has no
+  message handler registered" before `onMessage` ran (`plugin-api.ts`).
+  This happens at app start (enabled plugins are activated one after
+  another, `_loadEnabledPlugins`), after switching a plugin on and after a
+  re-upload (`reloadPlugin` tears the runtime down, then activates it
+  again) (`plugin.service.ts` at `c5eb3f6`)[^sp].
 - Uploading the ZIP of a plugin that is already installed (same `id`)
   replaces it: the plugin stays enabled and its plugin data stays.
   **Remove** on the plugin's card deletes its plugin data. Checked in the
