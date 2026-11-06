@@ -19,10 +19,12 @@ links. Change history is in [log.md](log.md).
 - [Journey design](journey-design.md) - The path, station states, last seven days, calm and game variant, accessibility; mockups.
 - [Data model](data-model.md) - Engine input (snapshot), choice records as one plugin-data key each, the game view and events, what Pensum reads and writes.
 - [Journey: A gentle morning](journey-gentle-morning.md) - The first built-in journey: from one glass of water to a short morning routine, four stages, two guardians; how it follows the design rules.
-- [Story format 3](story-format.md) - Journeys as JSON: stages with plan, schedule, condition, guardian, story texts and nugget; text keys; schema check; versions.
+- [Journey: First Things First](journey-first-things-first.md) - The second built-in journey, for work: one task written down, 15 then 45 quiet minutes on it, email in blocks, a one-line look back.
+- [Story format 3](story-format.md) - Journeys as one self-contained JSON file: stages with plan, schedule, condition, guardian, story texts and nugget; own texts and author; the journey checker; versions.
+- [Writing a journey](authoring-journeys.md) - Guide for people and their agents: the rules in short, the file, a template, the check, publishing by pull request, the CC BY-SA licence.
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, HP, graduation, calm mode, with worked examples.
 
-- [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; changes to the design rules; open gaps.
+- [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; focused work; changes to the design rules; open gaps.
 - [Design rules from habit psychology](psychology.md) - 27 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
 
 # Super Productivity
@@ -41,3 +43,4 @@ links. Change history is in [log.md](log.md).
 - [How the plugin sets up a stage's recurring task](decisions/recurring-task-setup.md) - Create and hand over, or bind an existing task; upstream API requested in parallel.
 - [The plugin's view uses no UI framework](decisions/plugin-ui-without-framework.md) - Plain TypeScript with a small DOM helper; screens are redrawn from the game state; nothing third-party ships.
 - [Finished stages survive deleted history](decisions/deleted-history.md) - Checkpoint record per accepted stage; only open progress is derived.
+- [Others publish journeys by pull request](decisions/journeys-by-pull-request.md) - One self-contained file, checked in CI, merged by the owner; CC BY-SA 4.0 with "Written by …"; private journeys later with the same file.

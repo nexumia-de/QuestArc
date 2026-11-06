@@ -124,8 +124,18 @@ a while.
 
 **Exit criteria**: more built-in journeys written along the psychology
 rules; HP in RPG mode; graduation by automaticity; "pair it with";
-optional plan check (WOOP); reminders that fade; German texts; import and export of
-journeys as JSON so users can write and share their own.
+optional plan check (WOOP); reminders that fade; German texts; others
+can publish journeys by pull request: self-contained journey files, the
+journey checker in CI and a guide for people and their agents
+([decision](decisions/journeys-by-pull-request.md)).
+
+# Private journeys
+
+**Goal**: users keep journeys of their own without publishing them.
+
+**Exit criteria**: import and export of a journey file in the plugin and
+in Pensum, checked by the same journey checker as CI (#40). Milestone to
+be created by the owner.
 
 # Backlog
 

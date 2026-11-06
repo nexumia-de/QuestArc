@@ -33,6 +33,9 @@ rules, changelog fragments and `release.toml`, REUSE. The UI rules for
   [Super Productivity facts](docs/super-productivity-facts.md).
 - A change to a rule changes the document, its test vectors and the code
   in the same pull request. Never let code and documents disagree.
+- A new journey is one file in `content/journeys/`, written along
+  [Writing a journey](docs/authoring-journeys.md) and clean in
+  `npm run journeys`.
 
 ## Architecture rules
 

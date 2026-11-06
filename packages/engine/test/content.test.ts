@@ -1,72 +1,52 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { basename, join } from 'node:path';
 import Ajv2020 from 'ajv/dist/2020';
 import { describe, expect, it } from 'vitest';
+import { journeyProblems } from '../src/content-check';
 
-// Every journey in content/ must match story format 3 and have an English
-// text for each key it uses (docs/story-format.md).
+// Every journey file in content/ must match story format 3 and pass the
+// journey checker (docs/authoring-journeys.md). Warnings are printed for
+// the reviewer; errors fail CI. `npm run journeys` runs only this file.
 const content = join(import.meta.dirname, '..', '..', '..', 'content');
 const schema = JSON.parse(readFileSync(join(content, 'schema', 'journey.schema.json'), 'utf8'));
 const validate = new Ajv2020({ allErrors: true }).compile(schema);
 
-const readJson = (path: string): unknown => JSON.parse(readFileSync(path, 'utf8'));
-
-/** Journey folders with the English texts their journeys use. */
-const folders = [
-  { dir: join(content, 'journeys'), texts: join(content, 'i18n', 'en.json') },
-  { dir: join(content, 'examples'), texts: join(content, 'examples', 'en.json') },
-].filter(({ dir }) => existsSync(dir));
-
-const journeys = folders.flatMap(({ dir, texts }) =>
-  readdirSync(dir)
-    .filter((file) => file.endsWith('.json') && file !== 'en.json')
-    .map((file) => ({ file, journey: readJson(join(dir, file)), texts })),
+const files = ['journeys', 'examples'].flatMap((dir) =>
+  readdirSync(join(content, dir))
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => join(content, dir, file)),
 );
+const journeys = files.map((path) => ({
+  path,
+  name: `${basename(join(path, '..'))}/${basename(path)}`,
+  journey: JSON.parse(readFileSync(path, 'utf8')) as { id?: unknown },
+}));
+const cases = journeys.map((j) => [j.name, j] as const);
 
-const textKeys = (value: unknown, key = ''): string[] => {
-  if (typeof value === 'string') {
-    const isText = ['title', 'description', 'why', 'anchor', 'action', 'place', 'name'];
-    return isText.includes(key) || ['arrival', 'accept', 'story', 'nugget'].includes(key)
-      ? [value]
-      : [];
-  }
-  if (Array.isArray(value)) return value.flatMap((item) => textKeys(item));
-  if (value && typeof value === 'object') {
-    return Object.entries(value).flatMap(([k, v]) => textKeys(v, k));
-  }
-  return [];
-};
-
-describe('journeys', () => {
+describe('journey files', () => {
   it('exist', () => {
-    expect(journeys.length).toBeGreaterThan(0);
+    expect(journeys.length).toBeGreaterThan(1);
   });
 
-  it.each(journeys.map((j) => [j.file, j] as const))('%s matches the schema', (_f, { journey }) => {
+  it('have unique ids', () => {
+    const ids = journeys.map((j) => j.journey.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it.each(cases)('%s is named after its id', (_n, { path, journey }) => {
+    expect(basename(path)).toBe(`${String(journey.id)}.json`);
+  });
+
+  it.each(cases)('%s matches the schema', (_n, { journey }) => {
     const valid = validate(journey);
     expect(validate.errors ?? []).toEqual([]);
     expect(valid).toBe(true);
   });
 
-  it.each(journeys.map((j) => [j.file, j] as const))(
-    '%s has an English text for every key',
-    (_f, { journey, texts }) => {
-      const english = readJson(texts) as Record<string, string>;
-      const missing = textKeys(journey).filter((key) => !english[key]);
-      expect(missing).toEqual([]);
-    },
-  );
-
-  it.each(journeys.map((j) => [j.file, j] as const))(
-    '%s has unique stage ids and sensible conditions',
-    (_f, { journey }) => {
-      const stages = (
-        journey as { stages: { id: string; condition: { n?: number; of?: number } }[] }
-      ).stages;
-      expect(new Set(stages.map((s) => s.id)).size).toBe(stages.length);
-      for (const { condition } of stages) {
-        if (condition.of !== undefined) expect(condition.n).toBeLessThanOrEqual(condition.of);
-      }
-    },
-  );
+  it.each(cases)('%s passes the journey checker', (name, { journey }) => {
+    const problems = journeyProblems(journey);
+    for (const p of problems.filter((p) => p.level === 'warning'))
+      console.warn(`${name} ${p.at}: warning: ${p.message}`);
+    expect(problems.filter((p) => p.level === 'error')).toEqual([]);
+  });
 });

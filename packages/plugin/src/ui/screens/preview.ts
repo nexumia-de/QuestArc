@@ -13,6 +13,9 @@ export const previewScreen = (ctx: Context, journeyId: string): Screen => {
       'div',
       { class: 'qa-stack' },
       h('p', {}, t(journey.description)),
+      journey.author
+        ? h('p', { class: 'qa-muted qa-small' }, t('ui.journey.author', { name: journey.author }))
+        : null,
       h('h2', { class: 'qa-section-title' }, t('ui.preview.stations')),
       h(
         'ol',

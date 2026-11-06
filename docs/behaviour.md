@@ -41,10 +41,12 @@ the journey is in [journey design](journey-design.md).
 
 ### 2. Choose a journey
 
-- List of journeys: title, description, number of stations, the first
-  step as a plan sentence ("After breakfast, I will put my walking shoes
-  by the door.").
-- Tapping one opens its preview: all stations as plan sentences.
+- List of journeys: title, description, number of stations, "Written
+  by …" when the journey names an author, the first step as a plan
+  sentence ("After lunch, I will put on my walking shoes (at the
+  door).").
+- Tapping one opens its preview: description, "Written by …" when
+  present, all stations as plan sentences.
 - Main action in the preview: **Start this journey**.
 - Only one journey runs at a time; if one is active, starting another
   pauses it after a confirmation that says so (it can be resumed).

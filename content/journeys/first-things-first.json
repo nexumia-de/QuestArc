@@ -1,0 +1,156 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "first-things-first",
+  "version": 1,
+  "title": "first-things-first.title",
+  "description": "first-things-first.description",
+  "why": "first-things-first.why",
+  "stages": [
+    {
+      "id": "one-thing",
+      "plan": {
+        "anchor": "first-things-first.anchor",
+        "action": "first-things-first.one-thing.action"
+      },
+      "schedule": {
+        "type": "weekdays",
+        "days": ["mon", "tue", "wed", "thu", "fri"]
+      },
+      "condition": {
+        "type": "days",
+        "n": 4,
+        "of": 5
+      },
+      "story": {
+        "arrival": "first-things-first.one-thing.arrival",
+        "accept": "first-things-first.one-thing.accept"
+      },
+      "nugget": "first-things-first.one-thing.nugget"
+    },
+    {
+      "id": "focus-15",
+      "plan": {
+        "anchor": "first-things-first.anchor",
+        "action": "first-things-first.focus-15.action"
+      },
+      "schedule": {
+        "type": "weekdays",
+        "days": ["mon", "tue", "wed", "thu", "fri"]
+      },
+      "condition": {
+        "type": "days",
+        "n": 4,
+        "of": 5
+      },
+      "story": {
+        "arrival": "first-things-first.focus-15.arrival",
+        "accept": "first-things-first.focus-15.accept"
+      },
+      "nugget": "first-things-first.focus-15.nugget"
+    },
+    {
+      "id": "focus-45",
+      "plan": {
+        "anchor": "first-things-first.anchor",
+        "action": "first-things-first.focus-45.action"
+      },
+      "schedule": {
+        "type": "weekdays",
+        "days": ["mon", "tue", "wed", "thu", "fri"]
+      },
+      "condition": {
+        "type": "days",
+        "n": 4,
+        "of": 5
+      },
+      "guardian": {
+        "name": "first-things-first.focus-45.guardian",
+        "hp": 100
+      },
+      "story": {
+        "arrival": "first-things-first.focus-45.arrival",
+        "accept": "first-things-first.focus-45.accept"
+      },
+      "nugget": "first-things-first.focus-45.nugget"
+    },
+    {
+      "id": "focus-mail",
+      "plan": {
+        "anchor": "first-things-first.anchor",
+        "action": "first-things-first.focus-mail.action"
+      },
+      "schedule": {
+        "type": "weekdays",
+        "days": ["mon", "tue", "wed", "thu", "fri"]
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
+      "guardian": {
+        "name": "first-things-first.focus-mail.guardian",
+        "hp": 150
+      },
+      "story": {
+        "arrival": "first-things-first.focus-mail.arrival",
+        "accept": "first-things-first.focus-mail.accept"
+      },
+      "nugget": "first-things-first.focus-mail.nugget"
+    },
+    {
+      "id": "look-back",
+      "plan": {
+        "anchor": "first-things-first.anchor",
+        "action": "first-things-first.look-back.action"
+      },
+      "schedule": {
+        "type": "weekdays",
+        "days": ["mon", "tue", "wed", "thu", "fri"]
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
+      "story": {
+        "arrival": "first-things-first.look-back.arrival"
+      },
+      "nugget": "first-things-first.look-back.nugget"
+    }
+  ],
+  "ending": {
+    "story": "first-things-first.ending"
+  },
+  "texts": {
+    "en": {
+      "first-things-first.title": "First Things First",
+      "first-things-first.description": "From one task on a note to a focused start of your workday, one small step at a time.",
+      "first-things-first.why": "Why do you want to start your workday this way? In your own words.",
+      "first-things-first.anchor": "sitting down at my desk",
+      "first-things-first.one-thing.action": "write down the one task that matters most today",
+      "first-things-first.one-thing.arrival": "The path starts at your desk, with one task on a slip of paper.",
+      "first-things-first.one-thing.accept": "Your one task is there every morning now. You could give it fifteen quiet minutes.",
+      "first-things-first.one-thing.nugget": "You could keep a pen and sticky notes where you sit down, so the first step is already in reach.",
+      "first-things-first.focus-15.action": "write down my one task and give it 15 quiet minutes, notifications off",
+      "first-things-first.focus-15.arrival": "The noise of the day fades a little while you work.",
+      "first-things-first.focus-15.accept": "Fifteen minutes became easy. You could give your one task a longer stretch.",
+      "first-things-first.focus-15.nugget": "Missing one workday is fine. What matters is coming back to your one task the next time.",
+      "first-things-first.focus-45.action": "write down my one task and give it 45 quiet minutes, notifications off",
+      "first-things-first.focus-45.guardian": "The Notification Swarm",
+      "first-things-first.focus-45.arrival": "A longer stretch of path, and a swarm of little pings tries to pull you away.",
+      "first-things-first.focus-45.accept": "The pings can wait now. You could give email and chat their own time too.",
+      "first-things-first.focus-45.nugget": "When something else comes to mind while you focus, you could write it on a parking list and go back to your task.",
+      "first-things-first.focus-mail.action": "write down my one task, give it 45 quiet minutes, then check email and chat in one block",
+      "first-things-first.focus-mail.guardian": "The Inbox Hydra",
+      "first-things-first.focus-mail.arrival": "The inbox grows new heads faster than you can answer them.",
+      "first-things-first.focus-mail.accept": "Messages have their place in your day. You could add one short look back before you start.",
+      "first-things-first.focus-mail.nugget": "You could plan for a day full of meetings: \"If a meeting takes my focus time, then I will do just the first step of my one task.\"",
+      "first-things-first.look-back.action": "note what moved forward yesterday, write down my one task and give it 45 quiet minutes",
+      "first-things-first.look-back.arrival": "The view opens up, and you can see how far your work has come.",
+      "first-things-first.look-back.nugget": "Small steps forward are easy to forget. Your one line keeps them in view, also on slow days.",
+      "first-things-first.ending": "Your workday starts with what matters now: a look back, one task and a quiet stretch of focus."
+    }
+  }
+}

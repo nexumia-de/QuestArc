@@ -7,13 +7,20 @@ import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'no
 import { join } from 'node:path';
 import { build } from 'esbuild';
 import { zipSync } from 'fflate';
+import { esbuildJourneys } from './journeys.mjs';
 
 const out = 'dist';
 const files = join(out, 'plugin');
 rmSync(out, { recursive: true, force: true });
 mkdirSync(files, { recursive: true });
 
-const common = { bundle: true, format: 'iife', target: 'es2022', legalComments: 'none' };
+const common = {
+  bundle: true,
+  format: 'iife',
+  target: 'es2022',
+  legalComments: 'none',
+  plugins: [esbuildJourneys],
+};
 
 await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'plugin.js') });
 

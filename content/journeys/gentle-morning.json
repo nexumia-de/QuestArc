@@ -67,5 +67,33 @@
       "nugget": "gentle-morning.plan-day.nugget"
     }
   ],
-  "ending": { "story": "gentle-morning.ending" }
+  "ending": { "story": "gentle-morning.ending" },
+  "texts": {
+    "en": {
+      "gentle-morning.title": "A gentle morning",
+      "gentle-morning.description": "From one glass of water to a short morning routine that starts by itself, one small step at a time.",
+      "gentle-morning.why": "Why do you want a calmer start to your day? In your own words.",
+      "gentle-morning.anchor": "getting up",
+      "gentle-morning.water.action": "drink a glass of water",
+      "gentle-morning.water.place": "in the kitchen",
+      "gentle-morning.water.arrival": "The path starts in your kitchen, with one glass of water.",
+      "gentle-morning.water.accept": "The water is part of your morning now. You could add one minute of stretching after it.",
+      "gentle-morning.water.nugget": "You could put the glass next to the tap in the evening, so it is the first thing you see in the morning.",
+      "gentle-morning.stretch-1.action": "drink a glass of water and stretch for one minute",
+      "gentle-morning.stretch-1.arrival": "A little more light comes through the window.",
+      "gentle-morning.stretch-1.accept": "One minute became easy. You could give your stretch a few more minutes.",
+      "gentle-morning.stretch-1.nugget": "Missing one morning is fine. What matters is coming back the next morning.",
+      "gentle-morning.stretch-5.action": "drink a glass of water and stretch for five minutes",
+      "gentle-morning.stretch-5.guardian": "The Heavy Blanket",
+      "gentle-morning.stretch-5.arrival": "The morning is getting longer, and something heavy pulls you back to bed.",
+      "gentle-morning.stretch-5.accept": "The blanket stays on the bed now. You could end your routine with a short look at the day ahead.",
+      "gentle-morning.stretch-5.nugget": "You could plan for a hard morning now: \"If I oversleep, then I will just drink the water.\" The smaller step still counts.",
+      "gentle-morning.plan-day.action": "drink a glass of water, stretch for five minutes and write down one thing for today",
+      "gentle-morning.plan-day.guardian": "The Morning Rush",
+      "gentle-morning.plan-day.arrival": "The sun is up. One last stretch of path, and the rush of the day tries to get ahead of you.",
+      "gentle-morning.plan-day.accept": "Your morning has a shape now.",
+      "gentle-morning.plan-day.nugget": "You could pair the stretch with something you enjoy, like a favourite song that you only play then.",
+      "gentle-morning.ending": "Your morning starts by itself now: water, a stretch and one thing for the day."
+    }
+  }
 }

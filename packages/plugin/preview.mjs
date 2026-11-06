@@ -4,6 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build } from 'esbuild';
+import { esbuildJourneys } from './journeys.mjs';
 
 const out = join('dist', 'preview');
 mkdirSync(out, { recursive: true });
@@ -15,6 +16,7 @@ const host = await build({
   target: 'es2022',
   write: false,
   define: { VIEW_HTML: JSON.stringify(view) },
+  plugins: [esbuildJourneys],
 });
 const script = host.outputFiles[0].text.replaceAll('</script', '<\\/script');
 const page = readFileSync('preview/index.html', 'utf8').replace(

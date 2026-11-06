@@ -3,12 +3,18 @@ export interface Journey {
   readonly format: 3;
   readonly id: string;
   readonly version: number;
+  /** Name or pseudonym shown as "Written by …"; missing for the project's own journeys. */
+  readonly author?: string;
   readonly title: string;
   readonly description: string;
   readonly why?: string;
   readonly stages: readonly Stage[];
   readonly ending?: { readonly story: string };
+  /** Texts by language, then text key; `en` is required in content files. */
+  readonly texts?: Texts;
 }
+
+export type Texts = Readonly<Record<string, Readonly<Record<string, string>>>>;
 
 export interface Stage {
   readonly id: string;
