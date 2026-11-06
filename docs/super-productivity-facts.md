@@ -418,6 +418,13 @@ Checked by running the plugin in `app.super-productivity.com`
   another, `_loadEnabledPlugins`), after switching a plugin on and after a
   re-upload (`reloadPlugin` tears the runtime down, then activates it
   again) (`plugin.service.ts` at `c5eb3f6`)[^sp].
+- The plugin's `icon.svg` is shown in the side menu and the page header
+  through `PluginIconComponent`, whose CSS sets `fill: currentColor` on
+  the `<svg>` root; that overrides a `fill="none"` there, so an outline
+  icon gets filled in. Shapes must set `fill` on themselves (`fill="none"`
+  on strokes). The sanitizer keeps only presentation attributes, no
+  `style` or `class` (`plugin-icon.component.ts`,
+  `sanitize-svg-icon.util.ts` at `c5eb3f6`)[^sp].
 - Uploading the ZIP of a plugin that is already installed (same `id`)
   replaces it: the plugin stays enabled and its plugin data stays.
   **Remove** on the plugin's card deletes its plugin data. Checked in the

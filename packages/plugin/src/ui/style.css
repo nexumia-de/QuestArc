@@ -241,12 +241,30 @@ body {
   border-color: var(--c-primary, #6495ed);
 }
 
-.qa-option input {
+/*
+ * Drawn from theme colours: without a color-scheme on the view (see the
+ * top), Chromium paints native radios light, so an unselected one shows
+ * as a white disc in dark mode.
+ */
+.qa-option input[type='radio'] {
+  appearance: none;
   width: 20px;
   height: 20px;
   margin: 0;
   flex: none;
-  accent-color: var(--c-primary, #6495ed);
+  border: 2px solid var(--text-color-muted, rgba(44, 44, 44, 0.66));
+  border-radius: 50%;
+  background: transparent;
+}
+
+.qa-option input[type='radio']:checked {
+  border-color: var(--c-primary, #6495ed);
+  background: radial-gradient(circle, var(--c-primary, #6495ed) 0 4px, transparent 4.5px);
+}
+
+.qa-option input[type='radio']:focus-visible {
+  outline: 2px solid var(--c-primary, #6495ed);
+  outline-offset: 2px;
 }
 
 .qa-option-text {
