@@ -22,6 +22,12 @@ Super Productivity facts used here: [facts](super-productivity-facts.md)
 
 ## 1. Engine input: the snapshot
 
+Both hosts build it with the engine's `snapshotFromHost`
+(`packages/engine/src/host-data.ts`) from Super Productivity's task and
+repeat objects as stored: the plugin from its API, Pensum from its
+backup file through `engine-cli.mjs` (`{ "evaluateHost": … }`). Only
+the bound tasks and their repeat configs are kept.
+
 ```ts
 interface Snapshot {
   day: { todayStr: string; startOfNextDayDiffMs: number; timeZone: string };

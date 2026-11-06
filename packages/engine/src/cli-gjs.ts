@@ -4,6 +4,7 @@
  * from stdin and prints the answer as JSON:
  *   { "evaluate": Snapshot }                 → GameView
  *   { "diff": { "before": GameView, "after": GameView } } → GameEvent[]
+ *   { "evaluateHost": HostInput }           → GameView (from raw SP objects)
  *   { "action": { "name": "startJourney", "args": [ … ] } } → record changes
  *   { "batch": [request, …] }                → [answer, …]
  * Run with `gjs -m engine-cli.mjs < request.json`.
@@ -13,6 +14,7 @@ import GioUnix from 'gi://GioUnix';
 import { actions } from './actions';
 import { diff } from './diff';
 import { evaluate } from './evaluate';
+import { snapshotFromHost, type HostInput } from './host-data';
 import type { Snapshot } from './types/snapshot';
 import type { GameView } from './types/view';
 
@@ -21,6 +23,7 @@ declare const print: (text: string) => void;
 type Action = { name: keyof typeof actions; args: unknown[] };
 type Request =
   | { evaluate: Snapshot }
+  | { evaluateHost: HostInput }
   | { diff: { before: GameView; after: GameView } }
   | { action: Action }
   | { batch: Request[] };
@@ -32,6 +35,7 @@ const act = ({ name, args }: Action): unknown => {
 
 const answer = (request: Request): unknown => {
   if ('evaluate' in request) return evaluate(request.evaluate);
+  if ('evaluateHost' in request) return evaluate(snapshotFromHost(request.evaluateHost));
   if ('diff' in request) return diff(request.diff.before, request.diff.after);
   if ('action' in request) return act(request.action);
   if ('batch' in request) return request.batch.map(answer);

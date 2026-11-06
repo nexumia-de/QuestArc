@@ -167,24 +167,25 @@ the commit in that package's README and in
 
 The engine (`packages/engine/src`) has one job per file:
 
-| File               | Job                                                              |
-| ------------------ | ---------------------------------------------------------------- |
-| `types/*.ts`       | Input (snapshot), journey and output (game view) types           |
-| `days.ts`          | Logical days, date arithmetic, ISO weeks                         |
-| `schedule.ts`      | Supported repeat schedules and their occurrences                 |
-| `choices.ts`       | Parsing the choice records                                       |
-| `binding.ts`       | A stage's repeat config and its instances                        |
-| `completions.ts`   | Which day a completion counts for, minutes tracked               |
-| `timeline.ts`      | Due days, misses, runs, welcome backs                            |
-| `conditions.ts`    | Stage conditions                                                 |
-| `xp.ts`            | XP and level                                                     |
-| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints |
-| `validate.ts`      | Structural check of journeys                                     |
-| `evaluate.ts`      | The whole game view                                              |
-| `diff.ts`          | Events between two views                                         |
-| `actions.ts`       | The choice records each user action writes, for both hosts       |
-| `content-check.ts` | The journey checker                                              |
-| `cli-gjs.ts`       | The gjs wrapper (`evaluate`, `diff`, `action`, `batch` on stdin) |
+| File               | Job                                                                     |
+| ------------------ | ----------------------------------------------------------------------- |
+| `types/*.ts`       | Input (snapshot), journey and output (game view) types                  |
+| `days.ts`          | Logical days, date arithmetic, ISO weeks                                |
+| `schedule.ts`      | Supported repeat schedules and their occurrences                        |
+| `choices.ts`       | Parsing the choice records                                              |
+| `binding.ts`       | A stage's repeat config and its instances                               |
+| `completions.ts`   | Which day a completion counts for, minutes tracked                      |
+| `timeline.ts`      | Due days, misses, runs, welcome backs                                   |
+| `conditions.ts`    | Stage conditions                                                        |
+| `xp.ts`            | XP and level                                                            |
+| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints        |
+| `validate.ts`      | Structural check of journeys                                            |
+| `evaluate.ts`      | The whole game view                                                     |
+| `diff.ts`          | Events between two views                                                |
+| `actions.ts`       | The choice records each user action writes, for both hosts              |
+| `host-data.ts`     | The snapshot from Super Productivity's raw tasks and configs            |
+| `content-check.ts` | The journey checker                                                     |
+| `cli-gjs.ts`       | The gjs wrapper (`evaluate`, `evaluateHost`, `diff`, `action`, `batch`) |
 
 Test vectors (`packages/engine/vectors/*.json`) hold every worked example
 of the [game rules](game-rules.md) and the edge cases from the

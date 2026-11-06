@@ -1,31 +1,43 @@
-import type {
-  DayContext,
-  Journey,
-  Snapshot,
-  SnapshotRepeatCfg,
-  SnapshotTask,
-} from '@questarc/engine';
-import type { PluginTaskRepeatCfg, Task } from '@questarc/sp-plugin-api';
-
-import type { Records } from './records';
+import type { Journey } from './types/journey';
+import type { DayContext, Snapshot, SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
 
 /**
- * Builds the engine's input from Super Productivity's data
- * (docs/data-model.md §1). Super Productivity passes more fields at
- * runtime than the plugin types declare (wontDoOn, deletedInstanceDates,
- * …); they are read here.
+ * Builds the engine's input from Super Productivity's task and repeat
+ * objects as they are (docs/data-model.md §1), for both hosts: the
+ * plugin passes what its API returns, Pensum what its backup file holds
+ * (engine-cli.mjs `{ "evaluateHost": … }`). Only the fields read here
+ * matter; everything else is ignored.
  */
 
-type RuntimeTask = Task & { wontDoOn?: number | null; created?: number };
-type RuntimeRepeatCfg = PluginTaskRepeatCfg & {
-  repeatUntilDay?: string;
-  deletedInstanceDates?: string[];
-  repeatFromCompletionDate?: boolean;
-  waitForCompletion?: boolean;
-};
+export type Records = Readonly<Record<string, unknown>>;
 
-export const toTask = (task: Task): SnapshotTask => {
-  const t = task as RuntimeTask;
+/** A task as Super Productivity stores it (the fields the engine reads). */
+export interface HostTask {
+  readonly id: string;
+  readonly isDone: boolean;
+  readonly doneOn?: number | null;
+  readonly wontDoOn?: number | null;
+  readonly dueDay?: string | null;
+  readonly created?: number;
+  readonly repeatCfgId?: string | null;
+  readonly timeSpentOnDay?: Readonly<Record<string, number>>;
+}
+
+/** A repeat config as Super Productivity stores it (the fields read). */
+export interface HostRepeatCfg {
+  readonly id: string;
+  readonly isPaused?: boolean;
+  readonly repeatCycle: SnapshotRepeatCfg['repeatCycle'];
+  readonly repeatEvery: number;
+  readonly startDate?: string | null;
+  readonly repeatUntilDay?: string | null;
+  readonly deletedInstanceDates?: readonly string[];
+  readonly repeatFromCompletionDate?: boolean;
+  readonly waitForCompletion?: boolean;
+  readonly [weekday: string]: unknown;
+}
+
+export const toTask = (t: HostTask): SnapshotTask => {
   return {
     id: t.id,
     isDone: t.isDone,
@@ -38,8 +50,7 @@ export const toTask = (task: Task): SnapshotTask => {
   };
 };
 
-export const toRepeatCfg = (cfg: PluginTaskRepeatCfg): SnapshotRepeatCfg => {
-  const c = cfg as RuntimeRepeatCfg;
+export const toRepeatCfg = (c: HostRepeatCfg): SnapshotRepeatCfg => {
   const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   return {
     id: c.id,
@@ -48,7 +59,7 @@ export const toRepeatCfg = (cfg: PluginTaskRepeatCfg): SnapshotRepeatCfg => {
     repeatEvery: c.repeatEvery,
     ...(c.startDate ? { startDate: c.startDate } : {}),
     ...(c.repeatUntilDay ? { repeatUntilDay: c.repeatUntilDay } : {}),
-    ...Object.fromEntries(days.map((d) => [d, Boolean(c[d as keyof RuntimeRepeatCfg])])),
+    ...Object.fromEntries(days.map((d) => [d, Boolean(c[d])])),
     ...(c.deletedInstanceDates ? { deletedInstanceDates: [...c.deletedInstanceDates] } : {}),
     ...(c.repeatFromCompletionDate ? { repeatFromCompletionDate: true } : {}),
     ...(c.waitForCompletion ? { waitForCompletion: true } : {}),
@@ -90,6 +101,24 @@ export interface SnapshotInput {
   readonly records: Records;
   readonly journeys: readonly Journey[];
 }
+
+/** The same input with Super Productivity's raw objects, for hosts that hold them. */
+export interface HostInput {
+  readonly day: DayContext;
+  readonly live: readonly HostTask[];
+  readonly archived: readonly HostTask[];
+  readonly repeatCfgs: readonly HostRepeatCfg[];
+  readonly records: Records;
+  readonly journeys: readonly Journey[];
+}
+
+export const snapshotFromHost = (input: HostInput): Snapshot =>
+  buildSnapshot({
+    ...input,
+    live: input.live.map(toTask),
+    archived: input.archived.map(toTask),
+    repeatCfgs: input.repeatCfgs.map(toRepeatCfg),
+  });
 
 /** Live tasks win over archived ones with the same id. */
 export const buildSnapshot = (input: SnapshotInput): Snapshot => {

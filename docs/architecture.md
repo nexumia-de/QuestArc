@@ -100,7 +100,7 @@ commit `8ec9137`) and on Codeberg (GoVenture, HeroicRPG).
 Pensum is Python. It starts `gjs -m engine-cli.mjs` from the GNOME
 runtime, passes the snapshot as JSON on stdin and reads the `GameView`
 from stdout: no new dependency, no second implementation. The records a
-user action writes (start, bind, continue, pause, resume, end, weekly
+user action writes (start, bind, continue, pause, resume, end, a paused repeat, weekly
 answer, mode, undo) are engine functions too (`actions.ts`), which
 Pensum calls with `{ "action": { "name": …, "args": […] } }`, so both
 hosts write the same records. This needs
