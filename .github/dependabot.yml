@@ -26,3 +26,7 @@ updates:
     groups:
       actions:
         patterns: ['*']
+  - package-ecosystem: docker
+    directory: /packages/plugin/e2e
+    schedule:
+      interval: weekly

@@ -410,6 +410,11 @@ Checked by running the plugin in `app.super-productivity.com`
   `layout.service.ts` at `c5eb3f6`); the task opens as a bottom sheet.
 - The in-app community plugin list still shows a "QuestArc" entry with
   the 2.x description (quests, badges, hero profile).
+- Uploading the ZIP of a plugin that is already installed (same `id`)
+  replaces it: the plugin stays enabled and its plugin data stays.
+  **Remove** on the plugin's card deletes its plugin data. Checked in the
+  Docker image `johannesjo/super-productivity:v19.3.1`, which serves the
+  same web build as the app (nginx, port 80).
 
 ## Consequences for QuestArc (from the facts above)
 

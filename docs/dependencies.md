@@ -37,6 +37,12 @@ below are MIT, Apache-2.0 or BlueOak-1.0.0 and compatible with it.
 | `globals`           | 17.14.0 | MIT        | Lint globals                  |
 | `prettier`          | 3.9.10  | MIT        | Formatting                    |
 | `@types/node`       | 22.20.5 | MIT        | Types for tests and scripts   |
+| `playwright`        | 1.63.0  | Apache-2.0 | Screenshots, real-app test    |
+
+The real-app test (CI job `real-app`) runs Super Productivity's Docker
+image `johannesjo/super-productivity` v19.3.1, pinned by digest in
+`packages/plugin/e2e/Dockerfile` (MIT, Johannes Millan); it is only
+started in CI and never shipped.
 
 TypeScript stays on 6.0 because typescript-eslint 8 supports TypeScript
 below 6.1; TypeScript 7 is the new native compiler. Dependabot ignores
@@ -56,4 +62,5 @@ supports TypeScript 7.
 Node 22.23.4 (`.nvmrc`) for development and CI. GitHub Actions:
 `actions/checkout` v7.0.1, `actions/setup-node` v7.1.0,
 `actions/upload-artifact` v7.0.2, `softprops/action-gh-release` v3.0.4,
-each pinned to its commit SHA.
+each pinned to its commit SHA. Dependabot also updates the Docker image
+of the real-app test.

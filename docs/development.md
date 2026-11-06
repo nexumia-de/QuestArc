@@ -38,11 +38,15 @@ adapter against a fake plugin API in `packages/plugin/test/`), `build`.
 - `.github/workflows/ci.yml` runs `npm ci` and `npm run check` on every
   pull request and push to `main` (job `check`, the required check in
   `.github/rulesets/main.json`; the owner imports the ruleset) and keeps
-  the plugin ZIP as an artifact.
+  the plugin ZIP as an artifact. Job `real-app`, also required, tries the
+  ZIP in Super Productivity ([in the real app](#in-the-real-app)).
 - `.github/workflows/release.yml` runs on tags `v<version>`: the tag must
   match `packages/plugin/src/manifest.json`; it runs the checks and
   attaches the ZIP and `SHA256SUMS` to a GitHub release (a tag with `-`
-  makes a pre-release).
+  makes a pre-release). Only the owner pushes tags: merge the pull request
+  that sets the version and adds its `CHANGELOG.md` section, then tag the
+  merge commit on `main` (`git tag v3.0.0 && git push origin v3.0.0`).
+  The README's install steps link to the latest release.
 - Dependabot opens weekly pull requests for npm packages and GitHub
   Actions; actions are pinned to a commit SHA with the release as a
   comment.
@@ -92,9 +96,9 @@ horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
 `journey`, `journey-rpg`, `met`, `unbound`; `empty:Settings` clicks the
 button named "Settings" first. In the browser console,
 `preview.setRepeat('<task id>')` gives a task a daily repeat, as the user
-would in Super Productivity, to try flow B by hand. It uses the Playwright and
-Chromium that the cloud environment provides (not a dependency of the
-repository); open `dist/preview/index.html?demo=walking&theme=dark` in any
+would in Super Productivity, to try flow B by hand. It uses Playwright
+1.63.0 (a development dependency; in the cloud environment its Chromium is
+preinstalled, elsewhere `npx playwright install chromium`); open `dist/preview/index.html?demo=walking&theme=dark` in any
 browser to look at it by hand.
 
 ## In the real app
@@ -114,9 +118,29 @@ npm run build -w @questarc/plugin
 cd packages/plugin && node e2e/real-app.mjs 360 720
 ```
 
-It needs the live app, so it is not part of `npm run check`; a pinned
-test in CI is #50. Uploaded plugins start disabled; the script switches
-QuestArc on.
+By default it uses the live app. `QUESTARC_SP_URL` points it at another
+one; CI (job `real-app`) runs Super Productivity's Docker image at the
+version pinned in `packages/plugin/e2e/Dockerfile` (tag and digest,
+updated by Dependabot) and runs the script at 360 × 720 and 1200 × 800
+(`npm run e2e -w @questarc/plugin`); screenshots are kept as the artifact
+`real-app-screenshots`. The same locally:
+
+```sh
+docker build -t questarc-sp packages/plugin/e2e
+```
+
+```sh
+docker run -d -p 8080:80 questarc-sp
+```
+
+```sh
+QUESTARC_SP_URL=http://localhost:8080/ npm run e2e -w @questarc/plugin
+```
+
+It is not part of `npm run check`, because it needs Docker and a
+browser. Uploaded plugins start disabled; the script switches QuestArc on.
+When the pinned version changes, also check `minSupVersion` in the
+manifest and the [facts](super-productivity-facts.md) §10.
 
 ## Plugin API types
 
@@ -191,4 +215,5 @@ Needed beyond the package registries; tested 2026-11-05:
 | `www.europarl.europa.eu`                                                           | Research: status of EU legislation (Digital Fairness Act)                                                    | allowed         |
 | `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                     | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead     | refused by site |
 | `app.super-productivity.com`                                                       | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data            | allowed         |
+| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`       | Super Productivity's Docker image for the pinned real-app test                                               | allowed         |
 | `test-app.super-productivity.com`                                                  | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                    | allowed         |
