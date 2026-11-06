@@ -1,6 +1,10 @@
 import type { Journey } from '@questarc/engine';
 
-import gentleMorning from '../../../../content/journeys/gentle-morning.json';
+import journeys from 'virtual:questarc-journeys';
 
-/** Built-in journeys shipped with the plugin (docs/architecture.md, where data lives). */
-export const builtInJourneys: readonly Journey[] = [gentleMorning as Journey];
+/**
+ * Built-in journeys shipped with the plugin: every file in
+ * content/journeys/ (docs/architecture.md, where data lives), in file-name
+ * order. CI checks each one with the journey checker.
+ */
+export const builtInJourneys: readonly Journey[] = journeys;

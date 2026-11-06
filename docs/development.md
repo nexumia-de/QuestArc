@@ -10,14 +10,14 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 ## Layout
 
-| Path                      | Job                                                                                                                     |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                  |
-| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                               |
-| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/` |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                              |
-| `content/`                | Journeys (`journeys/`), texts for journeys, UI and messages (`i18n/`), schema and example                               |
-| `scripts/`                | Maintenance scripts                                                                                                     |
+| Path                      | Job                                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                           |
+| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                        |
+| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`          |
+| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                       |
+| `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), UI and message texts (`i18n/`), schema, example |
+| `scripts/`                | Maintenance scripts                                                                                                              |
 
 ## Commands
 
@@ -32,6 +32,9 @@ npm run check
 the engine has extra rules: no clock, no `Math.random`, no console, no
 host globals), `typecheck`, `test` (Vitest: engine, then the plugin's
 adapter against a fake plugin API in `packages/plugin/test/`), `build`.
+
+`npm run journeys` runs only the journey files' schema check and the
+journey checker ([story format](story-format.md#the-journey-checker)).
 
 ## CI and releases
 
@@ -55,6 +58,11 @@ adapter against a fake plugin API in `packages/plugin/test/`), `build`.
 ## Plugin build
 
 `packages/plugin/build.mjs` uses esbuild:
+
+- Journeys come from the module `virtual:questarc-journeys`, which
+  `packages/plugin/journeys.mjs` builds from every file in
+  `content/journeys/` (for esbuild in `build.mjs` and `preview.mjs`, for
+  Vitest in `vitest.config.ts`).
 
 - `plugin.js` as a classic script (IIFE): Super Productivity runs it with
   `new Function`, so it must not contain `import`.
@@ -210,15 +218,17 @@ On a normal desktop or the phone, `flatpak run --command=gjs
 
 Needed beyond the package registries; tested 2026-11-05:
 
-| Host                                                                               | For                                                                                                          | State           |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------- |
-| `github.com`                                                                       | Git, Super Productivity source for the facts and API types                                                   | allowed         |
-| `dl.flathub.org`                                                                   | GNOME runtime for the gjs check                                                                              | allowed         |
-| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`  | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API | allowed         |
-| `doi.org`, `api.crossref.org`                                                      | Research: DOI metadata from Crossref                                                                         | allowed         |
-| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org` | Research: open full texts in university and author repositories                                              | allowed         |
-| `www.europarl.europa.eu`                                                           | Research: status of EU legislation (Digital Fairness Act)                                                    | allowed         |
-| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                     | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead     | refused by site |
-| `app.super-productivity.com`                                                       | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data            | allowed         |
-| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`       | Super Productivity's Docker image for the pinned real-app test                                               | allowed         |
-| `test-app.super-productivity.com`                                                  | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                    | allowed         |
+| Host                                                                                                                                                           | For                                                                                                               | State           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------- |
+| `github.com`                                                                                                                                                   | Git, Super Productivity source for the facts and API types                                                        | allowed         |
+| `dl.flathub.org`                                                                                                                                               | GNOME runtime for the gjs check                                                                                   | allowed         |
+| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`                                                                              | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API      | allowed         |
+| `doi.org`, `api.crossref.org`                                                                                                                                  | Research: DOI metadata from Crossref                                                                              | allowed         |
+| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org`                                                                             | Research: open full texts in university and author repositories                                                   | allowed         |
+| `www.europarl.europa.eu`                                                                                                                                       | Research: status of EU legislation (Digital Fairness Act)                                                         | allowed         |
+| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                                                                                                 | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead          | refused by site |
+| `app.super-productivity.com`                                                                                                                                   | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data                 | allowed         |
+| `raw.githubusercontent.com`                                                                                                                                    | SPDX licence texts (`content/LICENSE` is SPDX's CC-BY-SA-4.0 text, license-list-data v3.27.0)                     | allowed         |
+| `creativecommons.org`, `www.hbs.edu`, `hbr.org`, `papers.ssrn.com`, `www.interruptions.net`, `www.ics.uci.edu`, `pubmed.ncbi.nlm.nih.gov`, `journals.plos.org` | Licence texts; research for First Things First (tested 2026-11-06); PubMed abstracts come from Europe PMC instead | refused         |
+| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`                                                                                   | Super Productivity's Docker image for the pinned real-app test                                                    | allowed         |
+| `test-app.super-productivity.com`                                                                                                                              | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                         | allowed         |

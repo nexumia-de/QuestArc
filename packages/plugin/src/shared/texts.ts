@@ -1,14 +1,21 @@
 import english from '../../../../content/i18n/en.json';
+import { builtInJourneys } from './content';
 
 /**
- * UI, event and journey texts from content/i18n (docs/story-format.md,
- * texts). Shared by plugin.js and the view; Pensum reads the same files.
- * German follows with issue #39.
+ * UI and event texts from content/i18n plus each journey's own texts
+ * (docs/story-format.md, texts). Journey keys start with the journey id,
+ * so they never clash with the app's `ui.` and `event.` keys. Shared by
+ * plugin.js and the view; Pensum reads the same files. German follows
+ * with issue #39.
  */
 
 export type TextParams = Readonly<Record<string, string | number>>;
 
-const texts: Readonly<Record<string, string>> = english;
+const texts: Readonly<Record<string, string>> = Object.assign(
+  {},
+  english,
+  ...builtInJourneys.map((journey) => journey.texts?.en ?? {}),
+);
 
 export const hasText = (key: string): boolean => Object.hasOwn(texts, key);
 

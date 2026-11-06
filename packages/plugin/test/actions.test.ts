@@ -7,7 +7,7 @@ import { bindStage, continueJourney, newRunId, startJourney } from '../src/share
 import { builtInJourneys } from '../src/shared/content';
 import { createFakeHost } from './fake-host';
 
-const journey = builtInJourneys[0];
+const journey = builtInJourneys.find((j) => j.id === 'gentle-morning');
 if (!journey) throw new Error('no built-in journey');
 const day = { todayStr: '2026-11-10', startOfNextDayDiffMs: 0, timeZone: 'UTC' };
 

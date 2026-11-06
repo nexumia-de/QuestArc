@@ -1,20 +1,22 @@
 ---
 type: Reference
 title: Story format 3
-description: How a journey is written as JSON: stages with a plan, schedule, condition, optional guardian, story texts and a learning nugget; i18n keys; validation; versioning and what happens when a journey changes while someone walks it.
+description: How a journey is written as one self-contained JSON file: stages with a plan, schedule, condition, optional guardian, story texts and a learning nugget; its own texts per language and author; the journey checker; versioning and what happens when a journey changes while someone walks it.
 tags: [content, journeys, format, schema]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
 
 # Story format 3
 
-A journey is one JSON file. The schema is
+A journey is **one self-contained JSON file** with its own texts
+([decision](decisions/journeys-by-pull-request.md)). The schema is
 `content/schema/journey.schema.json` (JSON Schema 2020-12); a complete
-example is `content/examples/walking.json` with its texts in
-`content/examples/en.json`. Built-in journeys live in `content/journeys/`
-with their texts in `content/i18n/<language>.json`. CI checks every
-journey against the schema and checks that every text key has an English
-text (`packages/engine/test/content.test.ts`).
+example is `content/examples/example-walking.json`. Built-in journeys
+are the files in `content/journeys/`, named `<id>.json`; the plugin
+finds every file there (`packages/plugin/journeys.mjs`), so a new
+journey is one new file. CI checks every file against the schema and
+with the journey checker (below). How to write and publish one:
+[Writing a journey](authoring-journeys.md).
 
 Format 3 replaces both 2.x formats (projects with `📜` and tags in task
 titles, and the older `HeroStory` JSON). It takes HeroicRPG's idea that
@@ -28,11 +30,13 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `format`      | yes      | Always `3`                                                   |
 | `id`          | yes      | Lower case words with hyphens, unique, never reused          |
 | `version`     | yes      | Content version, raised on every change                      |
+| `author`      | no       | Name or pseudonym shown as "Written by …" (at most 60 chars) |
 | `title`       | yes      | Text key                                                     |
 | `description` | yes      | Text key, one or two sentences                               |
 | `why`         | no       | Text key: the prompt asking for the user's own reason        |
 | `stages`      | yes      | 2 to 12 stages, in order                                     |
 | `ending`      | no       | `{ "story": <text key> }`, shown when the last stage is done |
+| `texts`       | yes      | Texts by language: `{ "en": { <text key>: <text> }, … }`     |
 
 ## Stage
 
@@ -54,15 +58,47 @@ Productivity, and only the supported kinds can be bound
 
 - Every user-facing string is a **text key**: dot-separated, lower-case
   words with hyphens, starting with the journey id
-  (`example-walking.walk-5.action`).
-- Texts live in one flat file per language; English is required, other
-  languages fall back to English key by key.
+  (`example-walking.walk-5.action`). The ids `ui` and `event` are
+  reserved for the app's own texts in `content/i18n/<language>.json`.
+- The journey's `texts` holds one block per language (`en`, `de`,
+  `pt-BR`, …). English is required and has a text for every key; other
+  languages fall back to English key by key and may only use keys of
+  the journey.
 - Anchors and actions are written to fit the plan sentence: anchor
   "lunch", action "walk for 5 minutes".
+- The longest texts per field (360 px): title 40, description 160, why
+  120, anchor 40, action 120, place 40, guardian 40, arrival 200,
+  accept 200, nugget 240, ending 240 characters. A station's action is
+  also its name on the path, cut after two lines, so the part that
+  differs from the previous stage comes early.
+
+## The journey checker
+
+`journeyProblems()` in `packages/engine/src/content-check.ts` checks
+what can be checked without a person; `npm run journeys` runs it on
+every file, and `npm run check` (CI) includes it. A future import of
+private journeys (#40) runs the same function.
+
+| Level   | Check                                                                                                   | Rule       |
+| ------- | ------------------------------------------------------------------------------------------------------- | ---------- |
+| error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist | —          |
+| error   | the same anchor (English text) in every stage                                                           | 2          |
+| error   | text lengths above                                                                                      | —          |
+| error   | a number of days ("21 days")                                                                            | 4          |
+| error   | quotes with an author                                                                                   | 5          |
+| error   | controlling words (must, have to, you should, no excuses)                                               | 15         |
+| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                 | 11, 12, 15 |
+| error   | the same nugget twice                                                                                   | 22         |
+| warning | a `days` condition without room for one miss, or looking back more than 14 days                         | 1, 11      |
+| warning | a stage without a nugget, a journey without `why`; English texts no key uses                            | 5, 22      |
+
+The test also checks that each file is named after its id and that ids
+are unique.
 
 ## Writing a journey
 
-The [design rules](psychology.md) apply. In short:
+The [design rules](psychology.md) apply; the full guide for people and
+their agents is [Writing a journey](authoring-journeys.md). In short:
 
 - The first stage is too small to fail; each next stage is a slightly
   harder version of the same habit, with the same anchor.

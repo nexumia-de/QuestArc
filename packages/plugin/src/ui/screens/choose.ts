@@ -28,6 +28,13 @@ export const chooseScreen = (ctx: Context): Screen => ({
             { class: 'qa-muted qa-small' },
             t('ui.choose.stations', { n: journey.stages.length }),
           ),
+          journey.author
+            ? h(
+                'span',
+                { class: 'qa-muted qa-small' },
+                t('ui.journey.author', { name: journey.author }),
+              )
+            : null,
           first ? h('span', { class: 'qa-plan' }, planSentence(first)) : null,
         ),
       );

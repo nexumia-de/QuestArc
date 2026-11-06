@@ -16,6 +16,18 @@ const isInt = (v: unknown, min: number, max: number): boolean =>
   typeof v === 'number' && Number.isInteger(v) && v >= min && v <= max;
 const isKey = (v: unknown): boolean => typeof v === 'string' && KEY.test(v);
 
+const isText = (v: unknown, max: number): boolean =>
+  typeof v === 'string' && v.trim().length > 0 && v.length <= max;
+const LANG = /^[a-z]{2,3}(-[A-Z]{2})?$/;
+const textsOk = (v: unknown): boolean =>
+  isObject(v) &&
+  Object.entries(v).every(
+    ([lang, texts]) =>
+      LANG.test(lang) &&
+      isObject(texts) &&
+      Object.entries(texts).every(([key, text]) => KEY.test(key) && isText(text, 400)),
+  );
+
 const stageErrors = (stage: unknown, at: string): string[] => {
   if (!isObject(stage)) return [`${at}: not an object`];
   const errors: string[] = [];
@@ -58,6 +70,8 @@ export const journeyErrors = (value: unknown): string[] => {
   if (typeof value.id !== 'string' || !ID.test(value.id)) errors.push('id: invalid');
   if (!isInt(value.version, 1, Number.MAX_SAFE_INTEGER)) errors.push('version: invalid');
   if (!isKey(value.title) || !isKey(value.description)) errors.push('title/description: invalid');
+  if (value.author !== undefined && !isText(value.author, 60)) errors.push('author: invalid');
+  if (value.texts !== undefined && !textsOk(value.texts)) errors.push('texts: invalid');
   const stages = value.stages;
   if (!Array.isArray(stages) || stages.length < 2 || stages.length > 12) {
     errors.push('stages: 2 to 12 required');

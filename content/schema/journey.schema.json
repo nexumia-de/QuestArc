@@ -2,15 +2,21 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/nexumia-de/QuestArc/content/schema/journey.schema.json",
   "title": "QuestArc journey (story format 3)",
-  "description": "A journey: a sequence of habit stages that start tiny and grow. Texts are i18n keys resolved in content/i18n/<lang>.json. See docs/story-format.md.",
+  "description": "A journey: a sequence of habit stages that start tiny and grow. One self-contained file: every text is a key into the file's own texts. See docs/story-format.md and docs/authoring-journeys.md.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["format", "id", "version", "title", "description", "stages"],
+  "required": ["format", "id", "version", "title", "description", "stages", "texts"],
   "properties": {
     "$schema": { "type": "string" },
     "format": { "const": 3 },
     "id": { "$ref": "#/$defs/id" },
     "version": { "type": "integer", "minimum": 1 },
+    "author": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "Name or pseudonym shown as 'Written by ...'. Left out for journeys written by the QuestArc project."
+    },
     "title": { "$ref": "#/$defs/textKey" },
     "description": { "$ref": "#/$defs/textKey" },
     "why": {
@@ -28,6 +34,17 @@
       "additionalProperties": false,
       "required": ["story"],
       "properties": { "story": { "$ref": "#/$defs/textKey" } }
+    },
+    "texts": {
+      "type": "object",
+      "description": "Texts by language (en, de, pt-BR ...): text key to text. English is required; other languages may leave keys out and fall back to English.",
+      "required": ["en"],
+      "propertyNames": { "pattern": "^[a-z]{2,3}(-[A-Z]{2})?$" },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": { "$ref": "#/$defs/textKey" },
+        "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 400 }
+      }
     }
   },
   "$defs": {

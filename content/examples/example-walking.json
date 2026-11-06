@@ -1,0 +1,79 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "example-walking",
+  "version": 1,
+  "title": "example-walking.title",
+  "description": "example-walking.description",
+  "why": "example-walking.why",
+  "stages": [
+    {
+      "id": "shoes",
+      "plan": {
+        "anchor": "example-walking.anchor",
+        "action": "example-walking.shoes.action",
+        "place": "example-walking.shoes.place"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "example-walking.shoes.arrival",
+        "accept": "example-walking.shoes.accept"
+      },
+      "nugget": "example-walking.shoes.nugget"
+    },
+    {
+      "id": "walk-5",
+      "plan": {
+        "anchor": "example-walking.anchor",
+        "action": "example-walking.walk-5.action"
+      },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 },
+      "story": {
+        "arrival": "example-walking.walk-5.arrival",
+        "accept": "example-walking.walk-5.accept"
+      },
+      "nugget": "example-walking.walk-5.nugget"
+    },
+    {
+      "id": "walk-15",
+      "plan": {
+        "anchor": "example-walking.anchor",
+        "action": "example-walking.walk-15.action"
+      },
+      "schedule": { "type": "weekdays", "days": ["mon", "tue", "wed", "thu", "fri"] },
+      "condition": { "type": "days", "n": 8, "of": 10 },
+      "guardian": { "name": "example-walking.walk-15.guardian", "hp": 100 },
+      "story": {
+        "arrival": "example-walking.walk-15.arrival",
+        "accept": "example-walking.walk-15.accept"
+      },
+      "nugget": "example-walking.walk-15.nugget"
+    }
+  ],
+  "ending": { "story": "example-walking.ending" },
+  "texts": {
+    "en": {
+      "example-walking.title": "Back on your feet",
+      "example-walking.description": "From putting on your shoes after lunch to a daily walk, one small step at a time.",
+      "example-walking.why": "Why do you want to walk more? In your own words.",
+      "example-walking.anchor": "lunch",
+      "example-walking.shoes.action": "put on my walking shoes",
+      "example-walking.shoes.place": "at the door",
+      "example-walking.shoes.arrival": "The path starts at your own front door.",
+      "example-walking.shoes.accept": "Your shoes are waiting. Next, you could take them for a short walk.",
+      "example-walking.shoes.nugget": "Small enough to do on your worst day: that is what makes a first step stick.",
+      "example-walking.walk-5.action": "walk for 5 minutes",
+      "example-walking.walk-5.arrival": "The street outside feels a little more familiar.",
+      "example-walking.walk-5.accept": "Five minutes became easy. You could try a longer round.",
+      "example-walking.walk-5.nugget": "Missing one day is fine. What matters is coming back the next time.",
+      "example-walking.walk-15.action": "walk for 15 minutes",
+      "example-walking.walk-15.guardian": "The Grey Afternoon",
+      "example-walking.walk-15.arrival": "A longer path, and something grey blocks the view.",
+      "example-walking.walk-15.accept": "The afternoon cleared up.",
+      "example-walking.walk-15.nugget": "On a hard day, you could go back to 5 minutes. It still counts as showing up.",
+      "example-walking.ending": "You walk after lunch now. It is part of your day."
+    }
+  }
+}

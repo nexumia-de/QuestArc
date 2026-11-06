@@ -65,6 +65,13 @@ maintained; its code is in the git history (commit `8ec9137`).
 
 Changes per version: [CHANGELOG](CHANGELOG.md).
 
+## Write a journey
+
+Anyone can write a journey, alone or with an AI agent, and publish it for
+everyone by pull request: one file in `content/journeys/`, checked by CI
+against the design rules, merged by the owner. Your name is shown in the
+app as "Written by …". Guide: [Writing a journey](docs/authoring-journeys.md).
+
 ## Documents
 
 - [Roadmap](docs/roadmap.md): milestones and the journey.
@@ -92,4 +99,6 @@ Work items are [issues](https://github.com/nexumia-de/QuestArc/issues) in
 QuestArc is free software under the GNU Affero General Public License,
 version 3 or later ([LICENSE](LICENSE)), © 2026 suitably. The copy of
 Super Productivity's plugin API types in `packages/sp-plugin-api` keeps
-its MIT licence.
+its MIT licence. Journeys in `content/journeys/` and `content/examples/`
+are under [CC BY-SA 4.0](content/LICENSE); their authors are named in
+each file (`author`) or are the QuestArc project.
