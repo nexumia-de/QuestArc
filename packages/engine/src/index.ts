@@ -23,6 +23,15 @@ export {
   withdraw,
 } from './actions';
 export type { RecordChanges } from './actions';
+export {
+  buildSnapshot,
+  isRelevant,
+  relevantIds,
+  snapshotFromHost,
+  toRepeatCfg,
+  toTask,
+} from './host-data';
+export type { HostInput, HostRepeatCfg, HostTask, Records, SnapshotInput } from './host-data';
 export { diff } from './diff';
 export { journeyErrors, isJourney } from './validate';
 export { journeyProblems, TEXT_LIMITS } from './content-check';

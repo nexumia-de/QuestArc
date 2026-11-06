@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadRecords } from '../src/adapter/records';
-import { buildSnapshot } from '../src/adapter/snapshot';
+import { buildSnapshot } from '@questarc/engine';
 import { createFakeHost } from './fake-host';
 
 describe('choice records', () => {

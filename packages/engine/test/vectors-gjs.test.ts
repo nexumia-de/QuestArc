@@ -73,4 +73,23 @@ describe.skipIf(!gjs)('test vectors in gjs', () => {
       { error: 'unknown action nope' },
     ]);
   });
+
+  it('evaluates raw Super Productivity objects, the way Pensum passes them', () => {
+    const view = JSON.parse(
+      execFileSync(gjs as string, ['-m', cli], {
+        input: JSON.stringify({
+          evaluateHost: {
+            day: { todayStr: '2026-11-06', startOfNextDayDiffMs: 0, timeZone: 'UTC' },
+            live: [{ id: 't', isDone: false, title: 'ignored', subTaskIds: [] }],
+            archived: [],
+            repeatCfgs: [],
+            records: {},
+            journeys: [],
+          },
+        }),
+        encoding: 'utf8',
+      }),
+    ) as { todayStr?: string };
+    expect(view.todayStr).toBe('2026-11-06');
+  });
 });

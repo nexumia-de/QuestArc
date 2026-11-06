@@ -1,4 +1,12 @@
-import { diff, evaluate } from '@questarc/engine';
+import {
+  buildSnapshot,
+  diff,
+  evaluate,
+  isRelevant,
+  relevantIds,
+  toRepeatCfg,
+  toTask,
+} from '@questarc/engine';
 import type { GameEvent, GameView, Journey, SnapshotTask } from '@questarc/engine';
 
 import type { State } from '../shared/protocol';
@@ -6,7 +14,6 @@ import { readDay } from './day';
 import type { HostApi } from './host';
 import { loadRecords, writeRecords, type Records } from './records';
 import { repeatPauseChanges } from './repeat-pause';
-import { buildSnapshot, isRelevant, relevantIds, toRepeatCfg, toTask } from './snapshot';
 
 /**
  * Keeps the current game view in plugin.js, whether the view is open or

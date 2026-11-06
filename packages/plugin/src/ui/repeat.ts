@@ -1,7 +1,6 @@
-import { isSupported, type Schedule } from '@questarc/engine';
+import { isSupported, toRepeatCfg, type HostRepeatCfg, type Schedule } from '@questarc/engine';
 import type { PluginTaskRepeatCfg, Task } from '@questarc/sp-plugin-api';
 
-import { toRepeatCfg } from '../adapter/snapshot';
 import { t } from '../shared/texts';
 
 /**
@@ -21,7 +20,8 @@ const DAYS = [
 ] as const;
 const SHORT = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
-export const supported = (cfg: PluginTaskRepeatCfg): boolean => isSupported(toRepeatCfg(cfg));
+export const supported = (cfg: PluginTaskRepeatCfg): boolean =>
+  isSupported(toRepeatCfg(cfg as unknown as HostRepeatCfg));
 
 /** The schedule of a supported config in story-format terms. */
 export const scheduleOf = (cfg: PluginTaskRepeatCfg): Schedule | undefined => {
