@@ -97,6 +97,27 @@ Chromium that the cloud environment provides (not a dependency of the
 repository); open `dist/preview/index.html?demo=walking&theme=dark` in any
 browser to look at it by hand.
 
+## In the real app
+
+`packages/plugin/e2e/real-app.mjs` tries the built ZIP in Super
+Productivity's web app (`app.super-productivity.com`) in a fresh browser
+profile with throwaway data: install and enable, start "A gentle
+morning", create the task, make it recurring in Super Productivity's own
+dialog, tick it off, check the message and the journey. Screenshots go to
+`packages/plugin/dist/real-app/`.
+
+```sh
+npm run build -w @questarc/plugin
+```
+
+```sh
+cd packages/plugin && node e2e/real-app.mjs 360 720
+```
+
+It needs the live app, so it is not part of `npm run check`; a pinned
+test in CI is #50. Uploaded plugins start disabled; the script switches
+QuestArc on.
+
 ## Plugin API types
 
 The npm package `@super-productivity/plugin-api` is outdated (1.0.1, June
@@ -169,4 +190,5 @@ Needed beyond the package registries; tested 2026-11-05:
 | `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org` | Research: open full texts in university and author repositories                                              | allowed         |
 | `www.europarl.europa.eu`                                                           | Research: status of EU legislation (Digital Fairness Act)                                                    | allowed         |
 | `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                     | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead     | refused by site |
-| `test-app.super-productivity.com`                                                  | Trying the plugin ZIP in the real app with throwaway data                                                    | blocked         |
+| `app.super-productivity.com`                                                       | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data            | allowed         |
+| `test-app.super-productivity.com`                                                  | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                    | allowed         |

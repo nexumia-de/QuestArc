@@ -164,9 +164,10 @@ words.
 Per [recurring-task setup](decisions/recurring-task-setup.md):
 
 1. "Your plan: After lunch, I will walk for 5 minutes. Suggested: daily."
-2. **Create the task**: QuestArc creates the task and opens it. "Set
-   **Repeat** to daily in the task's details; QuestArc picks it up
-   automatically." The station waits until the task repeats.
+2. **Create the task**: QuestArc creates the task and opens it. "Open
+   the task, choose Schedule Task, then Repeat, and set it to: Every day.
+   QuestArc picks it up by itself." The station waits until the task
+   repeats.
 3. Or **Use an existing task**: a picker of recurring tasks with a
    supported schedule.
 4. If the schedule is not supported: "Journeys work with daily, every
