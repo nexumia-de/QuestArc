@@ -17,6 +17,7 @@ export {
   continueJourney,
   endJourney,
   pauseJourney,
+  repeatPause,
   resumeJourney,
   setMode,
   startJourney,

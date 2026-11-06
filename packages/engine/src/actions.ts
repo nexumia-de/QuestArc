@@ -105,6 +105,15 @@ export const endJourney = (runId: string, today: string): RecordChanges => ({
   [`run-end:${runId}`]: { day: today, reason: 'abandoned' },
 });
 
+/**
+ * The bound repeat config of the active stage was paused or resumed in
+ * the task app (game rules §2, pauses): a paused config carries no
+ * dates, so the day is recorded.
+ */
+export const repeatPause = (runId: string, today: string, paused: boolean): RecordChanges => ({
+  [`pause:${runId}:${today}`]: { action: paused ? 'pause' : 'resume', source: 'repeat-cfg' },
+});
+
 /** Answer the weekly look back (design rule 9): the automaticity score 1–7. */
 export const answerCheckin = (
   runId: string,
@@ -127,6 +136,7 @@ export const actions = {
   pauseJourney,
   resumeJourney,
   endJourney,
+  repeatPause,
   answerCheckin,
   setMode,
   withdraw,

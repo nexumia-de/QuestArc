@@ -1,4 +1,4 @@
-import type { GameView, SnapshotRepeatCfg } from '@questarc/engine';
+import { repeatPause, type GameView, type SnapshotRepeatCfg } from '@questarc/engine';
 
 import type { Records } from './records';
 
@@ -29,5 +29,5 @@ export const repeatPauseChanges = (
   const key = `pause:${run.runId}:${view.todayStr}`;
   const action = paused ? 'pause' : 'resume';
   if ((records[key] as { action?: string } | undefined)?.action === action) return {};
-  return { [key]: { action, source: 'repeat-cfg' } };
+  return repeatPause(run.runId, view.todayStr, paused);
 };
