@@ -1,4 +1,4 @@
-import { continueJourney } from '../../shared/actions';
+import { continueJourney } from '@questarc/engine';
 import { planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';

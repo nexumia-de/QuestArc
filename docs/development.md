@@ -167,22 +167,24 @@ the commit in that package's README and in
 
 The engine (`packages/engine/src`) has one job per file:
 
-| File             | Job                                                              |
-| ---------------- | ---------------------------------------------------------------- |
-| `types/*.ts`     | Input (snapshot), journey and output (game view) types           |
-| `days.ts`        | Logical days, date arithmetic, ISO weeks                         |
-| `schedule.ts`    | Supported repeat schedules and their occurrences                 |
-| `choices.ts`     | Parsing the choice records                                       |
-| `binding.ts`     | A stage's repeat config and its instances                        |
-| `completions.ts` | Which day a completion counts for, minutes tracked               |
-| `timeline.ts`    | Due days, misses, runs, welcome backs                            |
-| `conditions.ts`  | Stage conditions                                                 |
-| `xp.ts`          | XP and level                                                     |
-| `run.ts`         | One journey run: stations, current stage, guardians, checkpoints |
-| `validate.ts`    | Structural check of journeys                                     |
-| `evaluate.ts`    | The whole game view                                              |
-| `diff.ts`        | Events between two views                                         |
-| `cli-gjs.ts`     | The gjs wrapper (`evaluate`, `diff`, `batch` requests on stdin)  |
+| File               | Job                                                              |
+| ------------------ | ---------------------------------------------------------------- |
+| `types/*.ts`       | Input (snapshot), journey and output (game view) types           |
+| `days.ts`          | Logical days, date arithmetic, ISO weeks                         |
+| `schedule.ts`      | Supported repeat schedules and their occurrences                 |
+| `choices.ts`       | Parsing the choice records                                       |
+| `binding.ts`       | A stage's repeat config and its instances                        |
+| `completions.ts`   | Which day a completion counts for, minutes tracked               |
+| `timeline.ts`      | Due days, misses, runs, welcome backs                            |
+| `conditions.ts`    | Stage conditions                                                 |
+| `xp.ts`            | XP and level                                                     |
+| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints |
+| `validate.ts`      | Structural check of journeys                                     |
+| `evaluate.ts`      | The whole game view                                              |
+| `diff.ts`          | Events between two views                                         |
+| `actions.ts`       | The choice records each user action writes, for both hosts       |
+| `content-check.ts` | The journey checker                                              |
+| `cli-gjs.ts`       | The gjs wrapper (`evaluate`, `diff`, `action`, `batch` on stdin) |
 
 Test vectors (`packages/engine/vectors/*.json`) hold every worked example
 of the [game rules](game-rules.md) and the edge cases from the
@@ -218,17 +220,19 @@ On a normal desktop or the phone, `flatpak run --command=gjs
 
 Needed beyond the package registries; tested 2026-11-05:
 
-| Host                                                                                                                                                           | For                                                                                                               | State           |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------- |
-| `github.com`                                                                                                                                                   | Git, Super Productivity source for the facts and API types                                                        | allowed         |
-| `dl.flathub.org`                                                                                                                                               | GNOME runtime for the gjs check                                                                                   | allowed         |
-| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`                                                                              | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API      | allowed         |
-| `doi.org`, `api.crossref.org`                                                                                                                                  | Research: DOI metadata from Crossref                                                                              | allowed         |
-| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org`                                                                             | Research: open full texts in university and author repositories                                                   | allowed         |
-| `www.europarl.europa.eu`                                                                                                                                       | Research: status of EU legislation (Digital Fairness Act)                                                         | allowed         |
-| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                                                                                                 | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead          | refused by site |
-| `app.super-productivity.com`                                                                                                                                   | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data                 | allowed         |
-| `raw.githubusercontent.com`                                                                                                                                    | SPDX licence texts (`content/LICENSE` is SPDX's CC-BY-SA-4.0 text, license-list-data v3.27.0)                     | allowed         |
-| `creativecommons.org`, `www.hbs.edu`, `hbr.org`, `papers.ssrn.com`, `www.interruptions.net`, `www.ics.uci.edu`, `pubmed.ncbi.nlm.nih.gov`, `journals.plos.org` | Licence texts; research for First Things First (tested 2026-11-06); PubMed abstracts come from Europe PMC instead | refused         |
-| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`                                                                                   | Super Productivity's Docker image for the pinned real-app test                                                    | allowed         |
-| `test-app.super-productivity.com`                                                                                                                              | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                         | allowed         |
+| Host                                                                                                        | For                                                                                                               | State           |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------- |
+| `github.com`                                                                                                | Git, Super Productivity source for the facts and API types                                                        | allowed         |
+| `dl.flathub.org`                                                                                            | GNOME runtime for the gjs check                                                                                   | allowed         |
+| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`                           | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API      | allowed         |
+| `doi.org`, `api.crossref.org`                                                                               | Research: DOI metadata from Crossref                                                                              | allowed         |
+| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org`                          | Research: open full texts in university and author repositories                                                   | allowed         |
+| `www.europarl.europa.eu`                                                                                    | Research: status of EU legislation (Digital Fairness Act)                                                         | allowed         |
+| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                                              | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead          | refused by site |
+| `app.super-productivity.com`                                                                                | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data                 | allowed         |
+| `raw.githubusercontent.com`                                                                                 | SPDX licence texts (`content/LICENSE` is SPDX's CC-BY-SA-4.0 text, license-list-data v3.27.0)                     | allowed         |
+| `www.interruptions.net`, `hbr.org`                                                                          | Research: author PDFs of interruption studies (index `literature.htm`), HBR article text                          | allowed         |
+| `www.hbs.edu`                                                                                               | Research: HBS working papers; reachable, but HBS answers automated requests with 403                              | refused by site |
+| `creativecommons.org`, `papers.ssrn.com`, `www.ics.uci.edu`, `pubmed.ncbi.nlm.nih.gov`, `journals.plos.org` | Licence texts; research for First Things First (tested 2026-11-06); PubMed abstracts come from Europe PMC instead | refused         |
+| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`                                | Super Productivity's Docker image for the pinned real-app test                                                    | allowed         |
+| `test-app.super-productivity.com`                                                                           | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                         | allowed         |

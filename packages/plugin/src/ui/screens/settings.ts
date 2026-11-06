@@ -1,3 +1,5 @@
+import { setMode } from '@questarc/engine';
+
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import type { Context, Screen } from '../screen';
@@ -10,7 +12,7 @@ export const settingsScreen = (ctx: Context): Screen => ({
   body: h(
     'div',
     { class: 'qa-stack' },
-    modeChoice(ctx.state.view.mode, (mode) => void ctx.write({ settings: { mode } })),
+    modeChoice(ctx.state.view.mode, (mode) => void ctx.write(setMode(mode))),
     h(
       'button',
       {

@@ -1,4 +1,4 @@
-import { endJourney, pauseJourney, resumeJourney } from '../../shared/actions';
+import { endJourney, pauseJourney, resumeJourney, withdraw } from '@questarc/engine';
 import { t } from '../../shared/texts';
 import { banners } from '../banners';
 import { h } from '../dom';
@@ -39,7 +39,7 @@ export const homeScreen = (ctx: Context): Screen => {
                   type: 'button',
                   onclick: () => {
                     delete ctx.draft.ended;
-                    void ctx.write({ [`run-end:${ended.runId}`]: '' });
+                    void ctx.write(withdraw(`run-end:${ended.runId}`));
                   },
                 },
                 t('ui.action.undo'),

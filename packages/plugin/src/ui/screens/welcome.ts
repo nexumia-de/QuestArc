@@ -1,3 +1,5 @@
+import { setMode } from '@questarc/engine';
+
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import type { Context, Screen } from '../screen';
@@ -7,7 +9,7 @@ import { modeChoice } from './mode-choice';
 export const welcomeScreen = (ctx: Context): Screen => {
   const mode = (ctx.draft.mode as 'calm' | 'rpg' | undefined) ?? 'calm';
   const start = async () => {
-    await ctx.write({ settings: { mode } });
+    await ctx.write(setMode(mode));
     ctx.reset({ name: 'home' });
     ctx.go({ name: 'choose' });
   };

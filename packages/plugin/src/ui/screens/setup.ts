@@ -1,4 +1,4 @@
-import { bindStage } from '../../shared/actions';
+import { bindStage } from '@questarc/engine';
 import { capitalise, planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';

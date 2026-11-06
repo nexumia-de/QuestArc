@@ -1,6 +1,5 @@
-import { isoWeek, type Journey, type RunView } from '@questarc/engine';
+import { isoWeek, resumeJourney, withdraw, type Journey, type RunView } from '@questarc/engine';
 
-import { resumeJourney } from '../shared/actions';
 import { t } from '../shared/texts';
 import { h } from './dom';
 import { shortDate } from './journey/format';
@@ -33,7 +32,7 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
         t('ui.banner.ended', { title: ended.title }),
         button(t('ui.action.undo'), () => {
           delete ctx.draft.ended;
-          void ctx.write({ [`run-end:${ended.runId}`]: '' });
+          void ctx.write(withdraw(`run-end:${ended.runId}`));
         }),
       ),
     );

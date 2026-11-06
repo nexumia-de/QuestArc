@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import { useForCurrentStation } from '../src/adapter/context-menu';
 import { createBrain } from '../src/adapter/brain';
-import { bindStage, continueJourney, newRunId, startJourney } from '../src/shared/actions';
+import { bindStage, continueJourney, startJourney } from '@questarc/engine';
+
+import { newRunId } from '../src/shared/run-id';
 import { builtInJourneys } from '../src/shared/content';
 import { createFakeHost } from './fake-host';
 

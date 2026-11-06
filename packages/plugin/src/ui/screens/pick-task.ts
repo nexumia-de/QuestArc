@@ -1,4 +1,4 @@
-import { bindStage } from '../../shared/actions';
+import { bindStage } from '@questarc/engine';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';

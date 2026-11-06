@@ -1,4 +1,6 @@
-import { newRunId, startJourney } from '../../shared/actions';
+import { startJourney } from '@questarc/engine';
+
+import { newRunId } from '../../shared/run-id';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { firstOfNextMonth, nextMonday, shortDate } from '../journey/format';

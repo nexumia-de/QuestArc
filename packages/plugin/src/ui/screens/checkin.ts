@@ -1,4 +1,4 @@
-import { isoWeek } from '@questarc/engine';
+import { answerCheckin, isoWeek } from '@questarc/engine';
 
 import { capitalise } from '../../shared/plan';
 import { t } from '../../shared/texts';
@@ -26,7 +26,7 @@ export const checkinScreen = (ctx: Context): Screen => {
     anchor: t(stage.plan.anchor),
   });
   const answer = (score: number) => async () => {
-    await ctx.write({ [`checkin:${run.runId}:${stage.id}:${week}`]: { score } });
+    await ctx.write(answerCheckin(run.runId, stage.id, week, score));
     ctx.back();
   };
   const skip = () => {
