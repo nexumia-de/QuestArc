@@ -81,9 +81,16 @@ binds the chosen task to the active journey's current stage
 (`adapter/context-menu.ts`). A task that does not repeat yet is bound too;
 the stage waits until the user sets its repeat.
 
+## Paused repeats
+
+When the active stage's bound repeat config changes between paused and
+not paused in Super Productivity, plugin.js writes a `pause` or `resume`
+record with `source: "repeat-cfg"` for that day
+([game rules](game-rules.md) §2, `adapter/repeat-pause.ts`). The first
+evaluation after start only remembers the state. Devices that see the
+same change write the same record.
+
 ## Not yet
 
-- Writing pause records when the bound repeat config is paused or resumed
-  ([game rules](game-rules.md) §2) comes with pause and resume (#55).
 - The level in the header button (#32): `registerHeaderButton` cannot
   update a label ([facts](super-productivity-facts.md) §7).

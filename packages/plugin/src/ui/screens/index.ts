@@ -1,12 +1,15 @@
 import type { Context, Route, Screen } from '../screen';
+import { checkinScreen } from './checkin';
 import { chooseScreen } from './choose';
 import { continueScreen } from './continue';
 import { finishedScreen } from './finished';
 import { homeScreen } from './home';
+import { motivatesScreen } from './motivates';
 import { pickTaskScreen } from './pick-task';
 import { previewScreen } from './preview';
 import { settingsScreen } from './settings';
 import { setupScreen } from './setup';
+import { shelfScreen } from './shelf';
 import { startScreen } from './start';
 import { stationScreen } from './station';
 import { welcomeScreen } from './welcome';
@@ -36,5 +39,11 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
       return continueScreen(ctx);
     case 'finished':
       return finishedScreen(ctx, route.journeyId);
+    case 'checkin':
+      return checkinScreen(ctx);
+    case 'shelf':
+      return shelfScreen(ctx);
+    case 'motivates':
+      return motivatesScreen();
   }
 };

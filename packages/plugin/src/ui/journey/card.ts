@@ -114,5 +114,6 @@ export const stationCard = (
         )
       : null,
     hint(station, today) ? h('p', { class: 'qa-muted qa-small' }, hint(station, today)) : null,
+    run.why ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why })) : null,
   ) as HTMLElement;
 };

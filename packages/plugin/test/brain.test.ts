@@ -164,3 +164,40 @@ describe('hooks', () => {
     expect(refresh.mock.calls).toEqual([['records'], ['archive'], ['tasks']]);
   });
 });
+
+describe('repeat paused in Super Productivity', () => {
+  it('writes a pause record when the bound repeat is paused, and a resume record after', async () => {
+    const { brain, host } = setUp(['2026-10-31', '2026-11-01']);
+    await brain.state();
+    (host.repeatCfgs.cfg1 as { isPaused: boolean }).isPaused = true;
+    brain.refresh('tasks');
+    await settle();
+    expect(JSON.parse(host.data[`pause:${RUN}:2026-11-02`] ?? '')).toEqual({
+      action: 'pause',
+      source: 'repeat-cfg',
+    });
+    expect((await brain.state()).view.active?.paused).toBe(true);
+
+    host.today = '2026-11-04';
+    (host.repeatCfgs.cfg1 as { isPaused: boolean }).isPaused = false;
+    brain.refresh('tasks');
+    await settle();
+    expect(JSON.parse(host.data[`pause:${RUN}:2026-11-04`] ?? '')).toEqual({
+      action: 'resume',
+      source: 'repeat-cfg',
+    });
+    const station = (await brain.state()).view.active?.stations[0];
+    // 11-02 and 11-03 were paused, not missed.
+    expect(station?.lastDays?.filter((d) => d.mark === 'paused').map((d) => d.day)).toEqual([
+      '2026-11-02',
+      '2026-11-03',
+    ]);
+  });
+
+  it('only remembers the state on the first look', async () => {
+    const { brain, host } = setUp(['2026-11-01']);
+    (host.repeatCfgs.cfg1 as { isPaused: boolean }).isPaused = true;
+    await brain.state();
+    expect(Object.keys(host.data).some((key) => key.startsWith('pause:'))).toBe(false);
+  });
+});

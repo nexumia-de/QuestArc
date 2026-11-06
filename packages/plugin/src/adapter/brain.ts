@@ -5,6 +5,7 @@ import type { State } from '../shared/protocol';
 import { readDay } from './day';
 import type { HostApi } from './host';
 import { loadRecords, writeRecords, type Records } from './records';
+import { repeatPauseChanges } from './repeat-pause';
 import { buildSnapshot, isRelevant, relevantIds, toRepeatCfg, toTask } from './snapshot';
 
 /**
@@ -48,6 +49,7 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
   let timer: ReturnType<typeof setTimeout> | undefined;
   let queue: Promise<State | undefined> = Promise.resolve(undefined);
   let revision = 0;
+  const pauseSeen = new Map<string, boolean>();
 
   const evaluateOnce = async (): Promise<State> => {
     records ??= await loadRecords(api);
@@ -61,16 +63,23 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
     liveRelevant = nowRelevant;
     archived ??= (await api.getArchivedTasks()).map(toTask);
 
-    const view = evaluate(
+    const repeatCfgs = Object.values(app.taskRepeatCfgs).map(toRepeatCfg);
+    const snapshotOf = (choices: Records) =>
       buildSnapshot({
         day,
         live,
-        archived,
-        repeatCfgs: Object.values(app.taskRepeatCfgs).map(toRepeatCfg),
-        records,
+        archived: archived ?? [],
+        repeatCfgs,
+        records: choices,
         journeys,
-      }),
-    );
+      });
+    let view = evaluate(snapshotOf(records));
+    const pauses = repeatPauseChanges(pauseSeen, view, records, repeatCfgs);
+    if (Object.keys(pauses).length > 0) {
+      await writeRecords(api, pauses);
+      records = { ...records, ...pauses };
+      view = evaluate(snapshotOf(records));
+    }
     const before = current?.view;
     revision += 1;
     current = { revision, view, journeys, records };

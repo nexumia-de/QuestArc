@@ -92,10 +92,14 @@ overwrite each other. Most records are written once and never changed.
 - **Run ids** are random identifiers made by the host when a journey
   starts (`crypto.randomUUID()`); the engine never makes ids. A run is one
   walk through a journey, so a journey can be walked again later.
-- **Active journey:** the newest run without a `run-end` record. If two
-  devices start different journeys before syncing, the one with the later
-  `startDay` (then the larger run id) is active and the other counts as
-  paused; nothing is lost.
+- **Active journey:** the open run (no `run-end` record) that was started
+  or resumed last: the later of its `startDay` and its last `resume`
+  record. On the same day a run that is not paused wins, then the larger
+  run id. Starting a journey writes a `pause` record for the journey that
+  was active; resuming one writes a `resume` record for it and a `pause`
+  record for the active one, so a waiting journey's days are never
+  misses. If two devices start different journeys before syncing, both
+  stay open and one is active; nothing is lost.
 - **Withdrawing a record** (undo an acceptance, bring a graduated habit
   back, remove an imported journey): write an empty string to its key.
   `listSyncedDataKeys` lists only non-empty keys, and the engine ignores

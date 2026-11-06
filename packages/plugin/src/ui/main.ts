@@ -52,5 +52,8 @@ document.addEventListener('visibilitychange', () => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') app.back();
 });
+document.addEventListener('click', (event) => {
+  if (!(event.target as Element | null)?.closest('.qa-menu-wrap')) app.closeMenu();
+});
 
 void load();

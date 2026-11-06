@@ -1,0 +1,41 @@
+{
+  "name": "Starting a journey on the day another was resumed: the one not paused is active",
+  "rule": "data-model \u00a72, active journey",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-06",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "UTC"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:ra": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "run:rb": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-06"
+      },
+      "pause:ra:2026-11-06": {
+        "action": "pause",
+        "source": "user"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "runId": "rb"
+    },
+    "paused": [
+      {
+        "runId": "ra"
+      }
+    ]
+  }
+}

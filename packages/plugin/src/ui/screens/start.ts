@@ -50,7 +50,9 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
         runId,
         journey,
         startDay: days[choice],
+        today,
         why: (ctx.draft.why as string | undefined) ?? '',
+        ...(view.active ? { activeRunId: view.active.runId } : {}),
       }),
     );
     ctx.reset({ name: 'home' });

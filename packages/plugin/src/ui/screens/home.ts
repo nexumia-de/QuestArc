@@ -1,8 +1,10 @@
+import { endJourney, pauseJourney, resumeJourney } from '../../shared/actions';
 import { t } from '../../shared/texts';
+import { banners } from '../banners';
 import { h } from '../dom';
 import { stationCard } from '../journey/card';
 import { journeyPath, scrollFor } from '../journey/path';
-import type { Context, Screen } from '../screen';
+import type { Context, MenuItem, Screen } from '../screen';
 
 /**
  * Screen 4, the journey (docs/behaviour.md): the path, opened scrolled to
@@ -13,14 +15,43 @@ export const homeScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
   const run = view.active;
   const journey = run && journeys.find((j) => j.id === run.journeyId);
+  const shelfItem: MenuItem = {
+    label: t('ui.shelf.title'),
+    onSelect: () => ctx.go({ name: 'shelf' }),
+  };
   if (!run || !journey) {
+    const ended = ctx.draft.ended as { runId: string; title: string } | undefined;
     return {
       title: t('ui.app.name'),
+      menu: [shelfItem],
       body: h(
         'div',
-        { class: 'qa-empty' },
-        h('h2', { class: 'qa-heading' }, t('ui.home.empty.title')),
-        h('p', { class: 'qa-muted' }, t('ui.home.empty.text')),
+        { class: 'qa-stack' },
+        ended
+          ? h(
+              'div',
+              { class: 'qa-banner', role: 'status' },
+              h('p', {}, t('ui.banner.ended', { title: ended.title })),
+              h(
+                'button',
+                {
+                  class: 'qa-btn qa-btn-text',
+                  type: 'button',
+                  onclick: () => {
+                    delete ctx.draft.ended;
+                    void ctx.write({ [`run-end:${ended.runId}`]: '' });
+                  },
+                },
+                t('ui.action.undo'),
+              ),
+            )
+          : null,
+        h(
+          'div',
+          { class: 'qa-empty' },
+          h('h2', { class: 'qa-heading' }, t('ui.home.empty.title')),
+          h('p', { class: 'qa-muted' }, t('ui.home.empty.text')),
+        ),
       ),
       actions: [
         h(
@@ -61,15 +92,45 @@ export const homeScreen = (ctx: Context): Screen => {
           ]
         : [];
 
+  const today = view.todayStr;
+  const menu: MenuItem[] = [
+    run.paused
+      ? {
+          label: t('ui.action.resume'),
+          onSelect: () => void ctx.write(resumeJourney(run.runId, today)),
+        }
+      : {
+          label: t('ui.menu.pause'),
+          onSelect: () => void ctx.write(pauseJourney(run.runId, today)),
+        },
+    {
+      // Undo, not confirm: ending is one record, withdrawn by Undo.
+      label: t('ui.menu.end'),
+      onSelect: () => {
+        const title = t(journey.title);
+        void ctx
+          .write(endJourney(run.runId, today))
+          .then(() => ctx.reset({ name: 'home' }, { ended: { runId: run.runId, title } }));
+      },
+    },
+    shelfItem,
+  ];
+
   return {
     title: t(journey.title),
     layout: 'fill',
+    menu,
     body: h(
       'div',
       { class: 'qa-journey' },
       rpg ? h('p', { class: 'qa-chip qa-level' }, t('ui.level', { level: view.level })) : null,
       scroller,
-      stationCard(run, journey, rpg, view.todayStr) ?? null,
+      h(
+        'div',
+        { class: 'qa-card-area' },
+        ...banners(ctx, run, journey),
+        stationCard(run, journey, rpg, view.todayStr) ?? null,
+      ),
     ),
     actions,
     onShow: () => {

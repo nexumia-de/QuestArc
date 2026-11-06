@@ -23,6 +23,15 @@ export const welcomeScreen = (ctx: Context): Screen => {
       modeChoice(mode, (m) => {
         ctx.draft.mode = m;
       }),
+      h(
+        'button',
+        {
+          class: 'qa-btn qa-btn-text qa-link',
+          type: 'button',
+          onclick: () => ctx.go({ name: 'motivates' }),
+        },
+        t('ui.settings.motivates'),
+      ),
     ),
     actions: [
       h(

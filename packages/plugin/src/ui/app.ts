@@ -2,7 +2,7 @@ import type { State } from '../shared/protocol';
 import { t } from '../shared/texts';
 import type { Client } from './client';
 import { h, icon, ICONS } from './dom';
-import type { Context, Route, Screen } from './screen';
+import type { Context, MenuItem, Route, Screen } from './screen';
 import { screenFor } from './screens';
 
 /**
@@ -14,6 +14,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
   let state: State | undefined;
   let stack: { route: Route; draft: Record<string, unknown> }[] = [];
   let error: string | undefined;
+  let menuOpen = false;
 
   const entry = (route: Route) => ({ route, draft: {} });
   const firstRoute = (s: State): Route =>
@@ -23,6 +24,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
     state: s,
     draft: stack.at(-1)?.draft ?? {},
     go: (route) => {
+      menuOpen = false;
       stack = [...stack, entry(route)];
       render(true);
     },
@@ -31,8 +33,9 @@ export const createApp = (root: HTMLElement, client: Client) => {
       render(true);
     },
     redraw: () => render(false),
-    reset: (route) => {
-      stack = [entry(route)];
+    reset: (route, draft = {}) => {
+      menuOpen = false;
+      stack = [{ route, draft }];
       render(true);
     },
     write: async (records) => {
@@ -44,6 +47,76 @@ export const createApp = (root: HTMLElement, client: Client) => {
       }
     },
   });
+
+  const settingsButton = (screen: Screen, ctx: Context): Node =>
+    screen.noSettings
+      ? h('span', { class: 'qa-header-spacer' })
+      : h(
+          'button',
+          {
+            class: 'qa-icon-btn',
+            type: 'button',
+            title: t('ui.settings.title'),
+            'aria-label': t('ui.settings.title'),
+            onclick: () => ctx.go({ name: 'settings' }),
+          },
+          icon(ICONS.settings),
+        );
+
+  // The screen's menu (e.g. Pause, End journey) plus Settings, as a list
+  // under the header; closed by choosing, Escape or a tap elsewhere.
+  const menuButton = (items: readonly MenuItem[], ctx: Context): Node => {
+    const all = [
+      ...items,
+      { label: t('ui.settings.title'), onSelect: () => ctx.go({ name: 'settings' }) },
+    ];
+    return h(
+      'div',
+      { class: 'qa-menu-wrap' },
+      h(
+        'button',
+        {
+          class: 'qa-icon-btn',
+          type: 'button',
+          title: t('ui.action.menu'),
+          'aria-label': t('ui.action.menu'),
+          'aria-haspopup': 'true',
+          'aria-expanded': menuOpen ? 'true' : 'false',
+          onclick: () => {
+            menuOpen = !menuOpen;
+            render(false);
+          },
+        },
+        icon(ICONS.menu),
+      ),
+      menuOpen
+        ? h(
+            'ul',
+            { class: 'qa-menu', role: 'menu' },
+            ...all.map((item) =>
+              h(
+                'li',
+                { role: 'none' },
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    role: 'menuitem',
+                    class: 'qa-menu-item',
+                    onclick: () => {
+                      menuOpen = false;
+                      item.onSelect();
+                      render(false);
+                    },
+                  },
+                  item.label,
+                ),
+              ),
+            ),
+          )
+        : null,
+    );
+  };
 
   const header = (screen: Screen, ctx: Context): HTMLElement =>
     h(
@@ -63,19 +136,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
           )
         : h('span', { class: 'qa-header-spacer' }),
       h('h1', { class: 'qa-title' }, screen.title),
-      screen.noSettings
-        ? h('span', { class: 'qa-header-spacer' })
-        : h(
-            'button',
-            {
-              class: 'qa-icon-btn',
-              type: 'button',
-              title: t('ui.settings.title'),
-              'aria-label': t('ui.settings.title'),
-              onclick: () => ctx.go({ name: 'settings' }),
-            },
-            icon(ICONS.settings),
-          ),
+      screen.menu ? menuButton(screen.menu, ctx) : settingsButton(screen, ctx),
     ) as HTMLElement;
 
   const render = (navigated: boolean): void => {
@@ -126,7 +187,15 @@ export const createApp = (root: HTMLElement, client: Client) => {
       else root.replaceChildren(h('p', { class: 'qa-callout', role: 'alert' }, text));
     },
     back: () => {
-      if (state && stack.length > 1) context(state).back();
+      if (menuOpen) {
+        menuOpen = false;
+        render(false);
+      } else if (state && stack.length > 1) context(state).back();
+    },
+    closeMenu: () => {
+      if (!menuOpen) return;
+      menuOpen = false;
+      render(false);
     },
   };
 };

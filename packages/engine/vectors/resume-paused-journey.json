@@ -1,0 +1,52 @@
+{
+  "name": "Resuming a paused journey makes it active again; the other one is paused",
+  "rule": "data-model \u00a72, active journey",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-06",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "UTC"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:ra": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "run:rb": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-03"
+      },
+      "pause:ra:2026-11-03": {
+        "action": "pause",
+        "source": "user"
+      },
+      "pause:rb:2026-11-05": {
+        "action": "pause",
+        "source": "user"
+      },
+      "pause:ra:2026-11-05": {
+        "action": "resume",
+        "source": "user"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "runId": "ra",
+      "paused": false
+    },
+    "paused": [
+      {
+        "runId": "rb",
+        "paused": true
+      }
+    ],
+    "finished": []
+  }
+}
