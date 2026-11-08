@@ -1,4 +1,4 @@
-@../phosh-toolkit/AGENTS.md
+@../phosh-toolkit/agents/core.md
 
 # QuestArc
 
@@ -9,18 +9,10 @@ game page in [Pensum](https://github.com/nexumia-de/pensum), the native
 Phosh app on the same data. Knowledge of this repository:
 [docs/index.md](docs/index.md).
 
-## Which shared rules apply
-
 QuestArc is a Super Productivity plugin and an engine, not a GTK app
-(decision D6 in [docs/architecture.md](docs/architecture.md)). Of the
-shared rules in ../phosh-toolkit/AGENTS.md these apply: English,
-knowledge in `docs/`, network access, pinned dependencies, licences of
-dependencies, planning with issues and milestones, code structure, no
-copy-paste between apps, pull requests and CI. These do **not** apply:
-app id and `.desktop`/metainfo, Flatpak, GTK/libadwaita UI and design
-rules, changelog fragments and `release.toml`, REUSE. The UI rules for
-360 px, touch targets and accessibility apply through
-[docs/behaviour.md](docs/behaviour.md) instead.
+(decision D6 in [docs/architecture.md](docs/architecture.md)). The UI
+rules for 360 px, touch targets and accessibility are in
+[docs/behaviour.md](docs/behaviour.md).
 
 ## Work only from the documents
 
@@ -69,11 +61,7 @@ generic motivational quotes; no promised number of days.
 ## Before committing
 
 1. `npm run check` (format, lint, typecheck, tests, build) passes.
-2. Documents, `docs/index.md` and `docs/log.md` updated in the same
-   commit.
-3. New dependencies pinned exactly and listed with their licence in
-   [docs/dependencies.md](docs/dependencies.md).
-4. Screens checked at 360 × 720 and at a desktop size when the UI
+2. Screens checked at 360 × 720 and at a desktop size when the UI
    changed.
 
 ## Releases
