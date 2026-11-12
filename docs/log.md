@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-12
+
+- **Update**: The GitHub repository is renamed from `nexumia-de/QuestArc` to `nexumia-de/quest-arc` (lowercase, words joined by a hyphen, like `phosh-toolkit`); links in the README, changelog, roadmap, journey guide and the journey schema `$id` follow. The plugin id `questarc` and the npm package names stay, because Super Productivity keys the plugin's data by its id. The Codeberg repository `Nexumia/QuestArc` is archived; the 2.x tags are on GitHub.
+
 ## 2026-11-08
 
 - **Update**: `AGENTS.md` imports only `agents/core.md` from phosh-toolkit instead of its whole `AGENTS.md`, so the GTK app rules and the list of rules that do not apply are gone (toolkit decision "lean agent rules", to use fewer tokens per session).
