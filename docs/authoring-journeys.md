@@ -14,7 +14,7 @@ publish it for everyone by pull request. The owner reviews it and merges
 what is good; it then ships with the next release in the Super
 Productivity plugin and in Pensum. This page is all you or your agent
 need: hand it over with a sentence like _"Read
-`https://github.com/nexumia-de/QuestArc/blob/main/docs/authoring-journeys.md`
+`https://github.com/nexumia-de/quest-arc/blob/main/docs/authoring-journeys.md`
 and write a QuestArc journey for <topic>."_
 
 A journey cannot be private yet: it is either published here or not
