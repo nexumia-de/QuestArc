@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ART_MAX_BYTES, artProblems, sceneProblems } from '../src/art-check';
+import { ART_MAX_BYTES, ART_ROLES, artProblems } from '../src/art-check';
 
 // The picture checker on a picture that passes, and on one broken copy per
 // rule (docs/decisions/shared-pictures.md).
@@ -19,6 +19,14 @@ describe('artProblems', () => {
     expect(artProblems('stone', good)).toEqual([]);
   });
 
+  it.each(ART_ROLES)('passes the role %s', (role) => {
+    expect(artProblems('stone', good.replace('class="fg"', `class="${role}"`))).toEqual([]);
+  });
+
+  it('knows the six roles', () => {
+    expect(ART_ROLES).toEqual(['fg', 'accent', 'dim', 'bg', 'tint', 'tint-strong']);
+  });
+
   it.each([
     ['a fill colour', good.replace('class="accent"', 'class="accent" fill="#ff0000"'), /fill/],
     ['a stroke', good.replace('class="dim"', 'class="dim" stroke="red"'), /stroke/],
@@ -36,6 +44,8 @@ describe('artProblems', () => {
     ['a use reference', good.replace('</svg>', '<use href="#a"/></svg>'), /<use>/],
     ['an id', good.replace('class="fg"', 'class="fg" id="a"'), /id/],
     ['another class', good.replace('class="fg"', 'class="red"'), /class must be/],
+    ['an unknown role', good.replace('class="fg"', 'class="tint-weak"'), /class must be/],
+    ['two roles', good.replace('class="fg"', 'class="fg tint"'), /class must be/],
     ['a shape without a role', good.replace('class="accent" ', ''), /class is missing/],
     [
       'a group',
@@ -67,34 +77,5 @@ describe('artProblems', () => {
 
   it('wants a lower-case name', () => {
     expect(messages('Stone_1', good).join('\n')).toMatch(/name/);
-  });
-});
-
-describe('sceneProblems', () => {
-  const scene = {
-    title: 'A stone in a field',
-    width: 320,
-    height: 120,
-    pictures: [{ art: 'stone', x: 10, y: 80, width: 32, height: 32 }],
-  };
-
-  it('passes a scene of known pictures', () => {
-    expect(sceneProblems(scene, ['stone'])).toEqual([]);
-  });
-
-  it('fails an unknown picture, a place outside and a missing title', () => {
-    const bad = {
-      ...scene,
-      title: '',
-      pictures: [
-        { art: 'tower', x: 0, y: 0, width: 32, height: 32 },
-        { art: 'stone', x: 300, y: 0, width: 32, height: 32 },
-      ],
-    };
-    expect(sceneProblems(bad, ['stone']).map((p) => p.at)).toEqual([
-      'title',
-      'pictures[0]',
-      'pictures[1]',
-    ]);
   });
 });

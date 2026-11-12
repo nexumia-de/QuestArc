@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { artProblems, sceneProblems } from '../src/art-check';
+import { artProblems } from '../src/art-check';
+import { sceneProblems } from '../src/art-scene-check';
 
 // Every picture and scene in content/art/ must pass the picture checker
 // (docs/decisions/shared-pictures.md). `npm run journeys` runs this file.

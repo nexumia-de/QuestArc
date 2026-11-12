@@ -1,8 +1,10 @@
 /**
  * Pictures from content/art/ as inline SVG (docs/decisions/shared-pictures.md).
  * A picture has no colours of its own: its shapes carry the roles `fg`,
- * `accent` and `dim`, which style.css (`.qa-art`) fills from Super
- * Productivity's theme variables, so light and dark follow the app. The
+ * `accent`, `dim`, `bg`, `tint` and `tint-strong`, which style.css
+ * (`.qa-art`) fills from Super Productivity's theme variables, so light
+ * and dark follow the app; a scene's far band is one silhouette in
+ * `tint` (class `qa-art-far`). The
  * files are checked in CI (no scripts, links or styles), and only the
  * built-in set is ever drawn.
  */
@@ -16,6 +18,8 @@ export interface Scene {
   readonly height: number;
   readonly pictures: readonly {
     readonly art: string;
+    /** The depth band; missing for the ground (docs/journey-design.md). */
+    readonly band?: 'far' | 'middle' | 'near';
     readonly x: number;
     readonly y: number;
     readonly width: number;
@@ -53,6 +57,7 @@ export const scene = (layout: Scene, sources: Readonly<Record<string, string>>):
     part.querySelector('title')?.remove();
     for (const key of ['x', 'y', 'width', 'height'] as const)
       part.setAttribute(key, String(place[key]));
+    if (place.band === 'far') part.classList.add('qa-art-far');
     svg.append(part);
   }
   return svg;

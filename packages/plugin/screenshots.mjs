@@ -26,17 +26,19 @@ for (const demo of shots) {
     for (const [name, width, height] of sizes) {
       const tab = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
       const [, route] = demo.split(':');
-      // `art` is the picture spike's page (preview/art.ts), without the view.
-      const art = demo === 'art';
+      // `art` and `art:more` are the pictures' page (preview/art.ts), without the view.
+      const art = demo.startsWith('art');
       await tab.goto(
-        art ? `${artPage}?theme=${theme}` : `${page}?demo=${demo.split(':')[0]}&theme=${theme}`,
+        art
+          ? `${artPage}?theme=${theme}&part=${route ?? 'growth'}`
+          : `${page}?demo=${demo.split(':')[0]}&theme=${theme}`,
       );
       const frame = art ? tab.locator(':root') : tab.frameLocator('#view');
       await frame
         .locator(art ? 'svg.qa-art' : '.qa-header')
         .first()
         .waitFor();
-      if (route) await frame.getByRole('button', { name: route }).first().click();
+      if (route && !art) await frame.getByRole('button', { name: route }).first().click();
       await tab.waitForTimeout(200);
       const file = join(out, `${demo.replace(':', '-')}-${theme}-${name}.png`);
       await tab.screenshot({ path: file });

@@ -3,8 +3,8 @@ import type { Problem } from './content-check';
 /**
  * The picture checker (docs/decisions/shared-pictures.md): the rules for
  * the built-in pictures in content/art/. A picture is a symbolic SVG
- * without colours of its own; each host fills the three roles `fg`,
- * `accent` and `dim` from its theme. Only a small whitelist of elements
+ * without colours of its own; each host fills the six roles in
+ * `ART_ROLES` from its theme. Only a small whitelist of elements
  * and attributes passes, so colours, styles, scripts, links, images, text
  * and fonts cannot get in. The checker reads the file as text with its own
  * small XML reader, so it runs anywhere the engine runs.
@@ -16,7 +16,14 @@ export const ART_MAX_BYTES = 4096;
 /** The view box of a ground (`ground-…`) and of every other picture. */
 export const ART_VIEW_BOX = { ground: '0 0 320 120', picture: '0 0 32 32' } as const;
 
-export const ART_ROLES = ['fg', 'accent', 'dim'] as const;
+/**
+ * The colour roles. `fg` text colour (outlines), `accent` the host's
+ * accent, `dim` text mixed into the surface, `bg` the surface itself (the
+ * fill inside outlines), `tint` and `tint-strong` the accent mixed into
+ * the surface at a low and a stronger fixed share (ground and distance).
+ * Each host computes every role as an opaque colour.
+ */
+export const ART_ROLES = ['fg', 'accent', 'dim', 'bg', 'tint', 'tint-strong'] as const;
 
 const NAME = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 const NUMBER = /^-?(\d+(\.\d*)?|\.\d+)$/;
@@ -191,48 +198,6 @@ export const artProblems = (name: string, source: string): Problem[] => {
     }
     if (element.attributes.class === undefined)
       error(at, `class is missing; one of ${ART_ROLES.join(', ')}`);
-  });
-  return problems;
-};
-
-export interface ScenePicture {
-  readonly art: string;
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-}
-
-/**
- * Problems of a scene file (`content/art/<name>.scene.json`): pictures at
- * fixed places, named from `names`, inside the scene's own size.
- */
-export const sceneProblems = (value: unknown, names: readonly string[]): Problem[] => {
-  const problems: Problem[] = [];
-  const error = (at: string, message: string) => problems.push({ level: 'error', at, message });
-  const scene = (value ?? {}) as Record<string, unknown>;
-  const size = (key: string): number => {
-    const n = scene[key];
-    if (typeof n !== 'number' || n <= 0) error(key, 'a positive number');
-    return typeof n === 'number' ? n : 0;
-  };
-  const width = size('width');
-  const height = size('height');
-  if (typeof scene.title !== 'string' || scene.title.trim() === '')
-    error('title', 'the scene in words, for screen readers');
-  const pictures = Array.isArray(scene.pictures) ? (scene.pictures as unknown[]) : [];
-  if (pictures.length === 0) error('pictures', 'a list of pictures');
-  pictures.forEach((item, index) => {
-    const at = `pictures[${index}]`;
-    const p = (item ?? {}) as Record<string, unknown>;
-    if (typeof p.art !== 'string' || !names.includes(p.art))
-      error(at, `unknown picture ${String(p.art)}`);
-    const [x = NaN, y = NaN, w = NaN, h = NaN] = ['x', 'y', 'width', 'height'].map((key) =>
-      typeof p[key] === 'number' ? p[key] : NaN,
-    );
-    if ([x, y, w, h].some(Number.isNaN)) error(at, 'x, y, width and height are numbers');
-    else if (x < 0 || y < 0 || w <= 0 || h <= 0 || x + w > width || y + h > height)
-      error(at, 'lies outside the scene');
   });
   return problems;
 };

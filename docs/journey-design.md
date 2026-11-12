@@ -1,9 +1,13 @@
 ---
 type: Concept
 title: Journey design
-description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, and the rules for colours, shapes and accessibility; with mockups.
-tags: [design, ui, journey, mockups]
+description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, and the scene rules for a region of the Valley; with mockups.
+tags: [design, ui, journey, mockups, pictures, valley]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
+sources:
+  - '[^97]: https://github.com/nexumia-de/QuestArc/issues/97'
+  - '[^42]: https://github.com/nexumia-de/QuestArc/issues/42'
+  - '[^96]: https://github.com/nexumia-de/QuestArc/issues/96'
 ---
 
 # Journey design
@@ -94,3 +98,99 @@ earned on finished stations. XP is never shown before it is earned.
 - Texts follow the system font size; the card grows, the path scrolls.
 - Screen readers get the stations as a list in path order with their
   state ("Station 2 of 3, current: walk for 5 minutes, 4 of 5 days").
+
+## Scenes of a region (for the Valley, #42)
+
+Art direction from #97[^97], for the Valley (#42)[^42] to build on: a
+region is drawn as a place, not a row of icons. A scene is a file
+`content/art/<name>.scene.json` (format and checker in
+[shared pictures](decisions/shared-pictures.md)); the hosts only place
+what it says. The examples are a meadow at three moments
+(`meadow-started`, `meadow-half`, `meadow-finished`) and a shore
+(`shore-finished`):
+
+| Light                                                              | Dark                                                           |
+| ------------------------------------------------------------------ | -------------------------------------------------------------- |
+| ![A meadow at three moments](screenshots/valley-moments-light.png) | ![The same in dark style](screenshots/valley-moments-dark.png) |
+
+![A shore, both hosts, light and dark](screenshots/valley-shore.png)
+
+**Look.** Calm and light, like the [sketch](mockups/valley-sketch.svg):
+built things (landmarks, keeper, lantern, pennant, boat) are outlined in
+`fg` and filled with `bg`, with at most one `accent` detail (a window, the
+bucket, the light, the flag); nothing built is solid. Growth (tufts,
+flowers, bushes, trees, reeds) is solid `tint-strong`, with `accent` only
+for blossoms. The hedgehog is outlined like a built thing. Ground and
+distance use `tint` and `tint-strong` only; the sky is the card itself.
+
+**Size.** Every scene is 320 × 120 units, about 1 px per unit in a card
+at 360 px.
+
+**Sky.** At most the top fifth (24 units) is empty sky; hills or a
+horizon start there. Only far silhouettes and the tops of tall things
+reach into it.
+
+**Three depth bands**, each with fixed sizes (a picture is square; its
+feet are on y = 30 of its 32 grid, so feet = y + 15/16 of its size):
+
+| Band   | Feet between | Large (house, tree, lighthouse) | Medium (well, bench, gate, bush, pennant, lantern, boat, reeds) | Small (stone, tuft, flowers, hedgehog) | Drawn as                 |
+| ------ | ------------ | ------------------------------- | --------------------------------------------------------------- | -------------------------------------- | ------------------------ |
+| far    | 24–52        | 20                              | 12                                                              | –                                      | one silhouette in `tint` |
+| middle | 52–92        | 34                              | 24                                                              | 14                                     | own roles                |
+| near   | 92–120       | 48                              | 34                                                              | 20                                     | own roles                |
+
+The far band holds only scenery and growth that has become large
+(trees, later groves): it merges with the ground into one light
+silhouette, so it never competes with what was built. Pictures are
+listed back to front (feet never move up), so nearer things cover
+farther ones.
+
+**Ground.** A ground file (`ground-<kind>`) carries the kind's layers in
+`tint` (the field, far hills) and `tint-strong` (near banks in the
+corners, water), and the **path**: one ribbon in `bg` from the bottom
+edge to the goal, wide near the viewer (about 20 units) and narrow at
+the goal (about 5). The path's geometry is the ground's; everything else
+stands beside it.
+
+**Where things stand.**
+
+- The **path** is paved with stones (`stone`, small, on the ribbon) as
+  the journey is walked: the first stone at the bottom edge when it
+  starts, then one stone per reached place, never ahead of the user.
+  Ahead the ribbon is bare.
+- **Landmarks** (one per station) stand beside the path at its station,
+  alternating sides, the first in the near band, later ones in the
+  middle band as the path climbs.
+- The **keeper** (a worn-down guardian, the open gate) stands on its
+  segment of the path, the path running through it.
+- The **goal** is the path's far end in the middle band: the **pennant**
+  stands there from the start; the **lit lantern** joins it beside the
+  pennant when the step graduates. With anchors (#96)[^96] a region holds
+  several steps; each graduated step's lantern stands by its landmark.
+- **Growth** (one small thing per completion, #42) takes the next free
+  place of a fixed row of places off the path: tufts and flowers small,
+  in the middle and near bands; ten become one larger thing (bush, then
+  tree) in the same band; the largest grow in the near corners (framing
+  the scene on the near banks) and on the horizon (far band).
+- A **companion** (the hedgehog) walks on the path in the near band.
+
+**Kinds differ at a glance** by their ground's shape and their own
+pictures: a meadow is rolling hills with trees; a shore is a flat
+horizon over water in `tint-strong` with `bg` waves, a beach, a boat and
+a lighthouse, reeds instead of trees.
+
+**Smallest sizes.** Every single picture must read at 24, 32 and 48 px
+on a card ([size strip](screenshots/valley-sizes.png), light plugin left,
+dark Day Planner right); in a scene a landmark is never drawn smaller
+than 24 units (the medium middle size), growth and the hedgehog never
+smaller than 14 (12 for far silhouettes, which need not read on their
+own). The Map, which shows regions smaller, must keep a region at least
+240 px wide or drop the small band.
+
+**Review rounds** for #97 (plugin left, Day Planner right, light then
+dark, at 360 × 720, scale 1): [round 0, the spike](screenshots/valley-round-0.png),
+[1: tint roles, solid grey growth, stones without a path](screenshots/valley-round-1.png),
+[2: path ribbon, growth in `tint-strong`, outlined landmarks](screenshots/valley-round-2.png),
+[3: landmarks along the path, hedgehog outlined](screenshots/valley-round-3.png),
+[4: no rim lines between layers](screenshots/valley-round-4.png),
+[5: near banks for a near layer](screenshots/valley-round-5.png).

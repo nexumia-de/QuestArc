@@ -118,10 +118,16 @@ and `cdn.playwright.dev` is blocked, so a link
 browser to look at it by hand.
 
 The pictures (`content/art/`, [decision](decisions/shared-pictures.md))
-have their own page, `dist/preview/art.html?theme=light|dark`
-(`preview/art.ts`): the test scene and every picture at 48 and 24 px.
-`node screenshots.mjs art 2` (in `packages/plugin`, after `npm run
-preview`) writes it at scale 2; the second argument is the device scale.
+have their own page, `dist/preview/art.html?theme=light|dark&part=…`
+(`preview/art.ts`): `growth` (the meadow at three moments, default),
+`shore` and `sizes` (every picture at 48, 32 and 24 px).
+`node screenshots.mjs art,art:shore,art:sizes 2` (in `packages/plugin`,
+after `npm run preview`) writes them at scale 2; the second argument is
+the device scale. Day Planner's demo draws the same parts
+(`tests/art_demo.py growth|shore|sizes` in nexumia-de/pensum, through
+phosh-toolkit's `screenshot.sh -c light|dark`). The comparison images in
+`docs/screenshots/valley-*.png` put the plugin's and Day Planner's phone
+screenshots side by side (Pillow, 256-colour PNG).
 
 ## In the real app
 

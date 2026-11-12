@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Bush</title>
+  <circle class="tint-strong" cx="10" cy="24.5" r="5.5"/>
+  <circle class="tint-strong" cx="17" cy="21.5" r="7"/>
+  <circle class="tint-strong" cx="23.5" cy="25" r="5"/>
+  <rect class="tint-strong" x="4.5" y="24.5" width="24" height="5.5"/>
+</svg>

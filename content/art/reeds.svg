@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Reeds</title>
+  <rect class="tint-strong" x="11.2" y="10" width="1.4" height="20"/>
+  <ellipse class="tint-strong" cx="11.9" cy="11" rx="1.9" ry="4"/>
+  <rect class="tint-strong" x="19" y="6" width="1.4" height="24"/>
+  <ellipse class="tint-strong" cx="19.7" cy="8" rx="1.9" ry="4.4"/>
+  <path class="tint-strong" d="M14.8 30C14.6 23 13 18 8.5 14C14 17 16.6 22.6 16.8 30Z"/>
+  <path class="tint-strong" d="M21 30C21.6 24 23.6 19.6 27 16.6C24.6 20.6 23.4 25 23.2 30Z"/>
+  <path class="tint-strong" d="M8 30C7.8 27 6.6 25 4 23.4C7.6 24.2 9.8 26.6 10.2 30Z"/>
+</svg>
