@@ -3,6 +3,7 @@ export type { Condition, Journey, Schedule, Stage, Texts, Weekday } from './type
 export type {
   DayMark,
   GameView,
+  ReadOnlyRun,
   RunView,
   StationRun,
   StationState,
@@ -24,6 +25,9 @@ export {
   withdraw,
 } from './actions';
 export type { RecordChanges } from './actions';
+export { guardWrite } from './guard';
+export type { GuardedChanges } from './guard';
+export { DATA_FORMAT } from './choices';
 export {
   buildSnapshot,
   isRelevant,

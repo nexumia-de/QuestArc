@@ -56,6 +56,32 @@ const complete = (host: ReturnType<typeof createFakeHost>['host'], day: string) 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 30));
 
 describe('brain', () => {
+  it('keeps records it does not understand through a write', async () => {
+    const { brain, host } = setUp(['2026-10-26']);
+    host.data['note:run-1:water'] = JSON.stringify({ text: 'from a newer QuestArc' });
+    const before = { ...host.data };
+    const { view } = await brain.write({ settings: { mode: 'rpg' } });
+    expect(view.mode).toBe('rpg');
+    expect(view.problems).toEqual([]);
+    expect(host.data['note:run-1:water']).toBe(before['note:run-1:water']);
+    await brain.write({ 'note:run-1:water': '' });
+    expect(host.data['note:run-1:water']).toBe(before['note:run-1:water']);
+  });
+
+  it('shows a run written by a newer QuestArc as read-only and writes nothing for it', async () => {
+    const { brain, host } = setUp(['2026-10-26']);
+    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 2, choice: 'keep' });
+    const before = { ...host.data };
+    const { view } = await brain.state();
+    expect(view.active).toBeUndefined();
+    expect(view.readOnly).toEqual([
+      { runId: RUN, journeyId: 'gentle-morning', reason: 'newer-format', state: 'active' },
+    ]);
+    await brain.write({ [`pause:${RUN}:2026-11-02`]: { action: 'pause', source: 'user' } });
+    await brain.write({ [`run-end:${RUN}`]: { day: '2026-11-02', reason: 'abandoned' } });
+    expect(host.data).toEqual(before);
+  });
+
   it('derives the game from the plugin API', async () => {
     const { brain } = setUp(['2026-10-26', '2026-10-27', '2026-10-28']);
     const { view } = await brain.state();

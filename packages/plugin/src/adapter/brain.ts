@@ -2,6 +2,7 @@ import {
   buildSnapshot,
   diff,
   evaluate,
+  guardWrite,
   isRelevant,
   relevantIds,
   toRepeatCfg,
@@ -44,7 +45,11 @@ export interface Brain {
   state(): Promise<State>;
   /** Marks data as changed and evaluates after a short pause. */
   refresh(what: Invalidate): void;
-  /** Writes choice records and returns the state that includes them. */
+  /**
+   * Writes choice records and returns the state that includes them. A
+   * change into a read-only run or of a kind the engine does not write is
+   * refused as a whole (docs/data-model.md §2, data format).
+   */
   write(records: Records): Promise<State>;
 }
 
@@ -126,7 +131,9 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
         void run().catch(() => undefined);
       }, debounceMs);
     },
-    async write(changes) {
+    async write(proposed) {
+      const { changes } = guardWrite((await flush()).view, proposed);
+      if (Object.keys(changes).length === 0) return flush();
       await writeRecords(api, changes);
       records = { ...(records ?? (await loadRecords(api))), ...changes };
       if (timer !== undefined) clearTimeout(timer);

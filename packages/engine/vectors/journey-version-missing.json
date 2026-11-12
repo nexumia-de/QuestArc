@@ -1,0 +1,90 @@
+{
+  "name": "A run whose journey or journey version is not here is read-only in its place; nothing of it is computed",
+  "rule": "data-model §2, data format and unknown data; story-format, versions",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-04",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 2,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      },
+      "run:r0": {
+        "journeyId": "gone",
+        "journeyVersion": 1,
+        "startDay": "2026-10-01"
+      },
+      "run-end:r0": {
+        "day": "2026-10-20",
+        "reason": "finished"
+      },
+      "run:r3": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "pause:r3:2026-11-02": {
+        "action": "pause",
+        "source": "user"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 0,
+    "active": null,
+    "paused": [
+      {
+        "runId": "r3"
+      }
+    ],
+    "finished": [],
+    "readOnly": [
+      {
+        "runId": "r1",
+        "journeyId": "test-daily",
+        "reason": "journey-version",
+        "state": "active"
+      },
+      {
+        "runId": "r0",
+        "journeyId": "gone",
+        "reason": "journey-missing",
+        "state": "finished"
+      }
+    ],
+    "problems": [
+      "run r1: journey test-daily version 2 not available (version 1 here)",
+      "run r0: journey gone not available"
+    ]
+  }
+}
