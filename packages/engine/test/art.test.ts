@@ -28,8 +28,8 @@ describe('pictures in content/art', () => {
     expect(files.filter((f) => !known(f))).toEqual(['markers.json', 'palette.json']);
   });
 
-  it('have the markers lanterns, pennants and flowers, each with its pictures', () => {
-    expect(Object.keys(markers)).toEqual(['lanterns', 'pennants', 'flowers']);
+  it('have the markers lanterns, bunting and flowers, each with its pictures', () => {
+    expect(Object.keys(markers)).toEqual(['lanterns', 'bunting', 'flowers']);
     expect(markerProblems(markers, pictures)).toEqual([]);
   });
 

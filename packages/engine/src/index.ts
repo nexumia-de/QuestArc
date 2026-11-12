@@ -44,6 +44,6 @@ export { journeyErrors, isJourney } from './validate';
 export { journeyProblems, TEXT_LIMITS } from './content-check';
 export type { Problem } from './content-check';
 export { isSupported } from './schedule';
-export { LADDERS, ladderListProblems, markerFits, resolveBuild } from './ladders';
+export { LADDERS, markerFits, resolveBuild } from './ladders';
 export type { BuildChoice, Ladder, LadderList } from './ladders';
 export { isoWeek } from './days';

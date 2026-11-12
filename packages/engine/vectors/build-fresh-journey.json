@@ -42,7 +42,7 @@
         "ladder": "crossing",
         "version": 1,
         "versions": 4,
-        "marker": "pennants",
+        "marker": "lanterns",
         "hue": "water",
         "markerProgress": 0,
         "ready": false

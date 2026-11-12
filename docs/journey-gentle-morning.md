@@ -25,7 +25,7 @@ texts in `content/i18n/en.json` (keys `gentle-morning.*`).
 
 All stages are daily. In game mode the journey builds a **Home**
 ([game rules](game-rules.md) §9): four stages use all five versions,
-from a fireplace to a house, with lanterns on the marker; a morning
+from a fireplace to a house, with bunting on the marker (the ladder's default); a morning
 routine is something one comes home to every day.
 
 A guardian with 100 HP falls after 10 completions

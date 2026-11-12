@@ -10,14 +10,14 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 ## Layout
 
-| Path                      | Job                                                                                                                                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                                                                                             |
-| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                                                                                          |
-| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                                                                                            |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                                                                                         |
-| `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example, the list of ladders (`ladders.json`, bundled into the engine) |
-| `scripts/`                | Maintenance scripts                                                                                                                                                                                                |
+| Path                      | Job                                                                                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                              |
+| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                           |
+| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                             |
+| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                          |
+| `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example |
+| `scripts/`                | Maintenance scripts                                                                                                                                 |
 
 ## Commands
 

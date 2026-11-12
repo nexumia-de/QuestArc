@@ -1,35 +1,32 @@
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { LADDERS, ladderListProblems, type LadderList } from '../src/ladders';
+import { LADDERS, markerFits } from '../src/ladders';
 
-// content/ladders.json is read by the engine, the journey checker and both
-// hosts (docs/game-rules.md §9); it must be consistent in itself.
+// The engine's list of ladders comes from content/art/ (docs/game-rules.md
+// §9); the art checker checks the files themselves.
+const art = join(import.meta.dirname, '..', '..', '..', 'content', 'art');
+
 describe('the list of ladders', () => {
-  it('is consistent', () => {
-    expect(ladderListProblems(LADDERS)).toEqual([]);
+  it('has every ladder file in content/art', () => {
+    const files = readdirSync(art)
+      .filter((file) => file.endsWith('.ladder.json'))
+      .map((file) => file.slice(0, -'.ladder.json'.length));
+    expect(Object.keys(LADDERS.ladders).sort()).toEqual(files.sort());
   });
 
-  it('has the ladders the built-in journeys use', () => {
-    expect(Object.keys(LADDERS.ladders).sort()).toEqual(['crossing', 'home']);
-    expect(LADDERS.defaultLadder).toBe('home');
+  it('has a default ladder, and every default marker and hue fits', () => {
+    expect(LADDERS.ladders[LADDERS.defaultLadder]).toBeDefined();
+    for (const [name, ladder] of Object.entries(LADDERS.ladders)) {
+      expect(markerFits(ladder.marker, name), name).toBe(true);
+      expect(LADDERS.hues, name).toContain(ladder.hue);
+    }
   });
 
-  it('finds a broken list', () => {
-    const broken = structuredClone(LADDERS) as unknown as {
-      ladders: Record<string, { versions: number; setting: string; marker: string }>;
-      settings: Record<string, { water: boolean; layout: string; hue: string }>;
-    };
-    broken.ladders.crossing = { versions: 1, setting: 'river', marker: 'flowers' };
-    broken.ladders.tower = { versions: 4, setting: 'hill', marker: 'lanterns' };
-    broken.settings.clearing = { water: false, layout: 'round', hue: 'gold' };
-    expect(
-      ladderListProblems({ ...LADDERS, ...broken, defaultLadder: 'castle' } as LadderList),
-    ).toEqual([
-      'defaultLadder castle: not a ladder',
-      'ladder crossing: needs at least 2 versions',
-      'ladder crossing: default marker flowers unknown or not fitting',
-      'ladder tower: setting hill unknown',
-      'setting clearing: hue gold unknown',
-      'setting clearing: layout must be span or sides',
-    ]);
+  it('keeps flowers off water', () => {
+    expect(LADDERS.ladders.crossing).toMatchObject({ versions: 5, water: true });
+    expect(markerFits('flowers', 'crossing')).toBe(false);
+    expect(markerFits('flowers', 'home')).toBe(true);
+    expect(markerFits('balloons', 'home')).toBe(false);
   });
 });

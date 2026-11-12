@@ -71,7 +71,10 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   `PluginIframeMessageType` in `types.ts`). The shim has no helper for sending;
   the iframe posts the message itself[^sp].
 - ZIP: files at the root; `manifest.json` required (≤ 100 KB), `plugin.js`
-  ≤ 5 MB, `index.html` ≤ 1 MB, ZIP ≤ 10 MB, `i18n/<lang>.json` translations
+  ≤ 5 MB, `index.html` ≤ 1 MB (**19.3.1 and older: 100 KB, 102,400 bytes**;
+  raised by `668c0769` after 19.3.1; seen in 19.3.1's web app, which
+  refuses the ZIP with "Plugin index.html is too large (max 100.0KB)", on
+  2026-11-12; `packages/plugin/build.mjs` fails above it), ZIP ≤ 10 MB, `i18n/<lang>.json` translations
   ≤ 5 MB in total (`src/app/plugins/plugin.const.ts`;
   `plugin.service.ts`, ZIP loading). Other files in the ZIP are not served to
   the iframe; CSS and JS must be inlined (`docs/plugin-development.md`,

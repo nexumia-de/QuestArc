@@ -21,6 +21,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'binding',
   'stage-done',
   'pause',
+  'build',
   'checkin',
   'graduation',
   'build',

@@ -171,16 +171,16 @@ const stageProblems = (journey: Journey): Problem[] => {
   return problems;
 };
 
-/** What the journey builds (game rules §9), against content/ladders.json. */
+/** What the journey builds (game rules §9), against content/art/. */
 const buildProblems = (journey: Journey): Problem[] => {
   const build = journey.build;
-  if (!build) return [warning('build', 'name a ladder from content/ladders.json (issue #42)')];
+  if (!build) return [warning('build', 'name a ladder from content/art/ (issue #42)')];
   const ladder = Object.prototype.hasOwnProperty.call(LADDERS.ladders, build.ladder)
     ? LADDERS.ladders[build.ladder]
     : undefined;
   if (!ladder) {
     const known = Object.keys(LADDERS.ladders).join(', ');
-    return [error('build.ladder', `"${build.ladder}" is not in content/ladders.json (${known})`)];
+    return [error('build.ladder', `"${build.ladder}" is not in content/art/ (${known})`)];
   }
   const problems: Problem[] = [];
   const versions = journey.stages.length + 1;
@@ -190,7 +190,7 @@ const buildProblems = (journey: Journey): Problem[] => {
         'build.marker',
         Object.prototype.hasOwnProperty.call(LADDERS.markers, build.marker)
           ? `"${build.marker}" does not grow in the setting of "${build.ladder}" (water)`
-          : `"${build.marker}" is not a marker in content/ladders.json`,
+          : `"${build.marker}" is not a marker in content/art/`,
       ),
     );
   }

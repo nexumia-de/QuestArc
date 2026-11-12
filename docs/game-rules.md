@@ -213,12 +213,15 @@ journey builds one thing, whole after every stage; the hosts draw it,
 the engine gives only names and numbers.
 
 - **Ladder.** A journey names a ladder (story format, `build`): one
-  thing drawn in several whole versions. The ladders, their number of
-  versions, their setting and default marker are listed in
-  `content/ladders.json`. The user may choose another ladder for a run
+  thing drawn in several whole versions. The ladders are the picture
+  files `content/art/<name>.ladder.json` (#95): their versions, whether
+  their setting has `water`, their default `marker` and `hue`; the
+  markers are in `markers.json` (`landOnly`), the hues in
+  `palette.json`. The engine reads these names and numbers and nothing
+  else of the pictures. The user may choose another ladder for a run
   (a `build` record, [data model](data-model.md) §2). A ladder the engine
-  does not know, or a journey without `build`, gets the list's
-  `defaultLadder`, so a host always has pictures.
+  does not know, or a journey without `build`, gets the default
+  ladder `home`, so a host always has pictures.
 - **Version.** Version 1 stands when the journey starts. Every finished
   stage (a stage with a checkpoint,
   [deleted history](decisions/deleted-history.md)) raises the version by
@@ -246,11 +249,11 @@ the engine gives only names and numbers.
 - **Ready:** the current stage is met now (§4, state `met`). It follows
   the present: when a met stage falls below its condition, ready goes,
   the marker progress stays.
-- **Marker:** what hangs on the marker (lanterns, pennants, flowers): the
-  user's choice, else the journey's, else the ladder's default. Flowers
-  grow only in a setting without water; a marker that does not fit the
+- **Marker:** what hangs on the marker (lanterns, bunting (pennants), flowers): the
+  user's choice, else the journey's, else the ladder's default. A land-only
+  marker (flowers) never hangs over water; a marker that does not fit the
   ladder's setting, or is not in the list, gives way to the next in that
-  order. **Hue:** the user's choice, else the setting's default.
+  order. **Hue:** the user's choice, else the ladder's default.
 - **Continue:** the next version stands and the marker starts again at
   0 with the next stage. A **paused** journey keeps its build; its paused
   days are not due, so its marker progress does not change. An **ended**

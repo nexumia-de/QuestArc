@@ -98,7 +98,7 @@ overwrite each other. Most records are written once and never changed.
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
-| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names from `content/ladders.json`           | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
+| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §9)
   are one record per run, rewritten as a whole when the user changes
@@ -212,10 +212,10 @@ interface RunView {
 }
 
 interface BuildView {
-  ladder: string; // from content/ladders.json
+  ladder: string; // a ladder in content/art/ (<name>.ladder.json)
   version: number; // 1 + finished stages; never goes down
   versions: number; // stages + 1
-  marker: string; // what hangs: lanterns, pennants, flowers
+  marker: string; // what hangs: lanterns, bunting, flowers (markers.json)
   hue: string; // a name from the list's hues
   markerProgress: number; // 0..1, the stage's highest condition progress so far
   ready: boolean; // the current stage is met now

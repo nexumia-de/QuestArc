@@ -6,7 +6,7 @@ import { hasVertex, type Point } from './art-vertices';
  * The ladder checker (docs/journey-design.md, "Builds and ladders"): a
  * ladder (`content/art/<name>.ladder.json`) is one build in its versions,
  * each whole, standing in the same slot of the same setting; while a stage
- * runs a marker (lanterns, pennants, flowers: `markers.json`) stands as a
+ * runs a marker (lanterns, bunting, flowers: `markers.json`) stands as a
  * gate across the path in the foreground: in phases 1–3, and ready (lit,
  * with a centrepiece) while the stage's condition is met. The hosts fill
  * the slots (`build`, `lantern`, `keeper`, and the `marker` places: the

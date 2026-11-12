@@ -48,15 +48,15 @@ export interface RunView {
  * marker's E elements, all in their "on" form while `ready`.
  */
 export interface BuildView {
-  /** A ladder from content/ladders.json. */
+  /** A ladder in content/art/ (<name>.ladder.json). */
   readonly ladder: string;
   /** The version standing: 1 + the finished stages; never goes down. */
   readonly version: number;
   /** The versions this journey uses: its stages + 1. */
   readonly versions: number;
-  /** What hangs on the marker: lanterns, pennants or flowers. */
+  /** What hangs on the marker: lanterns, bunting or flowers (content/art/markers.json). */
   readonly marker: string;
-  /** A hue name from content/ladders.json. */
+  /** A hue name from content/art/palette.json. */
   readonly hue: string;
   /** The current stage's highest condition progress since it was accepted, 0..1. */
   readonly markerProgress: number;

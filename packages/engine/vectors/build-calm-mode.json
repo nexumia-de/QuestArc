@@ -51,7 +51,7 @@
   "expect": {
     "mode": "calm",
     "active": {
-      "build": "$absent"
+      "build": null
     }
   }
 }

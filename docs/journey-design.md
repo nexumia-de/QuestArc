@@ -223,7 +223,7 @@ Home pennants):
 
 - **lanterns**: small lanterns, outlined; ready filled with a flame, a
   halo and rays.
-- **pennants**: pale outlined pennants; ready solid in the
+- **pennants** (`bunting`): pale outlined pennants; ready solid in the
   accent with a second tail.
 - **flowers**: vines with closed buds; ready open blossoms. Land only:
   the checker refuses flowers for a ladder whose setting is water

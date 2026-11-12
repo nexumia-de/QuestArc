@@ -72,7 +72,7 @@ describe('ladderScene', () => {
   });
 
   it('takes the ladder default marker or another one', () => {
-    expect(marks(3, { progress: 0.1 }, home)).toEqual(['marker-pennants-post']);
+    expect(marks(3, { progress: 0.1 }, home)).toEqual(['marker-bunting-post']);
     expect(marks(3, { progress: 0.1, marker: 'flowers' }, home)).toEqual(['marker-flowers-post']);
   });
 

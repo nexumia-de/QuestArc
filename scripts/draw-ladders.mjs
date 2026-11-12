@@ -394,7 +394,7 @@ build('home-5', 'A house of two storeys', [
 const MARKER_TIE = [16, 15];
 const MARKERS = {
   lanterns: { title: 'Lanterns', landOnly: false },
-  pennants: { title: 'Pennants', landOnly: false },
+  bunting: { title: 'Pennants', landOnly: false },
   flowers: { title: 'Flowers', landOnly: true },
 };
 const marker = (name, title, shapes) =>
@@ -447,7 +447,7 @@ markerSet(
 // Pennants: pale outlined pennants on the line; ready they are solid in
 // the accent with a second tail beside them.
 markerSet(
-  'pennants',
+  'bunting',
   { bead: 'A pale pennant on a line', beadLit: 'A bright pennant with a second tail' },
   (lit) =>
     lit
@@ -780,7 +780,7 @@ ladder(
     title: 'Home',
     hue: 'meadow',
     water: false,
-    marker: 'pennants',
+    marker: 'bunting',
     ways: HOME_WAYS,
     ...markerOf(MARKER_LAYOUTS.clearing),
     versions: [

@@ -51,6 +51,18 @@ if (htmlBytes > MAX_INDEX_HTML) {
   );
 }
 
+// Super Productivity 19.3.x (minSupVersion) refuses an index.html above
+// 100 KB (102,400 bytes) at install; later versions allow 1 MB
+// (docs/super-productivity-facts.md §1). Fail here instead of in the real app.
+const INDEX_HTML_LIMIT = 102_400;
+const indexBytes = Buffer.byteLength(html);
+if (indexBytes > INDEX_HTML_LIMIT) {
+  throw new Error(
+    `index.html is ${indexBytes} bytes; Super Productivity 19.3 installs at most ${INDEX_HTML_LIMIT}`,
+  );
+}
+console.log(`index.html: ${indexBytes} of ${INDEX_HTML_LIMIT} bytes`);
+
 copyFileSync(join('src', 'manifest.json'), join(files, 'manifest.json'));
 
 const { version } = JSON.parse(readFileSync('src/manifest.json', 'utf8'));

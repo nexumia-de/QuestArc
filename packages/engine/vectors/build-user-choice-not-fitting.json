@@ -46,7 +46,7 @@
     "active": {
       "build": {
         "ladder": "crossing",
-        "marker": "pennants",
+        "marker": "lanterns",
         "hue": "water"
       }
     }

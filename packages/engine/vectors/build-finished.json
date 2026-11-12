@@ -45,7 +45,7 @@
     "journeys": ["$test-build"]
   },
   "expect": {
-    "active": "$absent",
+    "active": null,
     "finished": [
       {
         "build": {
