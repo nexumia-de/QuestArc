@@ -57,15 +57,15 @@ Productivity, and only the supported kinds can be bound
 
 ## Build
 
-What the journey builds in game mode ([game rules](game-rules.md) §10,
+What the journey builds in game mode ([game rules](game-rules.md) §9,
 issue #42). The names come from the built-in list
-`content/ladders.json`; pictures are found by these names in the hosts.
+the ladders in `content/art/` (`<name>.ladder.json`, `markers.json`); pictures are found by these names in the hosts.
 
-| Field    | Required | Meaning                                                                                         |
-| -------- | -------- | ----------------------------------------------------------------------------------------------- |
-| `ladder` | yes      | A ladder from the list (`home`, `crossing`, …)                                                  |
-| `marker` | no       | What hangs on the marker: `lanterns`, `pennants` or `flowers`; the ladder's default if left out |
-| `names`  | no       | Text keys naming the versions in the journey's own words, version 1 first (at most 40 chars)    |
+| Field    | Required | Meaning                                                                                        |
+| -------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `ladder` | yes      | A ladder from the list (`home`, `crossing`, …)                                                 |
+| `marker` | no       | What hangs on the marker: `lanterns`, `bunting` or `flowers`; the ladder's default if left out |
+| `names`  | no       | Text keys naming the versions in the journey's own words, version 1 first (at most 40 chars)   |
 
 ```json
 "build": { "ladder": "crossing", "names": ["first-things-first.build.v1"] }
@@ -99,20 +99,20 @@ what can be checked without a person; `npm run journeys` runs it on
 every file, and `npm run check` (CI) includes it. A future import of
 private journeys (#40) runs the same function.
 
-| Level   | Check                                                                                                               | Rule       |
-| ------- | ------------------------------------------------------------------------------------------------------------------- | ---------- |
-| error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist             | —          |
-| error   | the same anchor (English text) in every stage                                                                       | 2          |
-| error   | text lengths above                                                                                                  | —          |
-| error   | a number of days ("21 days")                                                                                        | 4          |
-| error   | quotes with an author                                                                                               | 5          |
-| error   | controlling words (must, have to, you should, no excuses)                                                           | 15         |
-| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                             | 11, 12, 15 |
-| error   | the same nugget twice                                                                                               | 22         |
-| warning | a `days` condition without room for one miss, or looking back more than 14 days                                     | 1, 11      |
-| warning | a stage without a nugget, a journey without `why`; English texts no key uses                                        | 5, 22      |
-| error   | `build`: a ladder or marker not in `content/ladders.json`; `flowers` with a water setting; more names than versions | 42         |
-| warning | no `build`; more stages than the ladder has versions minus one (its last version gains fixed additions)             | 42         |
+| Level   | Check                                                                                                                | Rule       |
+| ------- | -------------------------------------------------------------------------------------------------------------------- | ---------- |
+| error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist              | —          |
+| error   | the same anchor (English text) in every stage                                                                        | 2          |
+| error   | text lengths above                                                                                                   | —          |
+| error   | a number of days ("21 days")                                                                                         | 4          |
+| error   | quotes with an author                                                                                                | 5          |
+| error   | controlling words (must, have to, you should, no excuses)                                                            | 15         |
+| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                              | 11, 12, 15 |
+| error   | the same nugget twice                                                                                                | 22         |
+| warning | a `days` condition without room for one miss, or looking back more than 14 days                                      | 1, 11      |
+| warning | a stage without a nugget, a journey without `why`; English texts no key uses                                         | 5, 22      |
+| error   | `build`: a ladder or marker not in `content/art/`; a land-only marker (`flowers`) on water; more names than versions | 42         |
+| warning | no `build`; more stages than the ladder has versions minus one (its last version gains fixed additions)              | 42         |
 
 The test also checks that each file is named after its id and that ids
 are unique.

@@ -1,6 +1,6 @@
 {
   "name": "A paused journey keeps its marker progress: paused days are not due",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

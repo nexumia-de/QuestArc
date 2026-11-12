@@ -1,6 +1,6 @@
 {
   "name": "time_spent 30 minutes: 15 minutes tracked give half the marker",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

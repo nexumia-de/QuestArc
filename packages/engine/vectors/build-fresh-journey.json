@@ -1,6 +1,6 @@
 {
   "name": "A fresh journey: version 1 of 4 stands, the marker is empty",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -42,7 +42,7 @@
         "ladder": "crossing",
         "version": 1,
         "versions": 4,
-        "marker": "pennants",
+        "marker": "lanterns",
         "hue": "water",
         "markerProgress": 0,
         "ready": false

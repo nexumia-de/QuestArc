@@ -1,6 +1,6 @@
 {
   "name": "The condition holds now: ready, marker progress 1",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

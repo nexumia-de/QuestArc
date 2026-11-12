@@ -1,6 +1,6 @@
 {
   "name": "The window slides: completions that left it do not add up",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

@@ -1,0 +1,30 @@
+{
+  "title": "A shore, finished and graduated: the path along the beach to the pennant and the lit lantern, a house, a boat and a lighthouse, the keeper at the open gate, reeds and grass",
+  "width": 320,
+  "height": 120,
+  "pictures": [
+    { "art": "ground-shore", "x": 0, "y": 0, "width": 320, "height": 120 },
+    { "art": "boat", "band": "middle", "x": 128.0, "y": 49.5, "width": 24, "height": 24 },
+    { "art": "lighthouse", "band": "middle", "x": 285.0, "y": 54.125, "width": 34, "height": 34 },
+    { "art": "pennant", "band": "middle", "x": 236.0, "y": 66.5, "width": 24, "height": 24 },
+    { "art": "lantern", "band": "middle", "x": 254.0, "y": 67.5, "width": 24, "height": 24 },
+    { "art": "reeds", "band": "middle", "x": 13.0, "y": 76.875, "width": 14, "height": 14 },
+    { "art": "tuft", "band": "middle", "x": 193.0, "y": 76.875, "width": 14, "height": 14 },
+    { "art": "stone", "band": "near", "x": 210.976, "y": 75.44, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 193.613, "y": 78.789, "width": 20, "height": 20 },
+    { "art": "gate-open", "band": "near", "x": 161.0, "y": 66.625, "width": 34, "height": 34 },
+    { "art": "stone", "band": "near", "x": 174.61, "y": 82.101, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 155.514, "y": 84.831, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 136.464, "y": 87.859, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 117.465, "y": 91.196, "width": 20, "height": 20 },
+    { "art": "house", "band": "near", "x": 16.0, "y": 65.0, "width": 48, "height": 48 },
+    { "art": "reeds", "band": "near", "x": 300.0, "y": 93.25, "width": 20, "height": 20 },
+    { "art": "flowers", "band": "near", "x": 66.0, "y": 93.25, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 98.718, "y": 95.685, "width": 20, "height": 20 },
+    { "art": "reeds", "band": "near", "x": 269.0, "y": 84.125, "width": 34, "height": 34 },
+    { "art": "reeds", "band": "near", "x": 9.0, "y": 87.125, "width": 34, "height": 34 },
+    { "art": "tuft", "band": "near", "x": 256.0, "y": 100.25, "width": 20, "height": 20 },
+    { "art": "tuft", "band": "near", "x": 120.0, "y": 100.25, "width": 20, "height": 20 },
+    { "art": "stone", "band": "near", "x": 81.116, "y": 100.75, "width": 20, "height": 20 }
+  ]
+}

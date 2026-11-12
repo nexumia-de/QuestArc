@@ -1,6 +1,6 @@
 {
   "name": "count 3: marker progress follows the completions",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

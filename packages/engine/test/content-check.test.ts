@@ -135,7 +135,7 @@ describe('journey checker', () => {
     expect(problems.map((p) => p.at)).toEqual(['stages[0].condition', 'stages[1].nugget', 'why']);
   });
 
-  it('checks the build against content/ladders.json', () => {
+  it('checks the build against content/art/', () => {
     expect(errors((j) => (j.build = { ladder: 'castle' }))[0]?.message).toContain('castle');
     expect(errors((j) => (j.build.marker = 'balloons'))[0]?.message).toContain('not a marker');
     expect(errors((j) => (j.build.marker = 'flowers'))).toEqual([]);

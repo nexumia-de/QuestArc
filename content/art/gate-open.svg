@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Open gate</title>
+  <path class="fg" d="M3.8 30V14A10.2 10.2 0 0 1 24.2 14V30H22V14A8 8 0 0 0 6 14V30Z"/>
+  <path class="accent" d="M12.2 2.6H15.8L15.2 6.4H12.8Z"/>
+  <path class="fg" d="M23 15.4L30.6 12.4V27.6L23 30Z"/>
+  <path class="bg" d="M25 17L28.6 15.6V26.2L25 27.4Z"/>
+</svg>

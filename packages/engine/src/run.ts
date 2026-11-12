@@ -141,7 +141,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   });
 
   const lastPause = pauses.filter((p) => p.day <= today).at(-1);
-  // The build (game rules §10): game mode only; an ended run shows its
+  // The build (game rules §9): game mode only; an ended run shows its
   // version standing, without a marker.
   const ended = choices.runEnds.has(run.runId);
   const build: BuildView | undefined =

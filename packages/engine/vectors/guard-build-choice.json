@@ -1,0 +1,69 @@
+{
+  "name": "guardWrite accepts the user's build choice and its withdrawal",
+  "rule": "data-model \u00a72",
+  "kind": "guard",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-01",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "writes": [
+    {
+      "build:r1": {
+        "ladder": "home",
+        "marker": "flowers",
+        "hue": "rose"
+      }
+    },
+    {
+      "build:r1": ""
+    }
+  ],
+  "expect": [
+    {
+      "changes": {
+        "build:r1": {
+          "ladder": "home",
+          "marker": "flowers",
+          "hue": "rose"
+        }
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "build:r1": ""
+      },
+      "refused": []
+    }
+  ]
+}

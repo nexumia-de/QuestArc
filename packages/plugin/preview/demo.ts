@@ -9,9 +9,11 @@ import type { Task } from '@questarc/sp-plugin-api';
  * - journey-rpg: with game, stage 3 with its guardian
  * - met: the current stage's condition is met
  * - unbound: the current stage has no recurring task yet
+ * - newer: the journey was continued by a newer QuestArc (read-only)
  */
 
-export type Scenario = 'welcome' | 'empty' | 'journey' | 'journey-rpg' | 'met' | 'unbound';
+export type Scenario =
+  'welcome' | 'empty' | 'journey' | 'journey-rpg' | 'met' | 'unbound' | 'newer';
 
 const DAY_MS = 86_400_000;
 const STAGES = ['water', 'stretch-1', 'stretch-5', 'plan-day'];
@@ -98,5 +100,6 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     repeatCfgId: 'demo',
     day: accepted,
   });
+  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 2, day: day(1) });
   return { tasks, repeatCfgs, data };
 };

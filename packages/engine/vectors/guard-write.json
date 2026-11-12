@@ -1,0 +1,141 @@
+{
+  "name": "Writes into a read-only run or of unknown kinds are refused as a whole; others pass unchanged",
+  "rule": "data-model §2, data format and unknown data",
+  "kind": "guard",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-04",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      },
+      "run:r2": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-03"
+      },
+      "pause:r1:2026-11-03": {
+        "action": "pause",
+        "source": "user"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-03"
+      },
+      "stage-done:r2:a": {
+        "dataFormat": 2,
+        "day": "2026-11-04",
+        "steps": ["changed", "shape"]
+      },
+      "graduation:r2:a": {
+        "dataFormat": 2,
+        "day": "2026-11-04",
+        "choice": "keep"
+      },
+      "stage:r9:a": {
+        "dataFormat": 3,
+        "acceptedDay": "2026-11-04"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "writes": [
+    {
+      "pause:r2:2026-11-04": {
+        "action": "pause",
+        "source": "user"
+      }
+    },
+    {
+      "graduation:r2:a": ""
+    },
+    {
+      "note:r1:a": ""
+    },
+    {
+      "pause:r2:2026-11-04": {
+        "action": "pause",
+        "source": "user"
+      },
+      "run:r3": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-04"
+      }
+    },
+    {
+      "pause:r1:2026-11-04": {
+        "action": "resume",
+        "source": "user"
+      }
+    },
+    {
+      "settings": {
+        "mode": "rpg"
+      }
+    }
+  ],
+  "expect": [
+    {
+      "changes": {},
+      "refused": ["pause:r2:2026-11-04"]
+    },
+    {
+      "changes": {},
+      "refused": ["graduation:r2:a"]
+    },
+    {
+      "changes": {},
+      "refused": ["note:r1:a"]
+    },
+    {
+      "changes": {},
+      "refused": ["pause:r2:2026-11-04"]
+    },
+    {
+      "changes": {
+        "pause:r1:2026-11-04": {
+          "action": "resume",
+          "source": "user"
+        }
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "settings": {
+          "mode": "rpg"
+        }
+      },
+      "refused": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "Undoing a completion takes back what it added to the marker (derived, not stored)",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

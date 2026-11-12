@@ -18,7 +18,7 @@ sources:
 Issue #99[^issue99], from the owner's marker rule in #42[^issue42]
 (2026-11-12): the marker grows element by element from the **best**
 progress reached in the stage and never loses an element. The rule is in
-the [game rules](../game-rules.md) §10.
+the [game rules](../game-rules.md) §9.
 
 ## Problem
 

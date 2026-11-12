@@ -1,6 +1,6 @@
 {
   "name": "A journey without build gets the default ladder, its marker and hue",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -42,7 +42,7 @@
         "ladder": "home",
         "version": 1,
         "versions": 4,
-        "marker": "lanterns",
+        "marker": "bunting",
         "hue": "meadow",
         "markerProgress": 0,
         "ready": false

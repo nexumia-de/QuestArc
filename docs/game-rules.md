@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, HP, graduation, calm mode and the build of a journey (ladder, version, marker progress, ready), with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, graduation, calm mode and the build of a journey (ladder, version, marker progress, ready), with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -182,15 +182,7 @@ the welcome back on day 6 = 70 XP → level 2.
 **Example F.** Guardian HP 100 in Example C's stage: 70 damage after day 7. Day 10 is the first completion after the misses: 10 + 10 welcome back
 = 90. Day 11: 100, the guardian is defeated.
 
-## 7. HP (RPG mode only)
-
-- **HP = 100 − 20 × (number of run-ending second misses in the last 7
-  logical days)**, minimum 0.
-- HP recovers by itself as those days leave the 7-day window. HP 0 has no
-  consequence other than how it looks; nothing is lost.
-- Calm mode has no HP.
-
-## 8. Graduation
+## 7. Graduation
 
 A habit **qualifies** for graduation when all of these hold:
 
@@ -205,28 +197,31 @@ repeat in Super Productivity. QuestArc asks the weekly question again 2
 and 6 weeks after graduation; an answer of 4 or less, or completion below
 60 % in the 2 weeks before, suggests bringing the habit back (one tap).
 
-## 9. Calm mode
+## 8. Calm mode
 
-Calm mode hides XP, level, guardians and HP and uses no game words. It
+Calm mode hides XP, level and guardians and uses no game words. It
 shows the path, the stations, the current and best run, the conditions,
 the welcome-back text and the weekly question. Switching modes changes
 only what is shown; the engine computes the same values in both, except
-the build (§10), which is only a picture of the game and is left out of
+the build (§9), which is only a picture of the game and is left out of
 the view in calm mode.
 
-## 10. Builds
+## 9. Builds
 
 Issues #42 and #99, decided by the owner on 2026-11-12. In game mode a
 journey builds one thing, whole after every stage; the hosts draw it,
 the engine gives only names and numbers.
 
 - **Ladder.** A journey names a ladder (story format, `build`): one
-  thing drawn in several whole versions. The ladders, their number of
-  versions, their setting and default marker are listed in
-  `content/ladders.json`. The user may choose another ladder for a run
+  thing drawn in several whole versions. The ladders are the picture
+  files `content/art/<name>.ladder.json` (#95): their versions, whether
+  their setting has `water`, their default `marker` and `hue`; the
+  markers are in `markers.json` (`landOnly`), the hues in
+  `palette.json`. The engine reads these names and numbers and nothing
+  else of the pictures. The user may choose another ladder for a run
   (a `build` record, [data model](data-model.md) §2). A ladder the engine
-  does not know, or a journey without `build`, gets the list's
-  `defaultLadder`, so a host always has pictures.
+  does not know, or a journey without `build`, gets the default
+  ladder `home`, so a host always has pictures.
 - **Version.** Version 1 stands when the journey starts. Every finished
   stage (a stage with a checkpoint,
   [deleted history](decisions/deleted-history.md)) raises the version by
@@ -254,11 +249,11 @@ the engine gives only names and numbers.
 - **Ready:** the current stage is met now (§4, state `met`). It follows
   the present: when a met stage falls below its condition, ready goes,
   the marker progress stays.
-- **Marker:** what hangs on the marker (lanterns, pennants, flowers): the
-  user's choice, else the journey's, else the ladder's default. Flowers
-  grow only in a setting without water; a marker that does not fit the
+- **Marker:** what hangs on the marker (lanterns, bunting (pennants), flowers): the
+  user's choice, else the journey's, else the ladder's default. A land-only
+  marker (flowers) never hangs over water; a marker that does not fit the
   ladder's setting, or is not in the list, gives way to the next in that
-  order. **Hue:** the user's choice, else the setting's default.
+  order. **Hue:** the user's choice, else the ladder's default.
 - **Continue:** the next version stands and the marker starts again at
   0 with the next stage. A **paused** journey keeps its build; its paused
   days are not due, so its marker progress does not change. An **ended**

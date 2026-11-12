@@ -72,8 +72,9 @@ punishment and comparison often backfire.
     are not misses.
 15. **Kind words only.** All texts are autonomy-supportive ("you could"),
     never controlling ("you must") or blaming.
-16. **No permanent failure.** HP (RPG mode only) reflects the last seven
-    days, recovers by itself and never takes anything away.
+16. **No permanent failure.** Nothing earned is ever taken away: runs, journeys
+    and guardians are never lost or reset, and there is no HP or any other
+    value that falls because of misses.
 
 ## Game layer
 

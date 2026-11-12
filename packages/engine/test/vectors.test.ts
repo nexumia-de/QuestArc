@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { diff, evaluate } from '../src';
+import { diff, evaluate, guardWrite } from '../src';
 import type { GameView, Snapshot } from '../src';
 import { loadVectors, mismatches } from './vector-support';
 
@@ -15,13 +15,15 @@ describe('test vectors in Node', () => {
     const actual =
       vector.kind === 'diff'
         ? diff(evaluate(vector.before as Snapshot), evaluate(vector.after as Snapshot))
-        : evaluate(vector.input as Snapshot);
+        : vector.kind === 'guard'
+          ? vector.writes.map((changes) => guardWrite(evaluate(vector.input as Snapshot), changes))
+          : evaluate(vector.input as Snapshot);
     expect(mismatches(vector.expect, actual)).toEqual([]);
   });
 
   it('are deterministic', () => {
     for (const vector of vectors) {
-      if (vector.kind !== 'evaluate') continue;
+      if (vector.kind === 'diff') continue;
       const a: GameView = evaluate(vector.input as Snapshot);
       const b: GameView = evaluate(structuredClone(vector.input) as Snapshot);
       expect(b).toEqual(a);

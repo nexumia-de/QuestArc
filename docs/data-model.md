@@ -98,9 +98,9 @@ overwrite each other. Most records are written once and never changed.
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
-| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names from `content/ladders.json`           | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
+| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
-- **Build choices** (`build:<runId>`, [game rules](game-rules.md) §10)
+- **Build choices** (`build:<runId>`, [game rules](game-rules.md) §9)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
   suggestion back. A name the engine does not know, or flowers on
@@ -133,6 +133,47 @@ overwrite each other. Most records are written once and never changed.
 - **Uninstalling** the plugin in Super Productivity deletes all its
   records on all devices; the settings page says so.
 
+### Data format and unknown data
+
+The plugin and Pensum are released separately, so one may run a newer
+engine than the other on the same records
+([decision](decisions/data-format.md)).
+
+- **Run-scoped keys:** every key except `settings` and `journey:<id>`
+  names its run in the second part (`<kind>:<runId>:…`). Record kinds
+  added later follow this, or are global and must not change what an
+  older engine computes.
+- **Data format:** the engine has a data format number (`DATA_FORMAT`,
+  now `1`). A run-scoped record may carry `dataFormat: <n>`; a record
+  without it is format 1. A newer engine writes `dataFormat` only on a
+  record that changes what an older engine would compute for its run
+  (graduation, a real step back), and only then raises `DATA_FORMAT`.
+  Everything else (new optional fields, new kinds an older engine may
+  ignore) keeps format 1. Withdrawing such a record lowers the run's
+  format again. `format` on a `journey:` record is the story format, not
+  this number.
+- **Unknown kinds and fields:** the engine ignores record kinds and
+  fields it does not know, without a problem. It never withdraws or
+  rewrites them, and hosts keep every `questarc:` record they do not
+  understand untouched when they write.
+- **Read-only runs:** a run is read-only when one of its records has a
+  `dataFormat` above the engine's ("written by a newer QuestArc"), when
+  its journey is not available, or when the available journey has a
+  lower `version` than the run's `journeyVersion`. The engine does not
+  compute its stations and it adds no XP; the view lists it in
+  `readOnly` with the reason and a problem, and it keeps its place in
+  the order of runs (active, paused, finished) from its `run`, `pause`
+  and `run-end` records. Of a run in a newer format the engine reads
+  nothing else, so a changed shape is not reported as a problem. A host
+  shows a calm read-only page instead of the journey
+  ([behaviour](behaviour.md), screen 4) and writes nothing for it.
+- **Writing:** hosts pass every change through the engine's
+  `guardWrite`, with the current view. If one key belongs to a
+  read-only run or is of a kind this engine does not write, it refuses
+  the whole change and names the refused keys, so an older host can
+  neither add to a newer run nor withdraw a record it does not
+  understand, and never writes half an action.
+
 ## 3. Engine output
 
 The types are in `packages/engine/src/types/view.ts`; in short:
@@ -143,10 +184,18 @@ interface GameView {
   mode: 'calm' | 'rpg'; // from the settings record; calm by default
   totalXp: number; // computed in both modes, shown only with the game
   level: number;
-  active?: RunView; // the newest open run
+  active?: RunView; // the newest open run; absent when that run is read-only
   paused: RunView[]; // other open runs
   finished: RunView[]; // runs with a run-end record (the shelf)
+  readOnly: ReadOnlyRun[]; // runs this engine cannot compute (§2)
   problems: string[]; // records and journeys the engine could not use
+}
+
+interface ReadOnlyRun {
+  runId: string;
+  journeyId: string;
+  reason: 'newer-format' | 'journey-missing' | 'journey-version';
+  state: 'active' | 'paused' | 'finished'; // its place among the runs
 }
 
 interface RunView {
@@ -159,14 +208,14 @@ interface RunView {
   paused: boolean; // by a pause record or a paused repeat config
   checkinDue: boolean; // weekly question not answered this ISO week
   offerFallback: boolean; // second miss in a row, not yet followed by a completion
-  build?: BuildView; // game mode only (game rules §10)
+  build?: BuildView; // game mode only (game rules §9)
 }
 
 interface BuildView {
-  ladder: string; // from content/ladders.json
+  ladder: string; // a ladder in content/art/ (<name>.ladder.json)
   version: number; // 1 + finished stages; never goes down
   versions: number; // stages + 1
-  marker: string; // what hangs: lanterns, pennants, flowers
+  marker: string; // what hangs: lanterns, bunting, flowers (markers.json)
   hue: string; // a name from the list's hues
   markerProgress: number; // 0..1, the stage's highest condition progress so far
   ready: boolean; // the current stage is met now
@@ -198,7 +247,7 @@ than one new completion at once, e.g. after a sync),
 `event.guardian-defeated`, `event.fallback-offered`, `event.level-up`,
 and in game mode `event.build-element` (`{ from, to }`: the marker
 progress rose) and `event.build-version` (`{ version }`).
-HP and graduation follow with issue #22. All numbers follow the
+Graduation follows with issue #22. All numbers follow the
 [game rules](game-rules.md).
 
 ## 4. Pensum
@@ -207,8 +256,10 @@ Pensum reads the same records from its dataset:
 
 - `pluginUserData` entries with ids `questarc:<key>`; values of 1024 or
   more characters are stored as `GZ1:<base64 gzip>` and must be decoded.
-- To write a record, Pensum adds or replaces that entry, encoded the same
-  way, and keeps every other entry untouched. `pensum.store.validate`
+- To write a record, Pensum passes the changes through `guardWrite`
+  (`engine-cli.mjs`, `{ "guardWrite": … }`), adds or replaces those
+  entries, encoded the same way, and keeps every other entry untouched,
+  also `questarc:` entries it does not understand (§2, data format). `pensum.store.validate`
   must stay empty.
 - Pensum builds the snapshot from its tasks, archives and
   `taskRepeatCfg` slice, runs the engine through gjs

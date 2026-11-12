@@ -123,7 +123,7 @@ accepting a stage on the phone with the same choice records.
 a while.
 
 **Exit criteria**: more built-in journeys written along the psychology
-rules; HP in RPG mode; graduation by automaticity; "pair it with";
+rules; graduation by automaticity; "pair it with";
 optional plan check (WOOP); reminders that fade; German texts; others
 can publish journeys by pull request: self-contained journey files, the
 journey checker in CI and a guide for people and their agents

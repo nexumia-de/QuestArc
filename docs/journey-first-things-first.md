@@ -29,7 +29,7 @@ All stages on Monday to Friday; anchor "sitting down at my desk".
 | `look-back`  | note what moved forward yesterday, write down my one task and give it 45 quiet minutes   | 8 of 10 days | —                              |
 
 In game mode the journey builds a **Crossing**
-([game rules](game-rules.md) §10), with pennants on the marker: the
+([game rules](game-rules.md) §9), with lanterns on the marker (the ladder's default): the
 journey is about getting across to the one task before the stream of
 email and chat, and each stage makes that way over sturdier, from
 stepping stones to a covered bridge. Five stages need six versions and

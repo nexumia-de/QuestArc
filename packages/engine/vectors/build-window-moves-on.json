@@ -1,6 +1,6 @@
 {
   "name": "Example G: the days window moves on, progress falls, marker progress stays, not ready",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

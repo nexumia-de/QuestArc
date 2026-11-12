@@ -1,6 +1,6 @@
 {
   "name": "Continue: the next version stands and the marker starts again",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

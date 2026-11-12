@@ -1,6 +1,6 @@
 {
   "name": "A journey ended early: its version stands, no marker",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

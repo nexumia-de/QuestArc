@@ -10,14 +10,14 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 ## Layout
 
-| Path                      | Job                                                                                                                                                                                             |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                                                                          |
-| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                                                                       |
-| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                                                                         |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                                                                      |
-| `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), UI and message texts (`i18n/`), schema, example, the list of ladders (`ladders.json`, bundled into the engine) |
-| `scripts/`                | Maintenance scripts                                                                                                                                                                             |
+| Path                      | Job                                                                                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                              |
+| `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                           |
+| `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                             |
+| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                          |
+| `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example |
+| `scripts/`                | Maintenance scripts                                                                                                                                 |
 
 ## Commands
 
@@ -110,9 +110,32 @@ the view's requests fail as they do while plugin.js is not loaded
 not read" message with details).
 `preview.setRepeat('<task id>')` gives a task a daily repeat, as the user
 would in Super Productivity, to try flow B by hand. It uses Playwright
-1.63.0 (a development dependency; in the cloud environment its Chromium is
-preinstalled, elsewhere `npx playwright install chromium`); open `dist/preview/index.html?demo=walking&theme=dark` in any
+1.64.1 (a development dependency; elsewhere `npx playwright install chromium`;
+the cloud image has the headless shell of an older Playwright, build 1243,
+and `cdn.playwright.dev` is blocked, so a link
+`/opt/pw-browsers/chromium_headless_shell-1248` → `…-1243` made it run on
+2026-11-12); open `dist/preview/index.html?demo=walking&theme=dark` in any
 browser to look at it by hand.
+
+The pictures (`content/art/`, [decision](decisions/shared-pictures.md))
+have their own page, `dist/preview/art.html?theme=light|dark&part=…`
+(`preview/art.ts`): `growth` (the meadow at three moments, default),
+`shore` and `sizes` (every picture at 48, 32 and 24 px).
+`node screenshots.mjs art,art:shore,art:sizes 2` (in `packages/plugin`,
+after `npm run preview`) writes them at scale 2; the second argument is
+the device scale. The ladders (#42): `sequence-<ladder>[-<marker>]`
+(each version, its marker growing element by element, ready, the
+lantern, the row of versions), `journey-<ladder>[-ready]` (a static mock
+of the journey screen, mid-way or ready) and `palette`; `&hue=<name>`
+picks a palette hue. `node screenshots.mjs
+art:sequence-crossing,art:journey-home,art:palette 2` writes the
+sequences and the palette as one full page 1400 px wide and the mock at
+phone size (`art:sequence-crossing@slate` for a hue). The ladders' files
+come from `node scripts/draw-ladders.mjs`. Day Planner's demo draws the same parts
+(`tests/art_demo.py growth|shore|sizes` in nexumia-de/pensum, through
+phosh-toolkit's `screenshot.sh -c light|dark`). The comparison images in
+`docs/screenshots/valley-*.png` put the plugin's and Day Planner's phone
+screenshots side by side (Pillow, 256-colour PNG).
 
 ## In the real app
 
@@ -167,37 +190,48 @@ the commit in that package's README and in
 
 The engine (`packages/engine/src`) has one job per file:
 
-| File               | Job                                                                     |
-| ------------------ | ----------------------------------------------------------------------- |
-| `types/*.ts`       | Input (snapshot), journey and output (game view) types                  |
-| `days.ts`          | Logical days, date arithmetic, ISO weeks                                |
-| `schedule.ts`      | Supported repeat schedules and their occurrences                        |
-| `choices.ts`       | Parsing the choice records                                              |
-| `binding.ts`       | A stage's repeat config and its instances                               |
-| `completions.ts`   | Which day a completion counts for, minutes tracked                      |
-| `timeline.ts`      | Due days, misses, runs, welcome backs                                   |
-| `conditions.ts`    | Stage conditions                                                        |
-| `xp.ts`            | XP and level                                                            |
-| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints        |
-| `validate.ts`      | Structural check of journeys                                            |
-| `evaluate.ts`      | The whole game view                                                     |
-| `diff.ts`          | Events between two views                                                |
-| `actions.ts`       | The choice records each user action writes, for both hosts              |
-| `host-data.ts`     | The snapshot from Super Productivity's raw tasks and configs            |
-| `content-check.ts` | The journey checker                                                     |
-| `cli-gjs.ts`       | The gjs wrapper (`evaluate`, `evaluateHost`, `diff`, `action`, `batch`) |
+| File               | Job                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `types/*.ts`       | Input (snapshot), journey and output (game view) types                                |
+| `days.ts`          | Logical days, date arithmetic, ISO weeks                                              |
+| `schedule.ts`      | Supported repeat schedules and their occurrences                                      |
+| `choices.ts`       | Parsing the choice records                                                            |
+| `binding.ts`       | A stage's repeat config and its instances                                             |
+| `completions.ts`   | Which day a completion counts for, minutes tracked                                    |
+| `timeline.ts`      | Due days, misses, runs, welcome backs                                                 |
+| `conditions.ts`    | Stage conditions                                                                      |
+| `xp.ts`            | XP and level                                                                          |
+| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints                      |
+| `validate.ts`      | Structural check of journeys                                                          |
+| `evaluate.ts`      | The whole game view                                                                   |
+| `diff.ts`          | Events between two views                                                              |
+| `actions.ts`       | The choice records each user action writes, for both hosts                            |
+| `host-data.ts`     | The snapshot from Super Productivity's raw tasks and configs                          |
+| `content-check.ts` | The journey checker                                                                   |
+| `cli-gjs.ts`       | The gjs wrapper (`evaluate`, `evaluateHost`, `diff`, `action`, `guardWrite`, `batch`) |
 
 Test vectors (`packages/engine/vectors/*.json`) hold every worked example
 of the [game rules](game-rules.md) and the edge cases from the
 [Super Productivity facts](super-productivity-facts.md). A vector names a
-snapshot (`input`, or `before` and `after` for events) and only the
-fields it checks (`expect`); journeys written as `"$test-daily"` come
+snapshot (`input`, or `before` and `after` for events; a `guard` vector
+adds `writes` for `guardWrite`) and only the fields it checks (`expect`,
+where `null` means the field is absent); journeys written as `"$test-daily"` come
 from `vectors/journeys/`. `test/vectors.test.ts` runs them in Node,
 `test/vectors-gjs.test.ts` through `dist/engine-cli.mjs` in gjs when
 `QUESTARC_GJS` names a gjs command. CI installs Ubuntu's `gjs` and sets
 it; locally, use the runtime Pensum uses (below) through a small script
 that wraps the `bwrap` command, and set `QUESTARC_GJS` to it. A change
 to a game rule changes its vector in the same commit.
+
+`test/speed.test.ts` is the speed budget: `test/large-snapshot.ts`
+generates a large `evaluateHost` input (about 50,000 archived tasks over
+five years, one journey with two finished stages, a bound daily repeat
+config with 1,800 days of history; deterministic, never checked in) and the
+test fails when Node (300 ms) or gjs (1,000 ms, process start included)
+is over budget or when the journey's numbers change. Set
+`QUESTARC_SPEED_REPORT` to a file to get the times as Markdown rows; the CI
+job `speed-aarch64` writes them to the job summary on an arm64 runner. The
+job is not a required check.
 
 ## Engine in gjs
 

@@ -3,7 +3,7 @@ import { makeLogicalDay } from './days';
 import { buildRun } from './run';
 import type { Journey } from './types/journey';
 import type { Snapshot } from './types/snapshot';
-import type { GameView, RunView } from './types/view';
+import type { GameView, ReadOnlyRun, RunView } from './types/view';
 import { journeyErrors } from './validate';
 import { levelFor } from './xp';
 
@@ -57,20 +57,48 @@ export const evaluate = (snapshot: Snapshot): GameView => {
       pausedNow(a) - pausedNow(b) ||
       b.runId.localeCompare(a.runId),
   );
+  const readOnly: (Omit<ReadOnlyRun, 'state'> & { ended: boolean })[] = [];
+  let activeReadOnly: string | undefined;
   for (const run of runs) {
+    const ended = choices.runEnds.has(run.runId);
     const journey = journeys.get(run.journeyId);
-    if (!journey) {
-      problems.push(`run ${run.runId}: journey ${run.journeyId} not available`);
+    const format = choices.newer.get(run.runId);
+    const reason: ReadOnlyRun['reason'] | undefined =
+      format !== undefined
+        ? 'newer-format'
+        : !journey
+          ? 'journey-missing'
+          : journey.version < run.journeyVersion
+            ? 'journey-version'
+            : undefined;
+    if (reason) {
+      problems.push(
+        reason === 'newer-format'
+          ? `run ${run.runId}: written by a newer QuestArc (data format ${format})`
+          : reason === 'journey-missing'
+            ? `run ${run.runId}: journey ${run.journeyId} not available`
+            : `run ${run.runId}: journey ${run.journeyId} version ${run.journeyVersion} not available (version ${journey?.version} here)`,
+      );
+      // The newest open run is the active one, also when it is read-only.
+      if (!ended && open.length === 0 && activeReadOnly === undefined) activeReadOnly = run.runId;
+      readOnly.push({ runId: run.runId, journeyId: run.journeyId, reason, ended });
       continue;
     }
-    const view = buildRun(run, journey, ctx);
-    (choices.runEnds.has(run.runId) ? finished : open).push(view);
+    const view = buildRun(run, journey as Journey, ctx);
+    (ended ? finished : open).push(view);
+  }
+  for (const [runId, format] of choices.newer) {
+    if (!choices.runs.some((run) => run.runId === runId)) {
+      problems.push(`run ${runId}: written by a newer QuestArc (data format ${format})`);
+    }
   }
 
   const totalXp = [...open, ...finished]
     .flatMap((run) => run.stations)
     .reduce((sum, station) => sum + station.xp, 0);
-  const [active, ...paused] = open;
+  const [first, ...rest] = open;
+  const active = activeReadOnly === undefined ? first : undefined;
+  const paused = activeReadOnly === undefined ? rest : open;
 
   return {
     todayStr: today,
@@ -80,6 +108,10 @@ export const evaluate = (snapshot: Snapshot): GameView => {
     ...(active ? { active } : {}),
     paused: paused.map((run) => ({ ...run, paused: true })),
     finished,
+    readOnly: readOnly.map(({ ended, ...run }) => ({
+      ...run,
+      state: ended ? 'finished' : run.runId === activeReadOnly ? 'active' : 'paused',
+    })),
     problems,
   };
 };

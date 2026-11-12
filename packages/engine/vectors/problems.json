@@ -1,5 +1,5 @@
 {
-  "name": "A broken imported journey and unknown records are reported and ignored; empty records are withdrawn",
+  "name": "A broken imported journey is reported and ignored; unknown records are ignored; empty records are withdrawn",
   "rule": "data-model \u00a72, story-format",
   "kind": "evaluate",
   "input": {
@@ -53,7 +53,6 @@
   "expect": {
     "totalXp": 10,
     "problems": [
-      "record nonsense:1: unknown kind",
       "journey broken: version: invalid; title/description: invalid; stages: 2 to 12 required"
     ]
   }

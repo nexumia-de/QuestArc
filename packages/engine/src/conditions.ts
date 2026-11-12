@@ -25,7 +25,7 @@ export const conditionProgress = (
 };
 
 /**
- * Marker progress (docs/game-rules.md §10): the highest progress the
+ * Marker progress (docs/game-rules.md §9): the highest progress the
  * condition reached on any day since acceptance, each day evaluated with
  * the due days and completions up to that day. `count` and `time_spent`
  * only add up, so theirs is today's; `days` slides its window over the

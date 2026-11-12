@@ -39,12 +39,12 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["ladder"],
-      "description": "What the journey builds in game mode (docs/game-rules.md section 10). Names come from content/ladders.json; the journey checker checks them.",
+      "description": "What the journey builds in game mode (docs/game-rules.md section 9). Names come from the ladders in content/art/; the journey checker checks them.",
       "properties": {
         "ladder": { "$ref": "#/$defs/id" },
         "marker": {
           "$ref": "#/$defs/id",
-          "description": "What hangs on the marker: lanterns, pennants or flowers (flowers only in a setting without water). The ladder's default if left out."
+          "description": "What hangs on the marker: lanterns, bunting or flowers (flowers only in a setting without water). The ladder's default if left out."
         },
         "names": {
           "type": "array",

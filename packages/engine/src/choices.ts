@@ -5,7 +5,29 @@ import type { Journey } from './types/journey';
 /**
  * Parses the choice records (docs/data-model.md §2) from plugin-data keys.
  * Empty and malformed records are ignored; malformed ones are reported.
+ * Unknown kinds and fields are ignored without a problem; a run with a
+ * record in a newer data format is read only from its run, pause and
+ * run-end records (data model §2, data format).
  */
+
+/** The data format this engine reads and writes (docs/decisions/data-format.md). */
+export const DATA_FORMAT = 1;
+
+/** Record kinds that name their run in the key's second part. */
+export const RUN_KINDS: ReadonlySet<string> = new Set([
+  'run',
+  'run-end',
+  'stage',
+  'binding',
+  'stage-done',
+  'pause',
+  'build',
+  'checkin',
+  'graduation',
+]);
+
+/** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
+const PLACING_KINDS: ReadonlySet<string> = new Set(['run', 'run-end', 'pause']);
 
 export interface RunRecord {
   readonly runId: string;
@@ -40,6 +62,8 @@ export interface Choices {
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
+  /** runId → highest data format above DATA_FORMAT among its records */
+  readonly newer: ReadonlyMap<string, number>;
   readonly problems: readonly string[];
 }
 
@@ -51,6 +75,25 @@ const str = (value: unknown): string | undefined =>
 
 const num = (value: unknown): number | undefined =>
   typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+
+/** The run of a run-scoped key, if any. */
+const runOf = (key: string): string | undefined => {
+  const [kind, runId] = key.split(':');
+  return kind && RUN_KINDS.has(kind) ? str(runId) : undefined;
+};
+
+/** Runs with a record above this engine's data format, with the highest format. */
+const newerRuns = (records: Readonly<Record<string, unknown>>): Map<string, number> => {
+  const newer = new Map<string, number>();
+  for (const [key, value] of Object.entries(records)) {
+    const runId = runOf(key);
+    const format = isObject(value) ? num(value.dataFormat) : undefined;
+    if (runId && format !== undefined && format > DATA_FORMAT) {
+      newer.set(runId, Math.max(format, newer.get(runId) ?? 0));
+    }
+  }
+  return newer;
+};
 
 export const parseChoices = (records: Readonly<Record<string, unknown>>): Choices => {
   let mode: 'calm' | 'rpg' = 'calm';
@@ -64,14 +107,20 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
+  const newer = newerRuns(records);
 
   for (const key of Object.keys(records).sort()) {
     const value = records[key];
     if (value === '' || value === null || value === undefined) continue;
     const parts = key.split(':');
-    const kind = parts[0];
+    const kind = parts[0] ?? '';
+    // Kinds of a newer engine are its own: ignored, never reported.
+    if (kind !== 'settings' && kind !== 'journey' && !RUN_KINDS.has(kind)) continue;
+    const runId = runOf(key);
+    const tooNew = runId !== undefined && newer.has(runId);
+    if (tooNew && !PLACING_KINDS.has(kind)) continue;
     const bad = (): void => {
-      problems.push(`record ${key}: unexpected value`);
+      if (!tooNew) problems.push(`record ${key}: unexpected value`);
     };
     if (!isObject(value)) {
       bad();
@@ -135,8 +184,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       userJourneys.push(value as unknown as Journey);
     } else if (kind === 'graduation') {
       // Graduation is evaluated with the More journeys milestone (#22).
-    } else {
-      problems.push(`record ${key}: unknown kind`);
+    } else if (!tooNew) {
+      problems.push(`record ${key}: unexpected key`);
     }
   }
 
@@ -152,6 +201,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     checkins,
     builds,
     userJourneys,
+    newer,
     problems,
   };
 };

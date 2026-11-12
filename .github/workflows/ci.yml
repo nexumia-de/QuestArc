@@ -2,7 +2,9 @@
 # typecheck, tests and build (npm run check), then keeps the plugin ZIP
 # as an artifact so it can be tried in Super Productivity. The engine's
 # test vectors also run in gjs (QUESTARC_GJS), the runtime Pensum uses.
-# The job real-app installs the plugin in Super Productivity's web app at
+# The job speed-aarch64 runs the engine's speed budget (large archive) in Node
+# and in gjs on an arm64 runner and writes the times and the CPU to the job
+# summary (issue #83). The job real-app installs the plugin in Super Productivity's web app at
 # a pinned version (packages/plugin/e2e/Dockerfile) and walks the first
 # stage of a journey in it, at phone and desktop size.
 name: CI
@@ -36,6 +38,34 @@ jobs:
           name: questarc-plugin
           path: packages/plugin/dist/*.zip
           if-no-files-found: error
+
+  speed-aarch64:
+    name: speed-aarch64
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install gjs
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gjs
+      - run: npm ci
+      - name: Speed budget in Node and gjs, times to the job summary
+        run: |
+          {
+            echo "### Engine speed on $(uname -m)"
+            echo
+            echo "CPU: $(lscpu | sed -n 's/^Model name: *//p' | head -1), $(nproc) cores; gjs $(gjs --version)"
+            echo
+            echo "| Runtime | Measured | Archive | ms per run | best ms |"
+            echo "| --- | --- | --- | --- | --- |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          npm run build -w @questarc/engine
+          QUESTARC_SPEED_REPORT="$GITHUB_STEP_SUMMARY" npx vitest run test/speed.test.ts
+        working-directory: packages/engine
+        env:
+          QUESTARC_GJS: gjs
 
   real-app:
     name: real-app

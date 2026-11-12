@@ -1,6 +1,6 @@
 {
   "name": "A finished journey: every version stands, no marker",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -45,7 +45,7 @@
     "journeys": ["$test-build"]
   },
   "expect": {
-    "active": "$absent",
+    "active": null,
     "finished": [
       {
         "build": {

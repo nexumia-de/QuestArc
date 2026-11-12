@@ -1,6 +1,6 @@
 {
   "name": "Marker progress rises with completions toward days 5 of 7",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

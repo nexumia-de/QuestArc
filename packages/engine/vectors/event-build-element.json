@@ -1,6 +1,6 @@
 {
   "name": "A completion raises the marker progress: build-element with the old and new progress",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "diff",
   "before": {
     "day": {

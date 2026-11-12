@@ -1,6 +1,6 @@
 {
   "name": "Deleted history after checkpoints: the versions stay, the open stage is derived",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

@@ -14,7 +14,7 @@ const currentStation = (run: RunView | undefined): StationView | undefined =>
   run?.stations[run.position.stage];
 
 /**
- * Build events of the journey that was active (game rules §10): a higher
+ * Build events of the journey that was active (game rules §9): a higher
  * version, also when its last stage ended the journey, or else a higher
  * marker progress in the same stage. None in calm mode (no build).
  */

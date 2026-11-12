@@ -1,6 +1,6 @@
 {
   "name": "A window that never held n completions: the best of all days, below 1",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

@@ -1,6 +1,6 @@
 {
   "name": "Calm mode: the view carries no build",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -51,7 +51,7 @@
   "expect": {
     "mode": "calm",
     "active": {
-      "build": "$absent"
+      "build": null
     }
   }
 }

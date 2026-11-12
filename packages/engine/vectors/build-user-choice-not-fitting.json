@@ -1,6 +1,6 @@
 {
   "name": "Choices that do not fit fall back: unknown ladder and hue, flowers on water",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -46,7 +46,7 @@
     "active": {
       "build": {
         "ladder": "crossing",
-        "marker": "pennants",
+        "marker": "lanterns",
         "hue": "water"
       }
     }

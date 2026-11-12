@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>House</title>
+  <rect class="fg" x="20.5" y="5" width="3.4" height="7"/>
+  <path class="fg" d="M16 3.4L30.4 16.6L28.8 18.4L26 15.8V30H6V15.8L3.2 18.4L1.6 16.6Z"/>
+  <path class="bg" d="M16 6.1L24 13.4V28H8V13.4Z"/>
+  <rect class="fg" x="17.4" y="19.4" width="4.4" height="10"/>
+  <rect class="accent" x="10.4" y="18" width="4.4" height="4.4"/>
+</svg>

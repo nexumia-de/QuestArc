@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>A small lit lantern</title>
+  <rect class="fg" x="15.2" y="1" width="1.6" height="4"/>
+  <ellipse class="tint-strong" cx="16" cy="13.5" rx="9.5" ry="9.6"/>
+  <polygon class="fg" points="10,8.5 22,8.5 16,4.1"/>
+  <rect class="fg" x="11" y="7.5" width="10" height="12" rx="2.2"/>
+  <rect class="accent" x="12.6" y="9.1" width="6.8" height="8.8" rx="1"/>
+  <ellipse class="bg" cx="16" cy="14.1" rx="1.2" ry="2"/>
+  <rect class="fg" x="13" y="19.1" width="6" height="2" rx="0.8"/>
+  <polygon class="accent" points="24.5,14.3 29.5,14.3 29.5,12.7 24.5,12.7"/>
+  <polygon class="accent" points="7.5,12.7 2.5,12.7 2.5,14.3 7.5,14.3"/>
+  <polygon class="accent" points="22,19.6 25.8,22.8 26.9,21.6 23,18.4"/>
+  <polygon class="accent" points="9,18.4 5.1,21.6 6.2,22.8 10,19.6"/>
+</svg>

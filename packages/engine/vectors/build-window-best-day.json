@@ -1,6 +1,6 @@
 {
   "name": "Marker progress is the best day of the stage, not the last one",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "evaluate",
   "input": {
     "day": {

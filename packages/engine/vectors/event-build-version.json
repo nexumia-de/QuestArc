@@ -1,6 +1,6 @@
 {
   "name": "Continue raises the version: build-version, no build-element",
-  "rule": "game-rules §10",
+  "rule": "game-rules §9",
   "kind": "diff",
   "before": {
     "day": {

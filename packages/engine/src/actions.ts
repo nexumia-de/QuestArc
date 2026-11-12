@@ -124,8 +124,8 @@ export const answerCheckin = (
 
 /**
  * The user's choice of what a run builds, what hangs on its marker and
- * its hue (game rules §10), one record per run; names come from
- * content/ladders.json. Choosing nothing withdraws the record, so the
+ * its hue (game rules §9), one record per run; names come from
+ * content/art/. Choosing nothing withdraws the record, so the
  * journey's suggestion applies again.
  */
 export const chooseBuild = (
