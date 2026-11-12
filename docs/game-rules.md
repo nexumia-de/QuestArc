@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, HP, graduation and calm mode, with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, graduation and calm mode, with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -182,15 +182,7 @@ the welcome back on day 6 = 70 XP → level 2.
 **Example F.** Guardian HP 100 in Example C's stage: 70 damage after day 7. Day 10 is the first completion after the misses: 10 + 10 welcome back
 = 90. Day 11: 100, the guardian is defeated.
 
-## 7. HP (RPG mode only)
-
-- **HP = 100 − 20 × (number of run-ending second misses in the last 7
-  logical days)**, minimum 0.
-- HP recovers by itself as those days leave the 7-day window. HP 0 has no
-  consequence other than how it looks; nothing is lost.
-- Calm mode has no HP.
-
-## 8. Graduation
+## 7. Graduation
 
 A habit **qualifies** for graduation when all of these hold:
 
@@ -205,9 +197,9 @@ repeat in Super Productivity. QuestArc asks the weekly question again 2
 and 6 weeks after graduation; an answer of 4 or less, or completion below
 60 % in the 2 weeks before, suggests bringing the habit back (one tap).
 
-## 9. Calm mode
+## 8. Calm mode
 
-Calm mode hides XP, level, guardians and HP and uses no game words. It
+Calm mode hides XP, level and guardians and uses no game words. It
 shows the path, the stations, the current and best run, the conditions,
 the welcome-back text and the weekly question. Switching modes changes
 only what is shown; the engine computes the same values in both.

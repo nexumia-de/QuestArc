@@ -31,7 +31,7 @@ rules for 360 px, touch targets and accessibility are in
 
 ## Architecture rules
 
-- **Derive, don't count.** XP, level, progress, runs, guardians and HP are
+- **Derive, don't count.** XP, level, progress, runs, guardians are
   computed by the engine from task data every time. Only choice records
   are stored ([data model](docs/data-model.md)), one plugin-data key
   each.
