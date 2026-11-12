@@ -22,7 +22,7 @@ links. Change history is in [log.md](log.md).
 - [Journey: First Things First](journey-first-things-first.md) - The second built-in journey, for work: one task written down, 15 then 45 quiet minutes on it, email in blocks, a one-line look back.
 - [Story format 3](story-format.md) - Journeys as one self-contained JSON file: stages with plan, schedule, condition, guardian, story texts and nugget; own texts and author; the journey checker; versions.
 - [Writing a journey](authoring-journeys.md) - Guide for people and their agents: the rules in short, the file, a template, the check, publishing by pull request, the CC BY-SA licence.
-- [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, HP, graduation, calm mode, with worked examples.
+- [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, XP and welcome back, level, guardians, graduation, calm mode, with worked examples.
 
 - [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; focused work; changes to the design rules; open gaps.
 - [Design rules from habit psychology](psychology.md) - 27 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.

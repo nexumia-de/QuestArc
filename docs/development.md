@@ -200,6 +200,16 @@ it; locally, use the runtime Pensum uses (below) through a small script
 that wraps the `bwrap` command, and set `QUESTARC_GJS` to it. A change
 to a game rule changes its vector in the same commit.
 
+`test/speed.test.ts` is the speed budget: `test/large-snapshot.ts`
+generates a large `evaluateHost` input (about 50,000 archived tasks over
+five years, one journey with two finished stages, a bound daily repeat
+config with 1,800 days of history; deterministic, never checked in) and the
+test fails when Node (300 ms) or gjs (1,000 ms, process start included)
+is over budget or when the journey's numbers change. Set
+`QUESTARC_SPEED_REPORT` to a file to get the times as Markdown rows; the CI
+job `speed-aarch64` writes them to the job summary on an arm64 runner. The
+job is not a required check.
+
 ## Engine in gjs
 
 `flatpak run` does not work in the cloud container (no session

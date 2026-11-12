@@ -225,7 +225,7 @@ station's `xp` and guardian `damage` into the checkpoint record.
 than one new completion at once, e.g. after a sync),
 `event.station-reached`, `event.guardian-damaged`,
 `event.guardian-defeated`, `event.fallback-offered`, `event.level-up`.
-HP and graduation follow with issue #22. All numbers follow the
+Graduation follows with issue #22. All numbers follow the
 [game rules](game-rules.md).
 
 ## 4. Pensum

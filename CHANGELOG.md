@@ -2,7 +2,7 @@
 
 Changes that users notice, newest first. Versions follow the plugin's
 `manifest.json`; each version is a
-[GitHub release](https://github.com/nexumia-de/QuestArc/releases) with the
+[GitHub release](https://github.com/nexumia-de/quest-arc/releases) with the
 plugin ZIP.
 
 ## 3.1.0

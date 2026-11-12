@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/nexumia-de/QuestArc/content/schema/journey.schema.json",
+  "$id": "https://github.com/nexumia-de/quest-arc/content/schema/journey.schema.json",
   "title": "QuestArc journey (story format 3)",
   "description": "A journey: a sequence of habit stages that start tiny and grow. One self-contained file: every text is a key into the file's own texts. See docs/story-format.md and docs/authoring-journeys.md.",
   "type": "object",

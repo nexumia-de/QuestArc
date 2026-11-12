@@ -112,13 +112,38 @@ export interface HostInput {
   readonly journeys: readonly Journey[];
 }
 
-export const snapshotFromHost = (input: HostInput): Snapshot =>
-  buildSnapshot({
+/**
+ * Only tasks the bindings point to can count (data model: hosts may
+ * filter), and nearly all of an archive is unrelated, so the raw archived
+ * tasks are filtered before any is converted: a pass that reads only `id`
+ * and `repeatCfgId`. The result is the same snapshot as converting
+ * everything first (`buildSnapshot` still decides; live tasks still win).
+ */
+export const snapshotFromHost = (input: HostInput): Snapshot => {
+  const live = input.live.map(toTask);
+  const boundIds = new Set<string>();
+  for (const [key, value] of Object.entries(input.records)) {
+    if (!key.startsWith('binding:') || typeof value !== 'object' || value === null) continue;
+    const { taskId } = value as { taskId?: unknown };
+    if (typeof taskId === 'string') boundIds.add(taskId);
+  }
+  // A bound task's own repeatCfgId counts as a binding too; live wins.
+  const liveIds = new Set(live.map((task) => task.id));
+  const boundArchived = input.archived.filter(
+    (task) => boundIds.has(task.id) && !liveIds.has(task.id),
+  );
+  const { cfgIds } = relevantIds(input.records, [...boundArchived.map(toTask), ...live]);
+  return buildSnapshot({
     ...input,
-    live: input.live.map(toTask),
-    archived: input.archived.map(toTask),
+    live,
+    archived: input.archived
+      .filter(
+        (task) => boundIds.has(task.id) || (!!task.repeatCfgId && cfgIds.has(task.repeatCfgId)),
+      )
+      .map(toTask),
     repeatCfgs: input.repeatCfgs.map(toRepeatCfg),
   });
+};
 
 /** Live tasks win over archived ones with the same id. */
 export const buildSnapshot = (input: SnapshotInput): Snapshot => {
