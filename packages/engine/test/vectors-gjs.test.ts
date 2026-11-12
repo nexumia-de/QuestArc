@@ -37,20 +37,26 @@ describe.skipIf(!gjs)('test vectors in gjs', () => {
       }),
     ) as unknown[];
     const afterViews = views.slice(vectors.length);
-    const diffRequests = vectors
-      .map((v, i) => ({ v, i }))
-      .filter(({ v }) => v.kind === 'diff')
-      .map(({ i }, k) => ({ diff: { before: views[i], after: afterViews[k] } }));
-    const diffs = JSON.parse(
+    // second round in gjs: diff the two views, or guard each write with the view
+    let k = 0;
+    const second = vectors.map((v, i) =>
+      v.kind === 'diff'
+        ? [{ diff: { before: views[i], after: afterViews[k++] } }]
+        : v.kind === 'guard'
+          ? v.writes.map((changes) => ({ guardWrite: { view: views[i], changes } }))
+          : [],
+    );
+    const answers = JSON.parse(
       execFileSync(gjs as string, ['-m', cli], {
-        input: JSON.stringify({ batch: diffRequests }),
+        input: JSON.stringify({ batch: second.flat() }),
         encoding: 'utf8',
       }),
     ) as unknown[];
 
-    let d = 0;
+    let a = 0;
     const failures = vectors.flatMap((v, i) => {
-      const actual = v.kind === 'diff' ? diffs[d++] : views[i];
+      const own = answers.slice(a, (a += second[i]?.length ?? 0));
+      const actual = v.kind === 'diff' ? own[0] : v.kind === 'guard' ? own : views[i];
       return mismatches(v.expect, actual).map((m) => `${v.file} ${m}`);
     });
     expect(failures).toEqual([]);

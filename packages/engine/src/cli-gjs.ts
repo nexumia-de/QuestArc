@@ -6,6 +6,7 @@
  *   { "diff": { "before": GameView, "after": GameView } } → GameEvent[]
  *   { "evaluateHost": HostInput }           → GameView (from raw SP objects)
  *   { "action": { "name": "startJourney", "args": [ … ] } } → record changes
+ *   { "guardWrite": { "view": GameView, "changes": { … } } } → { changes, refused }
  *   { "batch": [request, …] }                → [answer, …]
  * Run with `gjs -m engine-cli.mjs < request.json`.
  */
@@ -14,6 +15,7 @@ import GioUnix from 'gi://GioUnix';
 import { actions } from './actions';
 import { diff } from './diff';
 import { evaluate } from './evaluate';
+import { guardWrite } from './guard';
 import { snapshotFromHost, type HostInput } from './host-data';
 import type { Snapshot } from './types/snapshot';
 import type { GameView } from './types/view';
@@ -26,6 +28,7 @@ type Request =
   | { evaluateHost: HostInput }
   | { diff: { before: GameView; after: GameView } }
   | { action: Action }
+  | { guardWrite: { view: GameView; changes: Record<string, unknown> } }
   | { batch: Request[] };
 
 const act = ({ name, args }: Action): unknown => {
@@ -38,6 +41,8 @@ const answer = (request: Request): unknown => {
   if ('evaluateHost' in request) return evaluate(snapshotFromHost(request.evaluateHost));
   if ('diff' in request) return diff(request.diff.before, request.diff.after);
   if ('action' in request) return act(request.action);
+  if ('guardWrite' in request)
+    return guardWrite(request.guardWrite.view, request.guardWrite.changes);
   if ('batch' in request) return request.batch.map(answer);
   return { error: 'unknown request' };
 };

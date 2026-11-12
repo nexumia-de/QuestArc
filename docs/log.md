@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-12
+
+- **Decision**: [A data format number on the record that needs it](decisions/data-format.md) (#85): the plugin and Pensum may run different engine versions on the same records. [Data model](data-model.md) §2 "Data format and unknown data": unknown kinds and fields are ignored without a problem and kept; a run-scoped record with `dataFormat` above the engine's `DATA_FORMAT` (1), a missing journey or a missing journey version makes its run read-only (`GameView.readOnly`, no stations, no XP, its place among the runs kept); `guardWrite` refuses a whole change into a read-only run or of a kind the engine does not write. Engine, gjs wrapper (`guardWrite`), plugin (`brain.write` guards, read-only page in [behaviour](behaviour.md) screen 4, preview demo `newer`) and four new vectors (`unknown-records-kept`, `newer-format-read-only`, `journey-version-missing`, `guard-write`) pass in Node and in gjs 1.90.1 from GNOME 51. Before, a run with a missing journey was dropped and the next run became active; now it stays in its place as read-only.
+
 ## 2026-11-08
 
 - **Update**: `AGENTS.md` imports only `agents/core.md` from phosh-toolkit instead of its whole `AGENTS.md`, so the GTK app rules and the list of rules that do not apply are gone (toolkit decision "lean agent rules", to use fewer tokens per session).
