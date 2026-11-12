@@ -47,7 +47,10 @@ writeFileSync(join(files, 'index.html'), html);
 
 // Super Productivity 19.3.x (minSupVersion) refuses an index.html above
 // 100 KB (102,400 bytes) at install; later versions allow 1 MB
-// (docs/super-productivity-facts.md §1). Fail here instead of in the real app.
+// (docs/super-productivity-facts.md §1). One build serves all supported
+// versions, so the oldest limit holds; what does not fit travels in
+// plugin.js by message (docs/decisions/one-build-for-older-versions.md).
+// Fail here instead of in the real app.
 const INDEX_HTML_LIMIT = 102_400;
 const indexBytes = Buffer.byteLength(html);
 if (indexBytes > INDEX_HTML_LIMIT) {

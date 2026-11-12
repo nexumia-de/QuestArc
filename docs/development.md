@@ -191,8 +191,11 @@ QUESTARC_SP_URL=http://localhost:8080/ npm run e2e -w @questarc/plugin
 
 It is not part of `npm run check`, because it needs Docker and a
 browser. Uploaded plugins start disabled; the script switches QuestArc on.
-When the pinned version changes, also check `minSupVersion` in the
-manifest and the [facts](super-productivity-facts.md) §10.
+The image stays on the oldest supported version (`minSupVersion`
+19.3.0): one build serves 19.3.x and later
+([decision](decisions/one-build-for-older-versions.md)), so Dependabot
+proposes only minor and patch updates. When the pinned version changes,
+check the [facts](super-productivity-facts.md) §10.
 
 ## Plugin API types
 

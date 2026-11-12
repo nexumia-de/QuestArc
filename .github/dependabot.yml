@@ -30,3 +30,9 @@ updates:
     directory: /packages/plugin/e2e
     schedule:
       interval: weekly
+    ignore:
+      # The real-app check runs against the oldest supported Super
+      # Productivity (minSupVersion 19.3.0); one build serves all versions
+      # (docs/decisions/one-build-for-older-versions.md).
+      - dependency-name: johannesjo/super-productivity
+        update-types: ['version-update:semver-major']
