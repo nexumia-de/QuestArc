@@ -39,7 +39,8 @@ Option 2.
   to bundle, no framework updates to follow and the view stays small
   (about 76 KB with whitespace stripped and names kept; limit 100 KB in
   Super Productivity 19.3.x, 1 MB from 20.0.0; the build fails above
-  100 KB).
+  100 KB, since one build serves 19.3.x and later,
+  [decision](one-build-for-older-versions.md)).
 - It follows Super Productivity's own plugin starter and keeps the
   journey drawing (hand-made SVG) in the same style as the rest.
 - The UI code is not shared with Pensum (GTK), so a framework would not

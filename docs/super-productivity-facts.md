@@ -83,7 +83,7 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   at `1014df9`): `manifest.json` ≤ 100 KiB; `index.html` is checked
   against the same constant, `MAX_PLUGIN_MANIFEST_SIZE` (102,400 bytes;
   `MAX_PLUGIN_INDEX_HTML_SIZE`, 1 MiB, exists only from `668c0769`, after
-  19.3.1; issue #102 weighs requiring 20.0.0); `plugin.js` ≤ 5 MiB; the declared `i18n/<lang>.json` ≤ 5 MiB
+  19.3.1; QuestArc keeps one build within 102,400 bytes for 19.3.x and later, [decision](decisions/one-build-for-older-versions.md)); `plugin.js` ≤ 5 MiB; the declared `i18n/<lang>.json` ≤ 5 MiB
   together; the icon (the manifest's `icon` file) ≤ 100 KiB; a ZIP from
   the community list ≤ 10 MiB. Only these files are kept: the loader
   reads them out of the ZIP and discards it ("Uploaded plugins use a
@@ -507,9 +507,10 @@ Checked by running the plugin in `app.super-productivity.com`
 - Take an instance's occurrence day from `created` (or the id), not `dueDay`:
   archiving clears `dueDay`.
 - Expect no instance for missed days, and exclude won't-do tasks.
-- `minSupVersion` must be the next release if QuestArc uses
-  `DATA_CHANGED`, `DAY_CHANGE` or `getDayContext`; they are optional members,
-  so feature-detect.
+- `minSupVersion` stays `19.3.0`: one build for 19.3.x and later
+  ([decision](decisions/one-build-for-older-versions.md)). `DATA_CHANGED`,
+  `DAY_CHANGE` and `getDayContext` are optional members of newer versions;
+  feature-detect them and work without them.
 
 [^sp]:
     Super Productivity master c5eb3f6 (2026-11-05),
