@@ -91,19 +91,26 @@ enough for slow CI runners, tight enough to catch a return to quadratic or
 unfiltered behaviour.
 
 **aarch64.** CI job `speed-aarch64` (arm64 runner `ubuntu-24.04-arm`) runs
-the same test in Node and gjs and writes the times and `lscpu`'s CPU model to
-the job summary. This is a runner measurement, not a phone measurement. The
-factor to the phone could not be stated: the target phone's model is still
-`TODO` in the toolkit's `docs/device.md`, and no run of the arm64 job
-exists yet, so there is no runner CPU or time to quote either. Fill in below
-from the first job summary and the phone's public single-core score, with
-source.
+the same test in Node and gjs 1.80.2 and writes the times and `lscpu`'s CPU
+model to the job summary. This is a runner measurement, not a phone
+measurement. First run ([run 43248504257](https://github.com/nexumia-de/QuestArc/actions/runs/43248504257/job/131287602335),
+2026-11-12, the 8.2 MB input, after the filter): Node in-process 335 ms for
+the first run, then 55, 53, 53, 53 ms; gjs whole process 330 ms for the
+first run, then 152 and 153 ms. That is as fast as the x86_64 cloud host
+(44 to 49 ms and 167 to 185 ms). The runner's CPU model is in the job
+summary only, which the agent could not read, so it is not recorded here.
+The factor to the phone is not stated: the target phone's model is still
+`TODO` in the toolkit's `docs/device.md`, so no public single-core
+comparison can be sourced. The numbers need a factor of about 2 for the
+large input to reach 300 ms in gjs; a typical dataset (the 5,000-task row
+above is about 6 ms in the engine) has far more room. Fill in below once
+the model is known.
 
-| Item                              | Value                 |
-| --------------------------------- | --------------------- |
-| Runner CPU (from the job summary) | not yet measured      |
-| Large input, gjs process, best ms | not yet measured      |
-| Phone model and single-core ratio | unknown (device TODO) |
+| Item                              | Value                                |
+| --------------------------------- | ------------------------------------ |
+| Runner CPU (job summary)          | read from the run page, not recorded |
+| Large input, gjs process, best ms | 152 (arm64 runner)                   |
+| Phone model and single-core ratio | unknown (device `TODO`)              |
 
 ## Open
 
