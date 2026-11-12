@@ -358,6 +358,7 @@ stations list and Settings with the side panel switch:
 [settings](screenshots/journey-build-settings.png). In Super Productivity
 19.3.1 (real-app test): [the first post after the first tick](screenshots/journey-build-real-app-first-post.png),
 [ready, with the message's Show](screenshots/journey-build-real-app-ready.png),
+[the next version after Continue](screenshots/journey-build-real-app-next-version.png),
 [the side panel beside Today](screenshots/journey-build-real-app-side-panel.png).
 
 - **Phone (360 px):** from the top, the level chip, the build at the

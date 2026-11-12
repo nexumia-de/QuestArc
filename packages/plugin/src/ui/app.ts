@@ -46,6 +46,14 @@ export const createApp = (root: HTMLElement, client: Client) => {
         render(false);
       }
     },
+    sidePanel: async (on) => {
+      try {
+        update(await client.sidePanel(on));
+      } catch {
+        error = { text: t('ui.error.write') };
+        render(false);
+      }
+    },
   });
 
   const settingsButton = (screen: Screen, ctx: Context): Node =>

@@ -1,4 +1,5 @@
 import type { Context, Route, Screen } from '../screen';
+import { buildScreen } from './build';
 import { checkinScreen } from './checkin';
 import { chooseScreen } from './choose';
 import { continueScreen } from './continue';
@@ -11,6 +12,7 @@ import { settingsScreen } from './settings';
 import { setupScreen } from './setup';
 import { shelfScreen } from './shelf';
 import { startScreen } from './start';
+import { stationsScreen } from './stations';
 import { stationScreen } from './station';
 import { welcomeScreen } from './welcome';
 
@@ -45,5 +47,9 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
       return shelfScreen(ctx);
     case 'motivates':
       return motivatesScreen();
+    case 'build':
+      return buildScreen(ctx);
+    case 'stations':
+      return stationsScreen(ctx);
   }
 };

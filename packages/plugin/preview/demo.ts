@@ -10,10 +10,24 @@ import type { Task } from '@questarc/sp-plugin-api';
  * - met: the current stage's condition is met
  * - unbound: the current stage has no recurring task yet
  * - newer: the journey was continued by a newer QuestArc (read-only)
+ * - build: with game, stage 3 under way: the hut stands, the marker has its
+ *   posts and two pennants (#100); `preview.tick()` ticks today off
+ * - build-ready: with game, stage 3 met: every pennant on
+ * - build-crossing: with game, stage 3 under way, the user picked the
+ *   Crossing with lanterns in sand
  */
 
 export type Scenario =
-  'welcome' | 'empty' | 'journey' | 'journey-rpg' | 'met' | 'unbound' | 'newer';
+  | 'welcome'
+  | 'empty'
+  | 'journey'
+  | 'journey-rpg'
+  | 'met'
+  | 'unbound'
+  | 'newer'
+  | 'build'
+  | 'build-ready'
+  | 'build-crossing';
 
 const DAY_MS = 86_400_000;
 const STAGES = ['water', 'stretch-1', 'stretch-5', 'plan-day'];
@@ -29,7 +43,8 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const tasks: DemoData['tasks'] = {};
   const repeatCfgs: DemoData['repeatCfgs'] = {};
   if (scenario === 'welcome') return { tasks, repeatCfgs, data };
-  const rpg = scenario === 'journey-rpg';
+  const build = scenario.startsWith('build');
+  const rpg = scenario === 'journey-rpg' || build;
   data.settings = JSON.stringify({ mode: rpg ? 'rpg' : 'calm' });
   if (scenario === 'empty') return { tasks, repeatCfgs, data };
 
@@ -81,7 +96,12 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     repeatEvery: 1,
     startDate: accepted,
   };
-  const doneOffsets = scenario === 'met' ? [6, 5, 4, 3, 2, 1] : [10, 9, 8, 7, 5, 4, 2];
+  const doneOffsets =
+    scenario === 'met' || scenario === 'build-ready'
+      ? [6, 5, 4, 3, 2, 1]
+      : build
+        ? [4, 2, 1]
+        : [10, 9, 8, 7, 5, 4, 2];
   for (const offset of doneOffsets) {
     const d = day(offset);
     tasks[`rpt_demo_${d}`] = {
@@ -100,6 +120,8 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     repeatCfgId: 'demo',
     day: accepted,
   });
+  if (scenario === 'build-crossing')
+    record('build:demo', { ladder: 'crossing', marker: 'lanterns', hue: 'sand' });
   if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 2, day: day(1) });
   return { tasks, repeatCfgs, data };
 };

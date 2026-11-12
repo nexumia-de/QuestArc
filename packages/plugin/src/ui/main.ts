@@ -4,6 +4,7 @@
 import type { Hooks } from '@questarc/sp-plugin-api';
 
 import { createApp } from './app';
+import { setArt } from './art-store';
 import { createClient } from './client';
 import { loadErrorText } from './load-error';
 
@@ -16,6 +17,12 @@ const root = document.getElementById('app') ?? document.body;
 const client = createClient();
 const app = createApp(root, client);
 
+// The ladders' pictures once (#100); without them the path is shown.
+const artReady = client
+  .art()
+  .then(setArt)
+  .catch(() => undefined);
+
 let loading = false;
 let failingSince: number | undefined;
 let retry: ReturnType<typeof setTimeout> | undefined;
@@ -23,7 +30,9 @@ const load = async (): Promise<void> => {
   if (loading) return;
   loading = true;
   try {
-    app.update(await client.get());
+    const state = await client.get();
+    await artReady;
+    app.update(state);
     failingSince = undefined;
   } catch (error) {
     failingSince ??= Date.now();

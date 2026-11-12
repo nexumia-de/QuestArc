@@ -9,7 +9,8 @@ import { modeChoice } from './mode-choice';
 export const welcomeScreen = (ctx: Context): Screen => {
   const mode = (ctx.draft.mode as 'calm' | 'rpg' | undefined) ?? 'calm';
   const start = async () => {
-    await ctx.write(setMode(mode));
+    // the choice made since the page was drawn (a radio does not redraw)
+    await ctx.write(setMode((ctx.draft.mode as 'calm' | 'rpg' | undefined) ?? mode));
     ctx.reset({ name: 'home' });
     ctx.go({ name: 'choose' });
   };

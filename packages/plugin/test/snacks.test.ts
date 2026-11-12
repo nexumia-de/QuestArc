@@ -2,7 +2,7 @@ import { evaluate } from '@questarc/engine';
 import type { GameEvent, GameView } from '@questarc/engine';
 import { describe, expect, it } from 'vitest';
 
-import { messageFor } from '../src/adapter/snacks';
+import { messageFor, snackFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
 
 // A view with the first gentle-morning stage current, 4 of 5 days done.
@@ -96,5 +96,33 @@ describe('messages after a completion (behaviour, flow A)', () => {
         messageFor([ev(key, { xp: 10, completions: 2, level: 2 })], view('rpg'), builtInJourneys),
       ).toBeTruthy();
     }
+  });
+});
+
+describe('the message opens the build in game mode (#100)', () => {
+  const show = () => undefined;
+  const events = [ev('event.completion', { xp: 10 })];
+
+  it('game mode with a build: the action Show', () => {
+    const snack = snackFor(events, view('rpg'), builtInJourneys, show);
+    expect(snack?.msg).toBe('+10 XP · 4 of 5 days.');
+    expect(snack?.action?.label).toBe('Show');
+    expect(snack?.action?.onClick).toBe(show);
+  });
+
+  it('calm mode: the same message as before, without an action', () => {
+    expect(snackFor(events, view('calm'), builtInJourneys, show)).toEqual({
+      msg: 'Drink a glass of water: done. 4 of 5 days.',
+      type: 'SUCCESS',
+      ico: 'route',
+    });
+  });
+
+  it('build events alone make no message (no words for in-between elements)', () => {
+    const quiet = [
+      ev('event.build-element', { from: 0.6, to: 0.8 }),
+      ev('event.build-version', { version: 4 }),
+    ];
+    expect(snackFor(quiet, view('rpg'), builtInJourneys, show)).toBeUndefined();
   });
 });

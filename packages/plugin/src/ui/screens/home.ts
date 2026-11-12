@@ -2,6 +2,7 @@ import { endJourney, pauseJourney, resumeJourney, withdraw } from '@questarc/eng
 import { t } from '../../shared/texts';
 import { banners } from '../banners';
 import { h } from '../dom';
+import { buildSection } from '../journey/build';
 import { stationCard } from '../journey/card';
 import { journeyPath, scrollFor } from '../journey/path';
 import type { Context, MenuItem, Screen } from '../screen';
@@ -9,8 +10,8 @@ import { readOnlyScreen } from './read-only';
 
 /**
  * Screen 4, the journey (docs/behaviour.md): the path, opened scrolled to
- * the current station, and the current station's card with its main
- * action. With no journey, the empty state; a read-only journey gets its
+ * the current station, or in game mode the build (journey/build.ts), and
+ * the current station's card with its main action. With no journey, the empty state; a read-only journey gets its
  * own page.
  */
 export const homeScreen = (ctx: Context): Screen => {
@@ -73,6 +74,7 @@ export const homeScreen = (ctx: Context): Screen => {
 
   const rpg = view.mode === 'rpg';
   const station = run.stations[run.position.stage];
+  const build = rpg ? buildSection(run, journey) : null;
   const scroller = h(
     'div',
     { class: 'qa-path-scroll', 'data-scroll-key': 'path' },
@@ -117,6 +119,12 @@ export const homeScreen = (ctx: Context): Screen => {
           .then(() => ctx.reset({ name: 'home' }, { ended: { runId: run.runId, title } }));
       },
     },
+    ...(build
+      ? [
+          { label: t('ui.build.title'), onSelect: () => ctx.go({ name: 'build' }) },
+          { label: t('ui.build.stations'), onSelect: () => ctx.go({ name: 'stations' }) },
+        ]
+      : []),
     shelfItem,
   ];
 
@@ -128,7 +136,7 @@ export const homeScreen = (ctx: Context): Screen => {
       'div',
       { class: 'qa-journey' },
       rpg ? h('p', { class: 'qa-chip qa-level' }, t('ui.level', { level: view.level })) : null,
-      scroller,
+      build ?? scroller,
       h(
         'div',
         { class: 'qa-card-area' },
@@ -138,6 +146,7 @@ export const homeScreen = (ctx: Context): Screen => {
     ),
     actions,
     onShow: () => {
+      if (build) return;
       scroller.scrollTop = scrollFor(
         run.position.stage,
         run.stations.length,
