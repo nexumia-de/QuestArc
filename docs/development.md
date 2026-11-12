@@ -67,7 +67,10 @@ journey checker ([story format](story-format.md#the-journey-checker)).
 - `plugin.js` as a classic script (IIFE): Super Productivity runs it with
   `new Function`, so it must not contain `import`.
 - `index.html` with the view's script and `style.css` inlined: iframe
-  plugins get no other files from the ZIP.
+  plugins get no other files from the ZIP. Both are built without
+  whitespace (`minifyWhitespace`; names stay readable), because
+  Super Productivity 19.3 installs an `index.html` of at most 100 KB; the
+  build fails above it. `plugin.js` stays as it is (limit 5 MB).
 - `dist/questarc-<version>.zip` with `manifest.json`, `plugin.js`,
   and `index.html`, packed with fflate. No `icon.svg`: the manifest's
   `"icon": "route"` is a Material icon name.

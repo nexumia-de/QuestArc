@@ -5,7 +5,7 @@
 // manifest: Super Productivity uses a name without a file as a Material icon.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { build } from 'esbuild';
+import { build, transform } from 'esbuild';
 import { zipSync } from 'fflate';
 import { esbuildJourneys } from './journeys.mjs';
 
@@ -24,9 +24,19 @@ const common = {
 
 await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'plugin.js') });
 
-const view = await build({ ...common, entryPoints: ['src/ui/main.ts'], write: false });
+// The view's script and style without whitespace, names kept readable:
+// Super Productivity 19.3 installs an index.html of at most 100 KB (below).
+const view = await build({
+  ...common,
+  entryPoints: ['src/ui/main.ts'],
+  write: false,
+  minifyWhitespace: true,
+});
 const script = view.outputFiles[0].text.replaceAll('</script', '<\\/script');
-const style = readFileSync('src/ui/style.css', 'utf8');
+const { code: style } = await transform(readFileSync('src/ui/style.css', 'utf8'), {
+  loader: 'css',
+  minifyWhitespace: true,
+});
 const html = readFileSync('src/ui/index.html', 'utf8')
   .replace('<!-- QUESTARC_STYLE -->', () => `<style>\n${style}</style>`)
   .replace('<!-- QUESTARC_SCRIPT -->', () => `<script>\n${script}</script>`);
