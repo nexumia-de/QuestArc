@@ -1,5 +1,7 @@
-import crossing from '../../../content/art/crossing.ladder.json';
-import home from '../../../content/art/home.ladder.json';
+// Named imports, so the bundles keep only these fields and none of the
+// pictures' coordinates (the plugin's view has a size limit).
+import * as crossing from '../../../content/art/crossing.ladder.json';
+import * as home from '../../../content/art/home.ladder.json';
 import markers from '../../../content/art/markers.json';
 import palette from '../../../content/art/palette.json';
 import type { Journey } from './types/journey';
@@ -21,7 +23,16 @@ interface LadderFile {
   readonly hue: string;
 }
 
-const SOURCES: Readonly<Record<string, LadderFile>> = { home, crossing };
+/** Only the fields the engine reads, named one by one so bundlers drop the rest. */
+const SOURCES: Readonly<Record<string, LadderFile>> = {
+  home: { versions: home.versions, water: home.water, marker: home.marker, hue: home.hue },
+  crossing: {
+    versions: crossing.versions,
+    water: crossing.water,
+    marker: crossing.marker,
+    hue: crossing.hue,
+  },
+};
 
 export interface Ladder {
   /** Number of whole versions drawn. */
@@ -41,7 +52,7 @@ export interface LadderList {
   readonly hues: readonly string[];
 }
 
-export const LADDERS: LadderList = {
+const listFromFiles = (): LadderList => ({
   defaultLadder: 'home',
   ladders: Object.fromEntries(
     Object.entries(SOURCES).map(([name, file]) => [
@@ -53,7 +64,11 @@ export const LADDERS: LadderList = {
     Object.entries(markers).map(([name, kind]) => [name, { landOnly: kind.landOnly }]),
   ),
   hues: Object.keys(palette),
-};
+});
+
+// Marked pure, so a bundle that does not use the list (the plugin's view,
+// which has a size limit) leaves it out.
+export const LADDERS: LadderList = /* @__PURE__ */ listFromFiles();
 
 /** The user's choices for a run (`build:<runId>`, docs/data-model.md §2). */
 export interface BuildChoice {
