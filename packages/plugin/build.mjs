@@ -25,31 +25,25 @@ const common = {
 
 await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'plugin.js') });
 
-// The view is minified: Super Productivity 19.3.1 refuses an index.html
-// over 100 KiB (it checks it against MAX_PLUGIN_MANIFEST_SIZE; the 1 MiB
-// limit is unreleased, docs/super-productivity-facts.md §1).
-const MAX_INDEX_HTML = 100 * 1024;
+// The view's script and style without whitespace, names kept readable:
+// Super Productivity 19.3 installs an index.html of at most 100 KB (below).
 const view = await build({
   ...common,
+  // the pictures come from plugin.js (questarc:art), not inlined
   plugins: [esbuildJourneys],
   entryPoints: ['src/ui/main.ts'],
   write: false,
-  minify: true,
+  minifyWhitespace: true,
 });
 const script = view.outputFiles[0].text.replaceAll('</script', '<\\/script');
-const style = (
-  await transform(readFileSync('src/ui/style.css', 'utf8'), { loader: 'css', minify: true })
-).code;
+const { code: style } = await transform(readFileSync('src/ui/style.css', 'utf8'), {
+  loader: 'css',
+  minifyWhitespace: true,
+});
 const html = readFileSync('src/ui/index.html', 'utf8')
   .replace('<!-- QUESTARC_STYLE -->', () => `<style>\n${style}</style>`)
   .replace('<!-- QUESTARC_SCRIPT -->', () => `<script>\n${script}</script>`);
 writeFileSync(join(files, 'index.html'), html);
-const htmlBytes = Buffer.byteLength(html);
-if (htmlBytes > MAX_INDEX_HTML) {
-  throw new Error(
-    `index.html is ${htmlBytes} bytes; Super Productivity 19.3.1 takes at most ${MAX_INDEX_HTML}`,
-  );
-}
 
 // Super Productivity 19.3.x (minSupVersion) refuses an index.html above
 // 100 KB (102,400 bytes) at install; later versions allow 1 MB
