@@ -8,8 +8,8 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 # How the plan is tracked
 
-Work items are [issues](https://github.com/nexumia-de/QuestArc/issues),
-grouped by [milestones](https://github.com/nexumia-de/QuestArc/milestones);
+Work items are [issues](https://github.com/nexumia-de/quest-arc/issues),
+grouped by [milestones](https://github.com/nexumia-de/quest-arc/milestones);
 issues without a milestone are the backlog. This file keeps only the
 goals. The architecture and the reasons behind it are in
 [architecture](architecture.md); the design rules come from
@@ -48,7 +48,7 @@ Productivity's theme, Pensum with GTK in libadwaita's look.
 
 # Foundation
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/1)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/1)
 
 **Goal**: a clean start for 3.0 with green checks, and the one technical
 risk that could change the architecture tested first.
@@ -63,7 +63,7 @@ GitHub; GoVenture and HeroicRPG archived on Codeberg.
 
 # Rules on paper
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/2)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/2)
 
 **Goal**: everything the engine and both hosts must do is written down
 and approved by the owner, starting with the open risks.
@@ -78,7 +78,7 @@ mockups approved.
 
 # Engine
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/3)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/3)
 
 **Goal**: one pure TypeScript engine computes what the first journey
 needs from task data, the same in Node and in GNOME's JavaScript runtime.
@@ -90,7 +90,7 @@ engine archive for Pensum is built in CI.
 
 # First journey in Super Productivity
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/4)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/4)
 
 **Goal**: the owner walks a real journey every day in Super Productivity
 with QuestArc 3.0.
@@ -106,7 +106,7 @@ release 3.0.0; the owner uses it every day without workarounds.
 
 # Journey in Pensum
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/5)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/5)
 
 **Goal**: the same journey on the phone, native in Pensum.
 
@@ -117,13 +117,13 @@ accepting a stage on the phone with the same choice records.
 
 # More journeys
 
-[Milestone](https://github.com/nexumia-de/QuestArc/milestone/6)
+[Milestone](https://github.com/nexumia-de/quest-arc/milestone/6)
 
 **Goal**: more journeys and the parts of the game that only matter after
 a while.
 
 **Exit criteria**: more built-in journeys written along the psychology
-rules; HP in RPG mode; graduation by automaticity; "pair it with";
+rules; graduation by automaticity; "pair it with";
 optional plan check (WOOP); reminders that fade; German texts; others
 can publish journeys by pull request: self-contained journey files, the
 journey checker in CI and a guide for people and their agents

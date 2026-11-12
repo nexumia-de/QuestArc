@@ -40,7 +40,7 @@ QuestArc 3.0 needs Super Productivity **19.3.0 or newer** (desktop app or
 the web app).
 
 1. Download `questarc-<version>.zip` from the
-   [latest release](https://github.com/nexumia-de/QuestArc/releases/latest).
+   [latest release](https://github.com/nexumia-de/quest-arc/releases/latest).
    `SHA256SUMS` next to it holds the checksum.
 2. In Super Productivity open **Settings**, the **Plugins** tab (puzzle
    icon), and upload the ZIP; confirm **Install Plugin**.
@@ -91,8 +91,8 @@ npm run check
 
 Details in [development](docs/development.md).
 
-Work items are [issues](https://github.com/nexumia-de/QuestArc/issues) in
-[milestones](https://github.com/nexumia-de/QuestArc/milestones).
+Work items are [issues](https://github.com/nexumia-de/quest-arc/issues) in
+[milestones](https://github.com/nexumia-de/quest-arc/milestones).
 
 ## Licence
 

@@ -3,6 +3,8 @@
 ## 2026-11-12
 
 - **Update**: engine speed (#83). `snapshotFromHost` filters the raw archived tasks to those of bound tasks and bound repeat configs before converting them (200,000 archived tasks: snapshot + evaluate 81 → 15 ms, Node, x86_64; snapshot unchanged). New speed budget test `test/speed.test.ts` with a deterministic large-input generator, in Node and gjs, and a CI job `speed-aarch64` that writes times and the CPU to the job summary. Numbers in [engine in gjs](decisions/engine-in-gjs.md); first arm64 runner run: Node 53 ms, gjs process 152 ms for the large input; the phone factor is open because the phone model is not recorded.
+- **Decision**: no HP for the player (#38, D3 in [architecture](architecture.md)). Removed game rules §7 (Graduation is now §7, Calm mode §8), the HP sentence of design rule 16 (the rule stays: nothing earned is taken away), HP in the header of the journey screens and mockup, and HP from the roadmap. Guardians keep their HP. The research entry on self-recovering HP now records that the recommendation was not taken.
+- **Update**: The GitHub repository is renamed from `nexumia-de/QuestArc` to `nexumia-de/quest-arc` (lowercase, words joined by a hyphen, like `phosh-toolkit`); links in the README, changelog, roadmap, journey guide and the journey schema `$id` follow. The plugin id `questarc` and the npm package names stay, because Super Productivity keys the plugin's data by its id. The Codeberg repository `Nexumia/QuestArc` is archived; the 2.x tags are on GitHub.
 
 ## 2026-11-08
 
