@@ -149,8 +149,12 @@ milestones.
 - **Deleting history changes the game.** If archived tasks or single
   instances are deleted, derived XP and progress drop. Decided: finished
   stages are kept as checkpoints ([deleted history](decisions/deleted-history.md)).
-- **Large archives.** Every evaluation reads the whole archive; with years
-  of data the GJS route in Pensum may become slow.
+- **Large archives.** Every evaluation receives the whole archive. Measured
+  and bounded: `snapshotFromHost` drops unrelated archived tasks before
+  converting them, and a speed budget test (about 50,000 archived tasks) runs
+  in Node and gjs ([engine speed](decisions/engine-in-gjs.md#engine-speed-issue-83)).
+  What remains is the cost of serialising and parsing the archive, which a
+  host avoids by sending only tasks of bound repeat configs.
 - **Testing in the real host.** Unit tests do not show whether the plugin
   works inside a running Super Productivity; a test in the real app is
   needed.

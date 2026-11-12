@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-12
+
+- **Update**: engine speed (#83). `snapshotFromHost` filters the raw archived tasks to those of bound tasks and bound repeat configs before converting them (200,000 archived tasks: snapshot + evaluate 81 → 15 ms, Node, x86_64; snapshot unchanged). New speed budget test `test/speed.test.ts` with a deterministic large-input generator, in Node and gjs, and a CI job `speed-aarch64` that writes times and the CPU to the job summary. Numbers in [engine in gjs](decisions/engine-in-gjs.md); the phone factor is open because the phone model is not recorded.
+
 ## 2026-11-08
 
 - **Update**: `AGENTS.md` imports only `agents/core.md` from phosh-toolkit instead of its whole `AGENTS.md`, so the GTK app rules and the list of rules that do not apply are gone (toolkit decision "lean agent rules", to use fewer tokens per session).
