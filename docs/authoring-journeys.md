@@ -103,6 +103,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
   "title": "my-journey.title",
   "description": "my-journey.description",
   "why": "my-journey.why",
+  "build": { "ladder": "home" },
   "stages": [
     {
       "id": "first",
@@ -154,6 +155,18 @@ A stage's action is also the station's name on the path, cut after two
 lines on a phone. Put what is new in a stage early ("give it **45**
 quiet minutes", not a long common start), so stations do not look the
 same.
+
+### What it builds
+
+In game mode a journey builds one thing, a larger whole version after
+every stage ([game rules](game-rules.md) §9). Name a ladder from
+`content/ladders.json` (`home`, `crossing`) in `build`. You may name
+what hangs on its marker (`lanterns`, `pennants`, or `flowers` where the
+ladder's setting has no water) and give the versions names in your own
+words (`names`, text keys, at most 40 characters). A journey with more
+stages than the ladder has versions minus one gets a warning: its last
+version then gains small fixed additions. The user may choose another
+ladder when starting.
 
 ### Conditions and guardians
 

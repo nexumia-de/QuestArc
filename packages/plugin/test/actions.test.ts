@@ -20,7 +20,7 @@ describe('records written by user actions', () => {
     ).toEqual({
       'run:r': {
         journeyId: 'gentle-morning',
-        journeyVersion: 1,
+        journeyVersion: journey.version,
         startDay: '2026-11-09',
         why: 'calm mornings',
       },

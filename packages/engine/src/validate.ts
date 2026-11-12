@@ -72,6 +72,20 @@ export const journeyErrors = (value: unknown): string[] => {
   if (!isKey(value.title) || !isKey(value.description)) errors.push('title/description: invalid');
   if (value.author !== undefined && !isText(value.author, 60)) errors.push('author: invalid');
   if (value.texts !== undefined && !textsOk(value.texts)) errors.push('texts: invalid');
+  if (value.build !== undefined) {
+    const b = value.build;
+    const name = (v: unknown): boolean => typeof v === 'string' && ID.test(v);
+    const ok =
+      isObject(b) &&
+      name(b.ladder) &&
+      (b.marker === undefined || name(b.marker)) &&
+      (b.names === undefined ||
+        (Array.isArray(b.names) &&
+          b.names.length >= 1 &&
+          b.names.length <= 13 &&
+          b.names.every(isKey)));
+    if (!ok) errors.push('build: invalid');
+  }
   const stages = value.stages;
   if (!Array.isArray(stages) || stages.length < 2 || stages.length > 12) {
     errors.push('stages: 2 to 12 required');

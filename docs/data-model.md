@@ -98,7 +98,16 @@ overwrite each other. Most records are written once and never changed.
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
+| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names from `content/ladders.json`           | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
+- **Build choices** (`build:<runId>`, [game rules](game-rules.md) §9)
+  are one record per run, rewritten as a whole when the user changes
+  them (last writer wins); withdrawing it gives the journey's
+  suggestion back. A name the engine does not know, or flowers on
+  water, is ignored and the next default is used, so an older engine
+  reading a newer list stays usable: the record changes only a
+  picture, never what is computed, so it needs no data format of its
+  own (#85).
 - **Run ids** are random identifiers made by the host when a journey
   starts (`crypto.randomUUID()`); the engine never makes ids. A run is one
   walk through a journey, so a journey can be walked again later.
@@ -199,6 +208,17 @@ interface RunView {
   paused: boolean; // by a pause record or a paused repeat config
   checkinDue: boolean; // weekly question not answered this ISO week
   offerFallback: boolean; // second miss in a row, not yet followed by a completion
+  build?: BuildView; // game mode only (game rules §9)
+}
+
+interface BuildView {
+  ladder: string; // from content/ladders.json
+  version: number; // 1 + finished stages; never goes down
+  versions: number; // stages + 1
+  marker: string; // what hangs: lanterns, pennants, flowers
+  hue: string; // a name from the list's hues
+  markerProgress: number; // 0..1, the stage's highest condition progress so far
+  ready: boolean; // the current stage is met now
 }
 
 interface StationView {
@@ -224,7 +244,9 @@ station's `xp` and guardian `damage` into the checkpoint record.
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more
 than one new completion at once, e.g. after a sync),
 `event.station-reached`, `event.guardian-damaged`,
-`event.guardian-defeated`, `event.fallback-offered`, `event.level-up`.
+`event.guardian-defeated`, `event.fallback-offered`, `event.level-up`,
+and in game mode `event.build-element` (`{ from, to }`: the marker
+progress rose) and `event.build-version` (`{ version }`).
 Graduation follows with issue #22. All numbers follow the
 [game rules](game-rules.md).
 

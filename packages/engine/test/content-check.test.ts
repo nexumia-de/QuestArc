@@ -11,6 +11,11 @@ const good = () => ({
   title: 'tea.title',
   description: 'tea.description',
   why: 'tea.why',
+  build: { ladder: 'home', names: ['tea.build.tent'] } as {
+    ladder: string;
+    marker?: string;
+    names?: string[];
+  },
   stages: [
     {
       id: 'cup',
@@ -37,6 +42,7 @@ const good = () => ({
       'tea.cup.nugget': 'You could put the kettle where you see it.',
       'tea.pot.action': 'make a pot of tea',
       'tea.pot.nugget': 'One missed day is fine; you could just come back the next day.',
+      'tea.build.tent': 'A tea corner',
     },
     de: { 'tea.title': 'Eine Tasse Tee' },
   },
@@ -127,5 +133,45 @@ describe('journey checker', () => {
     const problems = journeyProblems(journey);
     expect(problems.every((p) => p.level === 'warning')).toBe(true);
     expect(problems.map((p) => p.at)).toEqual(['stages[0].condition', 'stages[1].nugget', 'why']);
+  });
+
+  it('checks the build against content/ladders.json', () => {
+    expect(errors((j) => (j.build = { ladder: 'castle' }))[0]?.message).toContain('castle');
+    expect(errors((j) => (j.build.marker = 'balloons'))[0]?.message).toContain('not a marker');
+    expect(errors((j) => (j.build.marker = 'flowers'))).toEqual([]);
+    expect(
+      errors((j) => (j.build = { ladder: 'crossing', marker: 'flowers' }))[0]?.message,
+    ).toContain('water');
+    expect(errors((j) => (j.build = { ladder: 'crossing', marker: 'lanterns' }))).toEqual([]);
+    expect(errors((j) => (j.build = { ladder: 'Home' }))[0]?.message).toBe('build: invalid');
+  });
+
+  it('allows a name per version, each in the journey texts and short', () => {
+    const names = (j: Draft, n: number) => {
+      j.build.names = Array.from({ length: n }, (_, i) => `tea.build.v${i}`);
+      j.build.names.forEach((key) => (en(j)[key] = 'A tea corner'));
+    };
+    expect(errors((j) => names(j, 3))).toEqual([]);
+    expect(errors((j) => names(j, 4))[0]?.at).toBe('build.names');
+    expect(errors((j) => (en(j)['tea.build.tent'] = 'x'.repeat(41)))[0]?.message).toContain('40');
+    expect(errors((j) => delete en(j)['tea.build.tent'])[0]?.at).toBe('build.names[0]');
+  });
+
+  it('warns about a journey without build and one with more stages than the ladder has versions', () => {
+    const plain = good() as Draft;
+    delete (plain as { build?: unknown }).build;
+    delete en(plain)['tea.build.tent'];
+    expect(journeyProblems(plain).map((p) => [p.level, p.at])).toEqual([['warning', 'build']]);
+
+    const long = good() as Draft;
+    const extra = { ...stage(long, 1), nugget: undefined };
+    long.stages = [0, 1, 2, 3, 4].map((i) => ({ ...extra, id: `s${i}`, nugget: `tea.n${i}` }));
+    long.stages.forEach((s) => (en(long)[s.nugget as string] = `You could try idea ${s.id}.`));
+    delete en(long)['tea.cup.nugget'];
+    delete en(long)['tea.pot.nugget'];
+    delete en(long)['tea.cup.action'];
+    const problems = journeyProblems(long);
+    expect(problems.map((p) => [p.level, p.at])).toEqual([['warning', 'build.ladder']]);
+    expect(problems[0]?.message).toContain('6 versions');
   });
 });

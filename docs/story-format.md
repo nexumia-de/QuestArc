@@ -36,6 +36,7 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `why`         | no       | Text key: the prompt asking for the user's own reason        |
 | `stages`      | yes      | 2 to 12 stages, in order                                     |
 | `ending`      | no       | `{ "story": <text key> }`, shown when the last stage is done |
+| `build`       | no       | What the journey builds in game mode (below)                 |
 | `texts`       | yes      | Texts by language: `{ "en": { <text key>: <text> }, … }`     |
 
 ## Stage
@@ -54,6 +55,25 @@ The schedule is a suggestion: the user sets the real repeat in Super
 Productivity, and only the supported kinds can be bound
 ([game rules](game-rules.md#due-days-issue-48)).
 
+## Build
+
+What the journey builds in game mode ([game rules](game-rules.md) §9,
+issue #42). The names come from the built-in list
+`content/ladders.json`; pictures are found by these names in the hosts.
+
+| Field    | Required | Meaning                                                                                         |
+| -------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `ladder` | yes      | A ladder from the list (`home`, `crossing`, …)                                                  |
+| `marker` | no       | What hangs on the marker: `lanterns`, `pennants` or `flowers`; the ladder's default if left out |
+| `names`  | no       | Text keys naming the versions in the journey's own words, version 1 first (at most 40 chars)    |
+
+```json
+"build": { "ladder": "crossing", "names": ["first-things-first.build.v1"] }
+```
+
+The user may choose another ladder, marker and hue when starting; the
+journey only suggests.
+
 ## Texts
 
 - Every user-facing string is a **text key**: dot-separated, lower-case
@@ -68,7 +88,7 @@ Productivity, and only the supported kinds can be bound
   "lunch", action "walk for 5 minutes".
 - The longest texts per field (360 px): title 40, description 160, why
   120, anchor 40, action 120, place 40, guardian 40, arrival 200,
-  accept 200, nugget 240, ending 240 characters. A station's action is
+  accept 200, nugget 240, ending 240, build name 40 characters. A station's action is
   also its name on the path, cut after two lines, so the part that
   differs from the previous stage comes early.
 
@@ -79,18 +99,20 @@ what can be checked without a person; `npm run journeys` runs it on
 every file, and `npm run check` (CI) includes it. A future import of
 private journeys (#40) runs the same function.
 
-| Level   | Check                                                                                                   | Rule       |
-| ------- | ------------------------------------------------------------------------------------------------------- | ---------- |
-| error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist | —          |
-| error   | the same anchor (English text) in every stage                                                           | 2          |
-| error   | text lengths above                                                                                      | —          |
-| error   | a number of days ("21 days")                                                                            | 4          |
-| error   | quotes with an author                                                                                   | 5          |
-| error   | controlling words (must, have to, you should, no excuses)                                               | 15         |
-| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                 | 11, 12, 15 |
-| error   | the same nugget twice                                                                                   | 22         |
-| warning | a `days` condition without room for one miss, or looking back more than 14 days                         | 1, 11      |
-| warning | a stage without a nugget, a journey without `why`; English texts no key uses                            | 5, 22      |
+| Level   | Check                                                                                                               | Rule       |
+| ------- | ------------------------------------------------------------------------------------------------------------------- | ---------- |
+| error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist             | —          |
+| error   | the same anchor (English text) in every stage                                                                       | 2          |
+| error   | text lengths above                                                                                                  | —          |
+| error   | a number of days ("21 days")                                                                                        | 4          |
+| error   | quotes with an author                                                                                               | 5          |
+| error   | controlling words (must, have to, you should, no excuses)                                                           | 15         |
+| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                             | 11, 12, 15 |
+| error   | the same nugget twice                                                                                               | 22         |
+| warning | a `days` condition without room for one miss, or looking back more than 14 days                                     | 1, 11      |
+| warning | a stage without a nugget, a journey without `why`; English texts no key uses                                        | 5, 22      |
+| error   | `build`: a ladder or marker not in `content/ladders.json`; `flowers` with a water setting; more names than versions | 42         |
+| warning | no `build`; more stages than the ladder has versions minus one (its last version gains fixed additions)             | 42         |
 
 The test also checks that each file is named after its id and that ids
 are unique.

@@ -10,6 +10,13 @@ export interface Journey {
   readonly why?: string;
   readonly stages: readonly Stage[];
   readonly ending?: { readonly story: string };
+  /** What the journey builds in game mode (docs/story-format.md, Build). */
+  readonly build?: {
+    readonly ladder: string;
+    readonly marker?: string;
+    /** Text keys naming the versions, version 1 first. */
+    readonly names?: readonly string[];
+  };
   /** Texts by language, then text key; `en` is required in content files. */
   readonly texts?: Texts;
 }

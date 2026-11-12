@@ -1,0 +1,57 @@
+{
+  "name": "Calm mode: the view carries no build",
+  "rule": "game-rules §9",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-03",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793487600000,
+        "doneOn": 1793509200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793574000000,
+        "doneOn": 1793595600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "mode": "calm",
+    "active": {
+      "build": "$absent"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "A journey without build gets the default ladder, its marker and hue",
+  "rule": "game-rules §9",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-01",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "build": {
+        "ladder": "home",
+        "version": 1,
+        "versions": 4,
+        "marker": "lanterns",
+        "hue": "meadow",
+        "markerProgress": 0,
+        "ready": false
+      }
+    }
+  }
+}
