@@ -1,18 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
   <title>Stepping stones across a river</title>
   <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
-  <rect class="fg" x="14" y="57" width="14" height="7" rx="2"/>
-  <rect class="bg" x="16" y="59" width="10" height="3"/>
-  <rect class="fg" x="92" y="57" width="14" height="7" rx="2"/>
-  <rect class="bg" x="94" y="59" width="10" height="3"/>
-  <ellipse class="fg" cx="36" cy="62.6" rx="4.6" ry="4"/>
-  <ellipse class="bg" cx="36" cy="62.6" rx="2.6" ry="2"/>
-  <ellipse class="fg" cx="48" cy="63.4" rx="4.6" ry="4"/>
-  <ellipse class="bg" cx="48" cy="63.4" rx="2.6" ry="2"/>
-  <ellipse class="fg" cx="60" cy="62.6" rx="4.6" ry="4"/>
-  <ellipse class="bg" cx="60" cy="62.6" rx="2.6" ry="2"/>
-  <ellipse class="fg" cx="72" cy="63.4" rx="4.6" ry="4"/>
-  <ellipse class="bg" cx="72" cy="63.4" rx="2.6" ry="2"/>
-  <ellipse class="fg" cx="84" cy="62.6" rx="4.6" ry="4"/>
-  <ellipse class="bg" cx="84" cy="62.6" rx="2.6" ry="2"/>
+  <rect class="fg" x="10" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="12" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="10" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="20.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="15" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="25.4" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="88" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="90" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="88" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="98.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="93" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="103.4" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="14" y="57" width="16" height="7" rx="1.5"/>
+  <rect class="bg" x="16" y="59" width="12" height="3"/>
+  <rect class="fg" x="90" y="57" width="16" height="7" rx="1.5"/>
+  <rect class="bg" x="92" y="59" width="12" height="3"/>
+  <rect class="fg" x="33.5" y="56.5" width="13" height="10" rx="4.5"/>
+  <rect class="bg" x="35.5" y="58.5" width="9" height="6" rx="2.5"/>
+  <path class="bg" d="M31.5 68h17v1.4h-17Z"/>
+  <rect class="fg" x="47.5" y="58" width="11" height="9" rx="4.1"/>
+  <rect class="bg" x="49.5" y="60" width="7" height="5" rx="2.1"/>
+  <path class="bg" d="M45.5 68.5h15v1.4h-15Z"/>
+  <rect class="fg" x="59.5" y="56" width="13" height="11" rx="5"/>
+  <rect class="bg" x="61.5" y="58" width="9" height="7" rx="3"/>
+  <path class="bg" d="M57.5 68.5h17v1.4h-17Z"/>
+  <rect class="fg" x="74" y="58" width="11" height="9" rx="4.1"/>
+  <rect class="bg" x="76" y="60" width="7" height="5" rx="2.1"/>
+  <path class="bg" d="M72 68.5h15v1.4h-15Z"/>
 </svg>

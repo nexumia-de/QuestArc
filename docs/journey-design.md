@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Journey design
-description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, the builds and ladders of the Valley (one thing whole at every stage, scaffold states, way points, a hue per region) and the older scene rules for a region; with mockups.
+description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, the builds and ladders of the Valley (one thing whole at every stage, a festive marker growing in front of the build, way points, a hue per region) and the older scene rules for a region; with mockups.
 tags: [design, ui, journey, mockups, pictures, valley]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 sources:
@@ -104,25 +104,36 @@ earned on finished stations. XP is never shown before it is earned.
 Decided by the owner on 2026-11-12[^42]: a journey builds **one thing**,
 whole at every stage, and every stage makes it a larger version. A
 **ladder** is that thing drawn once in five versions and used by every
-journey that picks it. The first two ladders, Crossing and Home, plugin
-above, Day Planner below (scale 2):
+journey that picks it. The first two ladders, Crossing (with lanterns
+and with pennants) and Home (with pennants and with flowers); plugin
+light above, Day Planner dark below (scale 2). Each version, then its
+marker growing element by element (every element for the first stage, a
+few sampled steps for the others), ready, then the next version:
 
-![Crossing: each version, the scaffold, the scaffold with the flag, the lantern](screenshots/ladder-crossing.png)
+![Crossing with lanterns](screenshots/ladder-crossing.png)
 
-![Home, the same sequence](screenshots/ladder-home.png)
+![Crossing with pennants](screenshots/ladder-crossing-pennants.png)
 
-The journey screen as a static mock (plugin and Day Planner, Crossing and
-Home), light and dark: the build on top, the row of versions below it,
-the card unchanged.
+![Home with pennants](screenshots/ladder-home.png)
+
+![Home with flowers](screenshots/ladder-home-flowers.png)
+
+The journey screen as a static mock (plugin and Day Planner side by side;
+Crossing above, Home below; first mid-way, posts up and two elements
+hanging, then ready), light and dark: the build on top, the row of
+versions below it, the state in words, the card unchanged.
 
 | Light                                                          | Dark                                                         |
 | -------------------------------------------------------------- | ------------------------------------------------------------ |
 | ![Journey screen, light](screenshots/ladder-journey-light.png) | ![Journey screen, dark](screenshots/ladder-journey-dark.png) |
 
 **Files.** A ladder is `content/art/<ladder>.ladder.json` with its title,
-the default hue, the versions (`build-<ladder>-<n>.svg`, each with a
-title), the scaffold, the way points (`ways`) and the setting with its
-places; the setting is `setting-<kind>.svg`. Checked by
+the default hue, whether its setting is water (`water`), its default
+marker kind (`marker`), the marker's layout and post points (`layout`,
+`posts`), the versions (`build-<ladder>-<n>.svg`, each with a
+title), optionally the part of every version the row of versions shows
+(`row`), the way points (`ways`) and the setting with its places,
+including the marker's; the setting is `setting-<kind>.svg`. Checked by
 `ladderProblems` (`packages/engine/src/art-ladder-check.ts`) in
 `npm run journeys`. The coordinates of both ladders come from
 `scripts/draw-ladders.mjs`: change the numbers there and run it, never
@@ -153,38 +164,122 @@ journey):
    also spans the whole width.
 5. **Sizes.** Outlines 2 build units (3.5 px at 360 px, 1 px in the row of
    versions); every version must read at the journey screen's size (the
-   setting 360 px wide) and in the row of versions at 60 × 40 px. The
-   largest version may reach y = 4; the setting's sky is at most its top
-   fifth.
-6. **Look.** Outlined in `fg` with a `bg` fill, one `accent` detail (the
+   setting 360 px wide) and in the row of versions at 60 × 40 px: give the
+   smallest versions mass and a clear silhouette (stones with a flat top,
+   a log as thick as two path widths), not thin lines. A ladder whose
+   small versions are wide and flat may name `row`, a 3 : 2 part of the
+   build's view box that the row shows zoomed (Crossing: `[30, 38, 60,
+40]`, the stones without the bank slabs); the scene always shows the whole build. The largest version may
+   reach y = 4; the setting's sky is at most its top fifth.
+6. **Bank contact.** A crossing rests on the banks at both way points:
+   stone abutments under the deck ends (stepping stones, log, plank
+   bridge) or masonry reaching into the banks (stone and covered bridge).
+   No deck floats.
+7. **Growth in size and form.** Each version is larger than the one
+   before and also different in form, so the row reads as a story: Home
+   is a fire in a ring of single stones, a tent, a hut under a round
+   thatch, a cottage with a pitched roof and chimney, a house of two
+   storeys.
+8. **Look.** Outlined in `fg` with a `bg` fill, one `accent` detail (the
    flame, a glowing door or window, the keystone, a rail cap), water and
    the yard in `tint-strong` of the region's hue. The setting is quiet:
    ground and far trees in `tint`, a few reused plants (tuft, reeds, bush,
    flowers, far trees) in the bands of the region scenes.
 
-**Work on the next version: states, never counts** (owner, 2026-11-12).
-The picture shows states of the build: (1) the version **standing**; (2)
-**being extended**: the scaffold behind the build while the stage runs,
-from its first counting completion; (3) **ready**: the same scaffold with
-the flag (the pennant) on its right tower when the stage's condition is
-met. On Continue the next version stands without scaffold. A met stage
-that falls back below its condition goes back to state 2 only: the flag
-comes down, nothing built disappears. Counts stay where they are exact:
-the progress bar, the words ("3 of 5 days") and the seven day marks in
-the card. Under the row of versions the state is said in words ("A
-plank bridge stands · work on a stone bridge has begun", "… is ready").
+**Markers: a stage on its way** (owner, 2026-11-12; replacing the
+scaffold, which looked like a permanent building site over a thing that
+is meant to be whole, and later drafts with a ring around the build and
+with fixed phases, which could not be read in order). While a stage runs,
+a small festive **marker** grows in the foreground, in front of the
+build, never on it, behind it or across it:
 
-The **scaffold** (`build-scaffold.svg`) is drawn once for every build: two
-towers beside the largest version and a beam with a hoist above it, in
-`dim`, drawn behind the version, so the version stays whole and in front
-and it reads as being improved, never as damage.
+- **Element by element.** A marker has E elements in a fixed order: first
+  the posts, one after the other, then the hanging elements, one after
+  the other along the line from the first post. The line between two
+  neighbouring posts shows once both stand. The hosts show the first
+  ceil(p × E) elements, p (0 … 1) the best progress reached in the
+  stage's condition; p = 1 means all stand. So a `days` stage (5 of 7)
+  and a `count` stage (20) fill the same marker, and since p is the best
+  progress, never the current one, the marker never loses an element.
+- **Ready** while the condition is met now: every hanging element takes
+  its "on" form, different in shape, not only in colour: lanterns filled,
+  with a flame and rays; pennants solid with a second tail; flowers open
+  instead of in bud. It reads without telling the accent apart.
+- **Posts carry nothing on top.** They are plain (a post with a rounded
+  top); everything decorative hangs from the line.
+- After the last version nothing is on its way: no marker. On Continue
+  the next version stands and the marker is gone until the next stage's
+  first counting completion.
 
-**Slots** in a ladder's setting, filled by the hosts: `scaffold` (just
-before `build`, the same rectangle), `build`, `flag` (on the scaffold's
-right tower, after the build), `lantern` (after graduation, lit, beside
-the build on the left) and `keeper` (a worn-down guardian, beside the
-lantern; pictures for keepers are not drawn yet). After the last version
-there is nothing to extend: no scaffold, no flag.
+Counts stay where they are exact: the progress bar, the words ("3 of 5
+days") and the seven day marks in the card. Under the row of versions
+the state is said in words, never as a building site: "A plank bridge
+stands · a stone bridge is on its way" while the stage runs, "… · a stone
+bridge is ready" while it is met.
+
+**Marker kinds** (`content/art/markers.json`), each drawn once and used
+with every ladder and setting; what hangs is the user's choice per
+journey, the ladder only gives the default (`marker`: Crossing lanterns,
+Home pennants):
+
+- **lanterns**: small lanterns, outlined; ready filled with a flame, a
+  halo and rays.
+- **pennants** (`bunting`): pale outlined pennants; ready solid in the
+  accent with a second tail.
+- **flowers**: vines with closed buds; ready open blossoms. Land only:
+  the checker refuses flowers for a ladder whose setting is water
+  (`"water": true`).
+
+Each kind has three pictures (view box 32 × 32): `marker-<kind>-post`
+stands on y = 30 and the line is tied on at (16, 12); `marker-<kind>-bead`
+hangs from the line at (16, 2); `marker-<kind>-bead-lit` is its ready
+form.
+
+**Layouts and post points.** A setting declares its marker's layout and
+an ordered list of post points in the near band, as it declares where the
+path meets the build:
+
+- `span`: one continuous line over all posts (three: left, middle,
+  right). For a setting where the line can run in front of the build
+  without crossing the way or the view: Crossing, along the near edge in
+  front of the bridge over the river.
+- `sides`: two short lines, left and right, with a gap in the middle
+  (four posts, two on each side). For a way leading to the build (Home:
+  the path to the door) or a build on water (a boat: the gap is the
+  waterway).
+- **Choosing**: the gap is wherever the user's way or view to the build
+  passes. If nothing passes in front of the build, `span`; otherwise
+  `sides` with the gap there.
+
+The lines are pictures of the setting (`setting-<kind>-cord-<n>.svg`, the
+same for every kind); the hanging elements sit at fixed points along
+them, spread evenly, in order from the first post (Crossing 3 posts and 6
+elements, Home 4 posts and 6 elements). All numbers come from
+`MARKER_LAYOUTS` in `scripts/draw-ladders.mjs`. Every marker place in the
+ladder file has its `order` (1 … E); a line has the order of its second
+post.
+
+The checker (`ladderProblems`, `markerProblems`) requires: a known marker
+kind with its three pictures and a title; flowers not on water; a layout
+of `span` or `sides` (four post points); post points in the near band,
+left to right; one post on each point, in order, tied on below the
+build's base line; one line per pair of neighbours (`sides`: none across
+the gap), each shown with its second post; at least two hanging elements
+after the posts, in order, each under a line and below the build; nothing
+of the marker over a way point.
+
+**A new marker kind** comes by pull request like a ladder: add it to
+`MARKERS` in `scripts/draw-ladders.mjs` with its three pictures (a plain
+post, the hanging element and its ready form, different in shape), set
+`landOnly` if it needs ground, run the script, and show it with every
+ladder in both hosts (`sequence-<ladder>-<kind>`) light and dark at
+360 px. A new setting declares its layout and post points by the rule
+above.
+
+**Slots** in a ladder's setting, filled by the hosts: `build`, `lantern`
+(after graduation, lit, where the marker's first post stood: the
+marker's lasting form), `keeper` (a worn-down guardian; pictures for
+keepers are not drawn yet) and the `marker` places above.
 
 **Row of versions.** Below the build: the standing versions as small
 pictures (60 × 40 px), the next one as a plain outlined step without a
@@ -204,7 +299,8 @@ light above, Day Planner dark below:
 
 ![Every hue, each ladder in two hues](screenshots/ladder-palette.png)
 
-**Review rounds** (both hosts, light and dark, journey mock at 360 × 720):
+**Review rounds** (both hosts, light and dark, journey mock at 360 × 720;
+rounds 1–4 still show the dropped pile or scaffold):
 [1, crossing](screenshots/ladder-round-1-crossing.png) and
 [home](screenshots/ladder-round-1-home.png): the build too small, the
 river a straight wedge, beams like drawers;
@@ -213,7 +309,20 @@ the near edge, hut redrawn; [3](screenshots/ladder-round-3.png): river
 behind a fold, wider pile columns (the pile was later dropped);
 [4](screenshots/ladder-round-4.png): the owner's corrections: the path
 meets the crossing and the door at fixed way points, the river runs edge
-to edge, the scaffold and flag instead of a pile.
+to edge, the scaffold and flag instead of a pile. Markers (both hosts,
+journey mock light): [m1](screenshots/ladder-markers-round-1.png) a ring
+of posts around the build: the abutments looked like boats, too many
+lanterns, the flame a tree; [m2](screenshots/ladder-markers-round-2.png)
+brick abutments, a rounded thatch for the hut, the row zoomed;
+[m3](screenshots/ladder-markers-round-3.png) the owner could not read the
+ring's steps in order (a line behind the build looked odd, ready was a
+colour only): superseded by a gate across the path, then by the marker
+that grows element by element; [m4](screenshots/ladder-markers-round-4.png)
+element by element, `span` and `sides`: the posts looked like
+stanchions, and the scenery flowers read as a hanging element;
+[m5](screenshots/ladder-markers-round-5.png) slimmer posts, larger
+elements; then the owner asked for plain posts with nothing on top and
+ready only on the hanging elements: the final images above.
 
 ## Scenes of a region (for the Valley, #42)
 

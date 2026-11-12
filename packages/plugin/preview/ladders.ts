@@ -1,13 +1,24 @@
 // The ladders' pages (#42) for preview/art.ts, for the owner to judge:
-// `sequence` shows one ladder as it grows (each version, then the scaffold
-// while the next is worked on, the scaffold with the flag when it is
-// ready, the last version with the lit lantern, and the row of versions),
-// `journey` a static mock of the journey screen at 360 px with the build on
-// top, `palette` every hue and each ladder in two hues. Not part of the
-// plugin; the real journey screen is unchanged.
+// `sequence-<ladder>[-<marker>]` shows one ladder as it grows (each
+// version, then its marker growing element by element (every element for
+// the first stage, a few sampled steps for the others), ready, then the
+// next version; the last version with the lit lantern; the row of
+// versions), `journey-<ladder>[-ready]` a static mock of the journey screen
+// at 360 px with the build on top (posts up and two elements hanging, or
+// ready), `palette`
+// every hue and each ladder in two hues. Not part of the plugin; the real
+// journey screen is unchanged.
 import { ladders, palette, pictures } from 'virtual:questarc-art';
 import { picture, scene, type Hue } from '../src/ui/art';
-import { ladderScene, type BuildState, type Ladder, type LadderVersion } from '../src/ui/ladder';
+import {
+  buildWords,
+  ladderScene,
+  markerElements,
+  rowViewBox,
+  type BuildState,
+  type Ladder,
+  type LadderVersion,
+} from '../src/ui/ladder';
 
 export const laddersCss = `
 .frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
@@ -41,13 +52,12 @@ const frame = (
   hue: Hue,
   version: number,
   state: BuildState,
-  lit: boolean,
   caption: string,
 ) =>
   el(
     'div',
     'card',
-    scene(ladderScene(ladder, version, state, lit), pictures, hue),
+    scene(ladderScene(ladder, version, state), pictures, hue),
     el('p', '', caption),
   );
 
@@ -56,11 +66,12 @@ const versionRow = (el: El, ladder: Ladder, hue: Hue, standing: number) =>
   el(
     'div',
     'versions',
-    ...ladder.versions
-      .slice(0, standing)
-      .map((v: LadderVersion, i: number) =>
-        el('div', 'version', picture(pictures[v.art] ?? '', hue), String(i + 1)),
-      ),
+    ...ladder.versions.slice(0, standing).map((v: LadderVersion, i: number) => {
+      const svg = picture(pictures[v.art] ?? '', hue);
+      svg.setAttribute('viewBox', rowViewBox(ladder));
+      svg.style.overflow = 'hidden';
+      return el('div', 'version', svg, String(i + 1));
+    }),
     ...(standing < ladder.versions.length
       ? [el('div', 'version', el('div', 'next'), String(standing + 1))]
       : []),
@@ -69,32 +80,46 @@ const versionRow = (el: El, ladder: Ladder, hue: Hue, standing: number) =>
 const hueOf = (ladder: Ladder, name: string | null): Hue =>
   palette[name ?? ''] ?? palette[ladder.hue] ?? { title: '', light: '#6495ed', dark: '#6495ed' };
 
-/** The state in words, as under the row of versions. */
-const words = (ladder: Ladder, version: number, state: BuildState) => {
-  const now = ladder.versions[version - 1]?.title ?? '';
-  const stands = now.startsWith('A ') ? 'stands' : 'stand';
-  const next = ladder.versions[version]?.title.toLowerCase() ?? '';
-  if (state === 'extending') return `${now} ${stands} · work on ${next} has begun`;
-  if (state === 'ready') return `${now} ${stands} · ${next} is ready`;
-  return `${now} ${stands}`;
+/** The steps shown for a stage: every element for the first, a few for the others. */
+const steps = (ladder: Ladder, version: number): number[] => {
+  const all = markerElements(ladder);
+  const posts = ladder.posts.length;
+  if (version === 1) return Array.from({ length: all }, (_, i) => i + 1);
+  return [1, posts, posts + Math.ceil((all - posts) / 2), all];
 };
 
+/** `name` is `<ladder>` or `<ladder>-<marker kind>`. */
 export const sequence = (el: El, name: string, hueName: string | null): Node[] => {
-  const ladder = ladders[name];
+  const [ladderName = '', marker] = name.split('-');
+  const ladder = ladders[ladderName];
   if (ladder === undefined) return [el('p', '', `No ladder ${name}`)];
   const hue = hueOf(ladder, hueName);
+  const kind = marker ?? ladder.marker;
   const frames: Node[] = [];
   const last = ladder.versions.length;
+  const all = markerElements(ladder);
   for (let v = 1; v <= last; v += 1) {
-    frames.push(
-      frame(el, ladder, hue, v, 'standing', false, `${v} · ${words(ladder, v, 'standing')}`),
-    );
-    if (v < last)
-      for (const state of ['extending', 'ready'] as const)
-        frames.push(frame(el, ladder, hue, v, state, false, words(ladder, v, state)));
+    frames.push(frame(el, ladder, hue, v, {}, `${v} · ${buildWords(ladder, v)}`));
+    if (v < last) {
+      for (const n of steps(ladder, v)) {
+        const state = { progress: n / all, marker: kind };
+        frames.push(
+          frame(el, ladder, hue, v, state, `${n} of ${all} · ${buildWords(ladder, v, state)}`),
+        );
+      }
+      const ready = { ready: true, marker: kind };
+      frames.push(frame(el, ladder, hue, v, ready, `ready · ${buildWords(ladder, v, ready)}`));
+    }
   }
   frames.push(
-    frame(el, ladder, hue, last, 'standing', true, `${last} · after graduation: the lantern lit`),
+    frame(
+      el,
+      ladder,
+      hue,
+      last,
+      { graduated: true },
+      `${last} · after graduation: the lantern lit`,
+    ),
   );
   frames.push(
     el(
@@ -105,30 +130,41 @@ export const sequence = (el: El, name: string, hueName: string | null): Node[] =
     ),
   );
   return [
-    el('h1', '', `${ladder.title}: one thing, whole at every step (${hue.title.toLowerCase()})`),
+    el(
+      'h1',
+      '',
+      `${ladder.title} with ${kind}: one thing, whole at every step (${hue.title.toLowerCase()})`,
+    ),
     el('div', 'frames', ...frames),
   ];
 };
 
+/** `name` is `<ladder>` (posts up, two elements hanging) or `<ladder>-ready`. */
 export const journey = (el: El, name: string, hueName: string | null): Node[] => {
-  const ladder = ladders[name];
+  const [ladderName = '', flag] = name.split('-');
+  const ladder = ladders[ladderName];
   if (ladder === undefined) return [el('p', '', `No ladder ${name}`)];
   const hue = hueOf(ladder, hueName);
   const standing = 3;
+  const ready = flag === 'ready';
+  const midway = (ladder.posts.length + 2) / markerElements(ladder);
+  const state: BuildState = ready ? { ready } : { progress: midway };
   const dots = [
-    ['Fr', 'off'],
+    ['Fr', ready ? 'on' : 'off'],
     ['Sa', 'on'],
     ['Su', 'on'],
     ['Mo', 'off'],
     ['Tu', 'on'],
-    ['We', ''],
+    ['We', ready ? 'on' : ''],
     ['Th', ''],
-  ].map(([day, state]) => el('span', '', el('i', state ?? ''), day ?? ''));
+  ].map(([day, on]) => el('span', '', el('i', on ?? ''), day ?? ''));
+  const bar = el('b', '');
+  bar.style.width = ready ? '100%' : '60%';
   return [
     el('header', '', '‹', el('span', '', 'A gentle morning'), '⋮'),
-    el('div', 'card build', scene(ladderScene(ladder, standing, 'extending'), pictures, hue)),
+    el('div', 'card build', scene(ladderScene(ladder, standing, state), pictures, hue)),
     versionRow(el, ladder, hue, standing),
-    el('div', 'row-text', words(ladder, standing, 'extending')),
+    el('div', 'row-text', buildWords(ladder, standing, state)),
     el(
       'div',
       'card station',
@@ -138,8 +174,8 @@ export const journey = (el: El, name: string, hueName: string | null): Node[] =>
         '',
         'After getting up, I will drink a glass of water and stretch for five minutes.',
       ),
-      el('div', 'bar', el('b', '')),
-      el('span', '', '3 of 5 days in the last 7 due days'),
+      el('div', 'bar', bar),
+      el('span', '', `${ready ? '5' : '3'} of 5 days in the last 7 due days`),
       el('div', 'days', ...dots),
     ),
   ];
@@ -157,7 +193,14 @@ export const hues = (el: El): Node[] => {
     if (l === undefined) return [];
     return [a, b].map((h) => {
       const hue = hueOf(l, h);
-      return frame(el, l, hue, version, 'ready', false, `${l.title} in ${hue.title.toLowerCase()}`);
+      return frame(
+        el,
+        l,
+        hue,
+        version,
+        { ready: true },
+        `${l.title} in ${hue.title.toLowerCase()}`,
+      );
     });
   };
   return [

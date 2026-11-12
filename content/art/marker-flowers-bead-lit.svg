@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>A vine in bloom</title>
+  <rect class="tint-strong" x="14.8" y="2" width="2.4" height="10"/>
+  <polygon class="tint-strong" points="15,6 10.5,3.4 5.3,4.4 9.9,7"/>
+  <polygon class="tint-strong" points="17,9 21.5,6.4 26.8,7.4 22.1,10"/>
+  <ellipse class="accent" cx="16" cy="12.4" rx="4.4" ry="4.4"/>
+  <ellipse class="accent" cx="20.4" cy="15.6" rx="4.4" ry="4.4"/>
+  <ellipse class="accent" cx="18.7" cy="20.7" rx="4.4" ry="4.4"/>
+  <ellipse class="accent" cx="13.3" cy="20.7" rx="4.4" ry="4.4"/>
+  <ellipse class="accent" cx="11.6" cy="15.6" rx="4.4" ry="4.4"/>
+  <ellipse class="bg" cx="16" cy="17" rx="2.5" ry="2.5"/>
+</svg>

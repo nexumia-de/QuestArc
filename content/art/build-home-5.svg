@@ -5,31 +5,31 @@
   <rect class="bg" x="54.4" y="75.4" width="11.2" height="0.7"/>
   <rect class="fg" x="80" y="4" width="8" height="16"/>
   <rect class="bg" x="82" y="6" width="4" height="12"/>
-  <rect class="fg" x="16" y="30" width="88" height="44"/>
-  <rect class="bg" x="18" y="32" width="84" height="40"/>
-  <polygon class="fg" points="30,8 90,8 110,32 10,32"/>
-  <polygon class="bg" points="30.9,10 89.1,10 105.7,30 14.3,30"/>
-  <rect class="fg" x="16" y="50" width="88" height="2"/>
+  <rect class="fg" x="14" y="30" width="92" height="44"/>
+  <rect class="bg" x="16" y="32" width="88" height="40"/>
+  <polygon class="fg" points="30,8 90,8 112,32 8,32"/>
+  <polygon class="bg" points="30.9,10 89.1,10 107.5,30 12.5,30"/>
+  <rect class="fg" x="14" y="51" width="92" height="2"/>
   <rect class="fg" x="53" y="56" width="14" height="18" rx="1"/>
   <rect class="accent" x="55" y="58" width="10" height="16"/>
-  <rect class="fg" x="24" y="56" width="14" height="12" rx="1"/>
-  <rect class="bg" x="25.8" y="57.8" width="10.4" height="8.4"/>
-  <rect class="fg" x="30.2" y="56" width="1.6" height="12"/>
-  <rect class="fg" x="24" y="61.2" width="14" height="1.6"/>
-  <rect class="fg" x="82" y="56" width="14" height="12" rx="1"/>
-  <rect class="bg" x="83.8" y="57.8" width="10.4" height="8.4"/>
-  <rect class="fg" x="88.2" y="56" width="1.6" height="12"/>
-  <rect class="fg" x="82" y="61.2" width="14" height="1.6"/>
-  <rect class="fg" x="24" y="36" width="14" height="11" rx="1"/>
-  <rect class="bg" x="25.8" y="37.8" width="10.4" height="7.4"/>
-  <rect class="fg" x="30.2" y="36" width="1.6" height="11"/>
-  <rect class="fg" x="24" y="40.7" width="14" height="1.6"/>
+  <rect class="fg" x="22" y="56" width="14" height="12" rx="1"/>
+  <rect class="bg" x="23.8" y="57.8" width="10.4" height="8.4"/>
+  <rect class="fg" x="28.2" y="56" width="1.6" height="12"/>
+  <rect class="fg" x="22" y="61.2" width="14" height="1.6"/>
+  <rect class="fg" x="84" y="56" width="14" height="12" rx="1"/>
+  <rect class="bg" x="85.8" y="57.8" width="10.4" height="8.4"/>
+  <rect class="fg" x="90.2" y="56" width="1.6" height="12"/>
+  <rect class="fg" x="84" y="61.2" width="14" height="1.6"/>
+  <rect class="fg" x="22" y="36" width="14" height="11" rx="1"/>
+  <rect class="bg" x="23.8" y="37.8" width="10.4" height="7.4"/>
+  <rect class="fg" x="28.2" y="36" width="1.6" height="11"/>
+  <rect class="fg" x="22" y="40.7" width="14" height="1.6"/>
   <rect class="fg" x="53" y="36" width="14" height="11" rx="1"/>
   <rect class="accent" x="54.8" y="37.8" width="10.4" height="7.4"/>
   <rect class="fg" x="59.2" y="36" width="1.6" height="11"/>
   <rect class="fg" x="53" y="40.7" width="14" height="1.6"/>
-  <rect class="fg" x="82" y="36" width="14" height="11" rx="1"/>
-  <rect class="bg" x="83.8" y="37.8" width="10.4" height="7.4"/>
-  <rect class="fg" x="88.2" y="36" width="1.6" height="11"/>
-  <rect class="fg" x="82" y="40.7" width="14" height="1.6"/>
+  <rect class="fg" x="84" y="36" width="14" height="11" rx="1"/>
+  <rect class="bg" x="85.8" y="37.8" width="10.4" height="7.4"/>
+  <rect class="fg" x="90.2" y="36" width="1.6" height="11"/>
+  <rect class="fg" x="84" y="40.7" width="14" height="1.6"/>
 </svg>

@@ -68,7 +68,9 @@ if (part.startsWith('sequence-')) {
     card('shore-finished', 'Finished and graduated'),
   );
 } else {
-  const names = Object.keys(pictures).filter((name) => !name.startsWith('ground-'));
+  const names = Object.keys(pictures).filter(
+    (name) => !name.startsWith('ground-') && !name.includes('-cord-'),
+  );
   main.append(
     el('h1', '', 'Every picture at 48, 32 and 24 px'),
     el(

@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
   <title>A stone bridge across a river</title>
   <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
-  <path class="fg" d="M16 80V62H104V80H90C90 74 77 70 60 70C43 70 30 74 30 80Z"/>
-  <path class="bg" d="M18 78V64H102V78H92C91 72 78 68 60 68C42 68 29 72 28 78Z"/>
+  <path class="fg" d="M12 80V62H108V80H90C90 74 77 70 60 70C43 70 30 74 30 80Z"/>
+  <path class="bg" d="M14 78V64H106V78H92C91 72 78 68 60 68C42 68 29 72 28 78Z"/>
   <path class="fg" d="M27 80C27 71 42 65.5 60 65.5C78 65.5 93 71 93 80H89C89 73 76 69.5 60 69.5C44 69.5 31 73 31 80Z"/>
+  <rect class="fg" x="14" y="71" width="12" height="1.6"/>
+  <rect class="fg" x="94" y="71" width="12" height="1.6"/>
   <rect class="accent" x="56.5" y="64.5" width="7" height="6" rx="1"/>
   <rect class="fg" x="14" y="57" width="92" height="7"/>
   <rect class="bg" x="16" y="59" width="88" height="3"/>

@@ -1,7 +1,10 @@
 // Draws the ladders of the Valley (#42) into content/art/: the versions of
-// each build (`build-<ladder>-<n>.svg`, view box 120 × 80), the scaffold
-// (`build-scaffold.svg`) shown while the next version is worked on, the settings (`setting-<name>.svg`,
-// 320 × 180) and the ladder files (`<ladder>.ladder.json`) that place them.
+// each build (`build-<ladder>-<n>.svg`, view box 120 × 80), the markers
+// shown beside the build while the next version is on its way
+// (`marker-<kind>-post|bead[-lit].svg`, 32 × 32, and `markers.json`), the
+// settings (`setting-<name>.svg`, 320 × 180) with their marker cords
+// (`setting-<name>-cord-<n>.svg`) and the ladder files
+// (`<ladder>.ladder.json`) that place them.
 // Shapes and places come from the numbers here, so a picture is changed by
 // changing this file and running it again:
 //
@@ -9,7 +12,7 @@
 //
 // The rules the numbers follow are in docs/journey-design.md, "Builds and
 // ladders". Own work, CC BY-SA 4.0 like everything in content/.
-import { writeFileSync } from 'node:fs';
+import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const out = join(import.meta.dirname, '..', 'content', 'art');
@@ -119,42 +122,92 @@ const waterStrip = () => {
 /** The walking surface every crossing shows: a band from way point to way point. */
 const surface = () => boxO(DECK.left, DECK.top, DECK.right - DECK.left, DECK.bottom - DECK.top, T);
 
+// Where the deck ends, the bank holds it: every crossing stands on two
+// stone abutments at its way points, so no deck floats at the banks. Their
+// inner faces slope down into the water strip.
+const abutments = () =>
+  [10, 88].flatMap((x) => [
+    ...boxO(x, 63.5, 22, 9.5, T),
+    rect('fg', x, 67.6, 22, 1.5),
+    rect('fg', x + 10.2, 63.5, 1.6, 4.5),
+    rect('fg', x + 5, 68.5, 1.6, 4.5),
+    rect('fg', x + 15.4, 68.5, 1.6, 4.5),
+  ]);
+
+// Stepping stones: two landing slabs at the way points, four boulders
+// between, each with a flat top face, so they read as stones, not dots.
+const boulder = (cx, top, w, h) => [
+  rect('fg', cx - w / 2, top, w, h, h / 2.2),
+  rect('bg', cx - w / 2 + T, top + T, w - 2 * T, h - 2 * T, h / 2.2 - T),
+  path('bg', `M${n(cx - w / 2 - 2)} ${n(top + h + 1.5)}h${n(w + 4)}v1.4h${n(-w - 4)}Z`),
+];
 build('crossing-1', 'Stepping stones across a river', [
   waterStrip(),
-  // flat slabs where the path meets the water, stones between
-  ...boxO(DECK.left, DECK.top, 14, DECK.bottom - DECK.top, T, 2),
-  ...boxO(DECK.right - 14, DECK.top, 14, DECK.bottom - DECK.top, T, 2),
-  ...[36, 48, 60, 72, 84].flatMap((cx, i) => ellipseO(cx, 62.6 + (i % 2) * 0.8, 4.6, 4, T)),
+  ...abutments(),
+  ...boxO(DECK.left, DECK.top, 16, DECK.bottom - DECK.top, T, 1.5),
+  ...boxO(DECK.right - 16, DECK.top, 16, DECK.bottom - DECK.top, T, 1.5),
+  ...[
+    [40, 56.5, 13, 10],
+    [53, 58, 11, 9],
+    [66, 56, 13, 11],
+    [79.5, 58, 11, 9],
+  ].flatMap(([cx, top, w, h]) => boulder(cx, top, w, h)),
 ]);
 
+// The log: a round trunk from bank to bank, as thick as two path widths,
+// with bark lines and its cut end showing rings. Its outline keeps corners
+// at the way points.
+const LOG = [
+  [DECK.left, DECK.top],
+  [DECK.left, DECK.bottom],
+  [16, 67],
+  [21, 68.5],
+  [99, 68.5],
+  [104, 67],
+  [DECK.right, DECK.bottom],
+  [DECK.right, DECK.top],
+  [104, 54],
+  [99, 52.5],
+  [21, 52.5],
+  [16, 54],
+];
 build('crossing-2', 'A log across a river', [
   waterStrip(),
-  ...boxO(DECK.left, DECK.top, DECK.right - DECK.left, DECK.bottom - DECK.top + 1, T, 4),
-  rect('fg', 30, 60, 14, 2, 1),
-  rect('fg', 64, 60, 18, 2, 1),
-  ...ellipseO(DECK.right - 5, 61, 4.4, 4.4, 1.8),
-  ellipse('fg', DECK.right - 5, 61, 1.2, 1.2),
+  ...abutments(),
+  ...polyO(LOG, T),
+  rect('fg', 24, 57, 22, 1.8, 0.9),
+  rect('fg', 52, 62.5, 26, 1.8, 0.9),
+  rect('fg', 32, 64, 12, 1.6, 0.8),
+  rect('fg', 70, 56.5, 16, 1.6, 0.8),
+  ...ellipseO(101, 60.5, 5.5, 8, 1.8),
+  ...ellipseO(101, 60.5, 2.6, 4.2, 1.4),
+  rect('fg', 46, 51, 3, 3, 1),
+  rect('fg', 47, 48.5, 1.6, 3.5),
 ]);
 
 build('crossing-3', 'A plank bridge across a river', [
   waterStrip(),
-  rect('fg', 40, 62, 3.4, 16), // trestles in the water
-  rect('fg', 77, 62, 3.4, 16),
-  rect('fg', 40, 69, 40, 2.4),
+  ...abutments(),
+  rect('fg', 42, 62, 3.4, 16), // trestles in the water
+  rect('fg', 75, 62, 3.4, 16),
+  rect('fg', 42, 69, 36.4, 2.4),
   ...surface(),
   ...[16, 38, 59, 80, 101.4].map((x) => rect('fg', x, 44, 2.6, 13)),
   rect('fg', DECK.left, 43, DECK.right - DECK.left, 3, 1.5),
   rect('accent', 57.5, 40.5, 5.6, 5.6, 1.5),
 ]);
 
-// The stone bridge: one arch from bank to bank, the crossing's heaviest step.
+// The stone bridge: one arch from bank to bank, the crossing's heaviest step;
+// its masonry reaches down into both banks.
 const archBridge = () => [
-  path('fg', 'M16 80V62H104V80H90C90 74 77 70 60 70C43 70 30 74 30 80Z'),
-  path('bg', 'M18 78V64H102V78H92C91 72 78 68 60 68C42 68 29 72 28 78Z'),
+  path('fg', 'M12 80V62H108V80H90C90 74 77 70 60 70C43 70 30 74 30 80Z'),
+  path('bg', 'M14 78V64H106V78H92C91 72 78 68 60 68C42 68 29 72 28 78Z'),
   path(
     'fg',
     'M27 80C27 71 42 65.5 60 65.5C78 65.5 93 71 93 80H89C89 73 76 69.5 60 69.5C44 69.5 31 73 31 80Z',
   ),
+  rect('fg', 14, 71, 12, 1.6),
+  rect('fg', 94, 71, 12, 1.6),
   rect('accent', 56.5, 64.5, 7, 6, 1),
   ...surface(),
 ];
@@ -185,7 +238,9 @@ build('crossing-5', 'A covered bridge across a river', [
 // Home: everything grows around the fire at x = 60; its light stays the
 // accent (flame, glowing door, lit window). The yard is the same in all.
 // The way arrives at the threshold stone in front of every version: the
-// fire, the tent's opening, each door.
+// fire, the tent's opening, each door. Size and form both grow: a fire, a
+// tent, a low hut under a round thatch, a cottage with a pitched roof and
+// chimney, a house of two storeys.
 const HOME_WAYS = [
   [
     [53, 77.5],
@@ -198,46 +253,46 @@ const seat = (x = 82) => [
   rect('bg', x + 2, 69, 14, 3, 1.5),
   ...ellipseO(x + 16, 70.5, 3.5, 3.5, 1.6),
 ];
-const fire = (scale = 1) => {
-  const f = (x, y) => [60 + (x - 60) * scale, 74 + (y - 74) * scale];
-  const flame = [
-    [60, 48],
-    [66, 58],
-    [67.5, 64],
-    [64, 69],
-    [56, 69],
-    [52.5, 64],
-    [54, 58],
-  ].map(([x, y]) => f(x, y));
+// The fireplace: a ring of single round stones seen from the front, the
+// back row smaller and higher, the flame rising between the rows.
+const fire = () => {
+  const stone = (cx, cy, rx, ry) => ellipseO(cx, cy, rx, ry, 1.6);
   return [
-    poly('accent', flame),
-    // the ring of stones: a low wall with joints, the flame rising from it
-    ...boxO(...f(40, 64.5), 40 * scale, 9.5 * scale, 2, 4 * scale),
-    ...[47, 54, 61, 68, 75].map((x) => {
-      const [jx, jy] = f(x, 64.5);
-      return rect('fg', jx, jy, 1.8, 9.5 * scale);
-    }),
+    ...[44, 52, 60, 68, 76].flatMap((cx) => stone(cx, 62.5, 4.2, 3.2)),
+    // a flame of three tongues, the middle one highest
+    poly('accent', [
+      [60, 40],
+      [64, 50],
+      [67.5, 45],
+      [70, 55],
+      [67, 64],
+      [53, 64],
+      [50, 55],
+      [52.5, 46],
+      [56, 51],
+    ]),
+    ...[37, 48.5, 60, 71.5, 83].flatMap((cx) => stone(cx, 69.5, 6, 4.4)),
   ];
 };
-build('home-1', 'A fireplace in a clearing', [yard(), ...fire(1.3), ...seat(12)]);
+build('home-1', 'A fireplace in a clearing', [yard(), ...fire(), ...seat(6)]);
 
 build('home-2', 'A tent by its fire', [
   yard(),
   ...polyO(
     [
-      [60, 28],
-      [90, 74],
-      [30, 74],
+      [60, 32],
+      [86, 74],
+      [34, 74],
     ],
     T,
   ),
   poly('accent', [
-    [60, 46],
-    [69, 74],
-    [51, 74],
+    [60, 48],
+    [68, 74],
+    [52, 74],
   ]),
-  rect('fg', 59, 22, 2, 8),
-  rect('fg', 59, 46, 2, 26),
+  rect('fg', 59, 26, 2, 8),
+  rect('fg', 59, 48, 2, 24),
   ...seat(8),
 ]);
 
@@ -245,17 +300,25 @@ const door = (x, y, w, h) => [
   rect('fg', x, y, w, h, 1),
   rect('accent', x + 2, y + 2, w - 4, h - 2),
 ];
-build('home-3', 'A hut with a glowing door', [
+// The hut: low log walls under a round thatched roof (a half ellipse, a
+// second layer of thatch inside it), wider than the tent and lower than
+// the cottage.
+const dome = (cx, base, rx, ry, steps = 16) =>
+  Array.from({ length: steps + 1 }, (_, i) => {
+    const t = (2 * i) / steps - 1; // -1 … 1 across the roof
+    return [cx + rx * t, base - ry * (1 - Math.abs(t) ** 1.7)];
+  });
+const HUT_ROOF = dome(60, 59, 36, 36);
+build('home-3', 'A hut with a thatched roof', [
   yard(),
-  ...boxO(38, 54, 44, 20, T),
-  ...polyO(
-    [
-      [60, 18],
-      [96, 60],
-      [24, 60],
-    ],
-    T,
-  ),
+  ...boxO(36, 54, 48, 20, T),
+  rect('fg', 36, 61, 17, 1.6),
+  rect('fg', 67, 61, 17, 1.6),
+  rect('fg', 36, 67.5, 17, 1.6),
+  rect('fg', 67, 67.5, 17, 1.6),
+  ...polyO(HUT_ROOF, T),
+  ...[44, 51].map((y) => rect('fg', 60 - (59 - y) * 0.95, y, (59 - y) * 1.9, 1.6)),
+  ...boxO(57, 20, 6, 5, 1.6, 1),
   ...door(53, 60, 14, 14),
 ]);
 
@@ -267,74 +330,169 @@ const window4 = (x, y, w, h, role = 'bg') => [
 ];
 build('home-4', 'A cottage with a chimney', [
   yard(),
-  ...boxO(72, 14, 8, 16, T),
-  ...boxO(26, 42, 68, 32, T),
+  ...boxO(74, 6, 9, 18, T),
+  ...boxO(24, 44, 72, 30, T),
   ...polyO(
     [
-      [36, 20],
-      [84, 20],
-      [100, 44],
-      [20, 44],
+      [38, 14],
+      [82, 14],
+      [102, 46],
+      [18, 46],
     ],
     T,
   ),
   ...door(53, 54, 14, 20),
-  ...window4(32, 52, 14, 12),
-  ...window4(74, 52, 14, 12),
+  ...window4(30, 52, 15, 13),
+  ...window4(75, 52, 15, 13),
 ]);
 
 build('home-5', 'A house of two storeys', [
   yard(),
   ...boxO(80, 4, 8, 16, T),
-  ...boxO(16, 30, 88, 44, T),
+  ...boxO(14, 30, 92, 44, T),
   ...polyO(
     [
       [30, 8],
       [90, 8],
-      [110, 32],
-      [10, 32],
+      [112, 32],
+      [8, 32],
     ],
     T,
   ),
-  rect('fg', 16, 50, 88, 2),
+  rect('fg', 14, 51, 92, 2),
   ...door(53, 56, 14, 18),
-  ...window4(24, 56, 14, 12),
-  ...window4(82, 56, 14, 12),
-  ...window4(24, 36, 14, 11),
+  ...window4(22, 56, 14, 12),
+  ...window4(84, 56, 14, 12),
+  ...window4(22, 36, 14, 11),
   ...window4(53, 36, 14, 11, 'accent'),
-  ...window4(82, 36, 14, 11),
+  ...window4(84, 36, 14, 11),
 ]);
 
-// ---- the scaffold: one for every build (120 × 80) ------------------------
-// While a stage runs, the scaffold stands behind the build: two light towers
-// beside the largest version and a beam with a hoist over it. It is drawn in
-// `dim` and behind the version, so the version stays whole and in front;
-// it reads as "being improved", never as damage. The ready flag (the
-// pennant) is set on the right tower's top (the `flag` slot).
-const SCAFFOLD_TOP = 12;
-const tower = (x) => [
-  rect('dim', x, SCAFFOLD_TOP, 1.8, 80 - SCAFFOLD_TOP),
-  rect('dim', x + 8.2, SCAFFOLD_TOP, 1.8, 80 - SCAFFOLD_TOP),
-  ...[26, 42, 58].map((y) => rect('dim', x, y, 10, 1.6)),
-  ...[SCAFFOLD_TOP + 2, 28, 44, 60].map((y) =>
-    poly('dim', [
-      [x + 0.6, y + 12.4],
-      [x + 1.8, y + 13.4],
-      [x + 9.4, y + 0.6],
-      [x + 8.2, y - 0.4],
-    ]),
-  ),
+// ---- markers: drawn once for every ladder (32 × 32) ---------------------
+// While a stage runs, a small festive marker grows in the foreground, one
+// element at a time (owner, 2026-11-12, #42): first the posts, one after
+// the other, then the hanging elements along the line, from the first post
+// on. A marker has E elements in this fixed order; the hosts show the first
+// ceil(p × E), p (0…1) the best progress reached in the stage's condition,
+// so it never loses one. The line between two neighbouring posts shows
+// once both stand. Ready (while the condition holds) every element takes
+// its "on" form, different in shape: lanterns filled with rays, pennants
+// solid with a second tail, flowers open. Posts carry nothing on top:
+// they are plain, everything decorative hangs from the line.
+// Each kind has three pictures: `marker-<kind>-post` stands on y = 30 with
+// the line tied on at MARKER_TIE, `marker-<kind>-bead` hangs from the line
+// at its top centre (16, 2) and `marker-<kind>-bead-lit` is its form for
+// ready. The lines belong to the setting (`setting-<name>-cord-<n>.svg`).
+const MARKER_TIE = [16, 12];
+const MARKERS = {
+  lanterns: { title: 'Lanterns', landOnly: false },
+  bunting: { title: 'Pennants', landOnly: false },
+  flowers: { title: 'Flowers', landOnly: true },
+};
+const marker = (name, title, shapes) =>
+  write(`marker-${name}.svg`, svg('0 0 32 32', title, shapes));
+const ray = (cx, cy, degrees, r0, r1, w) => {
+  const a = (degrees * Math.PI) / 180;
+  const [dx, dy] = [Math.cos(a), Math.sin(a)];
+  const [nx, ny] = [(-dy * w) / 2, (dx * w) / 2];
+  return poly('accent', [
+    [cx + dx * r0 + nx, cy + dy * r0 + ny],
+    [cx + dx * r1 + nx, cy + dy * r1 + ny],
+    [cx + dx * r1 - nx, cy + dy * r1 - ny],
+    [cx + dx * r0 - nx, cy + dy * r0 - ny],
+  ]);
+};
+/** A plain post from the tie point down to y = 30, its top rounded. */
+const post = () => [
+  rect('fg', 14.9, MARKER_TIE[1] - 2, 2.2, 32 - MARKER_TIE[1], 1.1),
+  rect('fg', 13.5, 28.8, 5, 1.2, 0.6),
 ];
-write(
-  'build-scaffold.svg',
-  svg('0 0 120 80', 'A scaffold: work on the next version', [
-    ...tower(2),
-    ...tower(108),
-    rect('dim', 0, SCAFFOLD_TOP - 1, 120, 2.4, 1),
-    rect('dim', 59.2, SCAFFOLD_TOP, 1.6, 12),
-    rect('dim', 56.5, SCAFFOLD_TOP + 11.5, 7, 3, 1),
+const markerSet = (kind, words, bead) => {
+  marker(`${kind}-post`, 'A post', post());
+  marker(`${kind}-bead`, words.bead, bead(false));
+  marker(`${kind}-bead-lit`, words.beadLit, bead(true));
+};
+
+// Lanterns: small lanterns on the line; ready they are filled, with a
+// flame, a halo and rays.
+const lantern = (cx, top, w, h, lit, rays = []) => [
+  ...(lit ? [ellipse('tint-strong', cx, top + h / 2, w * 0.95, h * 0.8)] : []),
+  poly('fg', [
+    [cx - w / 2 - 1, top + 1],
+    [cx + w / 2 + 1, top + 1],
+    [cx, top - h * 0.28],
   ]),
+  rect('fg', cx - w / 2, top, w, h, w * 0.22),
+  rect(lit ? 'accent' : 'bg', cx - w / 2 + 1.6, top + 1.6, w - 3.2, h - 3.2, 1),
+  ...(lit ? [ellipse('bg', cx, top + h * 0.55, w * 0.12, h * 0.17)] : []),
+  rect('fg', cx - w * 0.3, top + h - 0.4, w * 0.6, 2, 0.8),
+  ...(lit ? rays.map((d) => ray(cx, top + h / 2, d, w * 0.85, w * 1.35, 1.6)) : []),
+];
+markerSet(
+  'lanterns',
+  { bead: 'A small lantern on a line', beadLit: 'A small lit lantern' },
+  (lit) => [rect('fg', 15.2, 1, 1.6, 4), ...lantern(16, 7.5, 10, 12, lit, [0, 180, 40, 140])],
 );
+
+// Pennants: pale outlined pennants on the line; ready they are solid in
+// the accent with a second tail beside them.
+markerSet(
+  'bunting',
+  { bead: 'A pale pennant on a line', beadLit: 'A bright pennant with a second tail' },
+  (lit) =>
+    lit
+      ? [
+          ...polyO(
+            [
+              [6, 2],
+              [24, 2],
+              [15, 27],
+            ],
+            1.8,
+            'accent',
+          ),
+          poly('accent', [
+            [24, 2],
+            [27.5, 2],
+            [30, 16],
+            [27, 14],
+          ]),
+        ]
+      : polyO(
+          [
+            [8, 2],
+            [24, 2],
+            [16, 24],
+          ],
+          1.8,
+        ),
+);
+
+// Flowers: vines with closed buds on the line; ready the buds open.
+const leaf = (x, y, dir) =>
+  poly('tint-strong', [
+    [x, y],
+    [x + dir * 3, y - 2.6],
+    [x + dir * 6.5, y - 1.6],
+    [x + dir * 3.4, y + 1],
+  ]);
+const bud = (cx, cy, s = 1) => [
+  ellipse('fg', cx, cy, 2.4 * s, 3.2 * s),
+  ellipse('dim', cx, cy, 1.2 * s, 2 * s),
+];
+const blossom = (cx, cy, r = 2.2) => [
+  ...[0, 72, 144, 216, 288].map((d) => {
+    const a = ((d - 90) * Math.PI) / 180;
+    return ellipse('accent', cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * 0.95, r * 0.95);
+  }),
+  ellipse('bg', cx, cy, r * 0.55, r * 0.55),
+];
+markerSet('flowers', { bead: 'A vine in bud on a line', beadLit: 'A vine in bloom' }, (lit) => [
+  rect('tint-strong', 14.8, 2, 2.4, 10),
+  leaf(15, 6, -1.5),
+  leaf(17, 9, 1.5),
+  ...(lit ? blossom(16, 17, 4.6) : bud(16, 16, 1.9)),
+]);
 
 // ---- settings: 320 × 180 --------------------------------------------------
 
@@ -386,12 +544,126 @@ setting('clearing', 'Clearing in a wood', [
   path('tint-strong', 'M320 150C300 148 282 160 270 180H320Z'),
   path(
     'bg',
-    `M128 180C138 166 146 156 ${HOME_WAYS[0]
+    `M128 180L130.5 176C139 163 146 155 ${HOME_WAYS[0]
       .map((p) => toScene(p).map(n).join(' '))
       .join('H')
-      .replace(/ [\d.]+$/, '')}C174 156 182 166 192 180Z`,
+      .replace(/ [\d.]+$/, '')}C174 155 181 163 189.5 176L192 180Z`,
   ),
 ]);
+
+// ---- the marker's posts: per setting (320 × 180) ------------------------
+// A setting declares its marker layout and an ordered list of post points
+// in the near band (`marker` in the ladder file), like it declares where
+// the path meets the build. `span`: one continuous line over all posts,
+// where it can run in front of the build without crossing the way or the
+// view (Crossing: along the near edge, in front of the bridge). `sides`:
+// two short lines, left and right, with a gap in the middle where the way
+// or the view to the build passes (Home: the path to the door; a boat on
+// water: the waterway). The lines hang below the build's base line, so
+// they never cross the build. The hanging elements are spread evenly over
+// the lines, in order from the first post.
+const MARKER_POST = 34; // near band
+const BEAD = 24;
+const SAG = 3.5;
+const CORD = 1.6;
+const tieAt = ([x, feet]) => [x, feet - (MARKER_POST * (30 - MARKER_TIE[1])) / 32];
+
+/** A point on the line from a to b, sagging by `sag` in the middle. */
+const cordAt = (a, b, sag, t) => {
+  const c = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 2 * sag];
+  const u = 1 - t;
+  return [
+    u * u * a[0] + 2 * u * t * c[0] + t * t * b[0],
+    u * u * a[1] + 2 * u * t * c[1] + t * t * b[1],
+  ];
+};
+/** The pairs of neighbouring posts a line joins in a layout. */
+const segmentsOf = (layout, count) =>
+  Array.from({ length: count - 1 }, (_, i) => [i, i + 1]).filter(
+    ([i]) => layout === 'span' || i !== count / 2 - 1,
+  );
+const markerPlaces = (settingName, { layout, posts, beads }) => {
+  const places = posts.map(([x, feet], i) => ({
+    slot: 'marker',
+    part: 'post',
+    order: i + 1,
+    band: 'near',
+    x: x - MARKER_POST / 2,
+    y: feet - (MARKER_POST * 30) / 32,
+    width: MARKER_POST,
+    height: MARKER_POST,
+    feet,
+  }));
+  const segments = segmentsOf(layout, posts.length);
+  const perSegment = beads / segments.length;
+  let order = posts.length;
+  segments.forEach(([i, j], k) => {
+    const [a, b] = [tieAt(posts[i]), tieAt(posts[j])];
+    const name = `setting-${settingName}-cord-${k + 1}`;
+    const top = Array.from({ length: 17 }, (_, s) => cordAt(a, b, SAG, s / 16));
+    const bottom = top.map(([x, y]) => [x, y + CORD]).reverse();
+    write(
+      `${name}.svg`,
+      svg('0 0 320 180', 'A line between two posts', [poly('fg', [...top, ...bottom])]),
+    );
+    const feet = Math.max(posts[i][1], posts[j][1]) + 0.1;
+    places.push({
+      slot: 'marker',
+      part: 'cord',
+      order: j + 1,
+      art: name,
+      x: 0,
+      y: 0,
+      width: 320,
+      height: 180,
+      feet,
+    });
+    for (let s = 0; s < perSegment; s += 1) {
+      const [px, py] = cordAt(a, b, SAG, (s + 1) / (perSegment + 1));
+      order += 1;
+      places.push({
+        slot: 'marker',
+        part: 'bead',
+        order,
+        band: 'near',
+        x: px - BEAD / 2,
+        y: py + CORD / 2 - (BEAD * 2) / 32,
+        width: BEAD,
+        height: BEAD,
+        feet: feet + 0.01 * order,
+      });
+    }
+  });
+  return places;
+};
+const MARKER_LAYOUTS = {
+  river: {
+    layout: 'span',
+    posts: [
+      [42, 172],
+      [152, 174],
+      [264, 172],
+    ],
+    beads: 6,
+  },
+  clearing: {
+    layout: 'sides',
+    posts: [
+      [34, 170],
+      [116, 173],
+      [204, 173],
+      [286, 170],
+    ],
+    beads: 6,
+  },
+};
+const markerOf = ({ layout, posts }) => ({ layout, posts });
+/** The graduation lantern stands where the marker's first post stood. */
+const lanternAtPost = ({ posts: [[x, feet]] }) => ({
+  ...at('', 'near', x - 17, feet, 34),
+  art: undefined,
+  slot: 'lantern',
+});
 
 // ---- ladders --------------------------------------------------------------
 
@@ -405,29 +677,16 @@ const at = (art, band, x, feet, size) => ({
   width: size,
   height: size,
 });
-// The flag that says "ready": the pennant's pole on the right tower's top.
-const FLAG = 24;
-const flag = () => {
-  const [x, y] = toScene([113, SCAFFOLD_TOP]);
-  return {
-    slot: 'flag',
-    band: 'middle',
-    x: x - FLAG * (9 / 32),
-    y: y - (FLAG * 30) / 32,
-    width: FLAG,
-    height: FLAG,
-  };
-};
+const BUILD_FEET = SLOT.y + SLOT.height * (74 / 80);
 const byFeet = (list) =>
-  [...list].sort((a, b) => {
-    const f = (p) =>
-      p.slot === 'flag'
-        ? 999
-        : p.slot === 'build' || p.slot === 'scaffold'
-          ? SLOT.y + SLOT.height * (74 / 80)
-          : feetOf(p.y, p.height);
-    return f(a) - f(b);
-  });
+  [...list]
+    .map((p) => ({
+      p,
+      f: p.feet ?? (p.slot === 'build' ? BUILD_FEET : feetOf(p.y, p.height)),
+    }))
+    .sort((a, b) => a.f - b.f)
+    // `feet` only sorts; it is not part of the ladder file
+    .map(({ p }) => Object.fromEntries(Object.entries(p).filter(([key]) => key !== 'feet')));
 const ladder = (name, data, ground, places) =>
   write(
     `${name}.ladder.json`,
@@ -441,8 +700,13 @@ ladder(
   {
     title: 'Crossing',
     hue: 'water',
+    water: true,
+    marker: 'lanterns',
+    // the row of versions shows the middle of the crossing, zoomed, so the
+    // stones and the log read at 60 × 40 px
+    row: [30, 38, 60, 40],
     ways: CROSSING_WAYS,
-    scaffold: 'build-scaffold',
+    ...markerOf(MARKER_LAYOUTS.river),
     versions: [
       { art: 'build-crossing-1', title: 'Stepping stones' },
       { art: 'build-crossing-2', title: 'A log' },
@@ -455,15 +719,14 @@ ladder(
   [
     at('tree', 'far', 246, 40, 20),
     at('tree', 'far', 26, 45, 20),
-    at('tuft', 'middle', 262, 96, 14),
-    slot('scaffold', { band: 'middle', ...SLOT }),
+    at('tuft', 'middle', 290, 92, 14),
     slot('build', { band: 'middle', ...SLOT }),
-    flag(),
-    { ...at('', 'middle', 8, 139, 34), art: undefined, slot: 'lantern' },
-    { ...at('', 'middle', 40, 140, MIDDLE), art: undefined, slot: 'keeper' },
-    at('reeds', 'near', 80, 166, 34),
-    at('bush', 'near', -20, 178, 48),
+    { ...at('', 'middle', 18, 144, MIDDLE), art: undefined, slot: 'keeper' },
+    at('reeds', 'near', 84, 166, 34),
     at('tuft', 'near', 296, 174, 20),
+    lanternAtPost(MARKER_LAYOUTS.river),
+    at('bush', 'near', -24, 179, 48),
+    ...markerPlaces('river', MARKER_LAYOUTS.river),
   ],
 );
 
@@ -472,8 +735,10 @@ ladder(
   {
     title: 'Home',
     hue: 'meadow',
+    water: false,
+    marker: 'bunting',
     ways: HOME_WAYS,
-    scaffold: 'build-scaffold',
+    ...markerOf(MARKER_LAYOUTS.clearing),
     versions: [
       { art: 'build-home-1', title: 'A fireplace' },
       { art: 'build-home-2', title: 'A tent' },
@@ -486,16 +751,23 @@ ladder(
   [
     at('tree', 'far', 18, 40, 20),
     at('tree', 'far', 284, 41, 20),
-    { ...at('', 'middle', 8, 139, 34), art: undefined, slot: 'lantern' },
-    { ...at('', 'middle', 40, 140, MIDDLE), art: undefined, slot: 'keeper' },
-    slot('scaffold', { band: 'middle', ...SLOT }),
+    { ...at('', 'middle', 26, 144, MIDDLE), art: undefined, slot: 'keeper' },
     slot('build', { band: 'middle', ...SLOT }),
-    flag(),
-    at('flowers', 'near', 76, 160, 20),
-    at('bush', 'near', -18, 176, 48),
-    at('tuft', 'near', 46, 172, 20),
-    at('tuft', 'near', 196, 168, 20),
+    at('flowers', 'middle', 36, 132, 24),
+    lanternAtPost(MARKER_LAYOUTS.clearing),
+    at('bush', 'near', -22, 179, 48),
+    at('tuft', 'near', 236, 178, 20),
+    ...markerPlaces('clearing', MARKER_LAYOUTS.clearing),
   ],
+);
+
+write(
+  'markers.json',
+  `${JSON.stringify(
+    Object.fromEntries(Object.entries(MARKERS).map(([k, v]) => [k, { ...v, tie: MARKER_TIE }])),
+    null,
+    2,
+  )}\n`,
 );
 
 // JSON as prettier writes it, so `npm run check` passes without a second step.
@@ -505,4 +777,8 @@ for (const [name, text] of files)
     join(out, name),
     name.endsWith('.json') ? await format(text, { parser: 'json' }) : text,
   );
+// Generated pictures this run no longer writes are removed.
+const generated = /^(build-|marker-|setting-[a-z]+-cord-)/;
+for (const name of readdirSync(out))
+  if (generated.test(name) && !files.has(name)) rmSync(join(out, name));
 console.log(`Wrote ${files.size} files to content/art/`);

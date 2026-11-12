@@ -123,10 +123,11 @@ have their own page, `dist/preview/art.html?theme=light|dark&part=…`
 `shore` and `sizes` (every picture at 48, 32 and 24 px).
 `node screenshots.mjs art,art:shore,art:sizes 2` (in `packages/plugin`,
 after `npm run preview`) writes them at scale 2; the second argument is
-the device scale. The ladders (#42): `sequence-<ladder>` (each version,
-the scaffold and the scaffold with the flag, the lantern, the row of
-versions), `journey-<ladder>` (a static mock of the journey screen) and
-`palette`; `&hue=<name>` picks a palette hue. `node screenshots.mjs
+the device scale. The ladders (#42): `sequence-<ladder>[-<marker>]`
+(each version, its marker growing element by element, ready, the
+lantern, the row of versions), `journey-<ladder>[-ready]` (a static mock
+of the journey screen, mid-way or ready) and `palette`; `&hue=<name>`
+picks a palette hue. `node screenshots.mjs
 art:sequence-crossing,art:journey-home,art:palette 2` writes the
 sequences and the palette as one full page 1400 px wide and the mock at
 phone size (`art:sequence-crossing@slate` for a hue). The ladders' files
