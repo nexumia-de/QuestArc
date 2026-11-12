@@ -1,3 +1,4 @@
+import { LADDERS, markerFits } from './ladders';
 import type { Journey, Stage } from './types/journey';
 import { journeyErrors } from './validate';
 
@@ -29,6 +30,7 @@ export const TEXT_LIMITS = {
   accept: 200,
   nugget: 240,
   ending: 240,
+  build: 40,
 } as const;
 
 type Field = keyof typeof TEXT_LIMITS;
@@ -87,6 +89,9 @@ const uses = (journey: Journey): Use[] => {
     if (stage.nugget) list.push({ key: stage.nugget, field: 'nugget', at: `${at}.nugget` });
   });
   if (journey.ending) list.push({ key: journey.ending.story, field: 'ending', at: 'ending.story' });
+  journey.build?.names?.forEach((key, i) =>
+    list.push({ key, field: 'build', at: `build.names[${i}]` }),
+  );
   return list;
 };
 
@@ -166,6 +171,41 @@ const stageProblems = (journey: Journey): Problem[] => {
   return problems;
 };
 
+/** What the journey builds (game rules §9), against content/art/. */
+const buildProblems = (journey: Journey): Problem[] => {
+  const build = journey.build;
+  if (!build) return [warning('build', 'name a ladder from content/art/ (issue #42)')];
+  const ladder = Object.prototype.hasOwnProperty.call(LADDERS.ladders, build.ladder)
+    ? LADDERS.ladders[build.ladder]
+    : undefined;
+  if (!ladder) {
+    const known = Object.keys(LADDERS.ladders).join(', ');
+    return [error('build.ladder', `"${build.ladder}" is not in content/art/ (${known})`)];
+  }
+  const problems: Problem[] = [];
+  const versions = journey.stages.length + 1;
+  if (build.marker !== undefined && !markerFits(build.marker, build.ladder)) {
+    problems.push(
+      error(
+        'build.marker',
+        Object.prototype.hasOwnProperty.call(LADDERS.markers, build.marker)
+          ? `"${build.marker}" does not grow in the setting of "${build.ladder}" (water)`
+          : `"${build.marker}" is not a marker in content/art/`,
+      ),
+    );
+  }
+  if ((build.names?.length ?? 0) > versions)
+    problems.push(error('build.names', `more names than the journey's ${versions} versions`));
+  if (versions > ladder.versions)
+    problems.push(
+      warning(
+        'build.ladder',
+        `${journey.stages.length} stages need ${versions} versions, "${build.ladder}" has ${ladder.versions}; the last one gains fixed additions`,
+      ),
+    );
+  return problems;
+};
+
 /** All problems of a journey file, errors first. An empty list means it passes. */
 export const journeyProblems = (value: unknown): Problem[] => {
   const structural = journeyErrors(value);
@@ -178,6 +218,7 @@ export const journeyProblems = (value: unknown): Problem[] => {
       : []),
     ...textProblems(journey, used),
     ...stageProblems(journey),
+    ...buildProblems(journey),
     ...(journey.why ? [] : [warning('why', "asking for the user's own reason helps (rule 5)")]),
   ];
   return [

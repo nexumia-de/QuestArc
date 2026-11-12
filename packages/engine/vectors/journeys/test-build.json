@@ -1,0 +1,28 @@
+{
+  "format": 3,
+  "id": "test-build",
+  "version": 1,
+  "title": "test-build.title",
+  "description": "test-build.description",
+  "build": { "ladder": "crossing" },
+  "stages": [
+    {
+      "id": "a",
+      "plan": { "anchor": "test-build.a.anchor", "action": "test-build.a.action" },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "days", "n": 5, "of": 7 }
+    },
+    {
+      "id": "b",
+      "plan": { "anchor": "test-build.b.anchor", "action": "test-build.b.action" },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "count", "n": 3 }
+    },
+    {
+      "id": "c",
+      "plan": { "anchor": "test-build.c.anchor", "action": "test-build.c.action" },
+      "schedule": { "type": "daily" },
+      "condition": { "type": "time_spent", "minutes": 30 }
+    }
+  ]
+}

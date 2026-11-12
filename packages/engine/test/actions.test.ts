@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { actions, answerCheckin, endJourney, resumeJourney, setMode, withdraw } from '../src';
+import {
+  actions,
+  answerCheckin,
+  chooseBuild,
+  endJourney,
+  resumeJourney,
+  setMode,
+  withdraw,
+} from '../src';
 
 // The record-writing actions both hosts use (docs/data-model.md §2); the
 // plugin's tests check startJourney, bindStage and continueJourney with
@@ -9,6 +17,7 @@ describe('actions', () => {
     expect(Object.keys(actions).sort()).toEqual([
       'answerCheckin',
       'bindStage',
+      'chooseBuild',
       'continueJourney',
       'endJourney',
       'pauseJourney',
@@ -36,5 +45,12 @@ describe('actions', () => {
     expect(endJourney('a', '2026-11-06')).toEqual({
       'run-end:a': { day: '2026-11-06', reason: 'abandoned' },
     });
+  });
+
+  it("write the user's build choice as one record, empty choice withdraws it", () => {
+    expect(chooseBuild('r', { ladder: 'home', marker: 'flowers', hue: '' })).toEqual({
+      'build:r': { ladder: 'home', marker: 'flowers' },
+    });
+    expect(chooseBuild('r', {})).toEqual({ 'build:r': '' });
   });
 });

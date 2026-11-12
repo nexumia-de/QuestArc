@@ -13,6 +13,30 @@ export interface GameEvent {
 const currentStation = (run: RunView | undefined): StationView | undefined =>
   run?.stations[run.position.stage];
 
+/**
+ * Build events of the journey that was active (game rules §9): a higher
+ * version, also when its last stage ended the journey, or else a higher
+ * marker progress in the same stage. None in calm mode (no build).
+ */
+const buildEvents = (before: GameView, after: GameView): GameEvent[] => {
+  const was = before.active?.build;
+  const runId = before.active?.runId;
+  if (!was) return [];
+  const is = [after.active, ...after.paused, ...after.finished].find(
+    (run) => run?.runId === runId,
+  )?.build;
+  if (!is) return [];
+  if (is.version > was.version) {
+    return [{ key: 'event.build-version', params: { version: is.version } }];
+  }
+  if (is.version === was.version && is.markerProgress > was.markerProgress) {
+    return [
+      { key: 'event.build-element', params: { from: was.markerProgress, to: is.markerProgress } },
+    ];
+  }
+  return [];
+};
+
 export const diff = (before: GameView, after: GameView): GameEvent[] => {
   const events: GameEvent[] = [];
   const run = after.active;
@@ -47,6 +71,7 @@ export const diff = (before: GameView, after: GameView): GameEvent[] => {
       events.push({ key: 'event.fallback-offered', params: { stage: now.stageId } });
     }
   }
+  events.push(...buildEvents(before, after));
   if (after.level > before.level) {
     events.push({ key: 'event.level-up', params: { level: after.level } });
   }

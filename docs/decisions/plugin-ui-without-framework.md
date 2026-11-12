@@ -37,7 +37,8 @@ Option 2.
   enough; a framework's reactivity would add little.
 - Nothing third-party ships in the plugin, so there are no licence texts
   to bundle, no framework updates to follow and the view stays small
-  (about 25 KB, limit 1 MB).
+  (limit 100 KB in Super Productivity 19.3.x, 1 MB later; the build
+  fails above 100 KB).
 - It follows Super Productivity's own plugin starter and keeps the
   journey drawing (hand-made SVG) in the same style as the rest.
 - The UI code is not shared with Pensum (GTK), so a framework would not

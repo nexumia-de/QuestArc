@@ -1,0 +1,83 @@
+{
+  "name": "A window that never held n completions: the best of all days, below 1",
+  "rule": "game-rules §9",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-14",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793487600000,
+        "doneOn": 1793509200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793574000000,
+        "doneOn": 1793595600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793833200000,
+        "doneOn": 1793854800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793919600000,
+        "doneOn": 1793941200000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "progress": 0
+        },
+        {},
+        {}
+      ],
+      "build": {
+        "markerProgress": 0.8,
+        "ready": false
+      }
+    }
+  }
+}

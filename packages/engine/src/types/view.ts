@@ -38,6 +38,30 @@ export interface RunView {
   readonly paused: boolean;
   readonly checkinDue: boolean;
   readonly offerFallback: boolean;
+  /** Game mode only: what the journey builds (docs/game-rules.md §9). */
+  readonly build?: BuildView;
+}
+
+/**
+ * The build of a run in names and numbers; the hosts find the pictures by
+ * these names. A host shows the first ceil(markerProgress × E) of a
+ * marker's E elements, all in their "on" form while `ready`.
+ */
+export interface BuildView {
+  /** A ladder in content/art/ (<name>.ladder.json). */
+  readonly ladder: string;
+  /** The version standing: 1 + the finished stages; never goes down. */
+  readonly version: number;
+  /** The versions this journey uses: its stages + 1. */
+  readonly versions: number;
+  /** What hangs on the marker: lanterns, bunting or flowers (content/art/markers.json). */
+  readonly marker: string;
+  /** A hue name from content/art/palette.json. */
+  readonly hue: string;
+  /** The current stage's highest condition progress since it was accepted, 0..1. */
+  readonly markerProgress: number;
+  /** The current stage's condition holds now. */
+  readonly ready: boolean;
 }
 
 export type StationState = 'done' | 'met' | 'current' | 'unbound' | 'unsupported-repeat' | 'ahead';

@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, graduation and calm mode, with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, graduation, calm mode and the build of a journey (ladder, version, marker progress, ready), with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -202,4 +202,73 @@ and 6 weeks after graduation; an answer of 4 or less, or completion below
 Calm mode hides XP, level and guardians and uses no game words. It
 shows the path, the stations, the current and best run, the conditions,
 the welcome-back text and the weekly question. Switching modes changes
-only what is shown; the engine computes the same values in both.
+only what is shown; the engine computes the same values in both, except
+the build (§9), which is only a picture of the game and is left out of
+the view in calm mode.
+
+## 9. Builds
+
+Issues #42 and #99, decided by the owner on 2026-11-12. In game mode a
+journey builds one thing, whole after every stage; the hosts draw it,
+the engine gives only names and numbers.
+
+- **Ladder.** A journey names a ladder (story format, `build`): one
+  thing drawn in several whole versions. The ladders are the picture
+  files `content/art/<name>.ladder.json` (#95): their versions, whether
+  their setting has `water`, their default `marker` and `hue`; the
+  markers are in `markers.json` (`landOnly`), the hues in
+  `palette.json`. The engine reads these names and numbers and nothing
+  else of the pictures. The user may choose another ladder for a run
+  (a `build` record, [data model](data-model.md) §2). A ladder the engine
+  does not know, or a journey without `build`, gets the default
+  ladder `home`, so a host always has pictures.
+- **Version.** Version 1 stands when the journey starts. Every finished
+  stage (a stage with a checkpoint,
+  [deleted history](decisions/deleted-history.md)) raises the version by
+  one, and so will a skipped stage once skipping exists (#81). So the
+  version is 1 + the journey's stages with a checkpoint; it never goes
+  down, because checkpoints are kept whatever happens to the tasks.
+  `versions` is the number of versions the journey uses: its stages + 1.
+  If that is more than the ladder has, the ladder's last version stands
+  for the rest and gains one fixed addition per version beyond it (a
+  flag, a bench; drawn by the host); the checker warns.
+- **Marker progress** of the current stage: the highest condition
+  progress (§4) the stage has reached on any day since it was accepted
+  (and its task bound), from 0 to 1. The progress of a day `d` is the
+  condition evaluated with the due days and credited completions up to
+  `d`: for `days` the completions among the last `of` due days up to `d`
+  ÷ `n`; `count` and `time_spent` only add up, so their highest value is
+  today's. Because it is the highest of all days, it does not fall when
+  the `days` window moves on. It is derived from the tasks every time,
+  never stored ([decision](decisions/marker-progress.md)): undoing a
+  completion takes back what it added, and so does deleting a done
+  instance, deleting the repeat config or binding another task, as they
+  do for progress and XP. A host shows the first `ceil(p × E)` of a
+  marker's `E` elements, so "5 of 7 days" and "20 times" fill the same
+  marker.
+- **Ready:** the current stage is met now (§4, state `met`). It follows
+  the present: when a met stage falls below its condition, ready goes,
+  the marker progress stays.
+- **Marker:** what hangs on the marker (lanterns, bunting (pennants), flowers): the
+  user's choice, else the journey's, else the ladder's default. A land-only
+  marker (flowers) never hangs over water; a marker that does not fit the
+  ladder's setting, or is not in the list, gives way to the next in that
+  order. **Hue:** the user's choice, else the ladder's default.
+- **Continue:** the next version stands and the marker starts again at
+  0 with the next stage. A **paused** journey keeps its build; its paused
+  days are not due, so its marker progress does not change. An **ended**
+  journey (a `run-end` record) shows its version standing, without a
+  marker (progress 0, not ready).
+- **Calm mode:** the view carries no build and no build events.
+- **Events** (game mode, the active journey): `event.build-element`
+  `{ from, to }` when the marker progress of the same stage rose (the
+  host decides whether that makes a new element and stays quiet in
+  between); `event.build-version` `{ version }` when the version rose,
+  also when the last stage was finished and the journey ended.
+
+**Example G.** Example D's stage (`days` 5 of 7, due daily, accepted on
+day 1). Days 1 to 5 done: progress and marker progress 1, ready. Days 6
+to 8 missed, day 9 is today: the last 7 due days (3 to 9) hold 3
+completions, so progress is 0.6 and the stage is no longer met; marker
+progress stays 1, ready is false. Continue on day 5 instead: version 2,
+marker progress 0.
