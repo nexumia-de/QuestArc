@@ -402,11 +402,14 @@ stations list and Settings with the side panel switch:
   palette. Region scenes and their pictures stay preview-only
   (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
   travel in `plugin.js` and reach the view once at start (message
-  `questarc:art`), because Super Productivity 19.3.1 takes an
-  `index.html` of at most 100 KiB ([facts](super-productivity-facts.md)
-  §1); until they arrive the screen shows the path. The ZIP: 41,700
-  bytes on `main`, 50,271 bytes with the build (`index.html` 80 KB,
-  minified; `plugin.js` 102 KB).
+  `questarc:art`); until they arrive the screen shows the path. The
+  view's `index.html` is limited to 102,400 bytes by Super Productivity
+  19.3.1, and the view may load no other file of the plugin
+  ([facts](super-productivity-facts.md) §1), so the view also takes the
+  journeys' texts from each state instead of bundling the journeys.
+  Measured on 2026-11-12: `index.html` 86,390 of 102,400 bytes (15.6 %
+  free; with the pictures inlined it was 112 KB even fully minified);
+  the ZIP 40,009 bytes on `main` with #103, 51,203 bytes with the build.
 - **Picture polish** with the build at its real size (issue #100's
   review): lit lanterns get an opaque halo in `tint-strong` larger than
   the lantern, so they glow in light style too; open blossoms are white

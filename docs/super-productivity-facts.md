@@ -79,14 +79,21 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   `plugin.service.ts`, ZIP loading). Other files in the ZIP are not served to
   the iframe; CSS and JS must be inlined (`docs/plugin-development.md`,
   "HTML/Iframe Plugins")[^sp].
-- **19.3.1 takes an `index.html` of at most 100 KiB**: at `1014df9` the
-  ZIP loader checks it against `MAX_PLUGIN_MANIFEST_SIZE` (100 × 1024,
-  `plugin.service.ts` line 1096); `MAX_PLUGIN_INDEX_HTML_SIZE` (1 MiB)
-  exists only from `668c0769`, unreleased. A larger `index.html` is
-  refused at upload and the plugin card never appears (seen 2026-11-12
-  with the Docker image of 19.3.1). QuestArc's build therefore minifies
-  the view and fails above 100 KiB, and `plugin.js` (5 MB) carries the
-  pictures for the view (#100)[^sp].
+- **What the limits cover in 19.3.1** (`plugin.service.ts`, ZIP upload,
+  at `1014df9`): `manifest.json` ≤ 100 KiB; `index.html` is checked
+  against the same constant, `MAX_PLUGIN_MANIFEST_SIZE` (102,400 bytes;
+  `MAX_PLUGIN_INDEX_HTML_SIZE`, 1 MiB, exists only from `668c0769`, after
+  19.3.1; issue #102 weighs requiring 20.0.0); `plugin.js` ≤ 5 MiB; the declared `i18n/<lang>.json` ≤ 5 MiB
+  together; the icon (the manifest's `icon` file) ≤ 100 KiB; a ZIP from
+  the community list ≤ 10 MiB. Only these files are kept: the loader
+  reads them out of the ZIP and discards it ("Uploaded plugins use a
+  virtual cache path, so these files cannot be fetched"), so the view
+  cannot load a second script, a JSON or an SVG file of the plugin. What
+  the view needs beyond its own `index.html` must come from `plugin.js`
+  by message. QuestArc's view is built without whitespace (#103), gets
+  the journeys' texts with each state and the ladders' pictures once
+  (`questarc:art`) from `plugin.js` (#100); `build.mjs` fails above
+  102,400 bytes[^sp].
 - Uploaded plugin code is cached per device in IndexedDB `SUPPluginCache`
   (`plugin-cache.service.ts`); enabled plugins are activated at startup
   (`plugin.service.ts`, `_loadEnabledPlugins`). The enabled flag is synced as

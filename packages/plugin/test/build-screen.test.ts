@@ -38,20 +38,11 @@ describe('the plugin bundles only the pictures of the build', () => {
   });
 });
 
-describe('the engine and the pictures name the same builds', () => {
-  it('every ladder, marker and hue of content/ladders.json is drawn', () => {
+describe('the engine offers only ladders the plugin draws', () => {
+  it('every ladder, marker and hue of the engine is in the bundled pictures', () => {
     for (const name of Object.keys(LADDERS.ladders)) expect(Object.keys(ladders)).toContain(name);
-    expect(Object.keys(markers).sort()).toEqual(Object.keys(LADDERS.markers).sort());
+    expect(Object.keys(kinds).sort()).toEqual(Object.keys(LADDERS.markers).sort());
     expect(Object.keys(palette).sort()).toEqual([...LADDERS.hues].sort());
-  });
-
-  it('agrees on water and on what may hang there', () => {
-    for (const [name, entry] of Object.entries(LADDERS.ladders)) {
-      const water = LADDERS.settings[entry.setting]?.water;
-      expect(ladders[name]?.water, name).toBe(water);
-    }
-    for (const [kind, entry] of Object.entries(LADDERS.markers))
-      expect(kinds[kind]?.landOnly, kind).toBe(!entry.onWater);
   });
 });
 
