@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-12
+
+- **Decision**: no HP for the player (#38, D3 in [architecture](architecture.md)). Removed game rules §7 (Graduation is now §7, Calm mode §8), the HP sentence of design rule 16 (the rule stays: nothing earned is taken away), HP in the header of the journey screens and mockup, and HP from the roadmap. Guardians keep their HP. The research entry on self-recovering HP now records that the recommendation was not taken.
+
 ## 2026-11-08
 
 - **Update**: `AGENTS.md` imports only `agents/core.md` from phosh-toolkit instead of its whole `AGENTS.md`, so the GTK app rules and the list of rules that do not apply are gone (toolkit decision "lean agent rules", to use fewer tokens per session).
