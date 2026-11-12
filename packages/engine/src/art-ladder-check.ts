@@ -93,6 +93,16 @@ const points = (value: unknown): Point[] | undefined => {
   return out.every((p) => p !== undefined) ? (out as Point[]) : undefined;
 };
 
+/** Whether (x, y) lies inside the polygon (even-odd rule). */
+const inside = (poly: readonly (readonly number[])[], x: number, y: number): boolean => {
+  let result = false;
+  poly.forEach(([x1 = 0, y1 = 0], i) => {
+    const [x2 = 0, y2 = 0] = poly[(i + 1) % poly.length] ?? [];
+    if (y1 > y !== y2 > y && x < ((x2 - x1) * (y - y1)) / (y2 - y1) + x1) result = !result;
+  });
+  return result;
+};
+
 /**
  * Problems of a ladder file: `names` are the pictures in content/art/,
  * `hues` the names in palette.json, `markers` markers.json; with `sources`
@@ -279,6 +289,25 @@ export const ladderProblems = (
     })
   )
     error('posts', 'post points [x, y] in the near band, left to right (sides: four)');
+  // No post stands in water: a setting with water marks it (`waterAreas`,
+  // polygons in setting units) and no post point lies inside one.
+  const areas = Array.isArray(ladder.waterAreas) ? (ladder.waterAreas as unknown[]) : [];
+  const polygons = areas.map((area) =>
+    Array.isArray(area)
+      ? (area as unknown[]).map((pt) =>
+          Array.isArray(pt) && pt.length === 2 ? [num(pt[0]), num(pt[1])] : [NaN, NaN],
+        )
+      : [],
+  );
+  if (
+    (ladder.water === true && polygons.length === 0) ||
+    polygons.some((poly) => poly.length < 3 || poly.flat().some(Number.isNaN))
+  )
+    error('waterAreas', 'a setting with water marks it: polygons of [x, y] points');
+  postPoints.forEach(([px = NaN, py = NaN], k) => {
+    if (polygons.some((poly) => inside(poly, px, py)))
+      error('posts', `post point ${k + 1} (${px}, ${py}) stands in water`);
+  });
   const parts = (part: string) =>
     markerParts.filter((m) => m.part === part).sort((a, b) => a.order - b.order);
   const posts = parts('post');

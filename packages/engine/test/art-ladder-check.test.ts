@@ -27,6 +27,15 @@ const ladder = {
   width: 320,
   height: 180,
   water: true,
+  // the river, where no post may stand
+  waterAreas: [
+    [
+      [100, 60],
+      [200, 60],
+      [200, 180],
+      [100, 180],
+    ],
+  ],
   marker: 'lanterns',
   // the walking surface meets the path at x = 14 and x = 106, y 57–64
   ways: [
@@ -201,6 +210,30 @@ describe('ladderProblems', () => {
       }),
     ).toContain('posts');
     expect(at(withPicture(6, { x: 80 }))).toEqual(['pictures[6]']);
+  });
+
+  it('wants no post in water: a setting with water marks it', () => {
+    const river = [
+      [
+        [100, 60],
+        [200, 60],
+        [200, 180],
+        [100, 180],
+      ],
+    ];
+    expect(at({ ...ladder, waterAreas: river })).toEqual([]);
+    expect(at({ ...ladder, waterAreas: undefined })).toEqual(['waterAreas']);
+    expect(at({ ...ladder, water: false, waterAreas: undefined })).toEqual([]);
+    expect(at({ ...ladder, waterAreas: [[[1, 2]]] })).toEqual(['waterAreas']);
+    const wet = [
+      [
+        [20, 160],
+        [40, 160],
+        [40, 180],
+        [20, 180],
+      ],
+    ];
+    expect(at({ ...ladder, waterAreas: wet })).toEqual(['posts']);
   });
 
   it('wants every hanging element under a line, below the build', () => {

@@ -129,7 +129,7 @@ versions below it, the state in words, the card unchanged.
 **Files.** A ladder is `content/art/<ladder>.ladder.json` with its title,
 the default hue, whether its setting is water (`water`), its default
 marker kind (`marker`), the marker's layout and post points (`layout`,
-`posts`), the versions (`build-<ladder>-<n>.svg`, each with a
+`posts`), where its setting has water (`waterAreas`), the versions (`build-<ladder>-<n>.svg`, each with a
 title), optionally the part of every version the row of versions shows
 (`row`), the way points (`ways`) and the setting with its places,
 including the marker's; the setting is `setting-<kind>.svg`. Checked by
@@ -238,10 +238,11 @@ form.
 an ordered list of post points in the near band, as it declares where the
 path meets the build:
 
-- `span`: one continuous line over all posts (three: left, middle,
-  right). For a setting where the line can run in front of the build
-  without crossing the way or the view: Crossing, along the near edge in
-  front of the bridge over the river.
+- `span`: one continuous line over all posts (at least two). For a
+  setting where the line can run in front of the build without crossing
+  the way or the view: Crossing, two posts on the near ground of each
+  bank and one line across the water in front of the bridge, sagging
+  gently.
 - `sides`: two short lines, left and right, with a gap in the middle
   (four posts, two on each side). For a way leading to the build (Home:
   the path to the door) or a build on water (a boat: the gap is the
@@ -249,10 +250,15 @@ path meets the build:
 - **Choosing**: the gap is wherever the user's way or view to the build
   passes. If nothing passes in front of the build, `span`; otherwise
   `sides` with the gap there.
+- **No post stands in water.** A setting with water marks it
+  (`waterAreas`, polygons in setting units, in the ladder file); a post
+  point inside one is refused. A line may cross water; a long line is
+  drawn a little thicker and sags more (by its length), it never gets an
+  extra post.
 
 The lines are pictures of the setting (`setting-<kind>-cord-<n>.svg`, the
 same for every kind); the hanging elements sit at fixed points along
-them, spread evenly, in order from the first post (Crossing 3 posts and 6
+them, spread evenly, in order from the first post (Crossing 2 posts and 6
 elements, Home 4 posts and 6 elements). All numbers come from
 `MARKER_LAYOUTS` in `scripts/draw-ladders.mjs`. Every marker place in the
 ladder file has its `order` (1 … E); a line has the order of its second
@@ -260,8 +266,8 @@ post.
 
 The checker (`ladderProblems`, `markerProblems`) requires: a known marker
 kind with its three pictures and a title; flowers not on water; a layout
-of `span` or `sides` (four post points); post points in the near band,
-left to right; one post on each point, in order, tied on below the
+of `span` (at least two post points) or `sides` (four); post points in
+the near band, left to right, none in a marked water area; one post on each point, in order, tied on below the
 build's base line; one line per pair of neighbours (`sides`: none across
 the gap), each shown with its second post; at least two hanging elements
 after the posts, in order, each under a line and below the build; nothing
@@ -321,7 +327,7 @@ element by element, `span` and `sides`: the posts looked like
 stanchions, and the scenery flowers read as a hanging element;
 [m5](screenshots/ladder-markers-round-5.png) slimmer posts, larger
 elements; then the owner asked for plain posts with nothing on top and
-ready only on the hanging elements: the final images above.
+ready only on the hanging elements; [m6](screenshots/ladder-markers-round-6.png) plain posts, but the `span` middle post stood in the water: now two posts, one on each bank, and one line across: the final images above.
 
 ## Scenes of a region (for the Valley, #42)
 

@@ -16,9 +16,25 @@
   ],
   "layout": "span",
   "posts": [
-    [42, 172],
-    [152, 174],
-    [264, 172]
+    [52, 172],
+    [262, 172]
+  ],
+  "waterAreas": [
+    [
+      [0, 72],
+      [120, 74],
+      [184.4, 94],
+      [192.4, 112],
+      [209.7, 150.5],
+      [218, 170],
+      [214, 180],
+      [84, 180],
+      [92, 170],
+      [111.8, 150.5],
+      [127.2, 112],
+      [80, 96],
+      [0, 96]
+    ]
   ],
   "versions": [
     {
@@ -102,7 +118,7 @@
     },
     {
       "band": "near",
-      "x": 25,
+      "x": 35,
       "y": 140.125,
       "width": 34,
       "height": 34,
@@ -113,36 +129,18 @@
       "part": "post",
       "order": 1,
       "band": "near",
-      "x": 25,
+      "x": 35,
       "y": 140.125,
       "width": 34,
       "height": 34
-    },
-    {
-      "slot": "marker",
-      "part": "post",
-      "order": 3,
-      "band": "near",
-      "x": 247,
-      "y": 140.125,
-      "width": 34,
-      "height": 34
-    },
-    {
-      "art": "tuft",
-      "band": "near",
-      "x": 296,
-      "y": 155.25,
-      "width": 20,
-      "height": 20
     },
     {
       "slot": "marker",
       "part": "post",
       "order": 2,
       "band": "near",
-      "x": 135,
-      "y": 142.125,
+      "x": 245,
+      "y": 140.125,
       "width": 34,
       "height": 34
     },
@@ -158,21 +156,21 @@
     },
     {
       "slot": "marker",
-      "part": "cord",
+      "part": "bead",
       "order": 3,
-      "art": "setting-river-cord-2",
-      "x": 0,
-      "y": 0,
-      "width": 320,
-      "height": 180
+      "band": "near",
+      "x": 70,
+      "y": 157.00357142857146,
+      "width": 24,
+      "height": 24
     },
     {
       "slot": "marker",
       "part": "bead",
       "order": 4,
       "band": "near",
-      "x": 57.5,
-      "y": 155.3,
+      "x": 100,
+      "y": 160.08928571428572,
       "width": 24,
       "height": 24
     },
@@ -181,8 +179,8 @@
       "part": "bead",
       "order": 5,
       "band": "near",
-      "x": 85,
-      "y": 156.675,
+      "x": 130,
+      "y": 161.63214285714287,
       "width": 24,
       "height": 24
     },
@@ -191,8 +189,8 @@
       "part": "bead",
       "order": 6,
       "band": "near",
-      "x": 112.5,
-      "y": 156.3,
+      "x": 160,
+      "y": 161.63214285714287,
       "width": 24,
       "height": 24
     },
@@ -201,8 +199,8 @@
       "part": "bead",
       "order": 7,
       "band": "near",
-      "x": 168,
-      "y": 156.3,
+      "x": 190,
+      "y": 160.08928571428572,
       "width": 24,
       "height": 24
     },
@@ -211,20 +209,18 @@
       "part": "bead",
       "order": 8,
       "band": "near",
-      "x": 196,
-      "y": 156.675,
+      "x": 220,
+      "y": 157.00357142857143,
       "width": 24,
       "height": 24
     },
     {
-      "slot": "marker",
-      "part": "bead",
-      "order": 9,
+      "art": "tuft",
       "band": "near",
-      "x": 224,
-      "y": 155.3,
-      "width": 24,
-      "height": 24
+      "x": 296,
+      "y": 155.25,
+      "width": 20,
+      "height": 20
     },
     {
       "art": "bush",

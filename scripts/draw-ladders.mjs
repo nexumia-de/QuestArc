@@ -564,8 +564,10 @@ setting('clearing', 'Clearing in a wood', [
 // the lines, in order from the first post.
 const MARKER_POST = 34; // near band
 const BEAD = 24;
-const SAG = 3.5;
-const CORD = 1.6;
+// A line sags gently, more the longer it is; it is a little thicker than
+// an outline so a long one still reads.
+const sagOf = (a, b) => Math.max(3.5, Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.045);
+const CORD = 2;
 const tieAt = ([x, feet]) => [x, feet - (MARKER_POST * (30 - MARKER_TIE[1])) / 32];
 
 /** A point on the line from a to b, sagging by `sag` in the middle. */
@@ -600,7 +602,8 @@ const markerPlaces = (settingName, { layout, posts, beads }) => {
   segments.forEach(([i, j], k) => {
     const [a, b] = [tieAt(posts[i]), tieAt(posts[j])];
     const name = `setting-${settingName}-cord-${k + 1}`;
-    const top = Array.from({ length: 17 }, (_, s) => cordAt(a, b, SAG, s / 16));
+    const SAG = sagOf(a, b);
+    const top = Array.from({ length: 25 }, (_, s) => cordAt(a, b, SAG, s / 24));
     const bottom = top.map(([x, y]) => [x, y + CORD]).reverse();
     write(
       `${name}.svg`,
@@ -640,9 +643,8 @@ const MARKER_LAYOUTS = {
   river: {
     layout: 'span',
     posts: [
-      [42, 172],
-      [152, 174],
-      [264, 172],
+      [52, 172],
+      [262, 172],
     ],
     beads: 6,
   },
@@ -658,6 +660,27 @@ const MARKER_LAYOUTS = {
   },
 };
 const markerOf = ({ layout, posts }) => ({ layout, posts });
+
+// Where a setting has water: polygons in setting units, so the checker can
+// refuse a post point on water (no post stands in water). They follow the
+// river's outline in setting-river.svg closely enough for post points.
+const RIVER_WATER = [
+  [
+    [0, 72],
+    [120, 74],
+    [riverRight(112) - 8, 94],
+    [riverRight(112), 112],
+    [riverRight(150.5), 150.5],
+    [218, 170],
+    [214, 180],
+    [84, 180],
+    [92, 170],
+    [riverLeft(150.5), 150.5],
+    [riverLeft(112), 112],
+    [80, 96],
+    [0, 96],
+  ].map(([x, y]) => [Math.round(x * 10) / 10, y]),
+];
 /** The graduation lantern stands where the marker's first post stood. */
 const lanternAtPost = ({ posts: [[x, feet]] }) => ({
   ...at('', 'near', x - 17, feet, 34),
@@ -707,6 +730,7 @@ ladder(
     row: [30, 38, 60, 40],
     ways: CROSSING_WAYS,
     ...markerOf(MARKER_LAYOUTS.river),
+    waterAreas: RIVER_WATER,
     versions: [
       { art: 'build-crossing-1', title: 'Stepping stones' },
       { art: 'build-crossing-2', title: 'A log' },
