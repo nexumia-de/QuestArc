@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A scaffold: work on the next version</title>
+  <rect class="dim" x="2" y="12" width="1.8" height="68"/>
+  <rect class="dim" x="10.2" y="12" width="1.8" height="68"/>
+  <rect class="dim" x="2" y="26" width="10" height="1.6"/>
+  <rect class="dim" x="2" y="42" width="10" height="1.6"/>
+  <rect class="dim" x="2" y="58" width="10" height="1.6"/>
+  <polygon class="dim" points="2.6,26.4 3.8,27.4 11.4,14.6 10.2,13.6"/>
+  <polygon class="dim" points="2.6,40.4 3.8,41.4 11.4,28.6 10.2,27.6"/>
+  <polygon class="dim" points="2.6,56.4 3.8,57.4 11.4,44.6 10.2,43.6"/>
+  <polygon class="dim" points="2.6,72.4 3.8,73.4 11.4,60.6 10.2,59.6"/>
+  <rect class="dim" x="108" y="12" width="1.8" height="68"/>
+  <rect class="dim" x="116.2" y="12" width="1.8" height="68"/>
+  <rect class="dim" x="108" y="26" width="10" height="1.6"/>
+  <rect class="dim" x="108" y="42" width="10" height="1.6"/>
+  <rect class="dim" x="108" y="58" width="10" height="1.6"/>
+  <polygon class="dim" points="108.6,26.4 109.8,27.4 117.4,14.6 116.2,13.6"/>
+  <polygon class="dim" points="108.6,40.4 109.8,41.4 117.4,28.6 116.2,27.6"/>
+  <polygon class="dim" points="108.6,56.4 109.8,57.4 117.4,44.6 116.2,43.6"/>
+  <polygon class="dim" points="108.6,72.4 109.8,73.4 117.4,60.6 116.2,59.6"/>
+  <rect class="dim" x="0" y="11" width="120" height="2.4" rx="1"/>
+  <rect class="dim" x="59.2" y="12" width="1.6" height="12"/>
+  <rect class="dim" x="56.5" y="23.5" width="7" height="3" rx="1"/>
+</svg>

@@ -1,10 +1,12 @@
-// The pictures' page (#86, #97): a region at three moments, a second
-// region kind and every single picture at 48, 32 and 24 px, drawn by
-// src/ui/art.ts with the theme variables of preview/theme.ts. Query:
-// ?theme=light|dark&part=growth|shore|sizes. Built by preview.mjs into
-// dist/preview/art.html; not part of the plugin.
+// The pictures' page (#86, #97, #42): a region at three moments, a second
+// region kind, every single picture at 48, 32 and 24 px, and the ladders
+// (preview/ladders.ts), drawn by src/ui/art.ts with the theme variables of
+// preview/theme.ts. Query: ?theme=light|dark&part=growth|shore|sizes|
+// sequence-<ladder>|journey-<ladder>|palette[&hue=<palette name>]. Built
+// by preview.mjs into dist/preview/art.html; not part of the plugin.
 import { pictures, scenes } from 'virtual:questarc-art';
 import { picture, scene } from '../src/ui/art';
+import { hues, journey, laddersCss, sequence } from './ladders';
 import { themeCss } from './theme';
 
 const query = new URLSearchParams(location.search);
@@ -20,7 +22,8 @@ h1{font-size:18px;margin:4px 0 0}
 .sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:4px 8px;padding:8px 12px}
 .cell{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--text-color-muted)}
 .row{display:flex;align-items:flex-end;gap:8px}
-.s48{width:48px;height:48px}.s32{width:32px;height:32px}.s24{width:24px;height:24px}`;
+.s48{width:48px;height:48px}.s32{width:32px;height:32px}.s24{width:24px;height:24px}
+${laddersCss}`;
 document.head.append(style);
 
 const el = (tag: string, className: string, ...children: (Node | string)[]) => {
@@ -42,7 +45,17 @@ const card = (name: string, caption: string) => {
 };
 
 const main = el('main', '');
-if (part === 'growth') {
+const hue = query.get('hue');
+if (part.startsWith('sequence-')) {
+  main.style.maxWidth = '1400px';
+  main.append(...sequence(el, part.slice('sequence-'.length), hue));
+} else if (part.startsWith('journey-')) {
+  main.classList.add('mock');
+  main.append(...journey(el, part.slice('journey-'.length), hue));
+} else if (part === 'palette') {
+  main.style.maxWidth = '1400px';
+  main.append(...hues(el));
+} else if (part === 'growth') {
   main.append(
     el('h1', '', 'A meadow as it grows'),
     card('meadow-started', 'Just started'),

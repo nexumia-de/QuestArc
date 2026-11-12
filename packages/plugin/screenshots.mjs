@@ -22,15 +22,25 @@ const sizes = [
 
 const browser = await chromium.launch();
 for (const demo of shots) {
+  // The ladders' pages (#42): sequences and the palette on one wide full
+  // page, the journey mock at phone size; `@<hue>` picks a palette hue.
+  const [, part = ''] = demo.split(':');
+  const ladderPage = /^(sequence-|palette)/.test(part);
+  const sizesHere = ladderPage
+    ? [['wide', 1400, 900]]
+    : part.startsWith('journey-')
+      ? sizes.slice(0, 1)
+      : sizes;
   for (const theme of ['light', 'dark']) {
-    for (const [name, width, height] of sizes) {
+    for (const [name, width, height] of sizesHere) {
       const tab = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
-      const [, route] = demo.split(':');
+      const [, full] = demo.split(':');
+      const [route, hue] = (full ?? '').split('@');
       // `art` and `art:more` are the pictures' page (preview/art.ts), without the view.
       const art = demo.startsWith('art');
       await tab.goto(
         art
-          ? `${artPage}?theme=${theme}&part=${route ?? 'growth'}`
+          ? `${artPage}?theme=${theme}&part=${route || 'growth'}${hue ? `&hue=${hue}` : ''}`
           : `${page}?demo=${demo.split(':')[0]}&theme=${theme}`,
       );
       const frame = art ? tab.locator(':root') : tab.frameLocator('#view');
@@ -40,8 +50,8 @@ for (const demo of shots) {
         .waitFor();
       if (route && !art) await frame.getByRole('button', { name: route }).first().click();
       await tab.waitForTimeout(200);
-      const file = join(out, `${demo.replace(':', '-')}-${theme}-${name}.png`);
-      await tab.screenshot({ path: file });
+      const file = join(out, `${demo.replace(/[:@]/g, '-')}-${theme}-${name}.png`);
+      await tab.screenshot({ path: file, fullPage: ladderPage });
       const overflow = await frame.locator('body').evaluate((b) => b.scrollWidth > b.clientWidth);
       console.log(`${file}${overflow ? '  HORIZONTAL OVERFLOW' : ''}`);
       await tab.close();

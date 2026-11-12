@@ -123,7 +123,14 @@ have their own page, `dist/preview/art.html?theme=light|dark&part=…`
 `shore` and `sizes` (every picture at 48, 32 and 24 px).
 `node screenshots.mjs art,art:shore,art:sizes 2` (in `packages/plugin`,
 after `npm run preview`) writes them at scale 2; the second argument is
-the device scale. Day Planner's demo draws the same parts
+the device scale. The ladders (#42): `sequence-<ladder>` (each version,
+the scaffold and the scaffold with the flag, the lantern, the row of
+versions), `journey-<ladder>` (a static mock of the journey screen) and
+`palette`; `&hue=<name>` picks a palette hue. `node screenshots.mjs
+art:sequence-crossing,art:journey-home,art:palette 2` writes the
+sequences and the palette as one full page 1400 px wide and the mock at
+phone size (`art:sequence-crossing@slate` for a hue). The ladders' files
+come from `node scripts/draw-ladders.mjs`. Day Planner's demo draws the same parts
 (`tests/art_demo.py growth|shore|sizes` in nexumia-de/pensum, through
 phosh-toolkit's `screenshot.sh -c light|dark`). The comparison images in
 `docs/screenshots/valley-*.png` put the plugin's and Day Planner's phone

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A hut with a glowing door</title>
+  <ellipse class="tint-strong" cx="60" cy="75" rx="54" ry="4.6"/>
+  <rect class="fg" x="53" y="74" width="14" height="3.5" rx="1"/>
+  <rect class="bg" x="54.4" y="75.4" width="11.2" height="0.7"/>
+  <rect class="fg" x="38" y="54" width="44" height="20"/>
+  <rect class="bg" x="40" y="56" width="40" height="16"/>
+  <polygon class="fg" points="60,18 96,60 24,60"/>
+  <polygon class="bg" points="60,21.1 91.7,58 28.3,58"/>
+  <rect class="fg" x="53" y="60" width="14" height="14" rx="1"/>
+  <rect class="accent" x="55" y="62" width="10" height="12"/>
+</svg>

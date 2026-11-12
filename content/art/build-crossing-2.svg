@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A log across a river</title>
+  <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
+  <rect class="fg" x="14" y="57" width="92" height="8" rx="4"/>
+  <rect class="bg" x="16" y="59" width="88" height="4" rx="2"/>
+  <rect class="fg" x="30" y="60" width="14" height="2" rx="1"/>
+  <rect class="fg" x="64" y="60" width="18" height="2" rx="1"/>
+  <ellipse class="fg" cx="101" cy="61" rx="4.4" ry="4.4"/>
+  <ellipse class="bg" cx="101" cy="61" rx="2.6" ry="2.6"/>
+  <ellipse class="fg" cx="101" cy="61" rx="1.2" ry="1.2"/>
+</svg>

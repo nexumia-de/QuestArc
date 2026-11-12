@@ -1,0 +1,10 @@
+{
+  "meadow": { "title": "Meadow green", "light": "#3d8a3a", "dark": "#7cc576" },
+  "water": { "title": "Water blue", "light": "#2f74b5", "dark": "#72b2ec" },
+  "sand": { "title": "Sand", "light": "#956a12", "dark": "#d8b25a" },
+  "heather": { "title": "Heather", "light": "#8650ab", "dark": "#c39be4" },
+  "rust": { "title": "Rust", "light": "#b4502a", "dark": "#ec9064" },
+  "slate": { "title": "Slate", "light": "#56697f", "dark": "#9fb1c6" },
+  "moss": { "title": "Moss", "light": "#667524", "dark": "#b2c264" },
+  "rose": { "title": "Rose", "light": "#b0466f", "dark": "#ec8bb2" }
+}

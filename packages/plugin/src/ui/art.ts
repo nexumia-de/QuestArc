@@ -4,27 +4,37 @@
  * `accent`, `dim`, `bg`, `tint` and `tint-strong`, which style.css
  * (`.qa-art`) fills from Super Productivity's theme variables, so light
  * and dark follow the app; a scene's far band is one silhouette in
- * `tint` (class `qa-art-far`). The
+ * `tint` (class `qa-art-far`). A region may take `accent`, `tint` and
+ * `tint-strong` from a hue of the palette instead of the app. The
  * files are checked in CI (no scripts, links or styles), and only the
  * built-in set is ever drawn.
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+/** A hue of the region palette (content/art/palette.json, #42). */
+export interface Hue {
+  readonly title: string;
+  readonly light: string;
+  readonly dark: string;
+}
+
+export interface Placed {
+  readonly art: string;
+  /** The depth band; missing for the ground (docs/journey-design.md). */
+  readonly band?: 'far' | 'middle' | 'near';
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 export interface Scene {
   /** The scene in words, for screen readers. */
   readonly title: string;
   readonly width: number;
   readonly height: number;
-  readonly pictures: readonly {
-    readonly art: string;
-    /** The depth band; missing for the ground (docs/journey-design.md). */
-    readonly band?: 'far' | 'middle' | 'near';
-    readonly x: number;
-    readonly y: number;
-    readonly width: number;
-    readonly height: number;
-  }[];
+  readonly pictures: readonly Placed[];
 }
 
 const parse = (source: string): SVGSVGElement => {
@@ -32,9 +42,21 @@ const parse = (source: string): SVGSVGElement => {
   return document.importNode(doc.documentElement, true) as unknown as SVGSVGElement;
 };
 
-/** One picture, named in words by its title. */
-export const picture = (source: string): SVGSVGElement => {
-  const svg = parse(source);
+/**
+ * A region's hue: `accent`, `tint` and `tint-strong` from the palette
+ * (style.css, `.qa-art-hue`), the light or dark value as the theme is.
+ */
+const tinted = (svg: SVGSVGElement, hue: Hue | undefined): SVGSVGElement => {
+  if (hue === undefined) return svg;
+  svg.classList.add('qa-art-hue');
+  svg.style.setProperty('--qa-hue-light', hue.light);
+  svg.style.setProperty('--qa-hue-dark', hue.dark);
+  return svg;
+};
+
+/** One picture, named in words by its title; in a region's hue if given. */
+export const picture = (source: string, hue?: Hue): SVGSVGElement => {
+  const svg = tinted(parse(source), hue);
   const title = svg.querySelector('title');
   svg.classList.add('qa-art');
   svg.setAttribute('role', 'img');
@@ -44,8 +66,12 @@ export const picture = (source: string): SVGSVGElement => {
 };
 
 /** A scene: pictures at fixed places in one view box, named by the scene's title. */
-export const scene = (layout: Scene, sources: Readonly<Record<string, string>>): SVGSVGElement => {
-  const svg = document.createElementNS(SVG_NS, 'svg');
+export const scene = (
+  layout: Scene,
+  sources: Readonly<Record<string, string>>,
+  hue?: Hue,
+): SVGSVGElement => {
+  const svg = tinted(document.createElementNS(SVG_NS, 'svg'), hue);
   svg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
   svg.classList.add('qa-art');
   svg.setAttribute('role', 'img');

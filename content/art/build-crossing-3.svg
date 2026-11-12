@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A plank bridge across a river</title>
+  <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
+  <rect class="fg" x="40" y="62" width="3.4" height="16"/>
+  <rect class="fg" x="77" y="62" width="3.4" height="16"/>
+  <rect class="fg" x="40" y="69" width="40" height="2.4"/>
+  <rect class="fg" x="14" y="57" width="92" height="7"/>
+  <rect class="bg" x="16" y="59" width="88" height="3"/>
+  <rect class="fg" x="16" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="38" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="59" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="80" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="101.4" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="14" y="43" width="92" height="3" rx="1.5"/>
+  <rect class="accent" x="57.5" y="40.5" width="5.6" height="5.6" rx="1.5"/>
+</svg>

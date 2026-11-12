@@ -1,5 +1,6 @@
-// The module `virtual:questarc-art`: every picture (`<name>.svg`) and scene
-// (`<name>.scene.json`) in content/art/ as text and data
+// The module `virtual:questarc-art`: every picture (`<name>.svg`), scene
+// (`<name>.scene.json`), ladder (`<name>.ladder.json`) and the palette in
+// content/art/ as text and data
 // (docs/decisions/shared-pictures.md). Used by esbuild in preview.mjs;
 // typed in src/virtual-art.d.ts.
 import { readdirSync, readFileSync } from 'node:fs';
@@ -22,7 +23,21 @@ const source = () => {
         JSON.parse(readFileSync(join(dir, file), 'utf8')),
       ]),
   );
-  return `export const pictures = ${JSON.stringify(pictures)};\nexport const scenes = ${JSON.stringify(scenes)};`;
+  const ladders = Object.fromEntries(
+    files
+      .filter((file) => file.endsWith('.ladder.json'))
+      .map((file) => [
+        file.slice(0, -'.ladder.json'.length),
+        JSON.parse(readFileSync(join(dir, file), 'utf8')),
+      ]),
+  );
+  const palette = JSON.parse(readFileSync(join(dir, 'palette.json'), 'utf8'));
+  return [
+    `export const pictures = ${JSON.stringify(pictures)};`,
+    `export const scenes = ${JSON.stringify(scenes)};`,
+    `export const ladders = ${JSON.stringify(ladders)};`,
+    `export const palette = ${JSON.stringify(palette)};`,
+  ].join('\n');
 };
 
 export const esbuildArt = {

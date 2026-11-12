@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Journey design
-description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, and the scene rules for a region of the Valley; with mockups.
+description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, the builds and ladders of the Valley (one thing whole at every stage, scaffold states, way points, a hue per region) and the older scene rules for a region; with mockups.
 tags: [design, ui, journey, mockups, pictures, valley]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 sources:
@@ -99,7 +99,130 @@ earned on finished stations. XP is never shown before it is earned.
 - Screen readers get the stations as a list in path order with their
   state ("Station 2 of 3, current: walk for 5 minutes, 4 of 5 days").
 
+## Builds and ladders (the Valley, #42)
+
+Decided by the owner on 2026-11-12[^42]: a journey builds **one thing**,
+whole at every stage, and every stage makes it a larger version. A
+**ladder** is that thing drawn once in five versions and used by every
+journey that picks it. The first two ladders, Crossing and Home, plugin
+above, Day Planner below (scale 2):
+
+![Crossing: each version, the scaffold, the scaffold with the flag, the lantern](screenshots/ladder-crossing.png)
+
+![Home, the same sequence](screenshots/ladder-home.png)
+
+The journey screen as a static mock (plugin and Day Planner, Crossing and
+Home), light and dark: the build on top, the row of versions below it,
+the card unchanged.
+
+| Light                                                          | Dark                                                         |
+| -------------------------------------------------------------- | ------------------------------------------------------------ |
+| ![Journey screen, light](screenshots/ladder-journey-light.png) | ![Journey screen, dark](screenshots/ladder-journey-dark.png) |
+
+**Files.** A ladder is `content/art/<ladder>.ladder.json` with its title,
+the default hue, the versions (`build-<ladder>-<n>.svg`, each with a
+title), the scaffold, the way points (`ways`) and the setting with its
+places; the setting is `setting-<kind>.svg`. Checked by
+`ladderProblems` (`packages/engine/src/art-ladder-check.ts`) in
+`npm run journeys`. The coordinates of both ladders come from
+`scripts/draw-ladders.mjs`: change the numbers there and run it, never
+edit the generated files by hand.
+
+**Rules for drawing a ladder** (a new ladder comes by pull request like a
+journey):
+
+1. **Whole at every step.** Each version is a complete thing (a log, a
+   plank bridge, a hut), never half built. Five versions; each clearly
+   the same thing grown: same place, same footprint centre, larger.
+2. **Same place, same setting.** Every version is drawn in the build's
+   view box `0 0 120 80`, standing on y = 74, centred on x = 60, and
+   placed in the same build slot of the setting (210 × 140 setting units,
+   1.75 per build unit, base line on y = 140). Switching versions must
+   read as the thing growing, not as a new picture.
+3. **The way.** A build that carries the way (a crossing) has two fixed
+   way points: its walking surface runs from x = 14 to x = 106 at
+   y = 57–64 in every version, and the setting's path ends exactly there
+   on both banks, as thick as the surface. A build the way leads to (a
+   home) has one: the threshold stone (x = 53–67, y = 74–77.5) in front
+   of the fire, the tent's opening and each door, where the path ends.
+   `ways` lists them; the checker requires a corner of every version and
+   of the setting's path at each way point.
+4. **Water runs through.** Water in a setting runs from edge to edge (the
+   river leaves the near edge and bends away to the left edge behind the
+   crossing); it never stops in the middle of the scene. The shore's water
+   also spans the whole width.
+5. **Sizes.** Outlines 2 build units (3.5 px at 360 px, 1 px in the row of
+   versions); every version must read at the journey screen's size (the
+   setting 360 px wide) and in the row of versions at 60 × 40 px. The
+   largest version may reach y = 4; the setting's sky is at most its top
+   fifth.
+6. **Look.** Outlined in `fg` with a `bg` fill, one `accent` detail (the
+   flame, a glowing door or window, the keystone, a rail cap), water and
+   the yard in `tint-strong` of the region's hue. The setting is quiet:
+   ground and far trees in `tint`, a few reused plants (tuft, reeds, bush,
+   flowers, far trees) in the bands of the region scenes.
+
+**Work on the next version: states, never counts** (owner, 2026-11-12).
+The picture shows states of the build: (1) the version **standing**; (2)
+**being extended**: the scaffold behind the build while the stage runs,
+from its first counting completion; (3) **ready**: the same scaffold with
+the flag (the pennant) on its right tower when the stage's condition is
+met. On Continue the next version stands without scaffold. A met stage
+that falls back below its condition goes back to state 2 only: the flag
+comes down, nothing built disappears. Counts stay where they are exact:
+the progress bar, the words ("3 of 5 days") and the seven day marks in
+the card. Under the row of versions the state is said in words ("A
+plank bridge stands · work on a stone bridge has begun", "… is ready").
+
+The **scaffold** (`build-scaffold.svg`) is drawn once for every build: two
+towers beside the largest version and a beam with a hoist above it, in
+`dim`, drawn behind the version, so the version stays whole and in front
+and it reads as being improved, never as damage.
+
+**Slots** in a ladder's setting, filled by the hosts: `scaffold` (just
+before `build`, the same rectangle), `build`, `flag` (on the scaffold's
+right tower, after the build), `lantern` (after graduation, lit, beside
+the build on the left) and `keeper` (a worn-down guardian, beside the
+lantern; pictures for keepers are not drawn yet). After the last version
+there is nothing to extend: no scaffold, no flag.
+
+**Row of versions.** Below the build: the standing versions as small
+pictures (60 × 40 px), the next one as a plain outlined step without a
+picture, like stations ahead; nothing further is shown.
+
+**Colour per region.** A region's scene takes `accent`, `tint` and
+`tint-strong` from one hue of `content/art/palette.json` (eight named
+hues, a light and a dark value each); `fg`, `bg` and `dim` stay the
+host's, and the path, card and controls keep the host's accent. The
+setting's kind sets the default (river: water blue; clearing: meadow
+green). Each hue is checked by computation (WCAG relative luminance) in
+both repositories: `accent` at least 3 : 1 against every host card (WCAG
+1.4.11, non-text), `tint-strong` at least 1.5 : 1 (decorative, but the
+water must show) and the outline `fg` at least 3 : 1 on `tint-strong`;
+`tint` is decorative and not tested. Each ladder in two hues, plugin
+light above, Day Planner dark below:
+
+![Every hue, each ladder in two hues](screenshots/ladder-palette.png)
+
+**Review rounds** (both hosts, light and dark, journey mock at 360 × 720):
+[1, crossing](screenshots/ladder-round-1-crossing.png) and
+[home](screenshots/ladder-round-1-home.png): the build too small, the
+river a straight wedge, beams like drawers;
+[2](screenshots/ladder-round-2.png): larger slot (1.75), river bends at
+the near edge, hut redrawn; [3](screenshots/ladder-round-3.png): river
+behind a fold, wider pile columns (the pile was later dropped);
+[4](screenshots/ladder-round-4.png): the owner's corrections: the path
+meets the crossing and the door at fixed way points, the river runs edge
+to edge, the scaffold and flag instead of a pile.
+
 ## Scenes of a region (for the Valley, #42)
+
+**Superseded as a design** by [builds and ladders](#builds-and-ladders-the-valley-42):
+the landmarks beside a path below were the first idea; the owner found
+them "a path and a flag, then random things put down". The depth bands,
+roles, the far silhouette and the reused plants, pennant and lantern stay
+and are used by the ladders' settings; the meadow and shore scenes stay
+as examples for the checker.
 
 Art direction from #97[^97], for the Valley (#42)[^42] to build on: a
 region is drawn as a place, not a row of icons. A scene is a file

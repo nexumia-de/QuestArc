@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>Stepping stones across a river</title>
+  <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
+  <rect class="fg" x="14" y="57" width="14" height="7" rx="2"/>
+  <rect class="bg" x="16" y="59" width="10" height="3"/>
+  <rect class="fg" x="92" y="57" width="14" height="7" rx="2"/>
+  <rect class="bg" x="94" y="59" width="10" height="3"/>
+  <ellipse class="fg" cx="36" cy="62.6" rx="4.6" ry="4"/>
+  <ellipse class="bg" cx="36" cy="62.6" rx="2.6" ry="2"/>
+  <ellipse class="fg" cx="48" cy="63.4" rx="4.6" ry="4"/>
+  <ellipse class="bg" cx="48" cy="63.4" rx="2.6" ry="2"/>
+  <ellipse class="fg" cx="60" cy="62.6" rx="4.6" ry="4"/>
+  <ellipse class="bg" cx="60" cy="62.6" rx="2.6" ry="2"/>
+  <ellipse class="fg" cx="72" cy="63.4" rx="4.6" ry="4"/>
+  <ellipse class="bg" cx="72" cy="63.4" rx="2.6" ry="2"/>
+  <ellipse class="fg" cx="84" cy="62.6" rx="4.6" ry="4"/>
+  <ellipse class="bg" cx="84" cy="62.6" rx="2.6" ry="2"/>
+</svg>

@@ -1,0 +1,132 @@
+{
+  "title": "Home",
+  "hue": "meadow",
+  "ways": [
+    [
+      [53, 77.5],
+      [67, 77.5]
+    ]
+  ],
+  "scaffold": "build-scaffold",
+  "versions": [
+    {
+      "art": "build-home-1",
+      "title": "A fireplace"
+    },
+    {
+      "art": "build-home-2",
+      "title": "A tent"
+    },
+    {
+      "art": "build-home-3",
+      "title": "A hut"
+    },
+    {
+      "art": "build-home-4",
+      "title": "A cottage"
+    },
+    {
+      "art": "build-home-5",
+      "title": "A house"
+    }
+  ],
+  "width": 320,
+  "height": 180,
+  "pictures": [
+    {
+      "art": "setting-clearing",
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 180
+    },
+    {
+      "art": "tree",
+      "band": "far",
+      "x": 18,
+      "y": 21.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "tree",
+      "band": "far",
+      "x": 284,
+      "y": 22.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "band": "middle",
+      "x": 8,
+      "y": 107.125,
+      "width": 34,
+      "height": 34,
+      "slot": "lantern"
+    },
+    {
+      "band": "middle",
+      "x": 40,
+      "y": 117.5,
+      "width": 24,
+      "height": 24,
+      "slot": "keeper"
+    },
+    {
+      "slot": "scaffold",
+      "band": "middle",
+      "x": 55,
+      "y": 10.5,
+      "width": 210,
+      "height": 140
+    },
+    {
+      "slot": "build",
+      "band": "middle",
+      "x": 55,
+      "y": 10.5,
+      "width": 210,
+      "height": 140
+    },
+    {
+      "art": "flowers",
+      "band": "near",
+      "x": 76,
+      "y": 141.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "tuft",
+      "band": "near",
+      "x": 196,
+      "y": 149.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "tuft",
+      "band": "near",
+      "x": 46,
+      "y": 153.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "bush",
+      "band": "near",
+      "x": -18,
+      "y": 131,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "slot": "flag",
+      "band": "middle",
+      "x": 246,
+      "y": 9,
+      "width": 24,
+      "height": 24
+    }
+  ]
+}
