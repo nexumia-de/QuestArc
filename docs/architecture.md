@@ -115,7 +115,7 @@ The exact rules and numbers are in [game rules](game-rules.md) (decided
 2026-11-05, #11): only the current stage's task counts, 10 XP per
 completion and 10 for a welcome back, cosmetic levels, never miss twice
 over due days with a one-day backfill window, guardians worn down by the
-stage's XP, HP only in RPG mode and self-recovering, graduation by three
+stage's XP, no player HP (D3), graduation by three
 high weekly answers, 80 % completion and reminders already off. Not
 planned: gold and shop, random rewards, login bonuses, leaderboards,
 money commitments.
@@ -150,26 +150,30 @@ milestones.
 - **Deleting history changes the game.** If archived tasks or single
   instances are deleted, derived XP and progress drop. Decided: finished
   stages are kept as checkpoints ([deleted history](decisions/deleted-history.md)).
-- **Large archives.** Every evaluation reads the whole archive; with years
-  of data the GJS route in Pensum may become slow.
+- **Large archives.** Every evaluation receives the whole archive. Measured
+  and bounded: `snapshotFromHost` drops unrelated archived tasks before
+  converting them, and a speed budget test (about 50,000 archived tasks) runs
+  in Node and gjs ([engine speed](decisions/engine-in-gjs.md#engine-speed-issue-83)).
+  What remains is the cost of serialising and parsing the archive, which a
+  host avoids by sending only tasks of bound repeat configs.
 - **Testing in the real host.** Unit tests do not show whether the plugin
   works inside a running Super Productivity; a test in the real app is
   needed.
 
 ## Decisions (owner, 2026-11-05)
 
-| #   | Question                   | Decision                                                                                                                                                                                                         |
-| --- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Others using QuestArc 2.x? | Probably nobody; clean break                                                                                                                                                                                     |
-| D2  | What is a habit?           | Super Productivity's recurring tasks (`taskRepeatCfg`); its habit counters do not fit                                                                                                                            |
-| D3  | Keep HP?                   | Only in RPG mode, derived from the last 7 days, recovers by itself                                                                                                                                               |
-| D4  | Gold and shop?             | Dropped for now                                                                                                                                                                                                  |
-| D5  | Planning?                  | GitHub issues and milestones as in the other apps; goals in the [roadmap](roadmap.md)                                                                                                                            |
-| D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules                                                                                                     |
-| D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                                                                                                                    |
-| D8  | Build on 2.x code?         | No: start from scratch and work only from these documents; 2.x stays in git history; no import of 2.x quests                                                                                                     |
-| D9  | Journey                    | Progress shown as travel along a path, QuestArc's own design ([roadmap](roadmap.md#the-journey))                                                                                                                 |
-| D10 | Journeys at once           | One active journey; it can be paused to start another                                                                                                                                                            |
-| D11 | Habits after a journey     | They stay: QuestArc never deletes or ends a recurring task; graduation is offered by automaticity, the user decides                                                                                              |
-| D12 | Evidence-based rules       | The [design rules](psychology.md) follow the [evidence review](research.md); no telemetry, so no A/B tests and success shown only to the user; a supporter digest needs sharing and waits with cooperation (#45) |
-| D13 | Licence                    | AGPL-3.0-or-later, © 2026 suitably, like the other apps; Pensum (also AGPL) can include the engine without a compatibility question; Super Productivity sets no licence rules for plugins                        |
+| #   | Question                   | Decision                                                                                                                                                                                                                                                                              |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Others using QuestArc 2.x? | Probably nobody; clean break                                                                                                                                                                                                                                                          |
+| D2  | What is a habit?           | Super Productivity's recurring tasks (`taskRepeatCfg`); its habit counters do not fit                                                                                                                                                                                                 |
+| D3  | Keep HP?                   | No HP (owner, 2026-11-12, #38): the only value that falls because of misses, and a seven-day value that only fills still stands lower after quiet days. The last due days, the runs and the gap on the path give the feedback. Guardians keep their HP, which only falls by XP earned |
+| D4  | Gold and shop?             | Dropped for now                                                                                                                                                                                                                                                                       |
+| D5  | Planning?                  | GitHub issues and milestones as in the other apps; goals in the [roadmap](roadmap.md)                                                                                                                                                                                                 |
+| D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules                                                                                                                                                                          |
+| D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                                                                                                                                                                                         |
+| D8  | Build on 2.x code?         | No: start from scratch and work only from these documents; 2.x stays in git history; no import of 2.x quests                                                                                                                                                                          |
+| D9  | Journey                    | Progress shown as travel along a path, QuestArc's own design ([roadmap](roadmap.md#the-journey))                                                                                                                                                                                      |
+| D10 | Journeys at once           | One active journey; it can be paused to start another                                                                                                                                                                                                                                 |
+| D11 | Habits after a journey     | They stay: QuestArc never deletes or ends a recurring task; graduation is offered by automaticity, the user decides                                                                                                                                                                   |
+| D12 | Evidence-based rules       | The [design rules](psychology.md) follow the [evidence review](research.md); no telemetry, so no A/B tests and success shown only to the user; a supporter digest needs sharing and waits with cooperation (#45)                                                                      |
+| D13 | Licence                    | AGPL-3.0-or-later, © 2026 suitably, like the other apps; Pensum (also AGPL) can include the engine without a compatibility question; Super Productivity sets no licence rules for plugins                                                                                             |

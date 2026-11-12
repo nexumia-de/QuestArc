@@ -4,11 +4,27 @@ export interface GameView {
   readonly mode: 'calm' | 'rpg';
   readonly totalXp: number;
   readonly level: number;
+  /** The active run; absent when it is read-only (then in `readOnly`). */
   readonly active?: RunView;
   readonly paused: readonly RunView[];
   readonly finished: readonly RunView[];
+  /** Runs this engine cannot compute (data model §2, data format). */
+  readonly readOnly: readonly ReadOnlyRun[];
   /** Journeys and records the engine could not use, with the reason. */
   readonly problems: readonly string[];
+}
+
+/**
+ * A run this engine cannot compute: a record in a newer data format, or
+ * its journey (version) is not available. Hosts show a read-only page
+ * and write nothing for it.
+ */
+export interface ReadOnlyRun {
+  readonly runId: string;
+  readonly journeyId: string;
+  readonly reason: 'newer-format' | 'journey-missing' | 'journey-version';
+  /** Its place among the runs. */
+  readonly state: 'active' | 'paused' | 'finished';
 }
 
 export interface RunView {

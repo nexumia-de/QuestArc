@@ -1,0 +1,93 @@
+{
+  "name": "A record in a newer data format makes its run read-only: no stations, no XP, no problem for its changed records; it stays the active run, the older run stays paused",
+  "rule": "data-model §2, data format and unknown data",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-04",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      },
+      "run:r2": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-03"
+      },
+      "pause:r1:2026-11-03": {
+        "action": "pause",
+        "source": "user"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-03"
+      },
+      "stage-done:r2:a": {
+        "dataFormat": 2,
+        "day": "2026-11-04",
+        "steps": ["changed", "shape"]
+      },
+      "graduation:r2:a": {
+        "dataFormat": 2,
+        "day": "2026-11-04",
+        "choice": "keep"
+      },
+      "stage:r9:a": {
+        "dataFormat": 3,
+        "acceptedDay": "2026-11-04"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 10,
+    "active": null,
+    "paused": [
+      {
+        "runId": "r1",
+        "paused": true
+      }
+    ],
+    "finished": [],
+    "readOnly": [
+      {
+        "runId": "r2",
+        "journeyId": "test-daily",
+        "reason": "newer-format",
+        "state": "active"
+      }
+    ],
+    "problems": [
+      "run r2: written by a newer QuestArc (data format 2)",
+      "run r9: written by a newer QuestArc (data format 3)"
+    ]
+  }
+}

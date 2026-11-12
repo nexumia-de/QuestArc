@@ -22,7 +22,7 @@ the journey is in [journey design](journey-design.md).
   back and menu at the top.
 - States are shown with text and shape, never by colour alone.
 - No text field is focused when a screen opens.
-- Calm mode shows the same screens without XP, level, guardians, HP or
+- Calm mode shows the same screens without XP, level, guardians or
   game words.
 - Texts are autonomy-supportive ("you could"), never controlling or
   blaming, and never promise a number of days.
@@ -64,7 +64,7 @@ the journey is in [journey design](journey-design.md).
 
 ### 4. Journey (home)
 
-- Top: journey title; in RPG mode level and HP; menu (Pause or Resume,
+- Top: journey title; in RPG mode the level; menu (Pause or Resume,
   End journey, Shelf, Settings). **End journey** happens at once and
   offers **Undo** (it writes one record, withdrawn by Undo).
 - Middle: the path ([journey design](journey-design.md)), scrolled to the
@@ -93,6 +93,16 @@ the journey is in [journey design](journey-design.md).
   question are remembered on the device only; they are not choices.
 - The card also shows the user's own reason, if they gave one.
 - Tapping any station opens its details (screen 5).
+- **Read-only journey:** when the active journey is read-only
+  ([data model](data-model.md) §2: written by a newer QuestArc, or its
+  journey or journey version is not here), the screen shows its title
+  (or "This journey" when the journey is not here) and one calm
+  sentence instead of the path: "This journey was continued with a newer
+  QuestArc. Update QuestArc here to go on with it; nothing is lost." or
+  "This journey is not available here. Update QuestArc here to go on
+  with it; nothing is lost." No progress, no main action, no Pause or
+  End journey; the menu keeps Shelf and Settings. Nothing is written for
+  it.
 
 ### 5. Station details
 
@@ -205,7 +215,7 @@ same effect.
 
 ### F. Graduation
 
-- When the habit qualifies ([game rules](game-rules.md) §8): banner "This
+- When the habit qualifies ([game rules](game-rules.md) §7): banner "This
   habit seems to run by itself. You could let it graduate." with
   **Graduate** and **Not now**.
 - Graduate: "Keep it repeating quietly" (default) or "End the repeat"

@@ -5,14 +5,18 @@ import { h } from '../dom';
 import { stationCard } from '../journey/card';
 import { journeyPath, scrollFor } from '../journey/path';
 import type { Context, MenuItem, Screen } from '../screen';
+import { readOnlyScreen } from './read-only';
 
 /**
  * Screen 4, the journey (docs/behaviour.md): the path, opened scrolled to
  * the current station, and the current station's card with its main
- * action. With no journey, the empty state.
+ * action. With no journey, the empty state; a read-only journey gets its
+ * own page.
  */
 export const homeScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
+  const readOnly = view.readOnly.find((r) => r.state === 'active');
+  if (readOnly) return readOnlyScreen(ctx, readOnly);
   const run = view.active;
   const journey = run && journeys.find((j) => j.id === run.journeyId);
   const shelfItem: MenuItem = {

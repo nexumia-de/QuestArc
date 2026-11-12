@@ -1,0 +1,67 @@
+{
+  "name": "Record kinds and fields the engine does not know are ignored without a problem; the run is computed as before",
+  "rule": "data-model §2, data format and unknown data",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-04",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02",
+        "mood": "calm"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02",
+        "note": {
+          "any": "thing"
+        }
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      },
+      "note:r1:a": {
+        "text": "from a newer QuestArc"
+      },
+      "reminder": "09:00"
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "totalXp": 10,
+    "active": {
+      "runId": "r1",
+      "stations": [
+        {
+          "completions": 1
+        },
+        {},
+        {}
+      ]
+    },
+    "readOnly": [],
+    "problems": []
+  }
+}

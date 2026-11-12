@@ -86,8 +86,7 @@ falls to zero; the run text ("Run 4 · best 6") stays next to the marks.
 
 ## Calm and game
 
-Same layout. The game variant adds: level chip and HP (heart with a
-number) in the header, the pennant as hero, guardians on the path and XP
+Same layout. The game variant adds: level chip in the header, the pennant as hero, guardians on the path and XP
 earned on finished stations. XP is never shown before it is earned.
 
 ## Accessibility
