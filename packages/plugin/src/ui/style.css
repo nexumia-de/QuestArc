@@ -838,3 +838,54 @@ body {
     padding-bottom: 40px;
   }
 }
+
+/*
+ * Pictures from content/art/ (src/ui/art.ts): the six roles from the
+ * theme, each an opaque colour so overlapping shapes of one role stay one
+ * colour. `dim` is the text colour and `tint`/`tint-strong` the accent
+ * mixed into the surface the picture stands on; `bg` is that surface.
+ * A scene's far band is one silhouette in `tint`.
+ */
+.qa-art {
+  --qa-art-surface: var(--bg-lighter, #fff);
+  --qa-art-accent: var(--c-primary, #6495ed);
+  --qa-art-tint-strong: color-mix(in srgb, var(--qa-art-accent) 40%, var(--qa-art-surface));
+  display: block;
+}
+
+/*
+ * A region's hue (content/art/palette.json): the palette's light or dark
+ * value as the theme is, from Super Productivity's --is-dark-theme (0 or 1).
+ */
+.qa-art-hue {
+  --qa-art-accent: color-mix(
+    in srgb,
+    var(--qa-hue-dark) calc(var(--is-dark-theme, 0) * 100%),
+    var(--qa-hue-light)
+  );
+}
+
+.qa-art .fg {
+  fill: var(--text-color, rgb(44, 44, 44));
+}
+
+.qa-art .accent {
+  fill: var(--qa-art-accent);
+}
+
+.qa-art .dim {
+  fill: color-mix(in srgb, var(--text-color, rgb(44, 44, 44)) 30%, var(--qa-art-surface));
+}
+
+.qa-art .bg {
+  fill: var(--qa-art-surface);
+}
+
+.qa-art .tint,
+.qa-art .qa-art-far [class] {
+  fill: color-mix(in srgb, var(--qa-art-accent) 16%, var(--qa-art-surface));
+}
+
+.qa-art .tint-strong {
+  fill: var(--qa-art-tint-strong);
+}

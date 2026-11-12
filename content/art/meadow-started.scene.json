@@ -1,0 +1,10 @@
+{
+  "title": "A meadow, just started: bare ground, the first stone of the path and the pennant at the goal",
+  "width": 320,
+  "height": 120,
+  "pictures": [
+    { "art": "ground-meadow", "x": 0, "y": 0, "width": 320, "height": 120 },
+    { "art": "pennant", "band": "middle", "x": 220.0, "y": 39.5, "width": 24, "height": 24 },
+    { "art": "stone", "band": "near", "x": 145.054, "y": 100.75, "width": 20, "height": 20 }
+  ]
+}

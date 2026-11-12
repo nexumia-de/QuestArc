@@ -16,7 +16,7 @@ links. Change history is in [log.md](log.md).
 # Design
 
 - [Behaviour](behaviour.md) - Every screen, flow and text, host-neutral, and where each lands in Super Productivity and Pensum.
-- [Journey design](journey-design.md) - The path, station states, last seven days, calm and game variant, accessibility; mockups.
+- [Journey design](journey-design.md) - The path, station states, last seven days, calm and game variant, accessibility, builds and ladders of the Valley (versions, markers that grow element by element, way points, a hue per region), the older scene rules for a region; mockups.
 - [Data model](data-model.md) - Engine input (snapshot), choice records as one plugin-data key each, the game view and events, what Pensum reads and writes.
 - [Journey: A gentle morning](journey-gentle-morning.md) - The first built-in journey: from one glass of water to a short morning routine, four stages, two guardians; how it follows the design rules.
 - [Journey: First Things First](journey-first-things-first.md) - The second built-in journey, for work: one task written down, 15 then 45 quiet minutes on it, email in blocks, a one-line look back.
@@ -43,5 +43,6 @@ links. Change history is in [log.md](log.md).
 - [How the plugin sets up a stage's recurring task](decisions/recurring-task-setup.md) - Create and hand over, or bind an existing task; upstream API requested in parallel.
 - [The plugin's view uses no UI framework](decisions/plugin-ui-without-framework.md) - Plain TypeScript with a small DOM helper; screens are redrawn from the game state; nothing third-party ships.
 - [Finished stages survive deleted history](decisions/deleted-history.md) - Checkpoint record per accepted stage; only open progress is derived.
+- [One set of symbolic pictures for both hosts](decisions/shared-pictures.md) - Go: symbolic SVG in `content/art/` with six colour roles (fg, accent, dim, bg, tint, tint-strong), filled from each host's theme; scenes in three depth bands; checked by the picture and scene checkers; screenshots of both hosts and the review rounds of #97.
 - [A data format number on the record that needs it](decisions/data-format.md) - Hosts on different engine versions: `dataFormat` on the run-scoped record an older engine would misread makes that run read-only there; unknown kinds and fields are ignored and kept; `guardWrite` refuses writes into such runs.
 - [Others publish journeys by pull request](decisions/journeys-by-pull-request.md) - One self-contained file, checked in CI, merged by the owner; CC BY-SA 4.0 with "Written by …"; private journeys later with the same file.

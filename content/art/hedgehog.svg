@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Hedgehog</title>
+  <path class="fg" d="M3 27L1.6 23.6L4.2 22.4L3 18.6L6.6 18.2L6.6 14.2L10.2 15.2L11.6 11L14.6 13.8L17.4 11.2L18.6 14.8L21.8 14.2L21.2 17.6L20.4 20.4L20.6 27Z"/>
+  <path class="bg" d="M5 25.8L3.9 23.1L5.9 22.2L5 19.2L7.8 18.9L7.8 15.8L10.6 16.6L11.7 13.3L14 15.5L16.2 13.5L17.1 16.3L19.6 15.8L19.2 18.5L18.6 20.6L18.7 25.8Z"/>
+  <path class="fg" d="M21.8 18.4C24.6 19 27.4 21 29.8 23.2C30.4 24.4 29.8 25.6 28.4 25.8L21.8 27Z"/>
+  <circle class="bg" cx="25" cy="21.8" r="1"/>
+  <rect class="fg" x="6.4" y="26" width="2.6" height="4" rx="1"/>
+  <rect class="fg" x="16.4" y="26" width="2.6" height="4" rx="1"/>
+</svg>

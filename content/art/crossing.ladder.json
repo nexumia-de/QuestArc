@@ -1,0 +1,234 @@
+{
+  "title": "Crossing",
+  "hue": "water",
+  "water": true,
+  "marker": "lanterns",
+  "row": [30, 38, 60, 40],
+  "ways": [
+    [
+      [14, 57],
+      [14, 64]
+    ],
+    [
+      [106, 57],
+      [106, 64]
+    ]
+  ],
+  "layout": "span",
+  "posts": [
+    [52, 172],
+    [262, 172]
+  ],
+  "waterAreas": [
+    [
+      [0, 72],
+      [120, 74],
+      [184.4, 94],
+      [192.4, 112],
+      [209.7, 150.5],
+      [218, 170],
+      [214, 180],
+      [84, 180],
+      [92, 170],
+      [111.8, 150.5],
+      [127.2, 112],
+      [80, 96],
+      [0, 96]
+    ]
+  ],
+  "versions": [
+    {
+      "art": "build-crossing-1",
+      "title": "Stepping stones"
+    },
+    {
+      "art": "build-crossing-2",
+      "title": "A log"
+    },
+    {
+      "art": "build-crossing-3",
+      "title": "A plank bridge"
+    },
+    {
+      "art": "build-crossing-4",
+      "title": "A stone bridge"
+    },
+    {
+      "art": "build-crossing-5",
+      "title": "A covered bridge"
+    }
+  ],
+  "width": 320,
+  "height": 180,
+  "pictures": [
+    {
+      "art": "setting-river",
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 180
+    },
+    {
+      "art": "tree",
+      "band": "far",
+      "x": 246,
+      "y": 21.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "tree",
+      "band": "far",
+      "x": 26,
+      "y": 26.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "tuft",
+      "band": "middle",
+      "x": 290,
+      "y": 78.875,
+      "width": 14,
+      "height": 14
+    },
+    {
+      "slot": "build",
+      "band": "middle",
+      "x": 55,
+      "y": 10.5,
+      "width": 210,
+      "height": 140
+    },
+    {
+      "band": "middle",
+      "x": 18,
+      "y": 121.5,
+      "width": 24,
+      "height": 24,
+      "slot": "keeper"
+    },
+    {
+      "art": "reeds",
+      "band": "near",
+      "x": 84,
+      "y": 134.125,
+      "width": 34,
+      "height": 34
+    },
+    {
+      "band": "near",
+      "x": 35,
+      "y": 140.125,
+      "width": 34,
+      "height": 34,
+      "slot": "lantern"
+    },
+    {
+      "slot": "marker",
+      "part": "post",
+      "order": 1,
+      "band": "near",
+      "x": 35,
+      "y": 140.125,
+      "width": 34,
+      "height": 34
+    },
+    {
+      "slot": "marker",
+      "part": "post",
+      "order": 2,
+      "band": "near",
+      "x": 245,
+      "y": 140.125,
+      "width": 34,
+      "height": 34
+    },
+    {
+      "slot": "marker",
+      "part": "cord",
+      "order": 2,
+      "art": "setting-river-cord-1",
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 180
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 3,
+      "band": "near",
+      "x": 70,
+      "y": 157.00357142857146,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 4,
+      "band": "near",
+      "x": 100,
+      "y": 160.08928571428572,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 5,
+      "band": "near",
+      "x": 130,
+      "y": 161.63214285714287,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 6,
+      "band": "near",
+      "x": 160,
+      "y": 161.63214285714287,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 7,
+      "band": "near",
+      "x": 190,
+      "y": 160.08928571428572,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "slot": "marker",
+      "part": "bead",
+      "order": 8,
+      "band": "near",
+      "x": 220,
+      "y": 157.00357142857143,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "art": "tuft",
+      "band": "near",
+      "x": 296,
+      "y": 155.25,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "art": "bush",
+      "band": "near",
+      "x": -24,
+      "y": 134,
+      "width": 48,
+      "height": 48
+    }
+  ]
+}

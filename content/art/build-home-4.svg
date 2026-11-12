@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A cottage with a chimney</title>
+  <ellipse class="tint-strong" cx="60" cy="75" rx="54" ry="4.6"/>
+  <rect class="fg" x="53" y="74" width="14" height="3.5" rx="1"/>
+  <rect class="bg" x="54.4" y="75.4" width="11.2" height="0.7"/>
+  <rect class="fg" x="74" y="6" width="9" height="18"/>
+  <rect class="bg" x="76" y="8" width="5" height="14"/>
+  <rect class="fg" x="24" y="44" width="72" height="30"/>
+  <rect class="bg" x="26" y="46" width="68" height="26"/>
+  <polygon class="fg" points="38,14 82,14 102,46 18,46"/>
+  <polygon class="bg" points="39.1,16 80.9,16 98.4,44 21.6,44"/>
+  <rect class="fg" x="53" y="54" width="14" height="20" rx="1"/>
+  <rect class="accent" x="55" y="56" width="10" height="18"/>
+  <rect class="fg" x="30" y="52" width="15" height="13" rx="1"/>
+  <rect class="bg" x="31.8" y="53.8" width="11.4" height="9.4"/>
+  <rect class="fg" x="36.7" y="52" width="1.6" height="13"/>
+  <rect class="fg" x="30" y="57.7" width="15" height="1.6"/>
+  <rect class="fg" x="75" y="52" width="15" height="13" rx="1"/>
+  <rect class="bg" x="76.8" y="53.8" width="11.4" height="9.4"/>
+  <rect class="fg" x="81.7" y="52" width="1.6" height="13"/>
+  <rect class="fg" x="75" y="57.7" width="15" height="1.6"/>
+</svg>

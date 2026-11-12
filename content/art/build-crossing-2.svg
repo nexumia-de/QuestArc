@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A log across a river</title>
+  <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
+  <rect class="fg" x="10" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="12" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="10" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="20.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="15" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="25.4" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="88" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="90" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="88" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="98.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="93" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="103.4" y="68.5" width="1.6" height="4.5"/>
+  <polygon class="fg" points="14,57 14,64 16,67 21,68.5 99,68.5 104,67 106,64 106,57 104,54 99,52.5 21,52.5 16,54"/>
+  <polygon class="bg" points="16,57.6 16,63.4 17.3,65.3 21.3,66.5 98.7,66.5 102.7,65.3 104,63.4 104,57.6 102.7,55.7 98.7,54.5 21.3,54.5 17.3,55.7"/>
+  <rect class="fg" x="24" y="57" width="22" height="1.8" rx="0.9"/>
+  <rect class="fg" x="52" y="62.5" width="26" height="1.8" rx="0.9"/>
+  <rect class="fg" x="32" y="64" width="12" height="1.6" rx="0.8"/>
+  <rect class="fg" x="70" y="56.5" width="16" height="1.6" rx="0.8"/>
+  <ellipse class="fg" cx="101" cy="60.5" rx="5.5" ry="8"/>
+  <ellipse class="bg" cx="101" cy="60.5" rx="3.7" ry="6.2"/>
+  <ellipse class="fg" cx="101" cy="60.5" rx="2.6" ry="4.2"/>
+  <ellipse class="bg" cx="101" cy="60.5" rx="1.2" ry="2.8"/>
+  <rect class="fg" x="46" y="51" width="3" height="3" rx="1"/>
+  <rect class="fg" x="47" y="48.5" width="1.6" height="3.5"/>
+</svg>

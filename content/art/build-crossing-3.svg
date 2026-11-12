@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <title>A plank bridge across a river</title>
+  <polygon class="tint-strong" points="38.9,64 81.2,64 88.4,80 32.5,80"/>
+  <rect class="fg" x="10" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="12" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="10" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="20.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="15" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="25.4" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="88" y="63.5" width="22" height="9.5"/>
+  <rect class="bg" x="90" y="65.5" width="18" height="5.5"/>
+  <rect class="fg" x="88" y="67.6" width="22" height="1.5"/>
+  <rect class="fg" x="98.2" y="63.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="93" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="103.4" y="68.5" width="1.6" height="4.5"/>
+  <rect class="fg" x="42" y="62" width="3.4" height="16"/>
+  <rect class="fg" x="75" y="62" width="3.4" height="16"/>
+  <rect class="fg" x="42" y="69" width="36.4" height="2.4"/>
+  <rect class="fg" x="14" y="57" width="92" height="7"/>
+  <rect class="bg" x="16" y="59" width="88" height="3"/>
+  <rect class="fg" x="16" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="38" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="59" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="80" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="101.4" y="44" width="2.6" height="13"/>
+  <rect class="fg" x="14" y="43" width="92" height="3" rx="1.5"/>
+  <rect class="accent" x="57.5" y="40.5" width="5.6" height="5.6" rx="1.5"/>
+</svg>

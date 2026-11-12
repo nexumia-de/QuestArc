@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>A vine in bud on a line</title>
+  <rect class="tint-strong" x="14.8" y="2" width="2.4" height="10"/>
+  <polygon class="tint-strong" points="15,6 10.5,3.4 5.3,4.4 9.9,7"/>
+  <polygon class="tint-strong" points="17,9 21.5,6.4 26.8,7.4 22.1,10"/>
+  <ellipse class="fg" cx="16" cy="16" rx="4.6" ry="6.1"/>
+  <ellipse class="dim" cx="16" cy="16" rx="2.3" ry="3.8"/>
+</svg>

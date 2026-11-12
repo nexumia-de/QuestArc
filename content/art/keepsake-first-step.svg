@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Keepsake: first step</title>
+  <path class="fg" fill-rule="evenodd" d="M16 1.5A14.5 14.5 0 1 1 15.99 1.5ZM16 4A12 12 0 1 0 16.01 4Z"/>
+  <path class="accent" d="M16.2 13.5C19 13.5 20.2 16 19.8 19.5C19.4 23 18.4 26 16 26C13.6 26 13 23.5 13.2 20.5C13.4 16.5 14 13.5 16.2 13.5Z"/>
+  <circle class="accent" cx="12.6" cy="11.6" r="1.25"/>
+  <circle class="accent" cx="14.5" cy="9.6" r="1.35"/>
+  <circle class="accent" cx="16.9" cy="9" r="1.5"/>
+  <circle class="accent" cx="19.2" cy="9.8" r="1.35"/>
+  <circle class="accent" cx="20.7" cy="11.9" r="1.2"/>
+</svg>
