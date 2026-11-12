@@ -2,10 +2,11 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "first-things-first",
-  "version": 1,
+  "version": 2,
   "title": "first-things-first.title",
   "description": "first-things-first.description",
   "why": "first-things-first.why",
+  "build": { "ladder": "crossing" },
   "stages": [
     {
       "id": "one-thing",

@@ -1,4 +1,5 @@
 import { isDay } from './days';
+import type { BuildChoice } from './ladders';
 import type { Journey } from './types/journey';
 
 /**
@@ -36,6 +37,8 @@ export interface Choices {
   readonly pauses: ReadonlyMap<string, readonly { day: string; action: 'pause' | 'resume' }[]>;
   /** `${runId}:${stageId}:${isoWeek}` present when answered */
   readonly checkins: ReadonlySet<string>;
+  /** runId → the user's build choices (names are checked when used) */
+  readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
   readonly problems: readonly string[];
 }
@@ -58,6 +61,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const checkpoints = new Map<string, { day: string; xp: number; damage: number }>();
   const pauses = new Map<string, { day: string; action: 'pause' | 'resume' }[]>();
   const checkins = new Set<string>();
+  const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
 
@@ -120,6 +124,13 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       const score = num(value.score);
       if (score !== undefined && score >= 1 && score <= 7) checkins.add(parts.slice(1).join(':'));
       else bad();
+    } else if (kind === 'build' && parts.length === 2 && parts[1]) {
+      const choice: Record<string, string> = {};
+      for (const field of ['ladder', 'marker', 'hue'] as const) {
+        const name = str(value[field]);
+        if (name) choice[field] = name;
+      }
+      builds.set(parts[1], choice);
     } else if (kind === 'journey' && parts.length === 2) {
       userJourneys.push(value as unknown as Journey);
     } else if (kind === 'graduation') {
@@ -139,6 +150,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     checkpoints,
     pauses,
     checkins,
+    builds,
     userJourneys,
     problems,
   };

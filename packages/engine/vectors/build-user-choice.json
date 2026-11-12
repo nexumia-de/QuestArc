@@ -1,0 +1,54 @@
+{
+  "name": "The user's choice of ladder, marker and hue wins over the journey's",
+  "rule": "game-rules §10",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-01",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      },
+      "build:r1": {
+        "ladder": "home",
+        "marker": "flowers",
+        "hue": "rose"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "active": {
+      "build": {
+        "ladder": "home",
+        "marker": "flowers",
+        "hue": "rose",
+        "version": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "name": "Continue raises the version: build-version, no build-element",
+  "rule": "game-rules §10",
+  "kind": "diff",
+  "before": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793487600000,
+        "doneOn": 1793509200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793574000000,
+        "doneOn": 1793595600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793660400000,
+        "doneOn": 1793682000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793746800000,
+        "doneOn": 1793768400000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793833200000,
+        "doneOn": 1793854800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "after": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793487600000,
+        "doneOn": 1793509200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793574000000,
+        "doneOn": 1793595600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793660400000,
+        "doneOn": 1793682000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793746800000,
+        "doneOn": 1793768400000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793833200000,
+        "doneOn": 1793854800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-05",
+        "xp": 50,
+        "damage": 0
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-05"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-11-05",
+        "repeatCfgId": "cfgB"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": [
+    {
+      "key": "event.build-version",
+      "params": {
+        "version": 2
+      }
+    }
+  ]
+}

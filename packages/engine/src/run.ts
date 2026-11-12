@@ -1,13 +1,14 @@
 import { resolveBinding } from './binding';
 import type { Choices, RunRecord } from './choices';
 import { creditedDays, minutesTracked } from './completions';
-import { conditionProgress } from './conditions';
+import { bestProgress, conditionProgress } from './conditions';
 import { daysBetween, isoWeek } from './days';
+import { resolveBuild } from './ladders';
 import { isSupported } from './schedule';
 import { buildTimeline } from './timeline';
 import type { Journey } from './types/journey';
 import type { SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
-import type { RunView, StationView } from './types/view';
+import type { BuildView, RunView, StationView } from './types/view';
 import { stageXp } from './xp';
 
 /**
@@ -37,6 +38,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   let checkinDue = false;
   let cfgPaused = false;
   let progress = 1;
+  let markerProgress = 0;
 
   const stations: StationView[] = journey.stages.map((stage, index) => {
     const checkpoint = choices.checkpoints.get(key(stage.id));
@@ -111,11 +113,13 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       credited,
       pauses,
     });
-    const condition = conditionProgress(stage.condition, {
+    const conditionInput = {
       dueDays: timeline.dueDays,
       credited,
       minutes: minutesTracked(binding.tasks, countFrom, today),
-    });
+    };
+    const condition = conditionProgress(stage.condition, conditionInput);
+    markerProgress = bestProgress(stage.condition, conditionInput);
     const xp = stageXp(credited.size, timeline.welcomeBacks);
     offerFallback = timeline.offerFallback;
     cfgPaused = binding.cfg.isPaused === true;
@@ -137,6 +141,19 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   });
 
   const lastPause = pauses.filter((p) => p.day <= today).at(-1);
+  // The build (game rules §10): game mode only; an ended run shows its
+  // version standing, without a marker.
+  const ended = choices.runEnds.has(run.runId);
+  const build: BuildView | undefined =
+    choices.mode === 'rpg'
+      ? {
+          ...resolveBuild(journey, choices.builds.get(run.runId)),
+          version: 1 + stations.filter((s) => s.state === 'done').length,
+          versions: journey.stages.length + 1,
+          markerProgress: ended ? 0 : markerProgress,
+          ready: !ended && stations[currentIndex]?.state === 'met',
+        }
+      : undefined;
   return {
     runId: run.runId,
     journeyId: journey.id,
@@ -150,5 +167,6 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     paused: lastPause?.action === 'pause' || cfgPaused,
     checkinDue,
     offerFallback,
+    ...(build ? { build } : {}),
   };
 };

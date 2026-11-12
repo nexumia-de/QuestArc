@@ -5,7 +5,8 @@ import { join } from 'node:path';
  * Test vectors (packages/engine/vectors/*.json): the engine's examples and
  * edge cases as data, run in Node and in gjs. A vector's `expect` names only
  * the fields it checks; objects match as subsets, arrays element by element
- * with equal length. Journeys written as "$name" come from vectors/journeys.
+ * with equal length; the string "$absent" requires the field to be missing.
+ * Journeys written as "$name" come from vectors/journeys.
  */
 
 const dir = join(import.meta.dirname, '..', 'vectors');
@@ -48,6 +49,11 @@ export const loadVectors = (): Vector[] =>
 
 /** Paths where `actual` does not match the expected subset. */
 export const mismatches = (expected: unknown, actual: unknown, path = '$'): string[] => {
+  if (expected === '$absent') {
+    return actual === undefined
+      ? []
+      : [`${path}: expected no value, got ${JSON.stringify(actual)}`];
+  }
   if (Array.isArray(expected)) {
     if (!Array.isArray(actual)) return [`${path}: expected an array`];
     if (actual.length !== expected.length) {

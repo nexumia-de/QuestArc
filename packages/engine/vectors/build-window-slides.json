@@ -1,0 +1,90 @@
+{
+  "name": "The window slides: completions that left it do not add up",
+  "rule": "game-rules §10",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-10",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793487600000,
+        "doneOn": 1793509200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793574000000,
+        "doneOn": 1793595600000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793660400000,
+        "doneOn": 1793682000000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794178800000,
+        "doneOn": 1794200400000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-10",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1794265200000,
+        "doneOn": 1794286800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-01",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "progress": 0.4
+        },
+        {},
+        {}
+      ],
+      "build": {
+        "markerProgress": 0.6,
+        "ready": false
+      }
+    }
+  }
+}

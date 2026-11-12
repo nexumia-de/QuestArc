@@ -1,0 +1,132 @@
+{
+  "name": "Finishing the last stage ends the journey and still raises the version",
+  "rule": "game-rules §10",
+  "kind": "diff",
+  "before": {
+    "day": {
+      "todayStr": "2026-11-12",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgC_2026-11-12",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1794438000000,
+        "doneOn": 1794459600000,
+        "timeSpentOnDay": {
+          "2026-11-12": 1800000
+        }
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-05",
+        "xp": 50,
+        "damage": 0
+      },
+      "stage-done:r1:b": {
+        "day": "2026-11-08",
+        "xp": 30,
+        "damage": 0
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-11-08"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-11-08",
+        "repeatCfgId": "cfgC"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "after": {
+    "day": {
+      "todayStr": "2026-11-12",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgC_2026-11-12",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1794438000000,
+        "doneOn": 1794459600000,
+        "timeSpentOnDay": {
+          "2026-11-12": 1800000
+        }
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-05",
+        "xp": 50,
+        "damage": 0
+      },
+      "stage-done:r1:b": {
+        "day": "2026-11-08",
+        "xp": 30,
+        "damage": 0
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-11-08"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-11-08",
+        "repeatCfgId": "cfgC"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-11-12",
+        "xp": 10,
+        "damage": 0
+      },
+      "run-end:r1": {
+        "day": "2026-11-12",
+        "reason": "finished"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": [
+    {
+      "key": "event.build-version",
+      "params": {
+        "version": 4
+      }
+    }
+  ]
+}

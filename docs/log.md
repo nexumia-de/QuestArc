@@ -2,6 +2,8 @@
 
 ## 2026-11-12
 
+- **Update**: The build of a journey (#99, from #42): game rules §10 "Builds" (ladder, version = 1 + finished stages, marker progress = the stage's best condition progress since acceptance, ready = met now, no build in calm mode, events `event.build-element` and `event.build-version`, Example G); story format and schema get `build` (`ladder`, `marker`, `names`) with checker rules; `content/ladders.json` lists ladders, settings, markers and hues for the engine, the checker and both hosts; the data model gets the `build:<runId>` choice record and `BuildView`. Decision: [marker progress is derived](decisions/marker-progress.md). Gentle morning builds Home, First Things First a Crossing; both journeys and the example are version 2.
+
 - **Update**: The GitHub repository is renamed from `nexumia-de/QuestArc` to `nexumia-de/quest-arc` (lowercase, words joined by a hyphen, like `phosh-toolkit`); links in the README, changelog, roadmap, journey guide and the journey schema `$id` follow. The plugin id `questarc` and the npm package names stay, because Super Productivity keys the plugin's data by its id. The Codeberg repository `Nexumia/QuestArc` is archived; the 2.x tags are on GitHub.
 
 ## 2026-11-08

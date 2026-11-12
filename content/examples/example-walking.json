@@ -2,10 +2,11 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "example-walking",
-  "version": 1,
+  "version": 2,
   "title": "example-walking.title",
   "description": "example-walking.description",
   "why": "example-walking.why",
+  "build": { "ladder": "home", "marker": "flowers" },
   "stages": [
     {
       "id": "shoes",

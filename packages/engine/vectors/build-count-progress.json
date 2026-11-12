@@ -1,0 +1,74 @@
+{
+  "name": "count 3: marker progress follows the completions",
+  "rule": "game-rules §10",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-07",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgB_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1793919600000,
+        "doneOn": 1793941200000
+      },
+      {
+        "id": "rpt_cfgB_2026-11-07",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1794006000000,
+        "doneOn": 1794027600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-05",
+        "xp": 50,
+        "damage": 0
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-06"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-11-06",
+        "repeatCfgId": "cfgB"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "active": {
+      "build": {
+        "version": 2,
+        "markerProgress": 0.6666666666666666,
+        "ready": false
+      }
+    }
+  }
+}

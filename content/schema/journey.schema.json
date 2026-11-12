@@ -35,6 +35,26 @@
       "required": ["story"],
       "properties": { "story": { "$ref": "#/$defs/textKey" } }
     },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ladder"],
+      "description": "What the journey builds in game mode (docs/game-rules.md section 10). Names come from content/ladders.json; the journey checker checks them.",
+      "properties": {
+        "ladder": { "$ref": "#/$defs/id" },
+        "marker": {
+          "$ref": "#/$defs/id",
+          "description": "What hangs on the marker: lanterns, pennants or flowers (flowers only in a setting without water). The ladder's default if left out."
+        },
+        "names": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 13,
+          "items": { "$ref": "#/$defs/textKey" },
+          "description": "Text keys naming the versions in the journey's own words, version 1 first; at most stages + 1."
+        }
+      }
+    },
     "texts": {
       "type": "object",
       "description": "Texts by language (en, de, pt-BR ...): text key to text. English is required; other languages may leave keys out and fall back to English.",

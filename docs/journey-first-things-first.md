@@ -28,6 +28,16 @@ All stages on Monday to Friday; anchor "sitting down at my desk".
 | `focus-mail` | write down my one task, give it 45 quiet minutes, then check email and chat in one block | 8 of 10 days | The Inbox Hydra, 150 HP        |
 | `look-back`  | note what moved forward yesterday, write down my one task and give it 45 quiet minutes   | 8 of 10 days | —                              |
 
+In game mode the journey builds a **Crossing**
+([game rules](game-rules.md) §10), with pennants on the marker: the
+journey is about getting across to the one task before the stream of
+email and chat, and each stage makes that way over sturdier, from
+stepping stones to a covered bridge. Five stages need six versions and
+the ladder has five, so the covered bridge gains one fixed addition for
+the last stage (the checker's warning is expected). Home was the other
+candidate; a home fits a morning routine better, and the two built-in
+journeys then build different things.
+
 ## How it follows the evidence and the design rules
 
 - **Start tiny** (rule 1): writing down one task takes a minute on the

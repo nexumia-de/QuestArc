@@ -23,7 +23,12 @@ texts in `content/i18n/en.json` (keys `gentle-morning.*`).
 | `stretch-5` | drink a glass of water and stretch for five minutes                                 | 5 of 7 days  | The Heavy Blanket, 100 HP |
 | `plan-day`  | drink a glass of water, stretch for five minutes and write down one thing for today | 8 of 10 days | The Morning Rush, 150 HP  |
 
-All stages are daily. A guardian with 100 HP falls after 10 completions
+All stages are daily. In game mode the journey builds a **Home**
+([game rules](game-rules.md) §10): four stages use all five versions,
+from a fireplace to a house, with lanterns on the marker; a morning
+routine is something one comes home to every day.
+
+A guardian with 100 HP falls after 10 completions
 (10 XP each, [game rules](game-rules.md) §5–6), so it is usually still
 there when the stage is met: an extra, never a condition.
 

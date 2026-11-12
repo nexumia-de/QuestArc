@@ -1,0 +1,59 @@
+{
+  "name": "Deleted history after checkpoints: the versions stay, the open stage is derived",
+  "rule": "game-rules §10",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-09",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "settings": {
+        "mode": "rpg"
+      },
+      "run:r1": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-11-05",
+        "xp": 50,
+        "damage": 0
+      },
+      "stage-done:r1:b": {
+        "day": "2026-11-08",
+        "xp": 30,
+        "damage": 0
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-11-08"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-11-08",
+        "repeatCfgId": "cfgC"
+      }
+    },
+    "journeys": ["$test-build"]
+  },
+  "expect": {
+    "active": {
+      "build": {
+        "version": 3,
+        "versions": 4,
+        "markerProgress": 0,
+        "ready": false
+      }
+    }
+  }
+}

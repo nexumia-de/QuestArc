@@ -122,6 +122,24 @@ export const answerCheckin = (
   score: number,
 ): RecordChanges => ({ [`checkin:${runId}:${stageId}:${isoWeek}`]: { score } });
 
+/**
+ * The user's choice of what a run builds, what hangs on its marker and
+ * its hue (game rules §10), one record per run; names come from
+ * content/ladders.json. Choosing nothing withdraws the record, so the
+ * journey's suggestion applies again.
+ */
+export const chooseBuild = (
+  runId: string,
+  choice: { ladder?: string; marker?: string; hue?: string },
+): RecordChanges => {
+  const value = Object.fromEntries(
+    (['ladder', 'marker', 'hue'] as const)
+      .filter((field) => typeof choice[field] === 'string' && choice[field] !== '')
+      .map((field) => [field, choice[field]]),
+  );
+  return { [`build:${runId}`]: Object.keys(value).length > 0 ? value : '' };
+};
+
 /** Calm or game mode (design rule 17). */
 export const setMode = (mode: 'calm' | 'rpg'): RecordChanges => ({ settings: { mode } });
 
@@ -138,6 +156,7 @@ export const actions = {
   endJourney,
   repeatPause,
   answerCheckin,
+  chooseBuild,
   setMode,
   withdraw,
 } as const;
