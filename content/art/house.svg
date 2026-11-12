@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>House</title>
+  <path class="fg" fill-rule="evenodd" d="M6.5 30V16.5H3.5L16 5L21.5 10.1V6H25V13.3L28.5 16.5H25.5V30ZM13.8 30V24.2A2.2 2.2 0 0 1 18.2 24.2V30Z"/>
+  <rect class="accent" x="8.6" y="18.6" width="3.6" height="3.6" rx="0.4"/>
+  <rect class="accent" x="19.8" y="18.6" width="3.6" height="3.6" rx="0.4"/>
+</svg>

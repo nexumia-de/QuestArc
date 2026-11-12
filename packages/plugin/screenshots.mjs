@@ -12,6 +12,8 @@ const { chromium } = require('playwright');
 const out = join('dist', 'screenshots');
 mkdirSync(out, { recursive: true });
 const page = pathToFileURL(resolve('dist', 'preview', 'index.html')).href;
+const artPage = pathToFileURL(resolve('dist', 'preview', 'art.html')).href;
+const scale = Number(process.argv[3] ?? 1);
 const shots = (process.argv[2] ?? 'welcome,empty,journey,journey-rpg,met,unbound').split(',');
 const sizes = [
   ['phone', 360, 720],
@@ -22,11 +24,18 @@ const browser = await chromium.launch();
 for (const demo of shots) {
   for (const theme of ['light', 'dark']) {
     for (const [name, width, height] of sizes) {
-      const tab = await browser.newPage({ viewport: { width, height } });
+      const tab = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
       const [, route] = demo.split(':');
-      await tab.goto(`${page}?demo=${demo.split(':')[0]}&theme=${theme}`);
-      const frame = tab.frameLocator('#view');
-      await frame.locator('.qa-header').waitFor();
+      // `art` is the picture spike's page (preview/art.ts), without the view.
+      const art = demo === 'art';
+      await tab.goto(
+        art ? `${artPage}?theme=${theme}` : `${page}?demo=${demo.split(':')[0]}&theme=${theme}`,
+      );
+      const frame = art ? tab.locator(':root') : tab.frameLocator('#view');
+      await frame
+        .locator(art ? 'svg.qa-art' : '.qa-header')
+        .first()
+        .waitFor();
       if (route) await frame.getByRole('button', { name: route }).first().click();
       await tab.waitForTimeout(200);
       const file = join(out, `${demo.replace(':', '-')}-${theme}-${name}.png`);

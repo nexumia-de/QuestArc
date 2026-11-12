@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120">
+  <title>Meadow</title>
+  <path class="dim" d="M170 47C204 30 246 28 286 38C300 41 311 42 320 40V42C311 44 299 43.2 285 40.2C246 31 205 33 170 47Z"/>
+  <path class="dim" d="M0 52C26 42 58 41 92 50C58 43.6 27 44.4 0 54Z"/>
+  <path class="dim" fill-rule="evenodd" d="M0 94C40 86 90 86 140 90C190 94 250 96 320 88V120H0ZM146 120C147 108 138 100 123 92.6H133C147 99 163 108 172 120Z"/>
+</svg>

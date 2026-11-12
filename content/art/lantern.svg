@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Lantern</title>
+  <rect class="fg" x="15" y="18" width="2" height="11"/>
+  <rect class="fg" x="12" y="28.5" width="8" height="1.5" rx="0.5"/>
+  <polygon class="fg" points="10.5,8.2 16,3.8 21.5,8.2"/>
+  <rect class="fg" x="15.2" y="2.2" width="1.6" height="2.4" rx="0.6"/>
+  <path class="fg" fill-rule="evenodd" d="M11.5 7.8H20.5V18.5H11.5ZM13.1 9.4V16.9H18.9V9.4Z"/>
+  <rect class="accent" x="13.1" y="9.4" width="5.8" height="7.5"/>
+  <rect class="accent" x="5.5" y="12.5" width="3.8" height="1.6" rx="0.8"/>
+  <rect class="accent" x="22.7" y="12.5" width="3.8" height="1.6" rx="0.8"/>
+  <path class="accent" d="M6.6 6.3L7.7 5.2L10.2 7.7L9.1 8.8Z"/>
+  <path class="accent" d="M25.4 6.3L24.3 5.2L21.8 7.7L22.9 8.8Z"/>
+</svg>

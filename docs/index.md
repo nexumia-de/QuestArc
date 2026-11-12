@@ -43,4 +43,5 @@ links. Change history is in [log.md](log.md).
 - [How the plugin sets up a stage's recurring task](decisions/recurring-task-setup.md) - Create and hand over, or bind an existing task; upstream API requested in parallel.
 - [The plugin's view uses no UI framework](decisions/plugin-ui-without-framework.md) - Plain TypeScript with a small DOM helper; screens are redrawn from the game state; nothing third-party ships.
 - [Finished stages survive deleted history](decisions/deleted-history.md) - Checkpoint record per accepted stage; only open progress is derived.
+- [One set of symbolic pictures for both hosts](decisions/shared-pictures.md) - Go: symbolic SVG in `content/art/` with the roles fg, accent and dim, filled from each host's theme; checked by the picture checker; screenshots of both hosts.
 - [Others publish journeys by pull request](decisions/journeys-by-pull-request.md) - One self-contained file, checked in CI, merged by the owner; CC BY-SA 4.0 with "Written by …"; private journeys later with the same file.

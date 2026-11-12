@@ -20,6 +20,11 @@ host's own colours. The screens around it are in [behaviour](behaviour.md).
 
 ![Desktop, calm](mockups/journey-desktop.svg)
 
+[valley-sketch.svg](mockups/valley-sketch.svg) is a rough sketch for the
+world (#42): the journey as its region and the regions as a map. It is
+a sketch, not a decision; the pictures it hints at are now drawn as
+symbolic files ([shared pictures](decisions/shared-pictures.md)).
+
 The mockups use neutral placeholder colours (blue accent on light grey).
 In the plugin the colours come from Super Productivity's theme variables,
 in Pensum from libadwaita's accent and named colours, both in light and

@@ -37,7 +37,7 @@ below are MIT, Apache-2.0 or BlueOak-1.0.0 and compatible with it.
 | `globals`           | 17.14.0 | MIT        | Lint globals                  |
 | `prettier`          | 3.9.10  | MIT        | Formatting                    |
 | `@types/node`       | 22.20.5 | MIT        | Types for tests and scripts   |
-| `playwright`        | 1.63.0  | Apache-2.0 | Screenshots, real-app test    |
+| `playwright`        | 1.64.1  | Apache-2.0 | Screenshots, real-app test    |
 
 The real-app test (CI job `real-app`) runs Super Productivity's Docker
 image `johannesjo/super-productivity` v19.3.1, pinned by digest in

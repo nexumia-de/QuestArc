@@ -838,3 +838,25 @@ body {
     padding-bottom: 40px;
   }
 }
+
+/*
+ * Pictures from content/art/ (src/ui/art.ts): the three roles from the
+ * theme. `dim` is the text colour mixed into the surface the picture
+ * stands on, so overlapping shapes stay one solid colour.
+ */
+.qa-art {
+  --qa-art-surface: var(--bg-lighter, #fff);
+  display: block;
+}
+
+.qa-art .fg {
+  fill: var(--text-color, rgb(44, 44, 44));
+}
+
+.qa-art .accent {
+  fill: var(--c-primary, #6495ed);
+}
+
+.qa-art .dim {
+  fill: color-mix(in srgb, var(--text-color, rgb(44, 44, 44)) 30%, var(--qa-art-surface));
+}

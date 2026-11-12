@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Tree</title>
+  <polygon class="dim" points="16,1.5 22.5,10.5 9.5,10.5"/>
+  <polygon class="dim" points="16,6 25,17.5 7,17.5"/>
+  <polygon class="dim" points="16,11 27.5,24.5 4.5,24.5"/>
+  <rect class="dim" x="14.6" y="24" width="2.8" height="6"/>
+</svg>

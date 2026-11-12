@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-12
+
+- **Decision**: [one set of symbolic pictures for both hosts](decisions/shared-pictures.md) (#86), go: eleven pictures and a test scene drawn for QuestArc in `content/art/` (ground, well, bench, house, open gate, flowers, tree, pennant, lantern, keepsake, hedgehog), CC BY-SA 4.0 like the journeys; the picture checker `artProblems`/`sceneProblems` (`npm run journeys`); the plugin draws them inline with Super Productivity's theme variables (`src/ui/art.ts`, preview page `dist/preview/art.html`), Day Planner with librsvg in libadwaita's colours (nexumia-de/pensum, `pensum/ui/journey/art.py`). Comparison screenshots in `docs/screenshots/pictures-*.png`. The rough sketch [valley-sketch.svg](mockups/valley-sketch.svg) for #42 is kept as a mockup ([journey design](journey-design.md)). [Architecture](architecture.md) lists the pictures; [development](development.md) the preview page and the Playwright version actually pinned (1.64.1).
+
 ## 2026-11-08
 
 - **Update**: `AGENTS.md` imports only `agents/core.md` from phosh-toolkit instead of its whole `AGENTS.md`, so the GTK app rules and the list of rules that do not apply are gone (toolkit decision "lean agent rules", to use fewer tokens per session).

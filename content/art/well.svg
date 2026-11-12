@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Well</title>
+  <polygon class="fg" points="2.5,11.5 16,3 29.5,11.5 27,13 16,6.2 5,13"/>
+  <rect class="fg" x="7.5" y="11" width="2.2" height="9"/>
+  <rect class="fg" x="22.3" y="11" width="2.2" height="9"/>
+  <rect class="dim" x="15.4" y="9" width="1.2" height="6"/>
+  <path class="accent" d="M12.8 14.5H19.2L18.2 18.5H13.8Z"/>
+  <rect class="fg" x="6" y="19.5" width="6" height="4.6" rx="0.6"/>
+  <rect class="fg" x="13" y="19.5" width="6" height="4.6" rx="0.6"/>
+  <rect class="fg" x="20" y="19.5" width="6" height="4.6" rx="0.6"/>
+  <rect class="fg" x="6" y="25.1" width="9.5" height="4.9" rx="0.6"/>
+  <rect class="fg" x="16.5" y="25.1" width="9.5" height="4.9" rx="0.6"/>
+</svg>
