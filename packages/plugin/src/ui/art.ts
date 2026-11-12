@@ -27,6 +27,8 @@ export interface Placed {
   readonly y: number;
   readonly width: number;
   readonly height: number;
+  /** A class for the part, e.g. to let it appear (wrapped in a group). */
+  readonly className?: string;
 }
 
 export interface Scene {
@@ -84,7 +86,14 @@ export const scene = (
     for (const key of ['x', 'y', 'width', 'height'] as const)
       part.setAttribute(key, String(place[key]));
     if (place.band === 'far') part.classList.add('qa-art-far');
-    svg.append(part);
+    if (place.className === undefined) svg.append(part);
+    else {
+      // a nested svg takes no CSS transform; its group does
+      const group = document.createElementNS(SVG_NS, 'g');
+      group.setAttribute('class', place.className);
+      group.append(part);
+      svg.append(group);
+    }
   }
   return svg;
 };

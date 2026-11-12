@@ -392,6 +392,7 @@ body {
 
   .qa-level {
     grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .qa-path-scroll {
@@ -888,4 +889,170 @@ body {
 
 .qa-art .tint-strong {
   fill: var(--qa-art-tint-strong);
+}
+
+/*
+ * The build on the journey screen in game mode (#100,
+ * docs/journey-design.md "The journey screen with the build"): the scene
+ * at the full width on a phone (16 : 9, the setting's view box), the row of versions, the line of
+ * state. At 720 px and wider it takes the path's place on the left.
+ */
+.qa-build {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--s-half, 4px);
+  min-height: 0;
+  margin-bottom: var(--s, 8px);
+}
+
+.qa-build-scene {
+  background: var(--bg-lighter, #fff);
+}
+
+.qa-build-scene > .qa-art {
+  width: 100%;
+  height: auto;
+}
+
+.qa-versions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-half, 4px);
+  align-items: flex-end;
+  margin: 0;
+  padding: var(--s-half, 4px) var(--s, 8px) 0;
+  list-style: none;
+}
+
+.qa-version {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-color-muted, rgba(44, 44, 44, 0.66));
+}
+
+.qa-version > .qa-art {
+  width: 60px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.qa-version-step {
+  box-sizing: border-box;
+  width: 56px;
+  height: 36px;
+  margin: 2px;
+  border: 2px solid var(--text-color-muted, rgba(44, 44, 44, 0.66));
+  border-radius: 10px;
+}
+
+.qa-build-state {
+  margin: 0;
+  padding: 0 var(--s2, 16px);
+  color: var(--text-color-muted, rgba(44, 44, 44, 0.66));
+}
+
+@media (min-width: 720px) {
+  .qa-build {
+    grid-row: 2;
+    align-self: start;
+    max-width: 560px;
+    margin: var(--s2, 16px) 0 0 var(--s2, 16px);
+  }
+
+  .qa-build-scene {
+    border-radius: var(--card-border-radius, 8px);
+    overflow: hidden;
+  }
+}
+
+/* The moment of the tick: what is new grows in from its foot, once. */
+.qa-grow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: qa-grow 600ms ease-out both;
+}
+
+@keyframes qa-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qa-grow {
+    animation: none;
+  }
+}
+
+/* What you build (screen 3a): options with a small picture, hue swatches. */
+.qa-choice-art {
+  flex: none;
+  width: 54px;
+  height: 36px;
+}
+
+.qa-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+  gap: var(--s, 8px);
+}
+
+.qa-swatches > .qa-option {
+  gap: var(--s, 8px);
+  padding: var(--s, 8px);
+}
+
+.qa-swatch {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+  border-radius: 50%;
+  background: color-mix(
+    in srgb,
+    var(--qa-hue-dark) calc(var(--is-dark-theme, 0) * 100%),
+    var(--qa-hue-light)
+  );
+}
+
+.qa-option-disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.qa-build-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--s2, 16px);
+}
+
+.qa-build-pick > p {
+  margin: 0;
+}
+
+.qa-switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2, 16px);
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.qa-switch-row input {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: 2px 0 0;
+  accent-color: var(--c-primary, #6495ed);
+}
+
+.qa-station-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }

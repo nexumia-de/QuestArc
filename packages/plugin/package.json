@@ -11,7 +11,7 @@
     "test": "vitest run",
     "preview": "node build.mjs && node preview.mjs",
     "screenshots": "npm run preview && node screenshots.mjs",
-    "e2e": "node e2e/real-app.mjs 360 720 && node e2e/real-app.mjs 1200 800"
+    "e2e": "node e2e/real-app.mjs 360 720 && node e2e/real-app.mjs 1200 800 && node e2e/real-app-build.mjs 360 720 && node e2e/real-app-build.mjs 1200 800 && node e2e/real-app-panel.mjs 1200 800"
   },
   "dependencies": {
     "@questarc/engine": "*",

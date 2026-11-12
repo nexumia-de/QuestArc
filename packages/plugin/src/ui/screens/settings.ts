@@ -5,7 +5,7 @@ import { h } from '../dom';
 import type { Context, Screen } from '../screen';
 import { modeChoice } from './mode-choice';
 
-/** Screen 8: mode and what QuestArc stores. */
+/** Screen 8: mode, the side panel (game mode), and what QuestArc stores. */
 export const settingsScreen = (ctx: Context): Screen => ({
   title: t('ui.settings.title'),
   noSettings: true,
@@ -13,6 +13,25 @@ export const settingsScreen = (ctx: Context): Screen => ({
     'div',
     { class: 'qa-stack' },
     modeChoice(ctx.state.view.mode, (mode) => void ctx.write(setMode(mode))),
+    ctx.state.view.mode === 'rpg' && ctx.state.sidePanel !== undefined
+      ? h(
+          'label',
+          { class: 'qa-card qa-switch-row' },
+          h('input', {
+            type: 'checkbox',
+            role: 'switch',
+            checked: ctx.state.sidePanel,
+            onchange: (event: Event) =>
+              void ctx.sidePanel((event.target as HTMLInputElement).checked),
+          }),
+          h(
+            'span',
+            { class: 'qa-option-text' },
+            h('span', { class: 'qa-section-title' }, t('ui.settings.panel')),
+            h('span', { class: 'qa-muted' }, t('ui.settings.panel.text')),
+          ),
+        )
+      : null,
     h(
       'button',
       {

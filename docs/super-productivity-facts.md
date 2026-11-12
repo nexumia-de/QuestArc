@@ -79,6 +79,21 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   `plugin.service.ts`, ZIP loading). Other files in the ZIP are not served to
   the iframe; CSS and JS must be inlined (`docs/plugin-development.md`,
   "HTML/Iframe Plugins")[^sp].
+- **What the limits cover in 19.3.1** (`plugin.service.ts`, ZIP upload,
+  at `1014df9`): `manifest.json` ≤ 100 KiB; `index.html` is checked
+  against the same constant, `MAX_PLUGIN_MANIFEST_SIZE` (102,400 bytes;
+  `MAX_PLUGIN_INDEX_HTML_SIZE`, 1 MiB, exists only from `668c0769`, after
+  19.3.1; issue #102 weighs requiring 20.0.0); `plugin.js` ≤ 5 MiB; the declared `i18n/<lang>.json` ≤ 5 MiB
+  together; the icon (the manifest's `icon` file) ≤ 100 KiB; a ZIP from
+  the community list ≤ 10 MiB. Only these files are kept: the loader
+  reads them out of the ZIP and discards it ("Uploaded plugins use a
+  virtual cache path, so these files cannot be fetched"), so the view
+  cannot load a second script, a JSON or an SVG file of the plugin. What
+  the view needs beyond its own `index.html` must come from `plugin.js`
+  by message. QuestArc's view is built without whitespace (#103), gets
+  the journeys' texts with each state and the ladders' pictures once
+  (`questarc:art`) from `plugin.js` (#100); `build.mjs` fails above
+  102,400 bytes[^sp].
 - Uploaded plugin code is cached per device in IndexedDB `SUPPluginCache`
   (`plugin-cache.service.ts`); enabled plugins are activated at startup
   (`plugin.service.ts`, `_loadEnabledPlugins`). The enabled flag is synced as
@@ -357,6 +372,49 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   (`src/app/plugins/plugin-i18n.service.ts`); `formatDate`,
   `getCurrentLanguage`; `LANGUAGE_CHANGE {code, newLanguage}` on a local
   language change (`plugin-hooks.effects.ts`, `languageChange$`)[^sp].
+
+### What a plugin may show outside its own page (#100)
+
+Checked at `c5eb3f6` and, for 19.3.1, at its version-bump commit `1014df9`
+(tag `v19.3.1`); everything below is in both[^sp]:
+
+- **Header button** (`registerHeaderButton`, `plugin.js` only): an icon
+  button with a tooltip label and a Material icon name; no picture, no
+  badge, no label change after registering
+  (`plugin-header-btns.component.ts`).
+- **Side panel** (`registerSidePanelButton({label, icon?, onClick})`,
+  `plugin.js` only, one per plugin): adds a button next to the play
+  button in the main header (`plugin-side-panel-btns.component.ts`) and,
+  up to 600 px, an entry in the mobile bottom bar
+  (`mobile-bottom-nav.component.html`, `sidePanelButtons`). The button
+  toggles the right panel (`togglePluginPanel`), which loads the
+  plugin's own `index.html` in an iframe (`plugin-panel-container`,
+  `plugin-index` with `showFullUI: false`), beside the work view. It is
+  the same document as the full view; the host passes it nothing that
+  tells it where it is shown. There is no call to remove the button: it
+  goes when the plugin unloads (`_removePluginSidePanelButtons`). The
+  manifest's `sidePanel: true` registers this button automatically and
+  then drops the side-menu entry for the full view (`plugin-runner.ts`).
+  The iframe allowlist names `showIndexHtmlInSidePanel`, but the bridge
+  has no such method (`plugin-iframe.util.ts`; no match in
+  `plugin-bridge.service.ts`), so a view cannot open the panel itself.
+- **Work view** (`showInWorkContext`, `closeWorkContextView`): the
+  plugin's `index.html` _in place of_ the task list for Today and
+  projects, not beside it; and `registerWorkContextHeaderButton` with
+  `showFor` (types.ts).
+- **Messages**: `showSnack({msg, type?, ico?, action?})`; the action
+  (`{label, onClick}`) only from `plugin.js`, because functions cannot
+  cross the iframe's `postMessage`; with an action the snack stays
+  visible 10 s instead of the default 3 s (types.ts, `SnackActionCfg`; `plugin-api-mapper.ts`, `ACTION_SNACK_DURATION_MS`).
+  `notify({title, body})` is a system notification of 5 s without an
+  action (`plugin-bridge.service.ts`, `notify`). `openDialog` shows
+  allowlist-sanitised HTML with buttons.
+- Nothing else: a plugin cannot draw into the task list, a task row, the
+  Today header or the app's badge.
+
+So the plugin's glanceable places are the side panel (QuestArc's page
+beside the task list, the user's choice) and the completion message's
+action, which opens the full view.
 
 ## 8. Mobile
 

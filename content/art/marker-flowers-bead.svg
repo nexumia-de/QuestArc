@@ -3,6 +3,7 @@
   <rect class="tint-strong" x="14.8" y="2" width="2.4" height="10"/>
   <polygon class="tint-strong" points="15,6 10.5,3.4 5.3,4.4 9.9,7"/>
   <polygon class="tint-strong" points="17,9 21.5,6.4 26.8,7.4 22.1,10"/>
-  <ellipse class="fg" cx="16" cy="16" rx="4.6" ry="6.1"/>
-  <ellipse class="dim" cx="16" cy="16" rx="2.3" ry="3.8"/>
+  <ellipse class="fg" cx="16" cy="16.5" rx="5" ry="6.7"/>
+  <ellipse class="bg" cx="16" cy="16.5" rx="2.9" ry="4.6"/>
+  <ellipse class="accent" cx="16" cy="19.4" rx="1.9" ry="1.5"/>
 </svg>

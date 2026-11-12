@@ -7,6 +7,7 @@ import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'no
 import { join } from 'node:path';
 import { build, transform } from 'esbuild';
 import { zipSync } from 'fflate';
+import { esbuildLadderArt } from './art.mjs';
 import { esbuildJourneys } from './journeys.mjs';
 
 const out = 'dist';
@@ -19,7 +20,7 @@ const common = {
   format: 'iife',
   target: 'es2022',
   legalComments: 'none',
-  plugins: [esbuildJourneys],
+  plugins: [esbuildJourneys, esbuildLadderArt],
 };
 
 await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'plugin.js') });
@@ -28,6 +29,8 @@ await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'p
 // Super Productivity 19.3 installs an index.html of at most 100 KB (below).
 const view = await build({
   ...common,
+  // the pictures come from plugin.js (questarc:art), not inlined
+  plugins: [esbuildJourneys],
   entryPoints: ['src/ui/main.ts'],
   write: false,
   minifyWhitespace: true,

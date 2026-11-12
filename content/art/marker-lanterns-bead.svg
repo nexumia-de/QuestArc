@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <title>A small lantern on a line</title>
   <rect class="fg" x="15.2" y="1" width="1.6" height="4"/>
-  <polygon class="fg" points="10,8.5 22,8.5 16,4.1"/>
-  <rect class="fg" x="11" y="7.5" width="10" height="12" rx="2.2"/>
-  <rect class="bg" x="12.6" y="9.1" width="6.8" height="8.8" rx="1"/>
-  <rect class="fg" x="13" y="19.1" width="6" height="2" rx="0.8"/>
+  <polygon class="fg" points="9,8 23,8 16,3.1"/>
+  <rect class="fg" x="10" y="7" width="12" height="14" rx="2.6"/>
+  <rect class="bg" x="11.6" y="8.6" width="8.8" height="10.8" rx="1"/>
+  <rect class="fg" x="12.4" y="20.6" width="7.2" height="2" rx="0.8"/>
 </svg>

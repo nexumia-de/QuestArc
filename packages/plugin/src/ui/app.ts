@@ -1,5 +1,5 @@
 import type { State } from '../shared/protocol';
-import { t } from '../shared/texts';
+import { addJourneyTexts, t } from '../shared/texts';
 import type { Client } from './client';
 import { h, icon, ICONS } from './dom';
 import type { Context, MenuItem, Route, Screen } from './screen';
@@ -41,6 +41,14 @@ export const createApp = (root: HTMLElement, client: Client) => {
     write: async (records) => {
       try {
         update(await client.write(records));
+      } catch {
+        error = { text: t('ui.error.write') };
+        render(false);
+      }
+    },
+    sidePanel: async (on) => {
+      try {
+        update(await client.sidePanel(on));
       } catch {
         error = { text: t('ui.error.write') };
         render(false);
@@ -182,6 +190,8 @@ export const createApp = (root: HTMLElement, client: Client) => {
   };
 
   const update = (next: State): void => {
+    // the journeys' own texts come with the state (shared/texts.ts)
+    if (next.journeys !== state?.journeys) addJourneyTexts(next.journeys);
     const first = !state;
     // A shown error goes as soon as an answer comes, even when the data
     // did not change in between.

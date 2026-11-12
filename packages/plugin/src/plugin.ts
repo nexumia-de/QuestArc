@@ -5,7 +5,8 @@ import { createBrain } from './adapter/brain';
 import { useForCurrentStation } from './adapter/context-menu';
 import { registerHooks } from './adapter/hooks';
 import { handleMessage } from './adapter/messages';
-import { messageFor } from './adapter/snacks';
+import { createSidePanel } from './adapter/side-panel';
+import { snackFor } from './adapter/snacks';
 import { builtInJourneys } from './shared/content';
 import { t } from './shared/texts';
 
@@ -13,13 +14,14 @@ const brain = createBrain({
   api: PluginAPI,
   journeys: builtInJourneys,
   onEvents: (events, view, journeys) => {
-    const msg = messageFor(events, view, journeys);
-    if (msg) PluginAPI.showSnack({ msg, type: 'SUCCESS', ico: 'route' });
+    const snack = snackFor(events, view, journeys, () => PluginAPI.showIndexHtmlAsView());
+    if (snack) PluginAPI.showSnack(snack);
   },
 });
 
 registerHooks(PluginAPI, brain.refresh);
-PluginAPI.onMessage?.((message) => handleMessage(brain, message));
+const panel = createSidePanel(PluginAPI);
+PluginAPI.onMessage?.((message) => handleMessage(brain, message, panel));
 
 PluginAPI.registerHeaderButton({
   label: 'QuestArc',

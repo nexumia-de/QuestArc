@@ -16,7 +16,9 @@ export type Route =
   | { readonly name: 'finished'; readonly journeyId: string }
   | { readonly name: 'checkin' }
   | { readonly name: 'shelf' }
-  | { readonly name: 'motivates' };
+  | { readonly name: 'motivates' }
+  | { readonly name: 'build' }
+  | { readonly name: 'stations' };
 
 export interface Context {
   readonly state: State;
@@ -33,6 +35,8 @@ export interface Context {
   redraw(): void;
   /** Writes choice records through plugin.js; the view redraws with the result. */
   write(records: Record<string, unknown>): Promise<void>;
+  /** Turns the side panel setting of this device on or off (plugin.js keeps it). */
+  sidePanel(on: boolean): Promise<void>;
 }
 
 export interface MenuItem {

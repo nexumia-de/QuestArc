@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build } from 'esbuild';
-import { esbuildArt } from './art.mjs';
+import { esbuildArt, esbuildLadderArt } from './art.mjs';
 import { esbuildJourneys } from './journeys.mjs';
 
 const out = join('dist', 'preview');
@@ -17,7 +17,7 @@ const host = await build({
   target: 'es2022',
   write: false,
   define: { VIEW_HTML: JSON.stringify(view) },
-  plugins: [esbuildJourneys],
+  plugins: [esbuildJourneys, esbuildLadderArt],
 });
 const script = host.outputFiles[0].text.replaceAll('</script', '<\\/script');
 const page = readFileSync('preview/index.html', 'utf8').replace(

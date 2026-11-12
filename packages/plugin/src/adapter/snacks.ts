@@ -1,4 +1,5 @@
 import type { GameEvent, GameView, Journey } from '@questarc/engine';
+import type { SnackCfg } from '@questarc/sp-plugin-api';
 
 import { capitalise, findStage, progressText } from '../shared/plan';
 import { hasText, t } from '../shared/texts';
@@ -35,4 +36,26 @@ export const messageFor = (
     parts.push(t(key, { ...shared, ...event.params }));
   }
   return parts.length > 0 ? parts.join(' ') : undefined;
+};
+
+/**
+ * The message for Super Productivity's snack: in game mode, while the
+ * active journey has a build, with the action **Show** that opens the view
+ * at the build (docs/behaviour.md, flow A; #100). Calm mode is unchanged.
+ */
+export const snackFor = (
+  events: readonly GameEvent[],
+  view: GameView,
+  journeys: readonly Journey[],
+  show: () => void,
+): SnackCfg | undefined => {
+  const msg = messageFor(events, view, journeys);
+  if (msg === undefined) return undefined;
+  const build = view.mode === 'rpg' && view.active?.build !== undefined;
+  return {
+    msg,
+    type: 'SUCCESS',
+    ico: 'route',
+    ...(build ? { action: { label: t('ui.snack.show'), onClick: show } } : {}),
+  };
 };

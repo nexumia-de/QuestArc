@@ -271,6 +271,14 @@ const fire = () => {
       [52.5, 46],
       [56, 51],
     ]),
+    // its light core, so the flame does not read as a shrub in a green hue
+    poly('bg', [
+      [60, 49],
+      [63.5, 57],
+      [62.5, 64],
+      [57.5, 64],
+      [56.5, 57],
+    ]),
     ...[37, 48.5, 60, 71.5, 83].flatMap((cx) => stone(cx, 69.5, 6, 4.4)),
   ];
 };
@@ -383,7 +391,7 @@ build('home-5', 'A house of two storeys', [
 // the line tied on at MARKER_TIE, `marker-<kind>-bead` hangs from the line
 // at its top centre (16, 2) and `marker-<kind>-bead-lit` is its form for
 // ready. The lines belong to the setting (`setting-<name>-cord-<n>.svg`).
-const MARKER_TIE = [16, 12];
+const MARKER_TIE = [16, 15];
 const MARKERS = {
   lanterns: { title: 'Lanterns', landOnly: false },
   bunting: { title: 'Pennants', landOnly: false },
@@ -404,8 +412,8 @@ const ray = (cx, cy, degrees, r0, r1, w) => {
 };
 /** A plain post from the tie point down to y = 30, its top rounded. */
 const post = () => [
-  rect('fg', 14.9, MARKER_TIE[1] - 2, 2.2, 32 - MARKER_TIE[1], 1.1),
-  rect('fg', 13.5, 28.8, 5, 1.2, 0.6),
+  rect('fg', 15, MARKER_TIE[1] - 1.8, 2, 32 - MARKER_TIE[1], 1),
+  rect('fg', 13.6, 28.9, 4.8, 1.1, 0.55),
 ];
 const markerSet = (kind, words, bead) => {
   marker(`${kind}-post`, 'A post', post());
@@ -415,8 +423,10 @@ const markerSet = (kind, words, bead) => {
 
 // Lanterns: small lanterns on the line; ready they are filled, with a
 // flame, a halo and rays.
+// The halo is opaque `tint-strong`, drawn first and clearly larger than the
+// lantern, so a lit lantern glows in light style too (#100's review).
 const lantern = (cx, top, w, h, lit, rays = []) => [
-  ...(lit ? [ellipse('tint-strong', cx, top + h / 2, w * 0.95, h * 0.8)] : []),
+  ...(lit ? [ellipse('tint-strong', cx, top + h / 2, w * 1.05, w * 1.05)] : []),
   poly('fg', [
     [cx - w / 2 - 1, top + 1],
     [cx + w / 2 + 1, top + 1],
@@ -426,12 +436,12 @@ const lantern = (cx, top, w, h, lit, rays = []) => [
   rect(lit ? 'accent' : 'bg', cx - w / 2 + 1.6, top + 1.6, w - 3.2, h - 3.2, 1),
   ...(lit ? [ellipse('bg', cx, top + h * 0.55, w * 0.12, h * 0.17)] : []),
   rect('fg', cx - w * 0.3, top + h - 0.4, w * 0.6, 2, 0.8),
-  ...(lit ? rays.map((d) => ray(cx, top + h / 2, d, w * 0.85, w * 1.35, 1.6)) : []),
+  ...(lit ? rays.map((d) => ray(cx, top + h / 2, d, w * 0.8, w * 1.2, 1.6)) : []),
 ];
 markerSet(
   'lanterns',
   { bead: 'A small lantern on a line', beadLit: 'A small lit lantern' },
-  (lit) => [rect('fg', 15.2, 1, 1.6, 4), ...lantern(16, 7.5, 10, 12, lit, [0, 180, 40, 140])],
+  (lit) => [rect('fg', 15.2, 1, 1.6, 4), ...lantern(16, 7, 12, 14, lit, [0, 180, 35, 145])],
 );
 
 // Pennants: pale outlined pennants on the line; ready they are solid in
@@ -478,20 +488,28 @@ const leaf = (x, y, dir) =>
   ]);
 const bud = (cx, cy, s = 1) => [
   ellipse('fg', cx, cy, 2.4 * s, 3.2 * s),
-  ellipse('dim', cx, cy, 1.2 * s, 2 * s),
+  ellipse('bg', cx, cy, 1.4 * s, 2.2 * s),
+  ellipse('accent', cx, cy + 1.4 * s, 0.9 * s, 0.7 * s),
 ];
-const blossom = (cx, cy, r = 2.2) => [
-  ...[0, 72, 144, 216, 288].map((d) => {
+// An open blossom: petals outlined in `fg` with a `bg` fill and an accent
+// centre, so it never sits green on green in the meadow hue (#100's review).
+const blossom = (cx, cy, r = 2.2) => {
+  const petals = [0, 72, 144, 216, 288].map((d) => {
     const a = ((d - 90) * Math.PI) / 180;
-    return ellipse('accent', cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * 0.95, r * 0.95);
-  }),
-  ellipse('bg', cx, cy, r * 0.55, r * 0.55),
-];
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+  });
+  return [
+    ...petals.map(([x, y]) => ellipse('fg', x, y, r * 0.95 + 1.4, r * 0.95 + 1.4)),
+    ...petals.map(([x, y]) => ellipse('bg', x, y, r * 0.95, r * 0.95)),
+    ellipse('fg', cx, cy, r * 0.62 + 1.2, r * 0.62 + 1.2),
+    ellipse('accent', cx, cy, r * 0.62, r * 0.62),
+  ];
+};
 markerSet('flowers', { bead: 'A vine in bud on a line', beadLit: 'A vine in bloom' }, (lit) => [
   rect('tint-strong', 14.8, 2, 2.4, 10),
   leaf(15, 6, -1.5),
   leaf(17, 9, 1.5),
-  ...(lit ? blossom(16, 17, 4.6) : bud(16, 16, 1.9)),
+  ...(lit ? blossom(16, 18, 4.4) : bud(16, 16.5, 2.1)),
 ]);
 
 // ---- settings: 320 × 180 --------------------------------------------------
@@ -562,12 +580,14 @@ setting('clearing', 'Clearing in a wood', [
 // water: the waterway). The lines hang below the build's base line, so
 // they never cross the build. The hanging elements are spread evenly over
 // the lines, in order from the first post.
-const MARKER_POST = 34; // near band
+// A light line, and short posts (the tie at y = 15): the first steps must not read as a rope
+// fence (#100's review).
+const MARKER_POST = 34; // near band (fixed size)
 const BEAD = 24;
 // A line sags gently, more the longer it is; it is a little thicker than
 // an outline so a long one still reads.
 const sagOf = (a, b) => Math.max(3.5, Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.045);
-const CORD = 2;
+const CORD = 1.6;
 const tieAt = ([x, feet]) => [x, feet - (MARKER_POST * (30 - MARKER_TIE[1])) / 32];
 
 /** A point on the line from a to b, sagging by `sag` in the middle. */
@@ -607,7 +627,7 @@ const markerPlaces = (settingName, { layout, posts, beads }) => {
     const bottom = top.map(([x, y]) => [x, y + CORD]).reverse();
     write(
       `${name}.svg`,
-      svg('0 0 320 180', 'A line between two posts', [poly('fg', [...top, ...bottom])]),
+      svg('0 0 320 180', 'A line between two posts', [poly('dim', [...top, ...bottom])]),
     );
     const feet = Math.max(posts[i][1], posts[j][1]) + 0.1;
     places.push({

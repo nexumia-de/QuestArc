@@ -24,6 +24,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'build',
   'checkin',
   'graduation',
+  'build',
 ]);
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */

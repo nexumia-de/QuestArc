@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import file from '../../../content/art/crossing.ladder.json';
 import homeFile from '../../../content/art/home.ladder.json';
 import {
+  appearing,
+  buildLabel,
   buildWords,
   elementsShown,
+  markerCount,
   ladderScene,
   markerElements,
   rowViewBox,
@@ -90,5 +93,69 @@ describe('ladderScene', () => {
   it('zooms the row of versions where the ladder says so', () => {
     expect(rowViewBox(crossing)).toBe('30 38 60 40');
     expect(rowViewBox(home)).toBe('0 0 120 80');
+  });
+});
+
+// The journey screen with the build (#100): names, the label for screen
+// readers, the journey's own version count and what appears at the tick.
+describe('the build on the journey screen', () => {
+  it('says the state in words, with the journey own names where given', () => {
+    expect(buildWords(crossing, 3, { progress: 0.5 })).toBe(
+      'A plank bridge stands · a stone bridge is on its way',
+    );
+    expect(buildWords(crossing, 1, { progress: 0.5 })).toBe(
+      'Stepping stones stand · a log is on its way',
+    );
+    expect(buildWords(crossing, 3, { progress: 0 })).toBe('A plank bridge stands');
+    expect(
+      buildWords(crossing, 3, {
+        ready: true,
+        names: [undefined, undefined, 'The Morning Bridge', 'The Stone Way'],
+      }),
+    ).toBe('The Morning Bridge stands · The Stone Way is ready');
+  });
+
+  it('names the marker in numbers for screen readers', () => {
+    expect(buildLabel(crossing, 3, { progress: 5 / 8 }, 'Lanterns')).toBe(
+      'A plank bridge, version 3 of 5; marker: 2 of 2 posts and 3 of 6 lanterns; not ready yet',
+    );
+    expect(buildLabel(home, 2, { progress: 0.2 }, 'Pennants')).toBe(
+      'A tent, version 2 of 5; marker: 2 of 4 posts and 0 of 6 pennants; not ready yet',
+    );
+    expect(buildLabel(home, 2, { ready: true }, 'Pennants')).toBe(
+      'A tent, version 2 of 5; marker: 4 of 4 posts and 6 of 6 pennants; ready',
+    );
+    expect(buildLabel(home, 2, {}, 'Pennants')).toBe(
+      'A tent, version 2 of 5; nothing on its way yet',
+    );
+    expect(buildLabel(home, 5, { progress: 1 }, 'Pennants')).toBe(
+      'A house, version 5 of 5; all versions stand',
+    );
+  });
+
+  it('follows the journey version count: more versions than pictures reuse the last', () => {
+    const six = { versions: 6, progress: 0.5 };
+    expect(arts(6, six).filter((a) => a.startsWith('build-'))).toEqual(['build-crossing-5']);
+    expect(marks(5, six).length).toBeGreaterThan(0);
+    expect(marks(6, six)).toEqual([]);
+    expect(markerCount(crossing, 5, six).hangingShown).toBe(2);
+    // a journey with fewer stages ends earlier: no marker on its last version
+    expect(marks(3, { versions: 3, progress: 0.5 })).toEqual([]);
+  });
+
+  it('lets only what is new appear, and nothing on the first draw', () => {
+    const at = (version: number, shown: number, key = 'r/crossing/lanterns') => ({
+      key,
+      version,
+      shown,
+    });
+    expect(appearing(undefined, at(3, 4))).toEqual({ version: false, fromOrder: Infinity });
+    expect(appearing(at(3, 4), at(3, 4))).toEqual({ version: false, fromOrder: Infinity });
+    expect(appearing(at(3, 4), at(3, 6))).toEqual({ version: false, fromOrder: 5 });
+    expect(appearing(at(3, 8), at(4, 0))).toEqual({ version: true, fromOrder: 1 });
+    expect(appearing(at(3, 4), at(3, 6, 'r/home/pennants'))).toEqual({
+      version: false,
+      fromOrder: Infinity,
+    });
   });
 });

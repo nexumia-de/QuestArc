@@ -1,4 +1,4 @@
-import type { Request, State } from '../shared/protocol';
+import type { ArtPack, Request, State } from '../shared/protocol';
 
 /**
  * Sends requests to plugin.js. Super Productivity forwards
@@ -8,7 +8,7 @@ import type { Request, State } from '../shared/protocol';
  */
 
 interface Pending {
-  resolve: (state: State) => void;
+  resolve: (result: never) => void;
   reject: (error: Error) => void;
 }
 
@@ -22,25 +22,25 @@ export const createClient = (target: Window = window.parent, source: Window = wi
     const data = event.data as {
       type?: string;
       messageId?: string;
-      result?: State;
+      result?: unknown;
       error?: string;
     };
     const call = data?.messageId ? pending.get(data.messageId) : undefined;
     if (!call || event.source !== target) return;
     if (data.type === 'PLUGIN_MESSAGE_RESPONSE' && data.result) {
       pending.delete(data.messageId as string);
-      call.resolve(data.result);
+      call.resolve(data.result as never);
     } else if (data.type === 'PLUGIN_MESSAGE_ERROR') {
       pending.delete(data.messageId as string);
       call.reject(new Error(data.error ?? 'QuestArc request failed'));
     }
   });
 
-  const request = (message: Request): Promise<State> =>
-    new Promise((resolve, reject) => {
+  const request = <T = State>(message: Request): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
       next += 1;
       const messageId = `questarc-${next}`;
-      pending.set(messageId, { resolve, reject });
+      pending.set(messageId, { resolve: resolve as (result: never) => void, reject });
       target.postMessage({ type: 'PLUGIN_MESSAGE', messageId, message }, '*');
       setTimeout(() => {
         if (pending.delete(messageId)) reject(new Error('QuestArc request timed out'));
@@ -50,6 +50,8 @@ export const createClient = (target: Window = window.parent, source: Window = wi
   return {
     get: () => request({ type: 'questarc:get' }),
     write: (records: Record<string, unknown>) => request({ type: 'questarc:write', records }),
+    sidePanel: (on: boolean) => request({ type: 'questarc:side-panel', on }),
+    art: () => request<ArtPack>({ type: 'questarc:art' }),
   };
 };
 

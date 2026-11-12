@@ -14,6 +14,7 @@
   <ellipse class="fg" cx="76" cy="62.5" rx="4.2" ry="3.2"/>
   <ellipse class="bg" cx="76" cy="62.5" rx="2.6" ry="1.6"/>
   <polygon class="accent" points="60,40 64,50 67.5,45 70,55 67,64 53,64 50,55 52.5,46 56,51"/>
+  <polygon class="bg" points="60,49 63.5,57 62.5,64 57.5,64 56.5,57"/>
   <ellipse class="fg" cx="37" cy="69.5" rx="6" ry="4.4"/>
   <ellipse class="bg" cx="37" cy="69.5" rx="4.4" ry="2.8"/>
   <ellipse class="fg" cx="48.5" cy="69.5" rx="6" ry="4.4"/>

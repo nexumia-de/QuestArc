@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createBrain } from '../src/adapter/brain';
 import { registerHooks } from '../src/adapter/hooks';
-import { handleMessage } from '../src/adapter/messages';
+import { artPack, handleMessage } from '../src/adapter/messages';
+import type { State } from '../src/shared/protocol';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
 import { createFakeHost, dailyHabit, noon } from './fake-host';
@@ -142,10 +143,10 @@ describe('brain', () => {
   it('writes records and answers with a state that includes them', async () => {
     const { brain, host } = setUp([]);
     await brain.state();
-    const state = await handleMessage(brain, {
+    const state = (await handleMessage(brain, {
       type: 'questarc:write',
       records: { settings: { mode: 'rpg' } },
-    });
+    })) as State;
     expect(host.data.settings).toBe('{"mode":"rpg"}');
     expect(state.view.mode).toBe('rpg');
     expect(state.records.settings).toEqual({ mode: 'rpg' });
@@ -225,5 +226,16 @@ describe('repeat paused in Super Productivity', () => {
     (host.repeatCfgs.cfg1 as { isPaused: boolean }).isPaused = true;
     await brain.state();
     expect(Object.keys(host.data).some((key) => key.startsWith('pause:'))).toBe(false);
+  });
+});
+
+describe('the pictures for the view (#100)', () => {
+  it('are sent once on request, only the ladders’ pictures', async () => {
+    const { brain } = setUp([]);
+    const pack = await handleMessage(brain, { type: 'questarc:art' });
+    expect(pack).toBe(artPack);
+    expect(Object.keys(artPack.ladders).sort()).toEqual(['crossing', 'home']);
+    expect(artPack.pictures['build-home-3']).toContain('<svg');
+    expect(artPack.pictures['hedgehog']).toBeUndefined();
   });
 });

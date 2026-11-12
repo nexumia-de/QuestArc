@@ -1,14 +1,16 @@
-import { startJourney } from '@questarc/engine';
+import { chooseBuild, startJourney, type BuildChoice } from '@questarc/engine';
 
 import { newRunId } from '../../shared/run-id';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
+import { buildChooser, buildSummary, firstVersion } from '../journey/build-choice';
 import { firstOfNextMonth, nextMonday, shortDate } from '../journey/format';
 import type { Context, Screen } from '../screen';
 
 /**
  * Screen 3, start a journey (issue #52): the user's own reason, optional
- * and never focused on open (design rule 5), and a self-chosen start day.
+ * and never focused on open (design rule 5), a self-chosen start day and,
+ * in game mode, what the journey builds (screen 3a in place, #100).
  */
 
 type StartChoice = 'today' | 'monday' | 'month' | 'date';
@@ -45,10 +47,14 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
       h('span', { class: 'qa-option-title' }, label),
     );
 
+  const rpg = view.mode === 'rpg';
+  const build = (ctx.draft.build as BuildChoice | undefined) ?? {};
+
   const start = async () => {
     const runId = newRunId();
-    await ctx.write(
-      startJourney({
+    const chosen = rpg && Object.keys(build).length > 0 ? chooseBuild(runId, build) : {};
+    await ctx.write({
+      ...startJourney({
         runId,
         journey,
         startDay: days[choice],
@@ -56,7 +62,8 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
         why: (ctx.draft.why as string | undefined) ?? '',
         ...(view.active ? { activeRunId: view.active.runId } : {}),
       }),
-    );
+      ...chosen,
+    });
     ctx.reset({ name: 'home' });
     ctx.go({ name: 'setup' });
   };
@@ -105,6 +112,7 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
             })
           : null,
       ),
+      rpg ? buildPart(ctx, journey, build) : null,
       active
         ? h('p', { class: 'qa-callout' }, t('ui.start.pauses', { title: t(active.title) }))
         : null,
@@ -118,3 +126,34 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
     ],
   };
 };
+
+/** What you build: the first version, the choice in words, Change in place. */
+const buildPart = (ctx: Context, journey: Parameters<typeof buildSummary>[0], build: BuildChoice) =>
+  h(
+    'section',
+    { class: 'qa-fieldset' },
+    h('h2', { class: 'qa-section-title' }, t('ui.build.title')),
+    h(
+      'div',
+      { class: 'qa-build-pick' },
+      firstVersion(journey, build),
+      h('p', {}, t('ui.build.start', { summary: buildSummary(journey, build) })),
+    ),
+    ctx.draft.buildOpen
+      ? buildChooser(journey, build, (next) => {
+          ctx.draft.build = next;
+          ctx.redraw();
+        })
+      : h(
+          'button',
+          {
+            class: 'qa-btn qa-btn-secondary',
+            type: 'button',
+            onclick: () => {
+              ctx.draft.buildOpen = true;
+              ctx.redraw();
+            },
+          },
+          t('ui.build.change'),
+        ),
+  );

@@ -2,71 +2,25 @@
 // browser profile with throwaway data (docs/development.md, real app):
 // install and enable the ZIP, start "A gentle morning", create the task,
 // make it recurring in Super Productivity's own dialog, tick it off, and
-// check the message and the journey. Screenshots go to dist/real-app/.
+// check the message and the journey (calm mode). Screenshots go to
+// dist/real-app/.
 //
 //   node e2e/real-app.mjs [width height]
 //
 // QUESTARC_SP_URL picks the app: by default the live web app; CI runs
 // Super Productivity's Docker image at a pinned digest on localhost
-// (.github/workflows/real-app.yml). The live app goes through
-// HTTPS_PROXY when it is set; a local app never does. Uses the
-// Playwright of the environment.
-import { mkdirSync, readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { join, resolve } from 'node:path';
+// (.github/workflows/ci.yml). The live app goes through HTTPS_PROXY when
+// it is set; a local app never does (e2e/sp.mjs).
+import { BASE, expect, install, makeRecurring, open, start, tick } from './sp.mjs';
 
-const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
-
-const BASE = process.env.QUESTARC_SP_URL ?? 'https://app.super-productivity.com/';
-const local = /^http:\/\/(localhost|127\.0\.0\.1)[:/]/.test(BASE);
-const { version } = JSON.parse(readFileSync(resolve('src', 'manifest.json'), 'utf8'));
-const ZIP = resolve('dist', `questarc-${version}.zip`);
-const OUT = resolve('dist', 'real-app');
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
-mkdirSync(OUT, { recursive: true });
-
-const expect = (ok, what) => {
-  if (!ok) throw new Error(`Failed: ${what}`);
-  console.log(`ok: ${what}`);
-};
-
-const proxy =
-  process.env.HTTPS_PROXY && !local ? { proxy: { server: process.env.HTTPS_PROXY } } : {};
-const browser = await chromium.launch(proxy);
-const page = await browser.newPage({ viewport: { width, height } });
-const shot = (name) => page.screenshot({ path: join(OUT, `${width}-${name}.png`) });
-page.on('pageerror', (error) => console.log('page error:', error.message));
-const view = () => page.frameLocator('iframe').first();
+const { browser, page, view, shot } = await open(width, height);
 
 try {
-  await page.goto(BASE, { waitUntil: 'networkidle', timeout: 90_000 });
-  await page
-    .getByText('Simple Todo List')
-    .click()
-    .catch(() => undefined);
-  const version = (await page.locator('body').innerText()).match(
-    /Super Productivity (\d+\.\d+\.\d+)/,
-  );
-
-  // Install and enable.
-  await page.goto(`${BASE}#/config`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1500);
-  const settingsText = await page.locator('body').innerText();
-  console.log('Super Productivity', version?.[1] ?? settingsText.match(/\d+\.\d+\.\d+/)?.[0]);
-  await page.locator('[role=tab]').filter({ hasText: 'extension' }).click();
-  await page.waitForTimeout(1500);
-  await page.locator('input[type=file]').first().setInputFiles(ZIP);
-  await page.locator('mat-dialog-container button').filter({ hasText: 'Install Plugin' }).click();
-  await page.waitForTimeout(2000);
-  await page
-    .locator('mat-card')
-    .filter({ hasText: 'QuestArc' })
-    .locator('[role=switch]')
-    .first()
-    .click();
-  await page.waitForTimeout(2000);
-  await shot('1-installed');
+  const version = await start(page);
+  const shown = await install(page);
+  console.log('Super Productivity', version ?? shown);
+  await shot('', '1-installed');
 
   // Start the journey and create the task.
   await page.goto(`${BASE}#/plugins/questarc/index`);
@@ -80,52 +34,22 @@ try {
   await view().getByRole('button', { name: 'Start', exact: true }).click();
   await view().getByRole('button', { name: 'Create the task' }).click();
   await page.waitForTimeout(2500);
-  await shot('2-created');
+  await shot('', '2-created');
   expect(
     (await view().locator('main').innerText()).includes('Schedule Task'),
     'the view explains how to set the repeat',
   );
 
-  // Make it recurring, as the user would: Schedule Task → Repeat → Save.
-  await page.getByText('Schedule Task', { exact: true }).click({ force: true });
-  await page
-    .locator('mat-dialog-container')
-    .getByText('Repeat', { exact: true })
-    .click({ force: true });
-  await page.locator('mat-dialog-container').getByRole('button', { name: /Save/ }).click();
-  await page.waitForTimeout(1000);
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(3000);
+  await makeRecurring(page);
   expect(
     (await view().locator('.qa-title').innerText()) === 'A gentle morning',
     'the journey picks up the repeat',
   );
 
-  // Tick it off in the task list and collect the messages.
-  await page.goto(`${BASE}#/tag/TODAY/tasks`);
-  await page.waitForTimeout(1500);
-  await page
-    .getByText('No thanks')
-    .click()
-    .catch(() => undefined);
-  const row = page
-    .locator('task')
-    .filter({ hasText: 'Getting up: drink a glass of water' })
-    .first();
-  await row.hover();
-  await row.locator('done-toggle').first().click({ force: true });
-  const messages = new Set();
-  for (let i = 0; i < 10; i += 1) {
-    await page.waitForTimeout(500);
-    for (const text of await page
-      .locator('snack-custom, .mat-mdc-snack-bar-container')
-      .allInnerTexts()) {
-      messages.add(text.replace(/^route\s*/, ''));
-    }
-  }
+  const messages = await tick(page, 'Getting up: drink a glass of water');
   expect(
-    [...messages].includes('Drink a glass of water: done. 1 of 5 days.'),
-    `message after the completion (${[...messages].join(' | ')})`,
+    messages.includes('Drink a glass of water: done. 1 of 5 days.'),
+    `message after the completion (${messages.join(' | ')})`,
   );
 
   await page.goto(`${BASE}#/plugins/questarc/index`);
@@ -135,7 +59,11 @@ try {
     card.includes('1 of 5 days') && card.includes('Calmer mornings'),
     'the card counts the completion',
   );
-  await shot('3-journey');
+  expect((await view().locator('.qa-build').count()) === 0, 'calm mode shows no build');
+  await shot('', '3-journey');
+} catch (error) {
+  await shot('failed-', 'page').catch(() => undefined);
+  throw error;
 } finally {
   await browser.close();
 }

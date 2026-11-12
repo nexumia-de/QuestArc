@@ -9,6 +9,7 @@ import { localDay } from '../src/adapter/day';
 import { registerHooks } from '../src/adapter/hooks';
 import type { HostApi } from '../src/adapter/host';
 import { handleMessage } from '../src/adapter/messages';
+import { createSidePanel } from '../src/adapter/side-panel';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
 import { demoData, type Scenario } from './demo';
@@ -72,6 +73,21 @@ Object.assign(window, {
     failMessages: (error: string | null) => {
       failWith = error;
     },
+    /** Ticks off today's instance of the demo's recurring task (#100: the moment of the tick). */
+    tick: () => {
+      const id = `rpt_demo_${today}`;
+      demo.tasks[id] = {
+        id,
+        title: 'Morning routine',
+        isDone: true,
+        doneOn: Date.now(),
+        repeatCfgId: 'demo',
+        dueDay: today,
+        created: Date.parse(`${today}T12:00:00Z`),
+        timeSpentOnDay: {},
+      } as never;
+      fire('dataChanged');
+    },
     /** Gives a task a daily repeat, as the user would in Super Productivity. */
     setRepeat: (taskId: string, cfg: Record<string, unknown> = {}) => {
       const id = `cfg-${taskId}`;
@@ -101,6 +117,7 @@ const brain = createBrain({
 });
 
 registerHooks(api, brain.refresh);
+const panel = createSidePanel({ registerSidePanelButton: () => undefined }, undefined);
 document.documentElement.style.cssText = '';
 const style = document.createElement('style');
 style.textContent = `${themeCss(theme)} body{background:var(--bg)}`;
@@ -140,7 +157,7 @@ addEventListener('message', async (event: MessageEvent) => {
       return;
     }
     try {
-      const result = await handleMessage(brain, data.message);
+      const result = await handleMessage(brain, data.message, panel);
       reply({ type: 'PLUGIN_MESSAGE_RESPONSE', messageId: data.messageId, result });
     } catch (error) {
       reply({ type: 'PLUGIN_MESSAGE_ERROR', messageId: data.messageId, error: String(error) });
