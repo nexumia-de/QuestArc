@@ -59,16 +59,67 @@ the journey is in [journey design](journey-design.md).
   Pick a date.
 - **Plan check** (optional, collapsed): wish, best outcome, main
   obstacle, "If …, then I will …".
+- **What you build** (game mode only, #100): the journey's suggested
+  build in words and as its first version, which stands from the start
+  ("You build a home · pennants · meadow green"), and **Change**, which
+  opens screen 3a. Nothing is shown of the versions to come. Calm mode
+  has no such section.
 - Main action: **Start**. Then the flow "Set up the task" (flow B) for
-  the first stage.
+  the first stage. A changed build is written with the start, as one
+  `build:<runId>` record ([data model](data-model.md)); an unchanged one
+  writes nothing, so the journey's own build applies.
+
+### 3a. What you build (game mode)
+
+The same choices on screen 3, where **Change** opens them in place, and
+as their own page from **What you build** in the journey's menu
+(screen 4).
+
+- **What grows**: one option per ladder (Home, Crossing, …), each with
+  its first version as a small picture and its name in words; the
+  journey's suggestion says "Suggested by the journey".
+- **What hangs**: lanterns, pennants, flowers, each with its plain
+  element as a small picture (the "on" form is earned, never shown ahead)
+  and its name. Flowers need ground: with a ladder on water the option is
+  disabled and says "Only on land"; a marker that no longer fits after
+  changing the ladder falls back to the ladder's own.
+- **Colour**: the eight hues of the palette, each a swatch with its name
+  (the name carries it, not the colour).
+- On screen 3 the choice is written with **Start**; from the menu each
+  change is written at once (`chooseBuild`). Only what the user picked
+  is stored; the rest follows the journey. Changing later loses nothing:
+  the version and the marker are derived from the stages, so the same
+  progress is drawn as the other thing. **Use the journey's suggestion**
+  withdraws the record.
 
 ### 4. Journey (home)
 
 - Top: journey title; in RPG mode the level; menu (Pause or Resume,
-  End journey, Shelf, Settings). **End journey** happens at once and
+  End journey, in game mode **What you build** (screen 3a) and
+  **Stations**, Shelf, Settings). **End journey** happens at once and
   offers **Undo** (it writes one record, withdrawn by Undo).
 - Middle: the path ([journey design](journey-design.md)), scrolled to the
   current station; finished stations below, coming ones above.
+- **Game mode: the build instead of the path** (#100, [journey
+  design](journey-design.md#the-journey-screen-with-the-build)). The
+  upper part is the build in its setting and the run's hue: the ladder's
+  current version, the marker with its first `ceil(markerProgress × E)`
+  elements, all hanging elements "on" while ready. Below it the row of
+  versions (the standing ones as small pictures with their number, the
+  next one as a plain step without a picture, nothing further), then one
+  line of state in words ("A plank bridge stands · a stone bridge is on
+  its way", "… is ready", or only "A hut stands" before the stage's first
+  counting completion), then the card unchanged. The picture's text for
+  screen readers says the same and the marker in words: "A plank bridge,
+  version 3 of 5; marker: 2 of 2 posts and 3 of 6 lanterns; not ready
+  yet". At 720 px and wider the build is on the left and the card on the
+  right. Station details (screen 5) stay reachable from the menu
+  ("Stations"), since the path is not shown. Calm mode keeps the path.
+- **The moment of the tick:** while the screen is open, a completion
+  that adds marker elements makes them appear with a short calm
+  animation (grow and fade in, about half a second), a new version
+  likewise; none with `prefers-reduced-motion`. A redraw without a change
+  animates nothing; opening the screen animates nothing.
 - Bottom card, the current station:
   - the plan sentence;
   - progress of the condition in words and a bar ("4 of 5 days in the
@@ -131,6 +182,13 @@ the journey is in [journey design](journey-design.md).
 ### 8. Settings
 
 - Mode: Calm / With game.
+- In game mode: **Show the build in the side panel** (off by default, on
+  this device only). On, Super Productivity gets QuestArc's side-panel
+  button (next to the play button; in the bottom bar on a phone), which
+  opens QuestArc's page beside the task list, so the build is in view
+  while ticking off. Off takes effect at Super Productivity's next start,
+  because a plugin cannot remove that button ([Super Productivity
+  facts](super-productivity-facts.md) §7); the text says so.
 - "How QuestArc motivates you".
 - **Remove QuestArc's data**: withdraws all of QuestArc's records, never
   tasks; it cannot be undone, so it asks first, in place.
@@ -161,6 +219,12 @@ second QuestArc shows a short message (snack or toast):
 | several at once (sync)       | "3 days done. 4 of 5 days."                  | "3 days done · 4 of 5 days."                                                                 |
 | condition met                | "Station reached: you can continue."         | same, plus "Level 3." when it changes                                                        |
 | guardian defeated            | —                                            | "The Heavy Blanket is gone."                                                                 |
+
+In game mode, while a journey with a build runs, the message carries
+the action **Show**, which opens QuestArc's page at the build (Super
+Productivity keeps a message with an action visible longer). Marker
+elements and new versions get no words of their own (Amir & Ariely
+2008, [research](research.md)): the picture shows them.
 
 The events of one change are joined into one message, so messages after
 a sync with many changes are summed up in one. The progress ("4 of 5
@@ -247,6 +311,7 @@ the first answer, also when the data did not change in between.
 | Journey (home)     | plugin view (`showIndexHtmlAsView`)                                                                                                                   | sidebar page; details pushed with swipe back |
 | Station details    | page inside the view                                                                                                                                  | pushed page                                  |
 | Bound task actions | task context menu "Use for current station"                                                                                                           | row menu "Use for current station"           |
-| Messages           | snack (`showSnack`)                                                                                                                                   | toast                                        |
+| Messages           | snack (`showSnack`); in game mode with the action **Show** (opens the view)                                                                           | toast                                        |
+| Build at a glance  | optional side panel (setting, off by default): the same view beside the task list                                                                     | strip at the top of Today (later)            |
 | Settings           | plugin settings view                                                                                                                                  | preferences                                  |
 | Main actions       | bottom of the view                                                                                                                                    | bottom bar (thumb reach)                     |

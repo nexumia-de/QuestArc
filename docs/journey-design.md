@@ -223,14 +223,14 @@ Home pennants):
 
 - **lanterns**: small lanterns, outlined; ready filled with a flame, a
   halo and rays.
-- **pennants** (`bunting`): pale outlined pennants; ready solid in the
+- **pennants**: pale outlined pennants; ready solid in the
   accent with a second tail.
 - **flowers**: vines with closed buds; ready open blossoms. Land only:
   the checker refuses flowers for a ladder whose setting is water
   (`"water": true`).
 
 Each kind has three pictures (view box 32 × 32): `marker-<kind>-post`
-stands on y = 30 and the line is tied on at (16, 12); `marker-<kind>-bead`
+stands on y = 30 and the line is tied on at (16, 15); `marker-<kind>-bead`
 hangs from the line at (16, 2); `marker-<kind>-bead-lit` is its ready
 form.
 
@@ -328,6 +328,92 @@ stanchions, and the scenery flowers read as a hanging element;
 [m5](screenshots/ladder-markers-round-5.png) slimmer posts, larger
 elements; then the owner asked for plain posts with nothing on top and
 ready only on the hanging elements; [m6](screenshots/ladder-markers-round-6.png) plain posts, but the `span` middle post stood in the water: now two posts, one on each bank, and one line across: the final images above.
+
+## The journey screen with the build
+
+Game mode, issue #100; calm mode keeps the path above unchanged. The
+engine's `build` view ([game rules](game-rules.md) §9) gives the ladder,
+the version, the versions the journey uses, the marker kind, the hue,
+the marker progress and whether the stage is ready; the screen draws it
+with the ladder's scene of "Builds and ladders" above.
+
+| Phone, light                                               | Phone, dark                                              |
+| ---------------------------------------------------------- | -------------------------------------------------------- |
+| ![Phone, light](screenshots/journey-build-phone-light.png) | ![Phone, dark](screenshots/journey-build-phone-dark.png) |
+
+| Ready, light                                                                 | Ready, dark                                                                       |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| ![Ready, light](screenshots/journey-build-phone-ready-light.png)             | ![Ready, dark](screenshots/journey-build-phone-ready-dark.png)                    |
+| ![Crossing in sand](screenshots/journey-build-phone-crossing-sand-light.png) | ![Crossing in sand, dark](screenshots/journey-build-phone-crossing-sand-dark.png) |
+
+![Desktop, light](screenshots/journey-build-desktop-light.png)
+
+![Desktop, dark, ready](screenshots/journey-build-desktop-dark.png)
+
+What you build on the start page (Change open) and from the menu, the
+stations list and Settings with the side panel switch:
+[start](screenshots/journey-build-start-change.png),
+[what you build](screenshots/journey-build-build-page-2.png),
+[stations](screenshots/journey-build-stations.png),
+[settings](screenshots/journey-build-settings.png). In Super Productivity
+19.3.1 (real-app test): [the first post after the first tick](screenshots/journey-build-real-app-first-post.png),
+[ready, with the message's Show](screenshots/journey-build-real-app-ready.png),
+[the side panel beside Today](screenshots/journey-build-real-app-side-panel.png).
+
+- **Phone (360 px):** from the top, the level chip, the build at the
+  full width (the setting is 16 : 9, so 360 × 203 px), the row of
+  versions, the line of state, then the card area as on the path screen.
+  The upper part does not scroll; the card area does.
+- **Desktop (720 px and wider):** the build with its row and line on the
+  left, the card on the right, both from the top, as the path layout
+  has it. The build is at most 560 px wide.
+- **Row of versions:** the versions that stand as 60 × 40 px pictures
+  with their number under them, the next as a plain rounded step with its
+  number, nothing beyond. A journey uses `versions` = stages + 1; when a
+  ladder has fewer pictures than that, the last picture stands for the
+  versions after it (the checker warns about such journeys).
+- **Line of state:** the version's name and what is on its way, from the
+  journey's own names (`build.names`) where given, else the ladder's
+  titles. Before the stage's first counting completion only "A hut
+  stands"; after the last stage only what stands.
+- **For screen readers** the picture's label is the same in words with
+  the marker counted: "A plank bridge, version 3 of 5; marker: 2 of 2
+  posts and 3 of 6 lanterns; not ready yet" (or "ready", or "nothing on
+  its way yet"). The row is a list ("Versions: 1, 2 and 3 stand; 4 is
+  next"). The marker's counts in the label are the only place where
+  elements are counted; the card keeps the exact stage counts.
+- **The moment of the tick:** the screen remembers, for as long as it is
+  open, which run, version and number of elements it last drew. When a
+  redraw shows more elements, the new ones grow in (scale from 0.6 and
+  fade, 600 ms, ease-out, from their foot); a new version fades in the
+  same way. Under `prefers-reduced-motion: reduce` nothing moves. The
+  first draw after opening animates nothing.
+- **Station details** are in the menu (**Stations**) as a list in path
+  order, since the path is not shown in game mode.
+- **Side panel:** with the setting on, the same page is in Super
+  Productivity's right panel beside the task list. The panel is narrow,
+  so it shows the phone layout with the build on top: the build is in
+  view while ticking off ([facts](super-productivity-facts.md) §7: a
+  plugin cannot draw anywhere smaller or closer to the task list).
+- **Bundle:** the plugin carries only what this screen and the start
+  page draw: per ladder its setting, the lines of the marker, the
+  versions; the three pictures of each marker kind; the lantern; the
+  palette. Region scenes and their pictures stay preview-only
+  (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
+  travel in `plugin.js` and reach the view once at start (message
+  `questarc:art`), because Super Productivity 19.3.1 takes an
+  `index.html` of at most 100 KiB ([facts](super-productivity-facts.md)
+  §1); until they arrive the screen shows the path. The ZIP: 41,700
+  bytes on `main`, 50,271 bytes with the build (`index.html` 80 KB,
+  minified; `plugin.js` 102 KB).
+- **Picture polish** with the build at its real size (issue #100's
+  review): lit lanterns get an opaque halo in `tint-strong` larger than
+  the lantern, so they glow in light style too; open blossoms are white
+  (`bg`) with an accent centre instead of green on green, buds white
+  with an accent tip; the line between posts is `dim` and thinner and
+  the posts shorter (tied on at y = 15), so the first steps no longer
+  read as a rope fence; the fire has a light core. The pennants' ready
+  form is unchanged (the solid fill carries it).
 
 ## Scenes of a region (for the Valley, #42)
 

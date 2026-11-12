@@ -132,8 +132,8 @@ For the files:
   hanging elements under a line and below the build, flowers not on
   water), and with the files' text that every version and the setting's
   path have a corner at each way point (`art-vertices.ts`).
-- `content/art/markers.json`: the marker kinds (lanterns, bunting shown
-  as pennants, flowers) with a title and `landOnly`; `markerProblems`
+- `content/art/markers.json`: the marker kinds (lanterns, pennants,
+  flowers) with a title and `landOnly`; `markerProblems`
   checks that each has its three pictures (`marker-<kind>-post`,
   `-bead`, `-bead-lit`).
 - `content/art/palette.json`: eight hues (meadow, water, sand, heather,

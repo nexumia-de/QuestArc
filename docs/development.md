@@ -130,7 +130,12 @@ of the journey screen, mid-way or ready) and `palette`; `&hue=<name>`
 picks a palette hue. `node screenshots.mjs
 art:sequence-crossing,art:journey-home,art:palette 2` writes the
 sequences and the palette as one full page 1400 px wide and the mock at
-phone size (`art:sequence-crossing@slate` for a hue). The ladders' files
+phone size (`art:sequence-crossing@slate` for a hue). The journey screen
+itself has the demos `build`, `build-ready` and `build-crossing`
+(`node screenshots.mjs build,build-ready,build-crossing 2`);
+`preview.tick()` in the console ticks today off, to see new marker
+elements grow in. The plugin bundles only the pictures of the ladders
+(`esbuildLadderArt` in `art.mjs`); the preview pages have all of them. The ladders' files
 come from `node scripts/draw-ladders.mjs`. Day Planner's demo draws the same parts
 (`tests/art_demo.py growth|shore|sizes` in nexumia-de/pensum, through
 phosh-toolkit's `screenshot.sh -c light|dark`). The comparison images in
@@ -143,7 +148,15 @@ screenshots side by side (Pillow, 256-colour PNG).
 Productivity's web app (`app.super-productivity.com`) in a fresh browser
 profile with throwaway data: install and enable, start "A gentle
 morning", create the task, make it recurring in Super Productivity's own
-dialog, tick it off, check the message and the journey. Screenshots go to
+dialog, tick it off, check the message and the journey (calm mode).
+`e2e/real-app-build.mjs` walks the journey screen with the build (#100)
+in game mode: start with another ladder (Crossing), tick, open the build
+from the message's **Show**, see the first marker element, tick on four
+more days (Playwright's clock moves the date; the app is reloaded each
+day) until the stage is ready, continue and see the next version. `e2e/real-app-panel.mjs` checks
+the side panel setting: no button by default, the button after turning
+it on, QuestArc in the right panel (320 px wide at 1200 px). They share
+the app steps in `e2e/sp.mjs`. Screenshots go to
 `packages/plugin/dist/real-app/`.
 
 ```sh

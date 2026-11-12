@@ -76,6 +76,14 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   `plugin.service.ts`, ZIP loading). Other files in the ZIP are not served to
   the iframe; CSS and JS must be inlined (`docs/plugin-development.md`,
   "HTML/Iframe Plugins")[^sp].
+- **19.3.1 takes an `index.html` of at most 100 KiB**: at `1014df9` the
+  ZIP loader checks it against `MAX_PLUGIN_MANIFEST_SIZE` (100 × 1024,
+  `plugin.service.ts` line 1096); `MAX_PLUGIN_INDEX_HTML_SIZE` (1 MiB)
+  exists only from `668c0769`, unreleased. A larger `index.html` is
+  refused at upload and the plugin card never appears (seen 2026-11-12
+  with the Docker image of 19.3.1). QuestArc's build therefore minifies
+  the view and fails above 100 KiB, and `plugin.js` (5 MB) carries the
+  pictures for the view (#100)[^sp].
 - Uploaded plugin code is cached per device in IndexedDB `SUPPluginCache`
   (`plugin-cache.service.ts`); enabled plugins are activated at startup
   (`plugin.service.ts`, `_loadEnabledPlugins`). The enabled flag is synced as
@@ -354,6 +362,49 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   (`src/app/plugins/plugin-i18n.service.ts`); `formatDate`,
   `getCurrentLanguage`; `LANGUAGE_CHANGE {code, newLanguage}` on a local
   language change (`plugin-hooks.effects.ts`, `languageChange$`)[^sp].
+
+### What a plugin may show outside its own page (#100)
+
+Checked at `c5eb3f6` and, for 19.3.1, at its version-bump commit `1014df9`
+(tag `v19.3.1`); everything below is in both[^sp]:
+
+- **Header button** (`registerHeaderButton`, `plugin.js` only): an icon
+  button with a tooltip label and a Material icon name; no picture, no
+  badge, no label change after registering
+  (`plugin-header-btns.component.ts`).
+- **Side panel** (`registerSidePanelButton({label, icon?, onClick})`,
+  `plugin.js` only, one per plugin): adds a button next to the play
+  button in the main header (`plugin-side-panel-btns.component.ts`) and,
+  up to 600 px, an entry in the mobile bottom bar
+  (`mobile-bottom-nav.component.html`, `sidePanelButtons`). The button
+  toggles the right panel (`togglePluginPanel`), which loads the
+  plugin's own `index.html` in an iframe (`plugin-panel-container`,
+  `plugin-index` with `showFullUI: false`), beside the work view. It is
+  the same document as the full view; the host passes it nothing that
+  tells it where it is shown. There is no call to remove the button: it
+  goes when the plugin unloads (`_removePluginSidePanelButtons`). The
+  manifest's `sidePanel: true` registers this button automatically and
+  then drops the side-menu entry for the full view (`plugin-runner.ts`).
+  The iframe allowlist names `showIndexHtmlInSidePanel`, but the bridge
+  has no such method (`plugin-iframe.util.ts`; no match in
+  `plugin-bridge.service.ts`), so a view cannot open the panel itself.
+- **Work view** (`showInWorkContext`, `closeWorkContextView`): the
+  plugin's `index.html` _in place of_ the task list for Today and
+  projects, not beside it; and `registerWorkContextHeaderButton` with
+  `showFor` (types.ts).
+- **Messages**: `showSnack({msg, type?, ico?, action?})`; the action
+  (`{label, onClick}`) only from `plugin.js`, because functions cannot
+  cross the iframe's `postMessage`; with an action the snack stays
+  visible 10 s instead of the default 3 s (types.ts, `SnackActionCfg`; `plugin-api-mapper.ts`, `ACTION_SNACK_DURATION_MS`).
+  `notify({title, body})` is a system notification of 5 s without an
+  action (`plugin-bridge.service.ts`, `notify`). `openDialog` shows
+  allowlist-sanitised HTML with buttons.
+- Nothing else: a plugin cannot draw into the task list, a task row, the
+  Today header or the app's badge.
+
+So the plugin's glanceable places are the side panel (QuestArc's page
+beside the task list, the user's choice) and the completion message's
+action, which opens the full view.
 
 ## 8. Mobile
 
