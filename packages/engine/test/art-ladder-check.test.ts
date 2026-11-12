@@ -119,13 +119,13 @@ describe('markerProblems', () => {
   it('wants a title, landOnly and the three pictures of every kind', () => {
     expect(markerProblems(markers, names)).toEqual([]);
     expect(markerProblems({}, names).map((p) => p.at)).toEqual(['markers']);
-    const broken = { bunting: { title: '', landOnly: 'no' } };
+    const broken = { pennants: { title: '', landOnly: 'no' } };
     expect(markerProblems(broken, names).map((p) => p.at)).toEqual([
-      'bunting',
-      'bunting',
-      'bunting',
-      'bunting',
-      'bunting',
+      'pennants',
+      'pennants',
+      'pennants',
+      'pennants',
+      'pennants',
     ]);
   });
 });

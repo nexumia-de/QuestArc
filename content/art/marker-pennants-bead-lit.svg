@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>A bright pennant with a second tail</title>
+  <polygon class="fg" points="6,2 24,2 15,27"/>
+  <polygon class="accent" points="8.6,3.8 21.4,3.8 15,21.7"/>
+  <polygon class="accent" points="24,2 27.5,2 30,16 27,14"/>
+</svg>

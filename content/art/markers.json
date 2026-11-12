@@ -2,16 +2,16 @@
   "lanterns": {
     "title": "Lanterns",
     "landOnly": false,
-    "tie": [16, 12]
+    "tie": [16, 15]
   },
-  "bunting": {
+  "pennants": {
     "title": "Pennants",
     "landOnly": false,
-    "tie": [16, 12]
+    "tie": [16, 15]
   },
   "flowers": {
     "title": "Flowers",
     "landOnly": true,
-    "tie": [16, 12]
+    "tie": [16, 15]
   }
 }
