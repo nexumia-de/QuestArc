@@ -1,19 +1,15 @@
-import { setMode } from '@questarc/engine';
-
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import type { Context, Screen } from '../screen';
-import { modeChoice } from './mode-choice';
 
-/** Screen 8: mode, the side panel (game mode), and what QuestArc stores. */
+/** Screen 8: the side panel, what motivates, and what QuestArc stores. */
 export const settingsScreen = (ctx: Context): Screen => ({
   title: t('ui.settings.title'),
   noSettings: true,
   body: h(
     'div',
     { class: 'qa-stack' },
-    modeChoice(ctx.state.view.mode, (mode) => void ctx.write(setMode(mode))),
-    ctx.state.view.mode === 'rpg' && ctx.state.sidePanel !== undefined
+    ctx.state.sidePanel !== undefined
       ? h(
           'label',
           { class: 'qa-card qa-switch-row' },

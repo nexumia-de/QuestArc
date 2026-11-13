@@ -92,15 +92,6 @@
         },
         "schedule": { "$ref": "#/$defs/schedule" },
         "condition": { "$ref": "#/$defs/condition" },
-        "guardian": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["name", "hp"],
-          "properties": {
-            "name": { "$ref": "#/$defs/textKey" },
-            "hp": { "type": "integer", "minimum": 10, "maximum": 1000 }
-          }
-        },
         "story": {
           "type": "object",
           "additionalProperties": false,

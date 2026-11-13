@@ -4,15 +4,13 @@ import { banners } from '../banners';
 import { h } from '../dom';
 import { buildSection } from '../journey/build';
 import { stationCard } from '../journey/card';
-import { journeyPath, scrollFor } from '../journey/path';
 import type { Context, MenuItem, Screen } from '../screen';
 import { readOnlyScreen } from './read-only';
 
 /**
- * Screen 4, the journey (docs/behaviour.md): the path, opened scrolled to
- * the current station, or in game mode the build (journey/build.ts), and
- * the current station's card with its main action. With no journey, the empty state; a read-only journey gets its
- * own page.
+ * Screen 4, the journey (docs/behaviour.md): the build (journey/build.ts)
+ * and the current station's card with its main action. With no journey,
+ * the empty state; a read-only journey gets its own page.
  */
 export const homeScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
@@ -72,14 +70,8 @@ export const homeScreen = (ctx: Context): Screen => {
     };
   }
 
-  const rpg = view.mode === 'rpg';
   const station = run.stations[run.position.stage];
-  const build = rpg ? buildSection(run, journey) : null;
-  const scroller = h(
-    'div',
-    { class: 'qa-path-scroll', 'data-scroll-key': 'path' },
-    journeyPath({ run, journey, rpg, onStation: (index) => ctx.go({ name: 'station', index }) }),
-  ) as HTMLElement;
+  const build = buildSection(run, journey);
 
   const action = (label: string, route: Parameters<Context['go']>[0]) =>
     h(
@@ -119,12 +111,8 @@ export const homeScreen = (ctx: Context): Screen => {
           .then(() => ctx.reset({ name: 'home' }, { ended: { runId: run.runId, title } }));
       },
     },
-    ...(build
-      ? [
-          { label: t('ui.build.title'), onSelect: () => ctx.go({ name: 'build' }) },
-          { label: t('ui.build.stations'), onSelect: () => ctx.go({ name: 'stations' }) },
-        ]
-      : []),
+    ...(build ? [{ label: t('ui.build.title'), onSelect: () => ctx.go({ name: 'build' }) }] : []),
+    { label: t('ui.build.stations'), onSelect: () => ctx.go({ name: 'stations' }) },
     shelfItem,
   ];
 
@@ -135,23 +123,14 @@ export const homeScreen = (ctx: Context): Screen => {
     body: h(
       'div',
       { class: 'qa-journey' },
-      rpg ? h('p', { class: 'qa-chip qa-level' }, t('ui.level', { level: view.level })) : null,
-      build ?? scroller,
+      build,
       h(
         'div',
         { class: 'qa-card-area' },
         ...banners(ctx, run, journey),
-        stationCard(run, journey, rpg, view.todayStr) ?? null,
+        stationCard(run, journey, view.todayStr) ?? null,
       ),
     ),
     actions,
-    onShow: () => {
-      if (build) return;
-      scroller.scrollTop = scrollFor(
-        run.position.stage,
-        run.stations.length,
-        scroller.clientHeight,
-      );
-    },
   };
 };

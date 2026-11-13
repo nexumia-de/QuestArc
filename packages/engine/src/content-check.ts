@@ -146,6 +146,8 @@ const stageProblems = (journey: Journey): Problem[] => {
       problems.push(
         error(`${at}.plan.anchor`, 'every stage keeps the anchor of the first stage (rule 2)'),
       );
+    if ('guardian' in stage)
+      problems.push(error(`${at}.guardian`, 'journeys have no guardians any more (issue #110)'));
     const c = stage.condition;
     if (c.type === 'days' && c.of > 1 && c.n === c.of)
       problems.push(

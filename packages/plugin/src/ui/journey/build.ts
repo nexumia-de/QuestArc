@@ -92,7 +92,7 @@ export const versionRow = (
   ) as HTMLElement;
 };
 
-/** The upper part of the journey screen in game mode. */
+/** The upper part of the journey screen. */
 export const buildSection = (run: RunView, journey: Journey): HTMLElement | null => {
   const build = run.build;
   const ladder = build && art().ladders[build.ladder];

@@ -4,16 +4,15 @@ import type { Task } from '@questarc/sp-plugin-api';
  * Demo datasets for the preview and screenshots (never real tasks). Days
  * are relative to `today`, so pictures look the same on any date.
  *
- * - welcome: first start; empty: no journey yet
- * - journey: calm, stage 2 of "A gentle morning" with one gap
- * - journey-rpg: with game, stage 3 with its guardian
+ * - welcome: first start; empty: no journey (the last one was ended)
+ * - journey: stage 2 of "A gentle morning" with one gap
  * - met: the current stage's condition is met
  * - unbound: the current stage has no recurring task yet
  * - newer: the journey was continued by a newer QuestArc (read-only)
- * - build: with game, stage 3 under way: the hut stands, the marker has its
+ * - build: stage 3 under way: the hut stands, the marker has its
  *   posts and two pennants (#100); `preview.tick()` ticks today off
- * - build-ready: with game, stage 3 met: every pennant on
- * - build-crossing: with game, stage 3 under way, the user picked the
+ * - build-ready: stage 3 met: every pennant on
+ * - build-crossing: stage 3 under way, the user picked the
  *   Crossing with lanterns in sand
  */
 
@@ -21,7 +20,6 @@ export type Scenario =
   | 'welcome'
   | 'empty'
   | 'journey'
-  | 'journey-rpg'
   | 'met'
   | 'unbound'
   | 'newer'
@@ -44,27 +42,27 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const repeatCfgs: DemoData['repeatCfgs'] = {};
   if (scenario === 'welcome') return { tasks, repeatCfgs, data };
   const build = scenario.startsWith('build');
-  const rpg = scenario === 'journey-rpg' || build;
-  data.settings = JSON.stringify({ mode: rpg ? 'rpg' : 'calm' });
-  if (scenario === 'empty') return { tasks, repeatCfgs, data };
 
   const todayMs = Date.parse(`${today}T12:00:00Z`);
   const day = (offset: number): string =>
     new Date(todayMs - offset * DAY_MS).toISOString().slice(0, 10);
-  const current = rpg ? 2 : 1;
+  const current = build ? 2 : 1;
   const start = day(10 + current * 9);
   const accepted = day(10);
   const record = (key: string, value: unknown) => {
     data[key] = JSON.stringify(value);
   };
   record('run:demo', { journeyId: 'gentle-morning', journeyVersion: 1, startDay: start });
+  if (scenario === 'empty') {
+    record('run-end:demo', { day: day(1) });
+    return { tasks, repeatCfgs, data };
+  }
   for (let i = 0; i < current; i += 1) {
     const stage = STAGES[i] as string;
     record(`stage:demo:${stage}`, { acceptedDay: day(10 + (current - i) * 9) });
     record(`stage-done:demo:${stage}`, {
       day: day(10 + (current - i - 1) * 9),
-      xp: 70,
-      damage: 70,
+      dataFormat: 2,
     });
   }
   const stage = STAGES[current] as string;
@@ -122,6 +120,6 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   });
   if (scenario === 'build-crossing')
     record('build:demo', { ladder: 'crossing', marker: 'lanterns', hue: 'sand' });
-  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 2, day: day(1) });
+  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 3, day: day(1) });
   return { tasks, repeatCfgs, data };
 };

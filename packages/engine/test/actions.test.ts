@@ -1,12 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  actions,
-  answerCheckin,
-  chooseBuild,
-  endJourney,
-  resumeJourney,
-  withdraw,
-} from '../src';
+import { actions, answerCheckin, chooseBuild, endJourney, resumeJourney, withdraw } from '../src';
 
 // The record-writing actions both hosts use (docs/data-model.md §2); the
 // plugin's tests check startJourney, bindStage and continueJourney with

@@ -72,7 +72,15 @@
     "paused": [
       {
         "runId": "r1",
-        "paused": true
+        "paused": true,
+        "stations": [
+          {
+            "stageId": "a",
+            "completions": 1
+          },
+          {},
+          {}
+        ]
       }
     ],
     "finished": [],

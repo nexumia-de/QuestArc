@@ -73,7 +73,7 @@ describe('records written by user actions', () => {
     if (!run) throw new Error('no run');
     expect(run.stations[0]?.state).toBe('met');
     expect(continueJourney(run, journey, '2026-11-10')).toEqual({
-      'stage-done:r:water': { day: '2026-11-10', xp: 50, damage: 0 },
+      'stage-done:r:water': { day: '2026-11-10', dataFormat: 2 },
       'stage:r:stretch-1': { acceptedDay: '2026-11-10' },
     });
 
@@ -81,7 +81,7 @@ describe('records written by user actions', () => {
     const done = Object.fromEntries(
       journey.stages
         .slice(0, -1)
-        .map((s) => [`stage-done:r:${s.id}`, { day: '2026-11-03', xp: 50, damage: 0 }]),
+        .map((s) => [`stage-done:r:${s.id}`, { day: '2026-11-03', dataFormat: 2 }]),
     );
     const atEnd = evaluate({
       ...base,

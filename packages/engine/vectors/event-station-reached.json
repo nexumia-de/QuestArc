@@ -139,6 +139,13 @@
       "params": {
         "stage": "a"
       }
+    },
+    {
+      "key": "event.build-element",
+      "params": {
+        "from": 0.8,
+        "to": 1
+      }
     }
   ]
 }

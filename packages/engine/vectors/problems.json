@@ -51,6 +51,16 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
+    "active": {
+      "stations": [
+        {
+          "stageId": "a",
+          "completions": 1
+        },
+        {},
+        {}
+      ]
+    },
     "problems": [
       "journey broken: version: invalid; title/description: invalid; stages: 2 to 12 required"
     ]

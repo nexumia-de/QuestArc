@@ -7,8 +7,8 @@ import { scheduleText } from '../repeat';
 import type { Context, Screen } from '../screen';
 
 /**
- * Screen 5, station details: arrival story, plan, schedule, condition,
- * guardian (game), and the learning nugget as "Try this" (design rule 22).
+ * Screen 5, station details: arrival story, plan, schedule, condition
+ * and the learning nugget as "Try this" (design rule 22).
  */
 
 export const stationScreen = (ctx: Context, index: number): Screen => {
@@ -20,7 +20,6 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
   if (!run || !journey || !stage || !station) {
     return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   }
-  const rpg = view.mode === 'rpg';
   const reached = station.state !== 'ahead';
   const condition = stage.condition;
   const conditionRule =
@@ -54,14 +53,6 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
           : null,
         station.state === 'done' && station.doneDay
           ? h('p', {}, t('ui.details.finished', { date: shortDate(station.doneDay) }))
-          : null,
-        rpg && station.state === 'done' ? h('p', {}, t('ui.details.xp', { xp: station.xp })) : null,
-        rpg && stage.guardian
-          ? h(
-              'p',
-              {},
-              t('ui.details.guardian', { name: t(stage.guardian.name), hp: stage.guardian.hp }),
-            )
           : null,
       ),
       reached && stage.nugget

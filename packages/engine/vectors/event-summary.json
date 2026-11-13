@@ -92,6 +92,13 @@
       "params": {
         "completions": 3
       }
+    },
+    {
+      "key": "event.build-element",
+      "params": {
+        "from": 0,
+        "to": 0.6
+      }
     }
   ]
 }

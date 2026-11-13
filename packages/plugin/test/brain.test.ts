@@ -17,7 +17,6 @@ const setUp = (doneDays: readonly string[], options: Parameters<typeof createFak
   fake.host.repeatCfgs.cfg1 = habit.cfg;
   for (const task of habit.tasks) fake.host.tasks[task.id] = task;
   Object.assign(fake.host.data, {
-    settings: JSON.stringify({ mode: 'calm' }),
     [`run:${RUN}`]: JSON.stringify({
       journeyId: 'gentle-morning',
       journeyVersion: 1,
@@ -61,8 +60,10 @@ describe('brain', () => {
     const { brain, host } = setUp(['2026-10-26']);
     host.data['note:run-1:water'] = JSON.stringify({ text: 'from a newer QuestArc' });
     const before = { ...host.data };
-    const { view } = await brain.write({ settings: { mode: 'rpg' } });
-    expect(view.mode).toBe('rpg');
+    const { view } = await brain.write({
+      'pause:run-1:2026-10-27': { action: 'pause', source: 'user' },
+    });
+    expect(view.active?.paused).toBe(true);
     expect(view.problems).toEqual([]);
     expect(host.data['note:run-1:water']).toBe(before['note:run-1:water']);
     await brain.write({ 'note:run-1:water': '' });
@@ -71,7 +72,7 @@ describe('brain', () => {
 
   it('shows a run written by a newer QuestArc as read-only and writes nothing for it', async () => {
     const { brain, host } = setUp(['2026-10-26']);
-    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 2, choice: 'keep' });
+    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 3, choice: 'keep' });
     const before = { ...host.data };
     const { view } = await brain.state();
     expect(view.active).toBeUndefined();
@@ -146,11 +147,11 @@ describe('brain', () => {
     await brain.state();
     await brain.state();
     expect(host.reads.keys).toBe(1);
-    host.data.settings = JSON.stringify({ mode: 'rpg' });
+    host.data['pause:run-1:2026-10-27'] = JSON.stringify({ action: 'pause', source: 'user' });
     brain.refresh('records');
     await settle();
     expect(host.reads.keys).toBe(2);
-    expect((await brain.state()).view.mode).toBe('rpg');
+    expect((await brain.state()).view.active?.paused).toBe(true);
   });
 
   it('writes records and answers with a state that includes them', async () => {
@@ -158,11 +159,11 @@ describe('brain', () => {
     await brain.state();
     const state = (await handleMessage(brain, {
       type: 'questarc:write',
-      records: { settings: { mode: 'rpg' } },
+      records: { 'pause:run-1:2026-10-27': { action: 'pause', source: 'user' } },
     })) as State;
-    expect(host.data.settings).toBe('{"mode":"rpg"}');
-    expect(state.view.mode).toBe('rpg');
-    expect(state.records.settings).toEqual({ mode: 'rpg' });
+    expect(host.data['pause:run-1:2026-10-27']).toBe('{"action":"pause","source":"user"}');
+    expect(state.view.active?.paused).toBe(true);
+    expect(state.records['pause:run-1:2026-10-27']).toEqual({ action: 'pause', source: 'user' });
   });
 
   it('withdraws a record by writing an empty string', async () => {
