@@ -143,6 +143,22 @@ describe('journey checker', () => {
     expect(problems.map((p) => p.at)).toEqual(['stages[0].condition', 'stages[1].nugget', 'why']);
   });
 
+  it('warns when a user who skips the first stage would start at a large step (#81)', () => {
+    const at = (action: string, condition?: object) => {
+      const journey = good() as Draft;
+      en(journey)['tea.pot.action'] = action;
+      if (condition) (stage(journey, 1) as { condition: object }).condition = condition;
+      return journeyProblems(journey).map((p) => [p.level, p.at]);
+    };
+    expect(at('make tea and sit with it for 15 quiet minutes')).toEqual([
+      ['warning', 'stages[1].plan.action'],
+    ]);
+    expect(at('make tea and sit with it for fifteen minutes')).toHaveLength(1);
+    expect(at('make a pot of tea', { type: 'time_spent', minutes: 20 })).toHaveLength(1);
+    expect(at('make tea and sit with it for five minutes')).toEqual([]);
+    expect(at('make tea and sit for 1 minute')).toEqual([]);
+  });
+
   it('checks the build against content/art/', () => {
     expect(errors((j) => (j.build = { ladder: 'castle' }))[0]?.message).toContain('castle');
     expect(errors((j) => (j.build.marker = 'balloons'))[0]?.message).toContain('not a marker');

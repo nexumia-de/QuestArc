@@ -42,7 +42,9 @@ can, the reviewer checks the rest.
 1. **One habit, starting tiny.** The first stage is so small it works on
    the worst day (one glass of water, writing down one task). Each next
    stage is the same habit, a little bigger; ideally it contains the
-   previous stage, so the smaller step is the fallback on hard days.
+   previous stage, so the smaller step is the fallback on hard days. A
+   user who already does the first stage can skip it, so keep the
+   second one small too. _CI warns when it asks for more than 5 minutes._
 2. **One anchor for all stages.** Every stage starts with the same
    "After …" (an existing routine or a fixed time). _CI checks this._
 3. **Reachable conditions.** Use `days` with room for one miss (5 of 7,

@@ -1,0 +1,74 @@
+{
+  "name": "The last stage cannot be skipped: its skip record is ignored and the journey goes on",
+  "rule": "game-rules §4, skipping",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:a": {
+        "day": "2026-11-02",
+        "dataFormat": 3
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:b": {
+        "day": "2026-11-03",
+        "dataFormat": 3
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-11-03"
+      },
+      "skip:r1:c": {
+        "day": "2026-11-04",
+        "dataFormat": 3
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "state": "skipped"
+        },
+        {
+          "state": "skipped",
+          "undoable": true
+        },
+        {
+          "state": "unbound"
+        }
+      ],
+      "position": {
+        "stage": 2
+      },
+      "build": {
+        "version": 3,
+        "skipped": [2, 3]
+      }
+    },
+    "finished": []
+  }
+}

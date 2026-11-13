@@ -1,0 +1,114 @@
+{
+  "name": "Completions of a task bound to a skipped stage give nothing; with a completion on the next stage the skip cannot be undone",
+  "rule": "game-rules §4, skipping",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      },
+      {
+        "id": "rpt_cfgB_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgB_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:a": {
+        "day": "2026-11-02",
+        "dataFormat": 3
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA",
+        "day": "2026-11-02"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-11-03",
+        "repeatCfgId": "cfgB",
+        "day": "2026-11-03"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "state": "skipped",
+          "completions": 0,
+          "run": {
+            "total": 0
+          },
+          "undoable": null
+        },
+        {
+          "state": "current",
+          "completions": 2
+        },
+        {}
+      ],
+      "build": {
+        "version": 2,
+        "skipped": [2]
+      }
+    }
+  }
+}

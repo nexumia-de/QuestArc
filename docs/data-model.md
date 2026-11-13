@@ -95,6 +95,8 @@ overwrite each other. Most records are written once and never changed.
 | `stage-done:<runId>:<stageId>`        | `{ day, dataFormat: 2 }`                                                  | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
 | `pause:<runId>:<day>`                 | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }`         | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                   |
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
+| `stay:<runId>:<stageId>`              | `{ day }`                                                                 | the user stays a while at a met station (quiets the offer for 7 days)                                |
+| `skip:<runId>:<stageId>`              | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 | `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
@@ -108,6 +110,16 @@ overwrite each other. Most records are written once and never changed.
   checkpoint without these two fields and would show the stage as not
   finished, so the checkpoint carries `dataFormat: 2`: there the run is
   read-only until that host is updated (below).
+- **Staying** (`stay`, [game rules](game-rules.md) §4) is one record per
+  stage, rewritten when the user stays again. It changes nothing that
+  is computed, only how loudly the offer is shown, so an older engine
+  may ignore it and it carries no data format (#85).
+- **Skipping** (`skip`, game rules §4) is written together with the
+  acceptance of the next stage (`skipStage`) and withdrawn together
+  with it (`undoSkip`). An engine that does not know skipping (3.3 and older) would still work on the
+  skipped stage and overwrite the next stage's acceptance, so the record
+  carries `dataFormat: 3`: there the run is read-only until that host is
+  updated (below). Taking the skip back lowers the run's format again.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -152,8 +164,11 @@ engine than the other on the same records
   added later follow this, or are global and must not change what an
   older engine computes.
 - **Data format:** the engine has a data format number (`DATA_FORMAT`,
-  now `2`, since checkpoints lost `xp` and `damage` in 3.3). A run-scoped record may carry `dataFormat: <n>`; a record
-  without it is format 1. A newer engine writes `dataFormat` only on a
+  now `3`: `2` since checkpoints lost `xp` and `damage` in 3.3, `3`
+  since stages can be skipped, #81). A record carries the format that
+  first gave it its meaning, not the engine's newest: a checkpoint stays
+  `2`, so a run without a skip stays usable on a 3.3 host. A run-scoped
+  record may carry `dataFormat: <n>`; a record without it is format 1. A newer engine writes `dataFormat` only on a
   record that changes what an older engine would compute for its run
   (a checkpoint, graduation, a real step back), and only then raises
   `DATA_FORMAT`.
@@ -214,12 +229,20 @@ interface RunView {
   paused: boolean; // by a pause record or a paused repeat config
   checkinDue: boolean; // weekly question not answered this ISO week
   offerFallback: boolean; // second miss in a row, not yet followed by a completion
+  offer?: ContinueOffer; // while the current stage is met (game rules §4)
   build: BuildView; // what the journey builds (game rules §7)
+}
+
+interface ContinueOffer {
+  suggest: 'continue' | 'stay' | 'none'; // from the latest weekly answer
+  answer?: number; // that answer, 1..7
+  quietUntil?: string; // the user stays: the offer is quiet before this day
 }
 
 interface BuildView {
   ladder: string; // a ladder in content/art/ (<name>.ladder.json)
-  version: number; // 1 + finished stages; never goes down
+  version: number; // 1 + finished and skipped stages
+  skipped: number[]; // standing versions that came from a skipped stage
   versions: number; // stages + 1
   marker: string; // what hangs: lanterns, bunting, flowers (markers.json)
   hue: string; // a name from the list's hues
@@ -229,20 +252,25 @@ interface BuildView {
 
 interface StationView {
   stageId: string;
-  state: 'done' | 'met' | 'current' | 'unbound' | 'unsupported-repeat' | 'ahead';
+  state: 'done' | 'skipped' | 'met' | 'current' | 'unbound' | 'unsupported-repeat' | 'ahead';
   progress: number; // 0..1
   run: { current: number; best: number; total: number; gap: boolean };
   completions: number; // days with a counting completion
   welcomeBacks: number;
   acceptedDay?: string;
   doneDay?: string;
+  skippedDay?: string; // a skipped stage ("already yours")
+  undoable?: boolean; // a skipped stage whose skip can still be taken back
   // current stage only: the last 7 due or paused days, oldest first
   lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
 ```
 
 When the user accepts the next stage, the host writes the checkpoint
-record with the day (`continueJourney`).
+record with the day (`continueJourney`); staying writes `stayHere`,
+"I already do this" `skipStage`, taking it back `undoSkip`. Each returns
+no changes when the view does not allow the action (not met, a stage
+with a task, the last stage, a skip that is no longer undoable).
 
 `diff(before, after)` returns events `{ key, params }` for toasts:
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more

@@ -53,6 +53,7 @@ export const versionRow = (
   version: number,
   state: BuildState,
   hue: Hue | undefined,
+  skipped: readonly number[] = [],
 ): HTMLElement => {
   const total = state.versions ?? ladder.versions.length;
   const items: Node[] = [];
@@ -63,12 +64,15 @@ export const versionRow = (
     svg.setAttribute('aria-hidden', 'true');
     svg.removeAttribute('role');
     svg.removeAttribute('aria-label');
+    // A version that stands for a skipped stage says so in words.
+    const given = skipped.includes(v) ? t('ui.build.given') : undefined;
+    const name = versionName(ladder, v, state);
     items.push(
       h(
         'li',
-        { class: 'qa-version', 'aria-label': `${v}: ${versionName(ladder, v, state)}` },
+        { class: 'qa-version', 'aria-label': `${v}: ${given ? `${name}, ${given}` : name}` },
         svg,
-        h('span', { 'aria-hidden': 'true' }, v),
+        h('span', { 'aria-hidden': 'true' }, given ? `${v} · ${given}` : v),
       ),
     );
   }
@@ -127,7 +131,7 @@ export const buildSection = (run: RunView, journey: Journey): HTMLElement | null
     'section',
     { class: 'qa-build', 'aria-label': t('ui.build.title') },
     h('div', { class: 'qa-build-scene' }, svg),
-    versionRow(ladder, build.version, state, hue),
+    versionRow(ladder, build.version, state, hue, build.skipped),
     h('p', { class: 'qa-build-state' }, buildWords(ladder, build.version, state)),
   ) as HTMLElement;
 };

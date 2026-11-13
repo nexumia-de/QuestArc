@@ -1,4 +1,4 @@
-import { continueJourney } from '@questarc/engine';
+import { continueJourney, stayHere } from '@questarc/engine';
 import { planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
@@ -6,8 +6,10 @@ import type { Context, Screen } from '../screen';
 
 /**
  * Flow C, continue to the next stage: the station's acceptance story and
- * the next plan; Continue writes the checkpoint and accepts the next stage,
- * then sets up its task. After the last stage the journey ends.
+ * the next plan, then two equal choices. Continue writes the checkpoint
+ * and accepts the next stage, then sets up its task; after the last stage
+ * the journey ends. Stay Here a While changes nothing and quiets the offer
+ * for a week. The latest weekly answer suggests one of them (design rule 1).
  */
 export const continueScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
@@ -27,6 +29,27 @@ export const continueScreen = (ctx: Context): Screen => {
     if (next) ctx.go({ name: 'setup' });
     else ctx.go({ name: 'finished', journeyId: journey.id });
   };
+  const stay = async () => {
+    await ctx.write(stayHere(run, view.todayStr));
+    ctx.reset({ name: 'home' });
+  };
+  const suggest = run.offer?.suggest ?? 'none';
+  const hint =
+    suggest === 'stay'
+      ? t(run.offer?.answer === undefined ? 'ui.continue.suggest-new' : 'ui.continue.suggest-stay')
+      : suggest === 'continue'
+        ? t('ui.continue.suggest-continue')
+        : undefined;
+  const choice = (label: string, onclick: () => void, suggested: boolean) =>
+    h(
+      'button',
+      {
+        class: `qa-btn ${suggested ? 'qa-btn-primary' : 'qa-btn-secondary'}`,
+        type: 'button',
+        onclick,
+      },
+      label,
+    );
   return {
     title: t('ui.continue.title'),
     body: h(
@@ -46,13 +69,16 @@ export const continueScreen = (ctx: Context): Screen => {
           )
         : h('p', {}, t('ui.continue.last')),
       next ? h('p', { class: 'qa-muted' }, t('ui.continue.earlier')) : null,
+      hint ? h('p', {}, hint) : null,
+      h('p', { class: 'qa-muted' }, t('ui.continue.choice')),
     ),
     actions: [
-      h(
-        'button',
-        { class: 'qa-btn qa-btn-primary', type: 'button', onclick: go },
+      choice(
         t(next ? 'ui.action.continue' : 'ui.continue.finish'),
+        () => void go(),
+        suggest === 'continue',
       ),
+      choice(t('ui.action.stay'), () => void stay(), suggest === 'stay'),
     ],
   };
 };

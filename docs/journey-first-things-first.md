@@ -34,7 +34,10 @@ journey is about getting across to the one task before the stream of
 email and chat, and each stage makes that way over sturdier, from
 stepping stones to a covered bridge. Five stages need six versions and
 the ladder has five, so the covered bridge gains one fixed addition for
-the last stage (the checker's warning is expected). Home was the other
+the last stage (the checker's warning is expected). The checker also
+warns that the second stage asks for 15 minutes: a user who skips the
+first stage (#81) starts there; whether to put a smaller stage in
+between is open. Home was the other
 candidate; a home fits a morning routine better, and the two built-in
 journeys then build different things.
 

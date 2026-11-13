@@ -56,7 +56,8 @@ export const diff = (before: GameView, after: GameView): GameEvent[] => {
     } else if (newCompletions === 1) {
       events.push({ key: 'event.completion', params: {} });
     }
-    if (now.state === 'met' && then.state !== 'met') {
+    // A stage the user chose to stay at is not announced again (game rules §4).
+    if (now.state === 'met' && then.state !== 'met' && !run.offer?.quietUntil) {
       events.push({ key: 'event.station-reached', params: { stage: now.stageId } });
     }
     if (run.offerFallback && !before.active?.offerFallback) {

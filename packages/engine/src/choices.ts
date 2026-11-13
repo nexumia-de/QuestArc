@@ -11,7 +11,13 @@ import type { Journey } from './types/journey';
  */
 
 /** The data format this engine reads and writes (docs/decisions/data-format.md). */
-export const DATA_FORMAT = 2;
+export const DATA_FORMAT = 3;
+
+/** The format a checkpoint carries: without `xp` and `damage` since 3.3 (#110). */
+export const CHECKPOINT_FORMAT = 2;
+
+/** The format a skipped stage carries: an older engine would still work on it (#81). */
+export const SKIP_FORMAT = 3;
 
 /** Record kinds that name their run in the key's second part. */
 export const RUN_KINDS: ReadonlySet<string> = new Set([
@@ -24,7 +30,8 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'build',
   'checkin',
   'graduation',
-  'build',
+  'stay',
+  'skip',
 ]);
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
@@ -57,8 +64,12 @@ export interface Choices {
   readonly checkpoints: ReadonlyMap<string, { day: string }>;
   /** runId → pause/resume actions sorted by day */
   readonly pauses: ReadonlyMap<string, readonly { day: string; action: 'pause' | 'resume' }[]>;
-  /** `${runId}:${stageId}:${isoWeek}` present when answered */
-  readonly checkins: ReadonlySet<string>;
+  /** `${runId}:${stageId}:${isoWeek}` → the weekly answer, 1..7 */
+  readonly checkins: ReadonlyMap<string, number>;
+  /** `${runId}:${stageId}` → the day the user chose to stay a while */
+  readonly stays: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` → the day the stage was skipped ("already yours") */
+  readonly skips: ReadonlyMap<string, string>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -102,7 +113,9 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const bindings = new Map<string, Binding>();
   const checkpoints = new Map<string, { day: string }>();
   const pauses = new Map<string, { day: string; action: 'pause' | 'resume' }[]>();
-  const checkins = new Set<string>();
+  const checkins = new Map<string, number>();
+  const stays = new Map<string, string>();
+  const skips = new Map<string, string>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -169,7 +182,12 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       } else bad();
     } else if (kind === 'checkin' && parts.length === 4) {
       const score = num(value.score);
-      if (score !== undefined && score >= 1 && score <= 7) checkins.add(parts.slice(1).join(':'));
+      if (score !== undefined && score >= 1 && score <= 7)
+        checkins.set(parts.slice(1).join(':'), score);
+      else bad();
+    } else if ((kind === 'stay' || kind === 'skip') && parts.length === 3) {
+      if (isDay(value.day))
+        (kind === 'stay' ? stays : skips).set(`${parts[1]}:${parts[2]}`, value.day);
       else bad();
     } else if (kind === 'build' && parts.length === 2 && parts[1]) {
       const choice: Record<string, string> = {};
@@ -196,6 +214,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     checkpoints,
     pauses,
     checkins,
+    stays,
+    skips,
     builds,
     userJourneys,
     newer,

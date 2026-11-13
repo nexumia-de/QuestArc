@@ -51,17 +51,17 @@
         "acceptedDay": "2026-11-03"
       },
       "stage-done:r2:a": {
-        "dataFormat": 3,
+        "dataFormat": 4,
         "day": "2026-11-04",
         "steps": ["changed", "shape"]
       },
       "graduation:r2:a": {
-        "dataFormat": 3,
+        "dataFormat": 4,
         "day": "2026-11-04",
         "choice": "keep"
       },
       "stage:r9:a": {
-        "dataFormat": 4,
+        "dataFormat": 5,
         "acceptedDay": "2026-11-04"
       }
     },
@@ -93,8 +93,8 @@
       }
     ],
     "problems": [
-      "run r2: written by a newer QuestArc (data format 3)",
-      "run r9: written by a newer QuestArc (data format 4)"
+      "run r2: written by a newer QuestArc (data format 4)",
+      "run r9: written by a newer QuestArc (data format 5)"
     ]
   }
 }

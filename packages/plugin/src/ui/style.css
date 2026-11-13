@@ -734,6 +734,11 @@ body {
   color: var(--text-color-muted, rgba(44, 44, 44, 0.66));
 }
 
+.qa-version > span {
+  max-width: 64px;
+  text-align: center;
+}
+
 .qa-version > .qa-art {
   width: 60px;
   height: 40px;

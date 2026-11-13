@@ -2,6 +2,7 @@ export type { DayContext, Snapshot, SnapshotRepeatCfg, SnapshotTask } from './ty
 export type { Condition, Journey, Schedule, Stage, Texts, Weekday } from './types/journey';
 export type {
   BuildView,
+  ContinueOffer,
   DayMark,
   GameView,
   ReadOnlyRun,
@@ -22,7 +23,10 @@ export {
   pauseJourney,
   repeatPause,
   resumeJourney,
+  skipStage,
   startJourney,
+  stayHere,
+  undoSkip,
   withdraw,
 } from './actions';
 export type { RecordChanges } from './actions';

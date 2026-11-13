@@ -76,6 +76,12 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   3.3 is read-only on an older QuestArc until that is updated; old
   checkpoints are still read. Graduation (#22) will take the next
   number if it needs one.
+- The second is the skip record (#81): an engine that does not know skipping (3.3 and older) would keep
+  working on a skipped stage, so `skip` carries `dataFormat: 3` and
+  `DATA_FORMAT` is 3. A record carries the format that first gave it its
+  meaning: checkpoints still say 2, so only a run with a skip is
+  read-only on a 3.3 host, and taking the skip back makes it usable
+  there again. `stay` only quiets an offer and carries no format.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through

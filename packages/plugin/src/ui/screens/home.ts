@@ -73,15 +73,20 @@ export const homeScreen = (ctx: Context): Screen => {
   const station = run.stations[run.position.stage];
   const build = buildSection(run, journey);
 
-  const action = (label: string, route: Parameters<Context['go']>[0]) =>
+  const action = (label: string, route: Parameters<Context['go']>[0], quiet = false) =>
     h(
       'button',
-      { class: 'qa-btn qa-btn-primary', type: 'button', onclick: () => ctx.go(route) },
+      {
+        class: `qa-btn ${quiet ? 'qa-btn-secondary' : 'qa-btn-primary'}`,
+        type: 'button',
+        onclick: () => ctx.go(route),
+      },
       label,
     );
+  // While the user stays at a met station the offer is quiet, not gone.
   const actions =
     station?.state === 'met'
-      ? [action(t('ui.action.continue'), { name: 'continue' })]
+      ? [action(t('ui.action.continue'), { name: 'continue' }, !!run.offer?.quietUntil)]
       : station?.state === 'unbound' || station?.state === 'unsupported-repeat'
         ? [
             action(t(station.state === 'unbound' ? 'ui.action.setup' : 'ui.action.change-repeat'), {

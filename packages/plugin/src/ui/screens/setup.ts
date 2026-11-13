@@ -1,4 +1,4 @@
-import { bindStage } from '@questarc/engine';
+import { bindStage, skipStage } from '@questarc/engine';
 import { capitalise, planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
@@ -12,7 +12,8 @@ import type { Context, Screen } from '../screen';
  * plugin cannot create a repeat, so it creates the task and opens it for
  * the user to set the repeat, or binds a recurring task the user already
  * has. It also handles a task that does not repeat yet, a repeat journeys
- * cannot follow, and a task that is gone.
+ * cannot follow, and a task that is gone. A stage the user already does
+ * can be passed with "I Already Do This" (never the last one).
  */
 export const setupScreen = (ctx: Context): Screen => {
   const { view, journeys, records } = ctx.state;
@@ -65,6 +66,8 @@ export const setupScreen = (ctx: Context): Screen => {
       label,
     );
   const pick = () => ctx.go({ name: 'pick-task' });
+  // The same screen then offers the next stage.
+  const skip = skipStage(run, journey, view.todayStr);
 
   let message: string;
   let actions: Node[];
@@ -104,6 +107,14 @@ export const setupScreen = (ctx: Context): Screen => {
             { class: 'qa-stack' },
             h('p', { class: 'qa-muted' }, t('ui.setup.earlier')),
             btn(t('ui.setup.open-earlier'), open(prevTask.id)),
+          )
+        : null,
+      Object.keys(skip).length > 0
+        ? h(
+            'div',
+            { class: 'qa-stack' },
+            h('p', { class: 'qa-muted' }, t('ui.setup.skip')),
+            btn(t('ui.action.skip-stage'), () => void ctx.write(skip)),
           )
         : null,
     ),

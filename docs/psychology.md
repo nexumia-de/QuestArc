@@ -25,8 +25,14 @@ punishment and comparison often backfire.
 
 1. **Start tiny, grow in stages.** A journey starts with a step too small
    to fail and offers the next, larger stage only when the current one has
-   become easy. Stages are short, and the distance to the next station is
-   always visible.
+   become easy. Completing a stage's condition is not ease: at a met
+   station staying a while is as good a choice as continuing, costs
+   nothing, and the user's own weekly answer (rule 9) suggests which one
+   fits; the user decides. A stage the user already does can be passed
+   ("already yours"); it earns nothing (rule 8), and a journey always
+   ends with a habit the user does. Stages are short, and the distance
+   to the next station is always visible. Growing the action is the
+   least tested part of the design ([research](research.md#open-evidence-gaps)).
 2. **Every stage is one plan: "After X, I will Y."** The plan names the
    anchor (an existing routine or a fixed time; both work), the action and
    optionally the place. The same anchor stays across the stages of a

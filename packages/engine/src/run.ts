@@ -4,6 +4,7 @@ import { creditedDays, minutesTracked } from './completions';
 import { bestProgress, conditionProgress } from './conditions';
 import { daysBetween, isoWeek } from './days';
 import { resolveBuild } from './ladders';
+import { continueOffer } from './offer';
 import { isSupported } from './schedule';
 import { buildTimeline } from './timeline';
 import type { Journey } from './types/journey';
@@ -12,8 +13,9 @@ import type { BuildView, RunView, StationView } from './types/view';
 
 /**
  * One walk through a journey (docs/game-rules.md, docs/data-model.md):
- * finished stages come from their checkpoints, the current stage is
- * derived from its bound recurring task, later stages are ahead.
+ * finished stages come from their checkpoints, skipped ones from their
+ * skip records, the current stage is derived from its bound recurring
+ * task, later stages are ahead.
  */
 
 export interface RunContext {
@@ -30,7 +32,15 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   const { today, choices } = ctx;
   const key = (stageId: string): string => `${run.runId}:${stageId}`;
   const pauses = choices.pauses.get(run.runId) ?? [];
-  const currentIndex = journey.stages.findIndex((s) => !choices.checkpoints.has(key(s.id)));
+  // A skipped stage is passed without a task (game rules §4); the last
+  // stage cannot be skipped: a journey ends with a habit the user does.
+  const skippedDay = (stageId: string, index: number): string | undefined =>
+    index < journey.stages.length - 1 && !choices.checkpoints.has(key(stageId))
+      ? choices.skips.get(key(stageId))
+      : undefined;
+  const currentIndex = journey.stages.findIndex(
+    (s, i) => !choices.checkpoints.has(key(s.id)) && skippedDay(s.id, i) === undefined,
+  );
 
   let lastDoneDay = run.startDay;
   let offerFallback = false;
@@ -51,6 +61,19 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
         completions: 0,
         welcomeBacks: 0,
         doneDay: checkpoint.day,
+      };
+    }
+    const skipped = skippedDay(stage.id, index);
+    if (skipped !== undefined) {
+      lastDoneDay = skipped;
+      return {
+        stageId: stage.id,
+        state: 'skipped',
+        progress: 1,
+        run: EMPTY_RUN,
+        completions: 0,
+        welcomeBacks: 0,
+        skippedDay: skipped,
       };
     }
     if (index !== currentIndex) {
@@ -116,15 +139,24 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   });
 
   const lastPause = pauses.filter((p) => p.day <= today).at(-1);
-  // The build (game rules §7): an ended run shows its version standing,
-  // without a marker.
   const ended = choices.runEnds.has(run.runId);
+  const current = stations[currentIndex];
+  // The latest skip can be taken back while the stage after it has no
+  // completion yet (game rules §4).
+  const before = stations[currentIndex - 1];
+  if (!ended && before?.state === 'skipped' && current?.completions === 0) {
+    stations[currentIndex - 1] = { ...before, undoable: true };
+  }
+  // The build (game rules §7): an ended run shows its version standing,
+  // without a marker. Finished and skipped stages each raise the version.
+  const passed = stations.filter((s) => s.state === 'done' || s.state === 'skipped');
   const build: BuildView = {
     ...resolveBuild(journey, choices.builds.get(run.runId)),
-    version: 1 + stations.filter((s) => s.state === 'done').length,
+    version: 1 + passed.length,
+    skipped: passed.flatMap((s, i) => (s.state === 'skipped' ? [i + 2] : [])),
     versions: journey.stages.length + 1,
     markerProgress: ended ? 0 : markerProgress,
-    ready: !ended && stations[currentIndex]?.state === 'met',
+    ready: !ended && current?.state === 'met',
   };
   return {
     runId: run.runId,
@@ -139,6 +171,9 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     paused: lastPause?.action === 'pause' || cfgPaused,
     checkinDue,
     offerFallback,
+    ...(!ended && current?.state === 'met'
+      ? { offer: continueOffer(choices, run.runId, current.stageId, today) }
+      : {}),
     build,
   };
 };

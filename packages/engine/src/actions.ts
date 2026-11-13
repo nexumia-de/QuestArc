@@ -1,6 +1,6 @@
 import type { Journey } from './types/journey';
 import type { RunView } from './types/view';
-import { DATA_FORMAT } from './choices';
+import { CHECKPOINT_FORMAT, SKIP_FORMAT } from './choices';
 
 /**
  * The choice records each user action writes (docs/data-model.md §2), as
@@ -72,11 +72,48 @@ export const continueJourney = (run: RunView, journey: Journey, today: string): 
   if (!station || !stage || station.state !== 'met') return {};
   const next = journey.stages[index + 1];
   return {
-    [`stage-done:${run.runId}:${stage.id}`]: { day: today, dataFormat: DATA_FORMAT },
+    [`stage-done:${run.runId}:${stage.id}`]: { day: today, dataFormat: CHECKPOINT_FORMAT },
     ...(next
       ? { [`stage:${run.runId}:${next.id}`]: { acceptedDay: today } }
       : { [`run-end:${run.runId}`]: { day: today, reason: 'finished' } }),
   };
+};
+
+/**
+ * Stay a while at a met station (design rule 1): nothing changes, the
+ * stage keeps counting; the record only quiets the offer for a week.
+ */
+export const stayHere = (run: RunView, today: string): RecordChanges => {
+  const station = run.stations[run.position.stage];
+  if (!station || station.state !== 'met') return {};
+  return { [`stay:${run.runId}:${station.stageId}`]: { day: today } };
+};
+
+/**
+ * "I already do this" (behaviour, flow B): the offered stage is passed
+ * without a task and the next one is accepted. Only a stage that has no
+ * task yet can be skipped, and never the last one.
+ */
+export const skipStage = (run: RunView, journey: Journey, today: string): RecordChanges => {
+  const index = run.position.stage;
+  const stage = journey.stages[index];
+  const next = journey.stages[index + 1];
+  if (!stage || !next || run.stations[index]?.state !== 'unbound') return {};
+  return {
+    [`skip:${run.runId}:${stage.id}`]: { day: today, dataFormat: SKIP_FORMAT },
+    [`stage:${run.runId}:${next.id}`]: { acceptedDay: today },
+  };
+};
+
+/**
+ * Take a skip back, while the view says it can be (`undoable`): the stage
+ * is offered again and the acceptance of the stage after it is withdrawn.
+ */
+export const undoSkip = (run: RunView, journey: Journey, stageId: string): RecordChanges => {
+  const index = run.stations.findIndex((s) => s.stageId === stageId);
+  const next = journey.stages[index + 1];
+  if (!next || run.stations[index]?.undoable !== true) return {};
+  return { [`skip:${run.runId}:${stageId}`]: '', [`stage:${run.runId}:${next.id}`]: '' };
 };
 
 const pauseRecord = (runId: string, day: string, action: 'pause' | 'resume'): RecordChanges => ({
@@ -145,6 +182,9 @@ export const actions = {
   startJourney,
   bindStage,
   continueJourney,
+  stayHere,
+  skipStage,
+  undoSkip,
   pauseJourney,
   resumeJourney,
   endJourney,

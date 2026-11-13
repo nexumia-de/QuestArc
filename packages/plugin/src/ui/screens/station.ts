@@ -1,3 +1,5 @@
+import { undoSkip } from '@questarc/engine';
+
 import { capitalise, planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
@@ -8,7 +10,9 @@ import type { Context, Screen } from '../screen';
 
 /**
  * Screen 5, station details: arrival story, plan, schedule, condition
- * and the learning nugget as "Try this" (design rule 22).
+ * and the learning nugget as "Try this" (design rule 22). A skipped
+ * station says "already yours" and can be offered again while the engine
+ * says so.
  */
 
 export const stationScreen = (ctx: Context, index: number): Screen => {
@@ -53,6 +57,21 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
           : null,
         station.state === 'done' && station.doneDay
           ? h('p', {}, t('ui.details.finished', { date: shortDate(station.doneDay) }))
+          : null,
+        station.state === 'skipped' && station.skippedDay
+          ? h('p', {}, t('ui.details.skipped', { date: shortDate(station.skippedDay) }))
+          : null,
+        station.undoable
+          ? h(
+              'button',
+              {
+                class: 'qa-btn qa-btn-secondary',
+                type: 'button',
+                onclick: () =>
+                  void ctx.write(undoSkip(run, journey, stage.id)).then(() => ctx.back()),
+              },
+              t('ui.details.skip-undo'),
+            )
           : null,
       ),
       reached && stage.nugget

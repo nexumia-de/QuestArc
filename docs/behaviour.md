@@ -130,6 +130,7 @@ as their own page from **What you build** in the journey's menu
 | unsupported repeat              | **Change how often** (explains the supported kinds) |
 | current, condition not met      | none: the habit is done in the task list            |
 | met                             | **Continue** (flow C)                               |
+| met, the user stays a while     | **Continue** as a quiet action (flow C)             |
 
 - A banner on top of the card when needed: paused (with **Resume**, or a
   note that the repeat is paused in Super Productivity), a hard week
@@ -137,7 +138,12 @@ as their own page from **What you build** in the journey's menu
   station's learning nugget once on arrival (**Got it**), habit can
   graduate (later, #22). Dismissing a banner and skipping the weekly
   question are remembered on the device only; they are not choices.
-- The card also shows the user's own reason, if they gave one.
+- The card also shows the user's own reason, if they gave one. While
+  the user stays at a met station it says "You are staying here a
+  while. You can continue whenever you like."
+- In the row of versions a version that stands for a skipped stage
+  carries the words "already yours" under its number (flow B); in the
+  **Stations** list such a station says "Already yours".
 - **Read-only journey:** when the active journey is read-only
   ([data model](data-model.md) §2: written by a newer QuestArc, or its
   journey or journey version is not here), the screen shows its title
@@ -154,6 +160,11 @@ as their own page from **What you build** in the journey's menu
 - Arrival story (if any), the plan sentence, schedule, condition, the
   learning nugget as a card titled **Try this**.
 - Finished stations show the day they were finished, and their best run.
+- A skipped station (flow B) shows its story, plan and nugget like any
+  reached station and "Already yours: passed on 3 Nov without a task.",
+  neutral, neither done nor a gap. While the engine says the skip can be
+  taken back (`undoable`), **Do This Station After All** withdraws it
+  and the station is offered again.
 
 ### 6. Weekly look back
 
@@ -190,7 +201,10 @@ as their own page from **What you build** in the journey's menu
 
 ### 9. How QuestArc motivates you
 
-Plain words, one paragraph each: small steps that grow; one plan "after
+Plain words, one paragraph each: small steps that grow (reaching a
+station is not the same as the step feeling easy, so staying is always
+possible and the weekly answer suggests when to go on; a step the user
+already does can be passed and counts nothing); one plan "after
 X, I will Y"; one missed day is fine, two in a row start a new run but
 never end the journey; welcome back after a gap; the weekly question;
 graduation when a habit runs by itself; every journey builds something
@@ -245,15 +259,37 @@ Per [recurring-task setup](decisions/recurring-task-setup.md):
 
 In Pensum, step 2 creates the repeat itself.
 
+5. **I Already Do This** (#81), below the choices, with "Is this already
+   part of your day? You could pass this station. It shows as already
+   yours and counts nothing." The stage is passed without a task
+   (`skipStage`) and the same screen offers the next stage. Not offered
+   for the last stage of a journey, and not once the station has a
+   repeating task.
+
 ### C. Continue to the next stage
 
 1. The station's acceptance story and the next stage's plan sentence.
-2. **Continue** writes the checkpoint and accepts the next stage, then
-   flow B for its task.
-3. "You could end or change your earlier task 'walk for 5 minutes' so
+2. Two equal choices (#81): **Continue** and **Stay Here a While**, with
+   "Both are fine. Staying costs nothing: everything keeps counting, and
+   you can continue whenever you like." The engine's suggestion
+   (`offer.suggest`, [game rules](game-rules.md) §4) adds one kind
+   sentence and makes that choice the filled button; the other stays an
+   outlined button of the same size:
+   - `stay` with a weekly answer of 3 or lower: "This step still takes
+     some thought. You could give it another week."
+   - `stay` without an answer yet: "This step is still new. You could
+     give it another week."
+   - `continue`: "This step seems to come by itself now. You could go
+     on."
+   - `none`: no sentence, both buttons outlined.
+3. **Stay Here a While** writes the `stay` record and leads back to the
+   journey; for 7 days **Continue** there is a quiet (outlined) action
+   and the station is not announced again. **Continue** writes the
+   checkpoint and accepts the next stage, then flow B for its task.
+4. "You could end or change your earlier task 'walk for 5 minutes' so
    you don't keep both." with **Open the earlier task**; QuestArc never
    ends it itself.
-4. Last stage: the ending story, the journey moves to the shelf, the
+5. Last stage: the ending story, the journey moves to the shelf, the
    habit stays as a maintained habit.
 
 ### D. Hard days

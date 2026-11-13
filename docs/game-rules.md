@@ -146,6 +146,47 @@ the journey view: `days` → completions in the window ÷ n (capped at 1);
 1, 2, 4, 5, 6 done, 3 and 7 missed: the last 7 due days hold 5
 completions → met on day 6.
 
+### Staying (issue #81)
+
+Decided by the owner on 2026-11-12. A met stage is offered two equal
+choices: continue, or stay a while ([design rule 1](psychology.md)).
+
+- **The suggestion** (`offer.suggest`) comes from the latest weekly
+  answer for this stage (the answer of the latest ISO week, rule 9):
+  3 or lower, or no answer yet → `stay`; 5 or more → `continue`; 4 →
+  `none`. It is only a suggestion; both choices are always there.
+- **Staying costs nothing and changes nothing.** The stage keeps
+  counting, its runs go on, the station stays met and the build stays
+  ready. The `stay` record only quiets the offer for 7 days from its
+  day (`offer.quietUntil`, the first day the offer is back): the hosts
+  show Continue as a quiet action and do not announce the station as
+  reached again. Staying again rewrites the record. The user can
+  continue on any day.
+- The 3/4/5 limits and the 7 days are design choices; no study defines
+  them.
+
+### Skipping (issue #81)
+
+- A stage that is offered and has no task yet (state `unbound`) can be
+  passed with "I already do this": a `skip` record with the day, and the
+  next stage is accepted on that day.
+- **A skipped stage earns nothing** (rule 8): no run, no completions,
+  no welcome back, also when a task bound to it is ticked off. Its
+  station has the state `skipped` ("already yours"): neither done nor a
+  gap. It raises the build's version like a finished stage (§7); the
+  view names those versions (`build.skipped`).
+- **The last stage cannot be skipped:** a journey ends with a habit the
+  user does. A skip record for the last stage is ignored, and so is one
+  for a stage that has a checkpoint.
+- **Undo:** the latest skip can be taken back while the stage after it
+  is the current one and has no counting completion yet (`undoable` on
+  the station). Taking it back withdraws the skip record and the
+  acceptance of the stage after it; the version goes back, because
+  nothing was earned.
+- The [journey checker](story-format.md) warns when the second stage
+  asks for more than 5 minutes: the first stage is then the only tiny
+  one and skipping it would start the user at a large step.
+
 ## 5. Welcome back
 
 - The first counting completion after a missed due day is a **welcome
@@ -193,9 +234,12 @@ the engine gives only names and numbers.
 - **Version.** Version 1 stands when the journey starts. Every finished
   stage (a stage with a checkpoint,
   [deleted history](decisions/deleted-history.md)) raises the version by
-  one, and so will a skipped stage once skipping exists (#81). So the
-  version is 1 + the journey's stages with a checkpoint; it never goes
-  down, because checkpoints are kept whatever happens to the tasks.
+  one, and so does a skipped stage (§4, #81). So the version is 1 + the
+  journey's stages with a checkpoint or a skip; it never goes down by
+  itself, because these records are kept whatever happens to the tasks
+  (only the user taking a skip back lowers it). `skipped` lists the
+  standing versions that came from a skipped stage, so a host can say
+  "already yours" in the row of versions.
   `versions` is the number of versions the journey uses: its stages + 1.
   If that is more than the ladder has, the ladder's last version stands
   for the rest and gains one fixed addition per version beyond it (a
@@ -231,7 +275,8 @@ the engine gives only names and numbers.
   `{ from, to }` when the marker progress of the same stage rose (the
   host decides whether that makes a new element and stays quiet in
   between); `event.build-version` `{ version }` when the version rose,
-  also when the last stage was finished and the journey ended.
+  also when the last stage was finished and the journey ended, and when
+  a stage was skipped.
 
 **Example E.** Example D's stage (`days` 5 of 7, due daily, accepted on
 day 1). Days 1 to 5 done: progress and marker progress 1, ready. Days 6

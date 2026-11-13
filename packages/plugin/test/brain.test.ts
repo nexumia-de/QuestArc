@@ -72,7 +72,7 @@ describe('brain', () => {
 
   it('shows a run written by a newer QuestArc as read-only and writes nothing for it', async () => {
     const { brain, host } = setUp(['2026-10-26']);
-    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 3, choice: 'keep' });
+    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 4, choice: 'keep' });
     const before = { ...host.data };
     const { view } = await brain.state();
     expect(view.active).toBeUndefined();

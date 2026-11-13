@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { actions, answerCheckin, chooseBuild, endJourney, resumeJourney, withdraw } from '../src';
+import {
+  actions,
+  answerCheckin,
+  chooseBuild,
+  endJourney,
+  evaluate,
+  resumeJourney,
+  skipStage,
+  stayHere,
+  undoSkip,
+  withdraw,
+} from '../src';
+import type { Journey, Snapshot } from '../src';
+import { loadVectors } from './vector-support';
+
+/** The active run and journey of a vector's input. */
+const fromVector = (file: string) => {
+  const vector = loadVectors().find((v) => v.file === file);
+  if (!vector || vector.kind === 'diff') throw new Error(file);
+  const snapshot = vector.input as Snapshot;
+  const run = evaluate(snapshot).active;
+  if (!run) throw new Error(file);
+  return { run, journey: snapshot.journeys[0] as Journey };
+};
 
 // The record-writing actions both hosts use (docs/data-model.md §2); the
 // plugin's tests check startJourney, bindStage and continueJourney with
@@ -15,7 +38,10 @@ describe('actions', () => {
       'pauseJourney',
       'repeatPause',
       'resumeJourney',
+      'skipStage',
       'startJourney',
+      'stayHere',
+      'undoSkip',
       'withdraw',
     ]);
   });
@@ -42,5 +68,39 @@ describe('actions', () => {
       'build:r': { ladder: 'home', marker: 'flowers' },
     });
     expect(chooseBuild('r', {})).toEqual({ 'build:r': '' });
+  });
+
+  it('stay only at a met station; the record names the day', () => {
+    expect(stayHere(fromVector('stay-no-answer.json').run, '2026-11-10')).toEqual({
+      'stay:r1:a': { day: '2026-11-10' },
+    });
+    expect(stayHere(fromVector('stay-not-met-no-offer.json').run, '2026-11-05')).toEqual({});
+  });
+
+  it('skip a stage that has no task yet, in data format 3, and accept the next', () => {
+    const fresh = fromVector('skip-undone.json');
+    expect(skipStage(fresh.run, fresh.journey, '2026-11-03')).toEqual({
+      'skip:r1:a': { day: '2026-11-03', dataFormat: 3 },
+      'stage:r1:b': { acceptedDay: '2026-11-03' },
+    });
+    const bound = fromVector('stay-not-met-no-offer.json');
+    expect(skipStage(bound.run, bound.journey, '2026-11-05')).toEqual({});
+  });
+
+  it('refuse to skip the last stage', () => {
+    const last = fromVector('skip-last-stage-refused.json');
+    expect(last.run.position.stage).toBe(2);
+    expect(skipStage(last.run, last.journey, '2026-11-05')).toEqual({});
+  });
+
+  it('take the latest skip back while the next stage has no completion', () => {
+    const skipped = fromVector('skip-last-stage-refused.json');
+    expect(undoSkip(skipped.run, skipped.journey, 'b')).toEqual({
+      'skip:r1:b': '',
+      'stage:r1:c': '',
+    });
+    expect(undoSkip(skipped.run, skipped.journey, 'a')).toEqual({});
+    const counted = fromVector('skip-completions-give-nothing.json');
+    expect(undoSkip(counted.run, counted.journey, 'a')).toEqual({});
   });
 });

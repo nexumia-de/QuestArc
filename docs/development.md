@@ -104,7 +104,7 @@ npm run screenshots -w @questarc/plugin
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
-`journey`, `met`, `unbound`, `newer`, `build`, `build-ready`,
+`journey`, `met`, `stayed`, `skipped`, `unbound`, `newer`, `build`, `build-ready`,
 `build-crossing`; `empty:Settings` clicks the
 button named "Settings" first. In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes
@@ -153,7 +153,8 @@ dialog, tick it off, check the message and the journey.
 start with another ladder (Crossing), tick, open the build
 from the message's **Show**, see the first marker element, tick on four
 more days (Playwright's clock moves the date; the app is reloaded each
-day) until the stage is ready, continue and see the next version. `e2e/real-app-panel.mjs` checks
+day) until the stage is ready, stay a while, continue and see the next
+version, then pass the next stage with **I Already Do This** (#81). `e2e/real-app-panel.mjs` checks
 the side panel setting: no button by default, the button after turning
 it on, QuestArc in the right panel (320 px wide at 1200 px). They share
 the app steps in `e2e/sp.mjs`. Screenshots go to

@@ -7,6 +7,8 @@ import type { Task } from '@super-productivity/plugin-api';
  * - welcome: first start; empty: no journey (the last one was ended)
  * - journey: stage 2 of "A gentle morning" with one gap
  * - met: the current stage's condition is met
+ * - stayed: the same, and the user chose to stay a while (#81)
+ * - skipped: the first stage was passed with "I already do this" (#81)
  * - unbound: the current stage has no recurring task yet
  * - newer: the journey was continued by a newer QuestArc (read-only)
  * - build: stage 3 under way: the hut stands, the marker has its
@@ -21,6 +23,8 @@ export type Scenario =
   | 'empty'
   | 'journey'
   | 'met'
+  | 'stayed'
+  | 'skipped'
   | 'unbound'
   | 'newer'
   | 'build'
@@ -60,10 +64,12 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   for (let i = 0; i < current; i += 1) {
     const stage = STAGES[i] as string;
     record(`stage:demo:${stage}`, { acceptedDay: day(10 + (current - i) * 9) });
-    record(`stage-done:demo:${stage}`, {
-      day: day(10 + (current - i - 1) * 9),
-      dataFormat: 2,
-    });
+    if (scenario === 'skipped') record(`skip:demo:${stage}`, { day: day(10), dataFormat: 3 });
+    else
+      record(`stage-done:demo:${stage}`, {
+        day: day(10 + (current - i - 1) * 9),
+        dataFormat: 2,
+      });
   }
   const stage = STAGES[current] as string;
   record(`stage:demo:${stage}`, { acceptedDay: accepted });
@@ -95,7 +101,7 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     startDate: accepted,
   };
   const doneOffsets =
-    scenario === 'met' || scenario === 'build-ready'
+    scenario === 'met' || scenario === 'stayed' || scenario === 'build-ready'
       ? [6, 5, 4, 3, 2, 1]
       : build
         ? [4, 2, 1]
@@ -118,8 +124,9 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     repeatCfgId: 'demo',
     day: accepted,
   });
+  if (scenario === 'stayed') record(`stay:demo:${stage}`, { day: day(1) });
   if (scenario === 'build-crossing')
     record('build:demo', { ladder: 'crossing', marker: 'lanterns', hue: 'sand' });
-  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 3, day: day(1) });
+  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 4, day: day(1) });
   return { tasks, repeatCfgs, data };
 };

@@ -1,0 +1,74 @@
+{
+  "name": "Skipping a stage raises the version and announces nothing else",
+  "rule": "game-rules §4, skipping; §7",
+  "kind": "diff",
+  "before": {
+    "day": {
+      "todayStr": "2026-11-02",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "after": {
+    "day": {
+      "todayStr": "2026-11-02",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:a": {
+        "day": "2026-11-02",
+        "dataFormat": 3
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-02"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": [
+    {
+      "key": "event.build-version",
+      "params": {
+        "version": 2
+      }
+    }
+  ]
+}

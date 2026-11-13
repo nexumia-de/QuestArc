@@ -132,6 +132,42 @@ const textProblems = (journey: Journey, used: readonly Use[]): Problem[] => {
   return problems;
 };
 
+/** Number words an action text may use for its minutes. */
+const NUMBER_WORDS: Readonly<Record<string, number>> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  fifteen: 15,
+  twenty: 20,
+  thirty: 30,
+  'forty-five': 45,
+  sixty: 60,
+};
+
+/** A step of more minutes than this is no longer tiny (rule 1). */
+const TINY_MINUTES = 5;
+
+/**
+ * The minutes a stage asks for, as far as the file says: its `time_spent`
+ * condition or the largest "n minutes" in the English action text.
+ */
+const stageMinutes = (stage: Stage, english: Readonly<Record<string, string>>): number => {
+  const text = (english[stage.plan.action] ?? '').toLowerCase();
+  const number = `\\d+|${Object.keys(NUMBER_WORDS).join('|')}`;
+  const named = [
+    ...text.matchAll(new RegExp(`\\b(${number})[\\s-]+(?:\\w+\\s+)?minutes?\\b`, 'g')),
+  ].map((m) => Number(m[1]) || (NUMBER_WORDS[m[1] ?? ''] ?? 0));
+  const required = stage.condition.type === 'time_spent' ? stage.condition.minutes : 0;
+  return Math.max(required, ...named);
+};
+
 const stageProblems = (journey: Journey): Problem[] => {
   const problems: Problem[] = [];
   const english = journey.texts?.en ?? {};
@@ -139,6 +175,17 @@ const stageProblems = (journey: Journey): Problem[] => {
     (english[stage.plan.anchor] ?? stage.plan.anchor).trim().toLowerCase();
   const first = journey.stages[0];
   const nuggets = new Map<string, number>();
+
+  // The first stage can be skipped ("I already do this", #81): the user
+  // then starts at the second one, which should still be a small step.
+  const second = journey.stages[1];
+  if (second && stageMinutes(second, english) > TINY_MINUTES)
+    problems.push(
+      warning(
+        'stages[1].plan.action',
+        `more than ${TINY_MINUTES} minutes: the first stage is the only tiny one, and a user who skips it starts here (rule 1)`,
+      ),
+    );
 
   journey.stages.forEach((stage, i) => {
     const at = `stages[${i}]`;

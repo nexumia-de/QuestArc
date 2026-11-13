@@ -26,7 +26,7 @@ export const conditionText = (stage: Stage, station: StationView): string => {
   });
 };
 
-const hint = (station: StationView, today: string): string | undefined => {
+const hint = (station: StationView, today: string, staying: boolean): string | undefined => {
   if (station.acceptedDay && station.acceptedDay > today) {
     return t('ui.card.starts', { date: shortDate(station.acceptedDay) });
   }
@@ -34,7 +34,7 @@ const hint = (station: StationView, today: string): string | undefined => {
     case 'current':
       return t('ui.card.hint');
     case 'met':
-      return t('ui.card.met');
+      return t(staying ? 'ui.card.staying' : 'ui.card.met');
     case 'unbound':
       return t('ui.card.unbound');
     case 'unsupported-repeat':
@@ -54,6 +54,7 @@ export const stationCard = (
   const stage = journey.stages[index];
   if (!station || !stage) return undefined;
   const bound = station.state === 'current' || station.state === 'met';
+  const words = hint(station, today, !!run.offer?.quietUntil);
   return h(
     'section',
     { class: 'qa-card qa-station-card', 'aria-label': t('ui.card.label') },
@@ -98,7 +99,7 @@ export const stationCard = (
           ),
         )
       : null,
-    hint(station, today) ? h('p', { class: 'qa-muted qa-small' }, hint(station, today)) : null,
+    words ? h('p', { class: 'qa-muted qa-small' }, words) : null,
     run.why ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why })) : null,
   ) as HTMLElement;
 };

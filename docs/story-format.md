@@ -110,6 +110,7 @@ private journeys (#40) runs the same function.
 | error   | the same nugget twice                                                                                                | 22         |
 | warning | a `days` condition without room for one miss, or looking back more than 14 days                                      | 1, 11      |
 | warning | a stage without a nugget, a journey without `why`; English texts no key uses                                         | 5, 22      |
+| warning | the second stage asks for more than 5 minutes (its `time_spent` condition or "n minutes" in its English action)      | 1          |
 | error   | `build`: a ladder or marker not in `content/art/`; a land-only marker (`flowers`) on water; more names than versions | 42         |
 | warning | no `build`; more stages than the ladder has versions minus one (its last version gains fixed additions)              | 42         |
 
@@ -122,7 +123,9 @@ The [design rules](psychology.md) apply; the full guide for people and
 their agents is [Writing a journey](authoring-journeys.md). In short:
 
 - The first stage is too small to fail; each next stage is a slightly
-  harder version of the same habit, with the same anchor.
+  harder version of the same habit, with the same anchor. A user who
+  already does the first stage may skip it (#81), so the second one is
+  still a small step.
 - Conditions are reachable: the default is `days` 5 of 7.
 - Nuggets are concrete techniques in autonomy-supportive words ("you
   could"); no quotes, no day-count promises, no blame.
