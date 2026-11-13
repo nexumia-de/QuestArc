@@ -1,6 +1,6 @@
 import type { GameView, Journey } from '@questarc/engine';
 
-import type { Hue, Scene } from '../ui/art';
+import type { Hue } from '../ui/art';
 import type { Ladder } from '../ui/ladder';
 
 /**
@@ -29,7 +29,6 @@ export interface ArtPack {
   readonly markers: Readonly<
     Record<string, { readonly title: string; readonly landOnly: boolean }>
   >;
-  readonly scenes?: Readonly<Record<string, Scene>>;
 }
 
 export type Request =

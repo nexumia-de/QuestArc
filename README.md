@@ -11,7 +11,7 @@ QuestArc runs in two places with the same game and the same data:
 - inside [Pensum](https://github.com/nexumia-de/pensum), a native app for
   Linux phones (Phosh) on Super Productivity's data (planned).
 
-<img src="docs/screenshots/journey-phone.png" alt="The journey 'A gentle morning' on a phone: the path with the current station, a weekly look back and the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-game-desktop.png" alt="The same journey at desktop size with the game layer: level, a guardian with HP on the path and the station card" width="520">
+<img src="docs/screenshots/journey-phone.png" alt="The journey 'A gentle morning' on a phone: the path with the current station, a weekly look back and the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-build-desktop-light.png" alt="The same journey at desktop size with the game layer: the hut the journey has built so far, with a line of pennants in front, next to the station card" width="520">
 
 _Screenshots from demo data._
 
@@ -28,7 +28,8 @@ _Screenshots from demo data._
 - **Missed days are neutral.** A gap is grey, never red. A hard week
   offers the earlier, smaller step; you can pause a journey at any time.
 - **Calm by default, game if you like.** The game layer adds level,
-  XP and guardians on the path. Rewards are fixed and only shown once
+  XP, guardians and a build: one thing that is whole at every station
+  and grows with the next, a fireplace that becomes a house. Rewards are fixed and only shown once
   earned.
 - **No network, no telemetry.** Everything stays in Super Productivity.
 

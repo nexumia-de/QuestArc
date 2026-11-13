@@ -32,9 +32,8 @@ describe('the plugin bundles only the pictures of the build', () => {
     expect(kept).toContain('lantern');
   });
 
-  it('leaves out the region scenes and their pictures', () => {
-    for (const name of ['well', 'hedgehog', 'house', 'keepsake-first-step', 'ground-shore'])
-      expect(kept).not.toContain(name);
+  it('leaves out pictures the journey screen does not draw', () => {
+    expect(kept).not.toContain('keepsake-first-step');
   });
 });
 

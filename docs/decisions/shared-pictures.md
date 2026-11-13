@@ -29,25 +29,16 @@ pictures.
 ## Decision: go
 
 One set in `content/art/`, drawn once, shown by both hosts from the same
-files. A meadow at three moments, plugin left, Day Planner right, at
-360 × 720 (scale 2):
-
-| Light                                                         | Dark                                                        |
-| ------------------------------------------------------------- | ----------------------------------------------------------- |
-| ![Both hosts, light](../screenshots/valley-moments-light.png) | ![Both hosts, dark](../screenshots/valley-moments-dark.png) |
-
-A second kind, a shore, in both hosts, light and dark, and every picture
-at 48, 32 and 24 px (plugin light, Day Planner dark):
-
-![A shore](../screenshots/valley-shore.png)
-
-![Every picture at three sizes](../screenshots/valley-sizes.png)
+files. The spike compared a meadow at three moments and a shore in both
+hosts, light and dark, at 360 × 720; those region scenes, their pictures
+and the comparison images were removed after 3.1.0, when the ladders
+replaced them (below), and are in git history.
 
 The two hosts draw the same shapes at the same places; only the colours
 differ, as they should: the plugin uses Super Productivity's primary
-colour, Day Planner its own indigo accent. The art direction of a region
-(depth bands, where things stand, the path, the smallest sizes) is in
-[journey design](../journey-design.md#scenes-of-a-region-for-the-valley-42).
+colour, Day Planner its own indigo accent. The art direction (look,
+depth bands, the smallest sizes) is in
+[journey design](../journey-design.md#look-and-depth-bands).
 
 ## The files
 
@@ -81,28 +72,22 @@ colour, Day Planner its own indigo accent. The art direction of a region
   role, never drawn with strokes. An outline is a shape in `fg` with the
   same shape 2 units smaller in `bg` on top.
 
-- At most 4096 bytes per file; the set's 18 pictures are 164–1046 bytes,
-  the two grounds 1.4 and 1.6 KB, 20 KB with the four scenes.
-- A scene is `content/art/<name>.scene.json`: its title in words, its
-  size (always 320 × 120) and the pictures at fixed places (`art`,
-  `band`, `x`, `y`, `width`, `height`). The ground comes first and fills
-  the scene; every other picture has a `band` (`far`, `middle`, `near`),
-  is square at one of the band's sizes, has its feet inside the band and
-  is listed back to front. The rules are in
-  [journey design](../journey-design.md#scenes-of-a-region-for-the-valley-42);
-  the scenes are a meadow at three moments and a shore.
+- At most 4096 bytes per file.
+- Pictures are placed by a ladder file (below): every placed picture has
+  a `band` (`far`, `middle`, `near`), is square at one of the band's
+  sizes, has its feet inside the band and is listed back to front
+  ([journey design](../journey-design.md#look-and-depth-bands)).
 
-The picture checker (`packages/engine/src/art-check.ts`, `artProblems`;
-scenes in `art-scene-check.ts`, `sceneProblems`) enforces these rules
-with its own small XML reader,
+The picture checker (`packages/engine/src/art-check.ts`, `artProblems`)
+enforces these rules with its own small XML reader,
 so it stays pure and runs wherever the engine runs. CI runs it on every
 file in `content/art/` (`packages/engine/test/art.test.ts`, part of
 `npm run journeys`); `art-check.test.ts` shows that a file with a colour,
 a stroke, a style, a script, an event handler, a link, an image, text, a
 `use`, an id, a group, an unknown role or two roles, another view box,
-no title, a DOCTYPE or too many bytes fails; `art-scene-check.test.ts`
-does the same for a scene without its ground first, a picture without a
-band, at a size or a height of another band, too far outside or out of
+no title, a DOCTYPE or too many bytes fails; `art-ladder-check.test.ts`
+does the same for a ladder without its setting first, a picture without
+a band, at a size or a height of another band, too far outside or out of
 order.
 
 ## Ladders and a hue per region (#42)
@@ -186,11 +171,10 @@ same in light and dark style.
 ## Art direction (#97)
 
 The spike's first scene was a flat row of solid icons on one heavy grey
-slab, a third of it empty sky (`valley-round-0.png`). Reviewed in five
-rounds in both hosts, light and dark, against the sketch
-(`docs/mockups/valley-sketch.svg`)[^97]; the rounds' screenshots are
-`docs/screenshots/valley-round-<n>.png`, listed in
-[journey design](../journey-design.md#scenes-of-a-region-for-the-valley-42):
+slab, a third of it empty sky. Reviewed in five rounds in both hosts,
+light and dark, against a first sketch[^97] (the sketch and the rounds'
+screenshots are in git history up to 3.1.0); what the rounds settled is
+in [journey design](../journey-design.md#look-and-depth-bands):
 
 1. Ground in two strengths of the accent instead of `dim` made the
    meadow light; but growth in `dim` was grey and looked dead or like
@@ -222,7 +206,7 @@ stronger); a third strength was not needed.
   too dark on dark surfaces. Reading the colour of a widget with the
   class `.accent` gives the app's accent, lightened in dark style
   (GNOME 51: `#594cc4` light, `#bebcff` dark).
-- **Strokes** in the first sketch (`docs/mockups/valley-sketch.svg`)
+- **Strokes** in the first sketch
   carried colours and widths; the set uses filled shapes only, so the
   checker can forbid every paint attribute.
 - **A height that follows the width** in GTK: setting the content height
@@ -262,13 +246,12 @@ stronger); a third strength was not needed.
 ## Consequences
 
 - #42 and #87 pick pictures from this set by name; new pictures are drawn
-  for QuestArc in the same style and pass the checker. #42 builds its
-  regions on the scene rules in journey design; the meadow and shore
-  scenes are examples, not the Valley's real layout (the fixed row of
-  growth places, anchors from #96).
-- The journey path is unchanged; the pictures are shown only on the
-  preview page (`dist/preview/art.html?part=growth|shore|sizes|sequence-<ladder>|journey-<ladder>|palette`)
-  and in Day Planner's demo (`tests/art_demo.py` with the same parts)
-  until the world and keepsakes pages exist.
-- The region scenes (meadow with landmarks, shore) are superseded as a
-  design by the ladders; they stay as checker examples.
+  for QuestArc in the same style and pass the checker.
+- The preview page (`dist/preview/art.html?part=sizes|sequence-<ladder>|journey-<ladder>|palette`)
+  and Day Planner's demo (`tests/art_demo.py` with the same parts) show
+  the pictures outside the journey screen.
+- The region scenes (meadow with landmarks, shore) were superseded as a
+  design by the ladders and removed with their pictures (bench, boat,
+  open gate, hedgehog, house, lighthouse, pennant, stone, well and the
+  two grounds); the scene checker is reduced to the depth bands'
+  sizes (`art-bands.ts`).

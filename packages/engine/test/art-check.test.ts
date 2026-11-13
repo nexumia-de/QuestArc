@@ -71,10 +71,6 @@ describe('artProblems', () => {
     expect(messages('stone', big).join('\n')).toMatch(/bytes/);
   });
 
-  it('wants the wide view box for a ground', () => {
-    expect(messages('ground-stone', good).join('\n')).toMatch(/0 0 320 120/);
-  });
-
   it('wants the view box of a setting and of a build', () => {
     expect(messages('setting-river', good).join('\n')).toMatch(/0 0 320 180/);
     expect(messages('build-crossing-1', good).join('\n')).toMatch(/0 0 120 80/);

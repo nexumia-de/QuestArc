@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <title>Boat</title>
-  <rect class="fg" x="15" y="3.4" width="1.8" height="19.6"/>
-  <path class="accent" d="M16.8 3.4L22 5.2L16.8 7Z"/>
-  <path class="fg" d="M17.8 8.4L27.6 21.2H17.8Z"/>
-  <path class="bg" d="M19.6 14L24.1 19.4H19.6Z"/>
-  <path class="fg" d="M2.6 22.2H29.4L25.8 29.4H6.4Z"/>
-  <path class="bg" d="M6.2 24.2H25.8L24.4 27.4H7.6Z"/>
-</svg>

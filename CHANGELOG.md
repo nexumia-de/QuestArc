@@ -5,6 +5,25 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/quest-arc/releases) with the
 plugin ZIP.
 
+## 3.2.0
+
+- **With the game, a journey now builds something.** Instead of the path
+  the journey screen shows one thing that is whole at every station and
+  becomes a larger version with the next: _A gentle morning_ grows from a
+  fireplace to a house, _First Things First_ from stepping stones to a
+  covered bridge. While you work on a station, a line of lanterns,
+  pennants or flowers grows in front of it and lights up when the station
+  is ready. Nothing is ever taken down. Calm mode keeps the path; with
+  the game it is under **Stations** in the menu.
+- When you start a journey with the game you can change what it builds,
+  what hangs on the line and the colour; later under **What you build**
+  in the menu.
+- With the game, the message after completing the journey's task has a
+  **Show** button that opens the journey screen, where the new piece
+  appears.
+- A journey that was continued with a newer QuestArc on another device
+  is shown read-only instead of being changed by the older one.
+
 ## 3.1.0
 
 - New journey **First Things First**, for work: on workdays, from writing

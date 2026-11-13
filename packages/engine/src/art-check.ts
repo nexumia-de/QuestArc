@@ -14,13 +14,11 @@ import type { Problem } from './content-check';
 export const ART_MAX_BYTES = 4096;
 
 /**
- * The view boxes: a region's ground (`ground-…`), a ladder's setting
- * (`setting-…`), a version of a build (`build-…`, larger than an icon so a
+ * The view boxes: a ladder's setting (`setting-…`), a version of a build (`build-…`, larger than an icon so a
  * bridge or a house reads as the subject of a screen) and every other
  * picture.
  */
 export const ART_VIEW_BOX = {
-  ground: '0 0 320 120',
   setting: '0 0 320 180',
   build: '0 0 120 80',
   picture: '0 0 32 32',
@@ -29,9 +27,7 @@ export const ART_VIEW_BOX = {
 /** The view box a picture's name asks for. */
 export const artViewBox = (name: string): string => {
   const [kind] = name.split('-');
-  return kind === 'ground' || kind === 'setting' || kind === 'build'
-    ? ART_VIEW_BOX[kind]
-    : ART_VIEW_BOX.picture;
+  return kind === 'setting' || kind === 'build' ? ART_VIEW_BOX[kind] : ART_VIEW_BOX.picture;
 };
 
 /**

@@ -1,5 +1,10 @@
 # Directory Update Log
 
+## 2026-11-13
+
+- **Update**: the region scenes of the first Valley design are removed (superseded by the ladders on 2026-11-12): the four `*.scene.json` files, the pictures only they used (bench, boat, open gate, hedgehog, house, lighthouse, pennant, stone, well, both grounds), the scene checker (`art-scene-check.ts`; the depth bands' sizes stay as `art-bands.ts`), the `ground-…` view box, the preview parts `growth` and `shore`, `docs/screenshots/valley-*.png` and the mockups `valley-sketch.svg` and `journey-phone-rpg.svg`. [Journey design](journey-design.md#look-and-depth-bands) keeps the look and the depth bands in one short section; [shared pictures](decisions/shared-pictures.md), [development](development.md), [architecture](architecture.md) and the [roadmap](roadmap.md) follow. `keepsake-first-step.svg` stays for #87.
+- **Update**: version 3.2.0 with its [changelog](../CHANGELOG.md) section: the build on the journey screen. The README shows it.
+
 ## 2026-11-12
 
 - **Decision**: [one plugin build for older Super Productivity versions](decisions/one-build-for-older-versions.md) (owner, correcting #102): `minSupVersion` stays `19.3.0`, the one ZIP stays within 19.3.x's limits (`index.html` ≤ 102,400 bytes), what does not fit travels in `plugin.js` by message, newer API members are feature-detected, and the real-app check stays on the oldest supported version (Dependabot ignores major updates of the image). Requiring 20.0.0 is dropped.
