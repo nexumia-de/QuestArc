@@ -168,6 +168,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     journeyId: journey.id,
     startDay: run.startDay,
     ...(run.why ? { why: run.why } : {}),
+    ...(choices.planChecks.has(run.runId) ? { planCheck: choices.planChecks.get(run.runId) } : {}),
     stations,
     position:
       currentIndex === -1

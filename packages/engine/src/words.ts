@@ -7,6 +7,12 @@
 /** The longest "pair it with" text a host writes (design rule 7). */
 export const PAIR_LIMIT = 60;
 
+/** The longest answer of the plan check a host writes (design rule 6). */
+export const PLAN_CHECK_LIMIT = 160;
+
+/** The four answers of the plan check, in the order they are asked. */
+export const PLAN_CHECK_FIELDS = ['wish', 'outcome', 'obstacle', 'plan'] as const;
+
 export const ownWords = (text: unknown, limit: number): string =>
   typeof text === 'string'
     ? [...text.replace(/\s+/g, ' ').trim()].slice(0, limit).join('').trim()

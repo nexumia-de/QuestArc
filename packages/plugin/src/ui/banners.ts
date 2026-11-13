@@ -8,7 +8,8 @@ import { markSeen, wasSeen } from './seen';
 
 /**
  * Banners on top of the current station's card (docs/behaviour.md,
- * screen 4): paused, a hard week (flow D), the weekly look back, a new
+ * screen 4): paused, a hard week (flow D, with the user's reason and
+ * their plan for the obstacle), the weekly look back, a new
  * learning nugget, and the undo after ending a journey.
  */
 
@@ -63,7 +64,13 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
       : t('ui.banner.fallback-first');
     out.push(
       banner(
-        run.why ? `${text} ${t('ui.banner.why', { why: run.why })}` : text,
+        [
+          text,
+          run.why && t('ui.banner.why', { why: run.why }),
+          run.planCheck?.plan && t('ui.check.yours', { plan: run.planCheck.plan }),
+        ]
+          .filter(Boolean)
+          .join(' '),
         button(t('ui.action.good-to-know'), () => {
           markSeen(fallbackKey);
           ctx.redraw();

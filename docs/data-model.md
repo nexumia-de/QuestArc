@@ -88,7 +88,7 @@ overwrite each other. Most records are written once and never changed.
 
 | Key                                   | Value                                                                     | Written when                                                                                         |
 | ------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? , woop? }`                   | a journey is started (own "why", optional plan check)                                                |
+| `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? }`                           | a journey is started (with the user's own "why")                                                     |
 | `run-end:<runId>`                     | `{ day, reason: "finished" \| "abandoned" }`                              | the last stage is done, or the user ends the journey                                                 |
 | `stage:<runId>:<stageId>`             | `{ acceptedDay }`                                                         | the user accepts a stage                                                                             |
 | `binding:<runId>:<stageId>`           | `{ taskId, repeatCfgId?, day }`; `day`: due days start then at the latest | a recurring task is bound or rebound; `repeatCfgId` is missing while a new task waits for its repeat |
@@ -97,6 +97,7 @@ overwrite each other. Most records are written once and never changed.
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `stay:<runId>:<stageId>`              | `{ day }`                                                                 | the user stays a while at a met station (quiets the offer for 7 days)                                |
 | `skip:<runId>:<stageId>`              | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
+| `plan-check:<runId>`                  | `{ wish?, outcome?, obstacle?, plan? }`: the user's own words             | a journey is started with the optional plan check, or the user saves it later                        |
 | `pair:<runId>:<stageId>`              | `{ text }`: the user's own words, at most 60 characters                   | the user names what they pair the stage with, or continues from a stage that has one                 |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
@@ -132,6 +133,15 @@ overwrite each other. Most records are written once and never changed.
   computed, so an older engine may ignore it and it carries no data
   format (#85). The text stays in the record: never in a task's title
   or notes, never in a log, never sent anywhere.
+- **The plan check** (`plan-check`, design rule 6) is one record per
+  run with the answers the user gave, rewritten as a whole and
+  withdrawn when all are empty (`checkPlan`: one line each, white space
+  collapsed, at most 160 characters, `PLAN_CHECK_LIMIT`). It is its own
+  record, not a field of `run`, so that changing it later never
+  rewrites the record a run is found by. The engine returns it as the
+  run's `planCheck`, only the answers that are text, and reads no
+  meaning from it; like the pairing it is own words: no data format,
+  never in a task, a log or a request.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -236,6 +246,7 @@ interface RunView {
   journeyId: string;
   startDay: string;
   why?: string;
+  planCheck?: { wish?: string; outcome?: string; obstacle?: string; plan?: string };
   stations: StationView[];
   position: { stage: number; progress: number }; // current station, 0..1
   paused: boolean; // by a pause record or a paused repeat config

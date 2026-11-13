@@ -46,7 +46,14 @@ punishment and comparison often backfire.
    stations and after a miss. Generic motivational quotes are not used.
 6. **Optional: a quick plan check (WOOP).** At the start of a journey the
    user may name the wish, the best outcome, the main obstacle and the
-   plan for it. Optional, because its effect is small.
+   plan for it ("If …, then I will …"). Optional, short and collapsed,
+   because its effect is small (g ≈ 0.28–0.34 with publication bias,
+   [research](research.md)); skipping it takes no tap, any answer may
+   stay empty, and nothing is rewarded for filling it in (rule 8). The
+   plan for the obstacle comes back where it helps, in the user's
+   words: in the hint after a second miss and in the station details.
+   Nothing asks for it again; it can be filled in, changed or emptied
+   later.
 7. **Optional: "pair it with".** Each stage may name something the user
    enjoys only while doing the habit (a podcast only while walking). It
    is the user's own words, asked once when the stage's task is set up,

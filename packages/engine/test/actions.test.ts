@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   actions,
   answerCheckin,
+  checkPlan,
   chooseBuild,
   continueJourney,
   endJourney,
@@ -34,6 +35,7 @@ describe('actions', () => {
     expect(Object.keys(actions).sort()).toEqual([
       'answerCheckin',
       'bindStage',
+      'checkPlan',
       'chooseBuild',
       'continueJourney',
       'endJourney',
@@ -91,6 +93,22 @@ describe('actions', () => {
       'stage-done:r1:a',
       'stage:r1:b',
     ]);
+  });
+
+  it('write the plan check as one record of the answers given, none withdraws it', () => {
+    expect(
+      checkPlan('r', {
+        wish: ' more  air ',
+        obstacle: '',
+        plan: `If it rains,\nthen I will walk indoors. ${'x'.repeat(200)}`,
+      }),
+    ).toEqual({
+      'plan-check:r': {
+        wish: 'more air',
+        plan: `If it rains, then I will walk indoors. ${'x'.repeat(121)}`,
+      },
+    });
+    expect(checkPlan('r', { wish: ' ', plan: '' })).toEqual({ 'plan-check:r': '' });
   });
 
   it("write the user's build choice as one record, empty choice withdraws it", () => {

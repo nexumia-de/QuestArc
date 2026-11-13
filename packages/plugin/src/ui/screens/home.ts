@@ -117,6 +117,7 @@ export const homeScreen = (ctx: Context): Screen => {
       },
     },
     ...(build ? [{ label: t('ui.build.title'), onSelect: () => ctx.go({ name: 'build' }) }] : []),
+    { label: t('ui.check.title'), onSelect: () => ctx.go({ name: 'plan-check' }) },
     { label: t('ui.build.stations'), onSelect: () => ctx.go({ name: 'stations' }) },
     shelfItem,
   ];

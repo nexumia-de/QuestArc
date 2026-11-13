@@ -24,11 +24,25 @@ export interface ReadOnlyRun {
   readonly state: 'active' | 'paused' | 'finished';
 }
 
+/**
+ * The optional plan check of a run (design rule 6), in the user's own
+ * words: the wish, its best outcome, the main obstacle and the plan for
+ * it ("If …, then I will …"). Any of them may be missing.
+ */
+export interface PlanCheck {
+  readonly wish?: string;
+  readonly outcome?: string;
+  readonly obstacle?: string;
+  readonly plan?: string;
+}
+
 export interface RunView {
   readonly runId: string;
   readonly journeyId: string;
   readonly startDay: string;
   readonly why?: string;
+  /** The user's plan check, if they filled in any of it (shown, never evaluated). */
+  readonly planCheck?: PlanCheck;
   readonly stations: readonly StationView[];
   /** Index of the current station and progress within it (0..1). */
   readonly position: { readonly stage: number; readonly progress: number };

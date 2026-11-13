@@ -7,6 +7,7 @@ import type { Task } from '@super-productivity/plugin-api';
  * - welcome: first start; empty: no journey (the last one was ended)
  * - journey: stage 2 of "A gentle morning" with one gap
  * - paired: the same journey, the stage paired with something the user enjoys (#58)
+ * - hard-week: two missed days in a row, with the user's plan check (#59)
  * - met: the current stage's condition is met
  * - stayed: the same, and the user chose to stay a while (#81)
  * - skipped: the first stage was passed with "I already do this" (#81)
@@ -24,6 +25,7 @@ export type Scenario =
   | 'empty'
   | 'journey'
   | 'paired'
+  | 'hard-week'
   | 'met'
   | 'stayed'
   | 'skipped'
@@ -107,7 +109,9 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
       ? [6, 5, 4, 3, 2, 1]
       : build
         ? [4, 2, 1]
-        : [10, 9, 8, 7, 5, 4, 2];
+        : scenario === 'hard-week'
+          ? [10, 9, 8, 7, 5, 4]
+          : [10, 9, 8, 7, 5, 4, 2];
   for (const offset of doneOffsets) {
     const d = day(offset);
     tasks[`rpt_demo_${d}`] = {
@@ -127,6 +131,12 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     day: accepted,
   });
   if (scenario === 'paired') record(`pair:demo:${stage}`, { text: 'my morning playlist' });
+  if (scenario === 'hard-week')
+    record('plan-check:demo', {
+      wish: 'A calm start into the day',
+      obstacle: 'Reaching for the phone first',
+      plan: 'If I reach for the phone, then I will put it down and fill the glass',
+    });
   if (scenario === 'stayed') record(`stay:demo:${stage}`, { day: day(1) });
   if (scenario === 'build-crossing')
     record('build:demo', { ladder: 'crossing', marker: 'lanterns', hue: 'sand' });

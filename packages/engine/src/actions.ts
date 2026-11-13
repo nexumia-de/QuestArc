@@ -1,7 +1,7 @@
 import type { Journey } from './types/journey';
-import type { RunView } from './types/view';
+import type { PlanCheck, RunView } from './types/view';
 import { CHECKPOINT_FORMAT, SKIP_FORMAT } from './choices';
-import { pairWords } from './words';
+import { ownWords, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
 
 /**
  * The choice records each user action writes (docs/data-model.md §2), as
@@ -190,6 +190,21 @@ export const pairStage = (runId: string, stageId: string, text: string): RecordC
   return { [`pair:${runId}:${stageId}`]: words ? { text: words } : '' };
 };
 
+/**
+ * The optional plan check of a run (design rule 6): wish, best outcome,
+ * main obstacle and the plan for it, in the user's own words, one record
+ * per run, rewritten as a whole. Empty answers are left out; no answer
+ * at all withdraws the record.
+ */
+export const checkPlan = (runId: string, answers: PlanCheck): RecordChanges => {
+  const value = Object.fromEntries(
+    PLAN_CHECK_FIELDS.map((field) => [field, ownWords(answers[field], PLAN_CHECK_LIMIT)]).filter(
+      ([, text]) => text !== '',
+    ),
+  );
+  return { [`plan-check:${runId}`]: Object.keys(value).length > 0 ? value : '' };
+};
+
 /** Withdraw a record (undo), the empty string the data model defines. */
 export const withdraw = (key: string): RecordChanges => ({ [key]: '' });
 
@@ -207,6 +222,7 @@ export const actions = {
   repeatPause,
   answerCheckin,
   chooseBuild,
+  checkPlan,
   pairStage,
   withdraw,
 } as const;

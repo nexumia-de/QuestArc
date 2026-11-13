@@ -77,6 +77,9 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
             )
           : null,
       ),
+      reached && run.planCheck?.plan
+        ? h('p', { class: 'qa-why' }, t('ui.check.yours', { plan: run.planCheck.plan }))
+        : null,
       index === run.position.stage && !['done', 'skipped'].includes(station.state)
         ? pairField(ctx, run, stage, plan)
         : null,

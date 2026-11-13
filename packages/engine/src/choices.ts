@@ -1,6 +1,8 @@
 import { isDay } from './days';
 import type { BuildChoice } from './ladders';
 import type { Journey } from './types/journey';
+import type { PlanCheck } from './types/view';
+import { PLAN_CHECK_FIELDS } from './words';
 
 /**
  * Parses the choice records (docs/data-model.md §2) from plugin-data keys.
@@ -33,6 +35,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'stay',
   'skip',
   'pair',
+  'plan-check',
 ]);
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
@@ -73,6 +76,8 @@ export interface Choices {
   readonly skips: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` → what the user pairs the stage with, in their words */
   readonly pairs: ReadonlyMap<string, string>;
+  /** runId → the user's plan check, the answers that are filled in */
+  readonly planChecks: ReadonlyMap<string, PlanCheck>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -120,6 +125,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const stays = new Map<string, string>();
   const skips = new Map<string, string>();
   const pairs = new Map<string, string>();
+  const planChecks = new Map<string, PlanCheck>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -197,6 +203,13 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       const text = str(value.text);
       if (text) pairs.set(`${parts[1]}:${parts[2]}`, text);
       else bad();
+    } else if (kind === 'plan-check' && parts.length === 2 && parts[1]) {
+      const answers = PLAN_CHECK_FIELDS.flatMap((field) => {
+        const text = str(value[field]);
+        return text ? [[field, text]] : [];
+      });
+      if (answers.length > 0) planChecks.set(parts[1], Object.fromEntries(answers) as PlanCheck);
+      else bad();
     } else if (kind === 'build' && parts.length === 2 && parts[1]) {
       const choice: Record<string, string> = {};
       for (const field of ['ladder', 'marker', 'hue'] as const) {
@@ -225,6 +238,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     stays,
     skips,
     pairs,
+    planChecks,
     builds,
     userJourneys,
     newer,

@@ -18,6 +18,7 @@ export type Route =
   | { readonly name: 'shelf' }
   | { readonly name: 'motivates' }
   | { readonly name: 'build' }
+  | { readonly name: 'plan-check' }
   | { readonly name: 'stations' };
 
 export interface Context {

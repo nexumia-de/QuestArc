@@ -471,6 +471,11 @@ body {
   gap: var(--s, 8px);
 }
 
+.qa-details > summary {
+  padding: calc(1.5 * var(--s, 8px)) 0;
+  cursor: pointer;
+}
+
 .qa-field > p {
   margin: 0;
 }

@@ -64,8 +64,18 @@ the journey is in [journey design](journey-design.md).
   field, not focused. "Only you see this."
 - **When to start**: Today (default), Next Monday, The 1st of next month,
   Pick a date.
-- **Plan check** (optional, collapsed): wish, best outcome, main
-  obstacle, "If …, then I will …".
+- **Plan check (optional)** (#59, design rule 6), collapsed, so
+  skipping it takes no tap: opened, it says "Four short questions you
+  could answer for yourself, or leave empty. You can change them later
+  from the menu. Only you see this." and has four short text fields, none
+  focused, none required, at most 160 characters each: "Your wish: what
+  would you like from this habit?", "Best outcome: what would be the
+  best thing about it?", "Main obstacle: what in you could get in the
+  way?", "Your plan: if that happens, then I will …". The screen
+  scrolls, so the fields stay reachable above the on-screen keyboard.
+  The answers given are written with **Start** as one
+  `plan-check:<runId>` record (`checkPlan`); without an answer nothing
+  is written. Nothing is shown, counted or built for answering.
 - **What you build** (#100): the journey's suggested
   build in words and as its first version, which stands from the start
   ("You build a home · pennants · meadow green"), and **Change**, which
@@ -98,10 +108,25 @@ as their own page from **What you build** in the journey's menu
   progress is drawn as the other thing. **Use the journey's suggestion**
   withdraws the record.
 
+### 3b. Plan check
+
+**Plan check** in the journey's menu (screen 4) opens the same four
+fields as their own page, filled with what is stored, to answer later,
+change or empty. Main action: **Save**, which rewrites the record
+(`checkPlan`) and leads back; with every field empty it withdraws the
+record. QuestArc never asks for the plan check by itself.
+
+Where the answers come back: only the plan for the obstacle, as one
+line "Your plan for the obstacle: If I reach for the phone, then I will
+put it down", in the hard-week hint (flow D) and in the details of
+every reached station (screen 5). The other answers are shown on this
+page only. They are never written into a task and never sent anywhere.
+
 ### 4. Journey (home)
 
 - Top: journey title; menu (Pause or Resume, End journey, **What you
-  build** (screen 3a), **Stations**, Shelf, Settings). **End journey**
+  build** (screen 3a), **Plan check** (screen 3b), **Stations**, Shelf,
+  Settings). **End journey**
   happens at once and offers **Undo** (it writes one record, withdrawn
   by Undo).
 - **The build** (#100, #110, [journey
@@ -142,7 +167,7 @@ as their own page from **What you build** in the journey's menu
 
 - A banner on top of the card when needed: paused (with **Resume**, or a
   note that the repeat is paused in Super Productivity), a hard week
-  (flow D, with the user's reason), weekly look back due (**Answer**), the
+  (flow D, with the user's reason and their plan for the obstacle), weekly look back due (**Answer**), the
   station's learning nugget once on arrival (**Got it**), habit can
   graduate (later, #22). Dismissing a banner and skipping the weekly
   question are remembered on the device only; they are not choices.
@@ -177,6 +202,9 @@ as their own page from **What you build** in the journey's menu
   step 6), filled with what is stored: changing it rewrites the record,
   emptying it removes the pairing. Finished stations keep theirs in the
   plan sentence.
+- A reached station shows the user's plan for the obstacle from the
+  plan check, if there is one: "Your plan for the obstacle: …"
+  (screen 3b).
 
 ### 6. Weekly look back
 
@@ -327,7 +355,9 @@ In Pensum, step 2 creates the repeat itself.
 - After the second missed due day in a row: banner "A hard week? On hard
   days, doing the earlier step (walk for 5 minutes) counts too." with
   **Good to know**. Doing the smaller step and ticking off the task
-  counts as a completion.
+  counts as a completion. The banner adds the user's reason, if they
+  gave one, and their plan for the obstacle from the plan check, if
+  they wrote one ("Your plan for the obstacle: …", screen 3b).
 - The next completion is welcomed back (flow A).
 
 ### E. Pause and resume

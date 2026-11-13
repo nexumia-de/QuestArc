@@ -1,16 +1,18 @@
-import { chooseBuild, startJourney, type BuildChoice } from '@questarc/engine';
+import { checkPlan, chooseBuild, startJourney, type BuildChoice } from '@questarc/engine';
 
 import { newRunId } from '../../shared/run-id';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { buildChooser, buildSummary, firstVersion } from '../journey/build-choice';
 import { firstOfNextMonth, nextMonday, shortDate } from '../journey/format';
+import { planCheckFields } from '../journey/plan-check';
 import type { Context, Screen } from '../screen';
 
 /**
  * Screen 3, start a journey (issue #52): the user's own reason, optional
- * and never focused on open (design rule 5), a self-chosen start day and,
- * what the journey builds (screen 3a in place, #100).
+ * and never focused on open (design rule 5), a self-chosen start day, the
+ * optional plan check, collapsed (design rule 6), and what the journey
+ * builds (screen 3a in place, #100).
  */
 
 type StartChoice = 'today' | 'monday' | 'month' | 'date';
@@ -48,10 +50,12 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
     );
 
   const build = (ctx.draft.build as BuildChoice | undefined) ?? {};
+  const check = (ctx.draft.check ??= {}) as Record<string, string | undefined>;
 
   const start = async () => {
     const runId = newRunId();
     const chosen = Object.keys(build).length > 0 ? chooseBuild(runId, build) : {};
+    const planned = checkPlan(runId, check);
     await ctx.write({
       ...startJourney({
         runId,
@@ -62,6 +66,7 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
         ...(view.active ? { activeRunId: view.active.runId } : {}),
       }),
       ...chosen,
+      ...(Object.values(planned)[0] ? planned : {}),
     });
     ctx.reset({ name: 'home' });
     ctx.go({ name: 'setup' });
@@ -110,6 +115,18 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
               },
             })
           : null,
+      ),
+      h(
+        'details',
+        {
+          class: 'qa-details',
+          open: !!ctx.draft.checkOpen,
+          ontoggle: (event: Event) => {
+            ctx.draft.checkOpen = (event.target as HTMLDetailsElement).open;
+          },
+        },
+        h('summary', { class: 'qa-section-title' }, t('ui.check.summary')),
+        h('div', { class: 'qa-stack' }, ...planCheckFields(check)),
       ),
       buildPart(ctx, journey, build),
       active

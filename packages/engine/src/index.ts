@@ -5,6 +5,7 @@ export type {
   ContinueOffer,
   DayMark,
   GameView,
+  PlanCheck,
   ReadOnlyRun,
   RunView,
   StationRun,
@@ -17,6 +18,7 @@ export {
   actions,
   answerCheckin,
   bindStage,
+  checkPlan,
   chooseBuild,
   continueJourney,
   endJourney,
@@ -34,7 +36,7 @@ export type { RecordChanges } from './actions';
 export { guardWrite } from './guard';
 export type { GuardedChanges } from './guard';
 export { DATA_FORMAT } from './choices';
-export { PAIR_LIMIT, pairWords } from './words';
+export { PAIR_LIMIT, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
 export {
   buildSnapshot,
   isRelevant,

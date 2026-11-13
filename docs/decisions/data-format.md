@@ -85,7 +85,11 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
 - The pairing record (`pair`, #58) holds only the user's words for the
   plan sentence. An engine that does not know it computes the same run
   and shows the plan without them, so it carries no format; an older
-  host cannot write it (`guardWrite`) and keeps it untouched.
+  host cannot write it (`guardWrite`) and keeps it untouched. The same
+  holds for the plan check (`plan-check`, #59): the user's four answers,
+  shown and never evaluated. It became a record of its own instead of
+  the `woop` field once planned for `run`, so a later change does not
+  rewrite the record every engine places a run by.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through

@@ -7,6 +7,7 @@ import { finishedScreen } from './finished';
 import { homeScreen } from './home';
 import { motivatesScreen } from './motivates';
 import { pickTaskScreen } from './pick-task';
+import { planCheckScreen } from './plan-check';
 import { previewScreen } from './preview';
 import { settingsScreen } from './settings';
 import { setupScreen } from './setup';
@@ -49,6 +50,8 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
       return motivatesScreen();
     case 'build':
       return buildScreen(ctx);
+    case 'plan-check':
+      return planCheckScreen(ctx);
     case 'stations':
       return stationsScreen(ctx);
   }
