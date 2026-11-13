@@ -102,6 +102,19 @@ describe('brain', () => {
     expect(messages).toEqual(['Drink a glass of water: done. 2 of 5 days.']);
   });
 
+  it('reads nothing and shows nothing after it is stopped', async () => {
+    const { brain, host, api, messages } = setUp(['2026-10-26']);
+    await brain.state();
+    const read = vi.spyOn(api, 'getAppState');
+    complete(host, '2026-10-28');
+    brain.refresh('tasks');
+    brain.stop();
+    brain.refresh('tasks');
+    await settle();
+    expect(read).not.toHaveBeenCalled();
+    expect(messages).toEqual([]);
+  });
+
   it('coalesces refreshes while time tracking fires dataChanged', async () => {
     const { brain, api } = setUp([]);
     await brain.state();

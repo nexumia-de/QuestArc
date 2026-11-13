@@ -37,6 +37,13 @@ starts a 750 ms timer, later ones join it, so at most one evaluation runs
 per 750 ms even while time tracking fires `dataChanged` every second. A
 request from the view runs a waiting evaluation at once.
 
+When Super Productivity switches the plugin off, reloads or replaces it,
+`plugin.js` stops the brain in `PluginAPI.onUnload` (feature-detected):
+the waiting timer is cleared, later refreshes are ignored and a running
+evaluation shows no message. Without it the old instance's timer would
+fire once more beside the new one
+([facts](super-productivity-facts.md), consequences).
+
 ## Caching
 
 | Data           | Read again when                                                                                                               |
@@ -53,8 +60,8 @@ only a few times a day.
 
 | Hook                                                        | Invalidates | Since                                 |
 | ----------------------------------------------------------- | ----------- | ------------------------------------- |
-| `dataChanged`                                               | tasks       | after 19.3.1; also covers remote sync |
-| `dayChange`                                                 | archive     | after 19.3.1                          |
+| `dataChanged`                                               | tasks       | since 20.0.0; also covers remote sync |
+| `dayChange`                                                 | archive     | since 20.0.0                          |
 | `persistedDataChanged`                                      | records     | 19.3.0                                |
 | `finishDay`                                                 | archive     | 19.3.0                                |
 | `taskComplete`, `taskUpdate`, `taskDelete`, `anyTaskUpdate` | tasks       | 19.3.0; local changes only            |

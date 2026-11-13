@@ -141,10 +141,11 @@ milestones.
   config clears `repeatCfgId` on all its tasks, so a stage must not be
   bound by `repeatCfgId` alone; "won't do" tasks are `isDone` too and must
   not count.
-- **Newest plugin API not released yet.** `getDayContext`, `dataChanged`
-  and `dayChange` came after 19.3.1, and the npm package of the API types
-  is from 2025. QuestArc either waits for the release or falls back for
-  older versions; the types come from the pinned upstream commit.
+- **Newest plugin API only in 20.0.0.** `getDayContext`, `dataChanged`
+  and `dayChange` came with Super Productivity 20.0.0. QuestArc uses
+  them where they exist and falls back for 19.3.x
+  ([decision](decisions/one-build-for-older-versions.md)); the types
+  come from the pinned upstream commit.
 - **Compressed plugin data.** Super Productivity stores long plugin data
   as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single

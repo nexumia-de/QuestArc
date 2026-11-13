@@ -10,6 +10,9 @@ sources:
   - id: sp
     title: "Super Productivity master c5eb3f6 (2026-11-05)"
     url: https://github.com/johannesjo/super-productivity/tree/c5eb3f6c426ddebd5de3536705b9739af6bf44db
+  - id: sp20
+    title: "Super Productivity v20.0.0, commit 4db0e112 (2026-11-06)"
+    url: https://github.com/johannesjo/super-productivity/tree/4db0e11236bc784d3184a9e252930b4bd53df823
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
 
@@ -22,10 +25,12 @@ root. "Unverified" marks what the source alone could not settle.
 
 **Release status.** `package.json` was bumped to 19.3.1 on 2026-10-25
 (commit `1014df98`). Several plugin features below landed on master after
-that and are not ancestors of that commit, so they are expected only in the
-next release (marked _unreleased_). Release tags were not available; the
-check used `git merge-base --is-ancestor` against the version-bump commits
-on master[^sp].
+that and are not ancestors of that commit. They were released with
+**20.0.0** (tag `v20.0.0`, commit `4db0e112`, 2026-11-06) and are marked
+_since 20.0.0_: on 2026-11-13 every commit named so, and `c5eb3f6`
+itself, was an ancestor of the tag (`git merge-base --is-ancestor`), and
+`packages/plugin-api/src/types.ts` at the tag is identical to the copy in
+`packages/sp-plugin-api`[^sp][^sp20].
 
 ## 1. Packaging
 
@@ -38,7 +43,8 @@ on master[^sp].
 - Install-time validation requires only `id` (no `:`), `name` and `version`,
   checks `allowedHosts`, and rejects a `minSupVersion` newer than the app
   (`src/app/plugins/util/validate-manifest.util.ts`, `validatePluginManifest`;
-  minSupVersion enforcement is commit `c11fd8d9`, _unreleased_)[^sp].
+  minSupVersion enforcement is commit `c11fd8d9`, _since 20.0.0_; 19.3.x
+  installs a plugin with a newer `minSupVersion` without complaint)[^sp].
 - Permissions: only `nodeExecution`, `http` (with `allowedHosts`, gates
   `PluginAPI.request` only) and `deleteProject` are checked; every other
   declared permission is shown but not enforced
@@ -72,7 +78,7 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   the iframe posts the message itself[^sp].
 - ZIP: files at the root; `manifest.json` required (≤ 100 KB), `plugin.js`
   ≤ 5 MB, `index.html` ≤ 1 MB (**19.3.1 and older: 100 KB, 102,400 bytes**;
-  raised by `668c0769` after 19.3.1; seen in 19.3.1's web app, which
+  raised by `668c0769`, since 20.0.0; seen in 19.3.1's web app, which
   refuses the ZIP with "Plugin index.html is too large (max 100.0KB)", on
   2026-11-12; `packages/plugin/build.mjs` fails above it), ZIP ≤ 10 MB, `i18n/<lang>.json` translations
   ≤ 5 MB in total (`src/app/plugins/plugin.const.ts`;
@@ -103,7 +109,7 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   release workflow. Its README is the recommended start for third-party
   plugins (`packages/plugin-starter/README.md`; `packages/README.md` calls it
   the "copy-out starter for third-party plugins"). Added in `ae754d78`,
-  _unreleased_[^sp].
+  _since 20.0.0_[^sp].
 - `packages/plugin-dev`: the bundled plugins and examples, one npm workspace
   that is not part of the root workspace; plugins consume plugin-api and
   vite-plugin via `file:` links (`packages/plugin-dev/README.md`;
@@ -111,11 +117,19 @@ message}` to the parent; the host calls the handler `plugin.js` set with
 - `packages/vite-plugin` (`@super-productivity/vite-plugin` 1.0.0): build
   tooling used in-repo only. `npm view @super-productivity/vite-plugin`
   returned 404 on 2026-11-05, so it is not on npm[^sp].
-- `@super-productivity/plugin-api` is on npm, but only versions 1.0.0 and
-  1.0.1 (both 2025-06-29, `npm view … time`). `publish-plugin-api.yml`
-  will publish it on each stable release with the app's version
-  (`packages/plugin-api/PUBLISHING.md`); no app-versioned release was on npm
-  on 2026-11-05. The npm 1.0.1 therefore lacks newer API members[^sp].
+- `@super-productivity/plugin-api` is on npm in versions 1.0.0, 1.0.1
+  (both 2025-06-29) and **20.0.0** (`npm view … versions`, 2026-11-13).
+  `publish-plugin-api.yml` publishes it on each stable release with the
+  app's version (`packages/plugin-api/PUBLISHING.md`): version X.Y.Z
+  describes the API of Super Productivity X.Y.Z
+  (`docs/plugin-development.md` at `v20.0.0`)[^sp][^sp20].
+- 20.0.0 has **Help → Build your own plugin**: it writes a prompt for an
+  AI chat with the release's `types.ts` and the rules of the guide's
+  "Vibe Coding" section, and installs the answer
+  (`src/app/plugins/ui/dialog-build-plugin/build-plugin.util.ts`). Its
+  rules are the facts of this section; it suggests `minSupVersion` = the
+  running version and empty `hooks` and `permissions`, which QuestArc
+  does not follow[^sp20].
 
 ## 2. Plugin data
 
@@ -180,17 +194,17 @@ message}` to the parent; the host calls the handler `plugin.js` set with
 - `getDayContext()` returns `{ todayStr, startOfNextDayDiffMs }` from
   `DateService` (`plugin-bridge-context.service.ts`). To find a timestamp's
   logical day, subtract `startOfNextDayDiffMs` before taking the local date
-  (`types.ts`, `PluginDayContext`). Optional method; _unreleased_
+  (`types.ts`, `PluginDayContext`). Optional method; _since 20.0.0_
   (`92a5f7d9`)[^sp].
 - `DAY_CHANGE {todayStr}`: logical day changed while the app runs (rollover
   or setting change, also re-checked after sleep/focus); not at startup; gated
   on the initial data load (`plugin-hooks.effects.ts`, `dayChange$`).
-  _Unreleased_ (`92a5f7d9`)[^sp].
+  _Since 20.0.0_ (`92a5f7d9`)[^sp].
 - `DATA_CHANGED` (no payload): task, project or tag feature state changed
   from any source, remote sync included; coalesced with `auditTime(250 ms)`;
   fires about once a second while time tracking runs (`plugin-hooks.effects.ts`,
   `dataChanged$`). It does **not** watch `taskRepeatCfg`, archive or
-  plugin data. _Unreleased_ (`92a5f7d9`)[^sp].
+  plugin data. _Since 20.0.0_ (`92a5f7d9`)[^sp].
 - Both new hooks fire on every device; the API docs say to refresh views only
   and not write data in response (`types.ts`, `PluginHooks`)[^sp].
 - The other hooks come from `LOCAL_ACTIONS` (`plugin-hooks.effects.ts`
@@ -363,7 +377,7 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   and a UI kit in `@layer sp-ui-kit` (off with `"uiKit": false`); open views
   follow dark-mode changes live (`plugin-iframe.util.ts`,
   `createThemeVarsCss`; `docs/plugin-development.md`). The kit upgrade is
-  `460c2ea1`, _unreleased_. No dark class is set on the iframe body[^sp].
+  `460c2ea1`, _since 20.0.0_. No dark class is set on the iframe body[^sp].
 - `PluginAPI.cfg.theme` is `'dark'` only when the setting is explicitly
   "dark"; with "system" it is `'light'` even on a dark system
   (`plugin.service.ts`, `_getBaseCfg`). Use `--is-dark-theme` instead[^sp].
@@ -435,7 +449,7 @@ action, which opens the full view.
 From `git log -100 -- src/app/plugins packages/plugin-api` on a separate
 history clone (the given checkout is shallow, 50 commits)[^sp]:
 
-- _Unreleased_ after 19.3.1: `92a5f7d9` `DATA_CHANGED`, `DAY_CHANGE`,
+- 20.0.0 (2026-11-06): `92a5f7d9` `DATA_CHANGED`, `DAY_CHANGE`,
   `getDayContext`, `startTracking`/`stopTracking`; `ae754d78` plugin-starter;
   `5a6d557e` AI-oriented docs; `c11fd8d9` minSupVersion enforced;
   `af82c33b` `triggerSync` in iframes; `668c0769` index.html up to 1 MB;
@@ -462,7 +476,8 @@ Checked by running the plugin in `app.super-productivity.com`
   **Schedule Task → Repeat**, which opens "Make task recurring" with
   "Every day" preselected; saving sets `repeatCfgId` and fires the task
   hooks, so plugin.js picks it up within a few seconds.
-- 19.3.1 rejects the `dataChanged` and `dayChange` hooks (they are newer);
+- 19.3.1 rejects the `dataChanged` and `dayChange` hooks (they came with
+  20.0.0);
   the other hooks, `onMessage`, the header button and the task context
   menu entry work.
 - Up to an app width of 600 px the app shows a bottom navigation whose
@@ -509,9 +524,18 @@ Checked by running the plugin in `app.super-productivity.com`
 - Expect no instance for missed days, and exclude won't-do tasks.
 - `minSupVersion` stays `19.3.0`: one build for 19.3.x and later
   ([decision](decisions/one-build-for-older-versions.md)). `DATA_CHANGED`,
-  `DAY_CHANGE` and `getDayContext` are optional members of newer versions;
-  feature-detect them and work without them.
+  `DAY_CHANGE` and `getDayContext` exist since 20.0.0; feature-detect
+  them and work without them. The 102,400-byte limit for `index.html`
+  is kept only for 19.3.x.
+- `plugin.js` clears its own timers in `PluginAPI.onUnload`
+  (feature-detected): the host does not, and a timer of a switched-off or
+  replaced plugin would still fire (`docs/plugin-development.md`,
+  "Clean up with `plugin.onUnload()`", at `v20.0.0`)[^sp20].
 
 [^sp]:
     Super Productivity master c5eb3f6 (2026-11-05),
     https://github.com/johannesjo/super-productivity/tree/c5eb3f6c426ddebd5de3536705b9739af6bf44db
+
+[^sp20]:
+    Super Productivity v20.0.0, commit 4db0e112 (2026-11-06),
+    https://github.com/johannesjo/super-productivity/tree/4db0e11236bc784d3184a9e252930b4bd53df823

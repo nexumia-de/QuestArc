@@ -68,7 +68,7 @@ interface SnapshotRepeatCfg {
   a binding record, and only bound repeat configs, are needed. Large
   archives therefore cost little. The engine gives the same result with
   the full lists.
-- `day` comes from `getDayContext()` (Super Productivity after 19.3.1) and
+- `day` comes from `getDayContext()` (Super Productivity 20.0.0 and newer) and
   the host's time zone (`Intl.DateTimeFormat().resolvedOptions().timeZone`
   in the plugin; the system time zone in Pensum). Older Super
   Productivity versions without `getDayContext()`: offset 0 and the

@@ -6,7 +6,7 @@ import type { HostApi } from './host';
 /**
  * Which hooks make the game recompute, and what they invalidate
  * (docs/super-productivity-facts.md §3). `dataChanged` and `dayChange`
- * exist only after Super Productivity 19.3.1 and cover remote sync; older
+ * exist since Super Productivity 20.0.0 and cover remote sync; older
  * versions reject unknown hooks, so each is registered on its own and the
  * local task hooks and window focus are the fallback.
  */

@@ -2,6 +2,8 @@
 
 ## 2026-11-13
 
+- **Update**: [Super Productivity facts](super-productivity-facts.md) follow the release of 20.0.0 (tag `v20.0.0`, 2026-11-06): what was marked unreleased is "since 20.0.0" (checked by ancestry against the tag; `types.ts` there equals our copy), `@super-productivity/plugin-api` 20.0.0 is on npm, and 20.0.0's "Build your own plugin" prompt is recorded. [Architecture](architecture.md), [data model](data-model.md) and [plugin adapter](plugin-adapter.md) name 20.0.0. `minSupVersion` stays 19.3.0 ([decision](decisions/one-build-for-older-versions.md)).
+- **Fix**: plugin.js stops its brain in `PluginAPI.onUnload` ([plugin adapter](plugin-adapter.md)): Super Productivity does not clear a plugin's timers when it switches the plugin off or replaces it. A test fails without the stop. Version 3.2.1.
 - **Update**: the region scenes of the first Valley design are removed (superseded by the ladders on 2026-11-12): the four `*.scene.json` files, the pictures only they used (bench, boat, open gate, hedgehog, house, lighthouse, pennant, stone, well, both grounds), the scene checker (`art-scene-check.ts`; the depth bands' sizes stay as `art-bands.ts`), the `ground-…` view box, the preview parts `growth` and `shore`, `docs/screenshots/valley-*.png` and the mockups `valley-sketch.svg` and `journey-phone-rpg.svg`. [Journey design](journey-design.md#look-and-depth-bands) keeps the look and the depth bands in one short section; [shared pictures](decisions/shared-pictures.md), [development](development.md), [architecture](architecture.md) and the [roadmap](roadmap.md) follow. `keepsake-first-step.svg` stays for #87.
 - **Update**: version 3.2.0 with its [changelog](../CHANGELOG.md) section: the build on the journey screen. The README shows it.
 
