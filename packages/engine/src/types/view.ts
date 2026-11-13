@@ -97,6 +97,8 @@ export interface StationView {
   readonly skippedDay?: string;
   /** A skipped stage whose skip can still be taken back (`undoSkip`). */
   readonly undoable?: boolean;
+  /** What the user pairs this stage with, in their own words (design rule 7). */
+  readonly pair?: string;
   /** Current stage only: the last 7 due (or paused) days, oldest first. */
   readonly lastDays?: readonly DayMark[];
 }

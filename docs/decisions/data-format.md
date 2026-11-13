@@ -82,6 +82,10 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   meaning: checkpoints still say 2, so only a run with a skip is
   read-only on a 3.3 host, and taking the skip back makes it usable
   there again. `stay` only quiets an offer and carries no format.
+- The pairing record (`pair`, #58) holds only the user's words for the
+  plan sentence. An engine that does not know it computes the same run
+  and shows the plan without them, so it carries no format; an older
+  host cannot write it (`guardWrite`) and keeps it untouched.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through

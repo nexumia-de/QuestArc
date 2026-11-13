@@ -65,7 +65,11 @@ export const continueScreen = (ctx: Context): Screen => {
               { class: 'qa-overline' },
               t('ui.station.of', { n: index + 2, total: journey.stages.length }),
             ),
-            h('p', { class: 'qa-plan' }, planSentence(next)),
+            h(
+              'p',
+              { class: 'qa-plan' },
+              planSentence(next, run.stations[index + 1]?.pair ?? station.pair),
+            ),
           )
         : h('p', {}, t('ui.continue.last')),
       next ? h('p', { class: 'qa-muted' }, t('ui.continue.earlier')) : null,

@@ -137,6 +137,11 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       lastDays: timeline.lastDays,
     };
   });
+  // The user's own "pair it with" (design rule 7): shown, never evaluated.
+  stations.forEach((station, index) => {
+    const pair = choices.pairs.get(key(station.stageId));
+    if (pair) stations[index] = { ...station, pair };
+  });
 
   const lastPause = pauses.filter((p) => p.day <= today).at(-1);
   const ended = choices.runEnds.has(run.runId);

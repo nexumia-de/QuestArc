@@ -87,7 +87,10 @@ chosen ladder, so a host compares it with `build.ladder`).
   languages fall back to English key by key and may only use keys of
   the journey.
 - Anchors and actions are written to fit the plan sentence: anchor
-  "lunch", action "walk for 5 minutes".
+  "lunch", action "walk for 5 minutes". The user may end it with
+  something they pair the stage with (", with my podcast",
+  [behaviour](behaviour.md), flow B), so an action does not name a
+  treat of its own.
 - The longest texts per field (360 px): title 40, description 160, why
   120, anchor 40, action 120, place 40, arrival 200,
   accept 200, nugget 240, ending 240, build name 40 characters. A station's action is

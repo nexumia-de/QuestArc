@@ -3,8 +3,10 @@ import {
   actions,
   answerCheckin,
   chooseBuild,
+  continueJourney,
   endJourney,
   evaluate,
+  pairStage,
   resumeJourney,
   skipStage,
   stayHere,
@@ -35,6 +37,7 @@ describe('actions', () => {
       'chooseBuild',
       'continueJourney',
       'endJourney',
+      'pairStage',
       'pauseJourney',
       'repeatPause',
       'resumeJourney',
@@ -61,6 +64,33 @@ describe('actions', () => {
     expect(endJourney('a', '2026-11-06')).toEqual({
       'run-end:a': { day: '2026-11-06', reason: 'abandoned' },
     });
+  });
+
+  it("write what a stage is paired with as one line of the user's words", () => {
+    expect(pairStage('r', 'walk', '  my   podcast. ')).toEqual({
+      'pair:r:walk': { text: 'my podcast' },
+    });
+    expect(pairStage('r', 'walk', 'x'.repeat(80))).toEqual({
+      'pair:r:walk': { text: 'x'.repeat(60) },
+    });
+    expect(pairStage('r', 'walk', ' . ')).toEqual({ 'pair:r:walk': '' });
+  });
+
+  it('take the pairing along when continuing, unless the next stage has its own', () => {
+    const met = fromVector('pair-met-station.json');
+    expect(continueJourney(met.run, met.journey, '2026-11-10')).toEqual({
+      'stage-done:r1:a': { day: '2026-11-10', dataFormat: 2 },
+      'stage:r1:b': { acceptedDay: '2026-11-10' },
+      'pair:r1:b': { text: 'my podcast' },
+    });
+    const own = {
+      ...met.run,
+      stations: met.run.stations.map((s, i) => (i === 1 ? { ...s, pair: 'tea' } : s)),
+    };
+    expect(Object.keys(continueJourney(own, met.journey, '2026-11-10'))).toEqual([
+      'stage-done:r1:a',
+      'stage:r1:b',
+    ]);
   });
 
   it("write the user's build choice as one record, empty choice withdraws it", () => {

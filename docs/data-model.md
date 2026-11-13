@@ -97,6 +97,7 @@ overwrite each other. Most records are written once and never changed.
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `stay:<runId>:<stageId>`              | `{ day }`                                                                 | the user stays a while at a met station (quiets the offer for 7 days)                                |
 | `skip:<runId>:<stageId>`              | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
+| `pair:<runId>:<stageId>`              | `{ text }`: the user's own words, at most 60 characters                   | the user names what they pair the stage with, or continues from a stage that has one                 |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 | `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
@@ -120,6 +121,17 @@ overwrite each other. Most records are written once and never changed.
   skipped stage and overwrite the next stage's acceptance, so the record
   carries `dataFormat: 3`: there the run is read-only until that host is
   updated (below). Taking the skip back lowers the run's format again.
+- **Own words** (`pair`, design rule 7): what the user enjoys only
+  while doing the stage's habit, one record per stage, rewritten when
+  the user changes it and withdrawn when they empty it (`pairStage`).
+  Hosts write one line: white space collapsed, at most 60 characters
+  (`PAIR_LIMIT`), no final full stop (`pairWords`), so it fits the end
+  of the plan sentence. `continueJourney` copies it to the next stage
+  unless that has its own. The engine returns it as the station's
+  `pair` and reads no meaning from it; it changes nothing that is
+  computed, so an older engine may ignore it and it carries no data
+  format (#85). The text stays in the record: never in a task's title
+  or notes, never in a log, never sent anywhere.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -261,13 +273,15 @@ interface StationView {
   doneDay?: string;
   skippedDay?: string; // a skipped stage ("already yours")
   undoable?: boolean; // a skipped stage whose skip can still be taken back
+  pair?: string; // what the user pairs the stage with, in their words
   // current stage only: the last 7 due or paused days, oldest first
   lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
 ```
 
 When the user accepts the next stage, the host writes the checkpoint
-record with the day (`continueJourney`); staying writes `stayHere`,
+record with the day (`continueJourney`, which also takes the stage's
+pairing along); staying writes `stayHere`,
 "I already do this" `skipStage`, taking it back `undoSkip`. Each returns
 no changes when the view does not allow the action (not met, a stage
 with a task, the last stage, a skip that is no longer undoable).

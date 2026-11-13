@@ -4,18 +4,26 @@ import { t } from './texts';
 
 /**
  * Sentences built from a journey's stage: the plan "After X, I will Y"
- * (design rule 2) and the condition's progress in words, used by the
+ * (design rule 2), with what the user pairs it with (rule 7), and the condition's progress in words, used by the
  * view and by the messages after a completion (docs/behaviour.md).
  */
 
 export const findStage = (journeys: readonly Journey[], journeyId: string, stageId: string) =>
   journeys.find((j) => j.id === journeyId)?.stages.find((s) => s.id === stageId);
 
-export const planSentence = (stage: Stage): string => {
-  const parts = { anchor: t(stage.plan.anchor), action: t(stage.plan.action) };
-  return stage.plan.place
-    ? t('ui.plan.sentence-place', { ...parts, place: t(stage.plan.place) })
-    : t('ui.plan.sentence', parts);
+/**
+ * `pair` is what the user pairs the stage with, in their own words
+ * (design rule 7). Each of the four forms is one whole sentence in
+ * content/i18n, so a language orders the parts as it needs.
+ */
+export const planSentence = (stage: Stage, pair?: string): string => {
+  const { anchor, action, place } = stage.plan;
+  return t(`ui.plan.sentence${place ? '-place' : ''}${pair ? '-pair' : ''}`, {
+    anchor: t(anchor),
+    action: t(action),
+    place: place ? t(place) : '',
+    pair: pair ?? '',
+  });
 };
 
 /** Upper-cases the first letter, for an action used at the start of a sentence. */

@@ -63,7 +63,7 @@ export const stationCard = (
       { class: 'qa-overline' },
       t('ui.station.of', { n: index + 1, total: run.stations.length }),
     ),
-    h('p', { class: 'qa-plan' }, planSentence(stage)),
+    h('p', { class: 'qa-plan' }, planSentence(stage, station.pair)),
     bound
       ? h(
           'div',

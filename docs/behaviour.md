@@ -22,6 +22,14 @@ the journey is in [journey design](journey-design.md).
   back and menu at the top.
 - States are shown with text and shape, never by colour alone.
 - No text field is focused when a screen opens.
+- **The plan sentence** is one whole sentence per form in
+  `content/i18n` (`ui.plan.sentence`, `-place`, `-pair`, `-place-pair`),
+  filled with the stage's anchor, action and place and, for a stage of a
+  run, what the user pairs it with (design rule 7): "After lunch, I will
+  walk for 15 minutes (in the park), with my podcast." A language orders
+  the parts as it needs; no sentence is glued together from pieces. The
+  pairing is the user's text as stored, one line without a final full
+  stop, and is not translated.
 - There is one look and no mode: no XP, no levels, no guardians and no
   game words (#110). Every journey shows what it builds.
 - Texts are autonomy-supportive ("you could"), never controlling or
@@ -117,7 +125,7 @@ as their own page from **What you build** in the journey's menu
   likewise; none with `prefers-reduced-motion`. A redraw without a change
   animates nothing; opening the screen animates nothing.
 - Bottom card, the current station:
-  - the plan sentence;
+  - the plan sentence, with the user's pairing if there is one;
   - progress of the condition in words and a bar ("4 of 5 days in the
     last week");
   - "Current run 6 · best 9 · 23 in total"; a gap is shown as a gap, not
@@ -165,6 +173,10 @@ as their own page from **What you build** in the journey's menu
   neutral, neither done nor a gap. While the engine says the skip can be
   taken back (`undoable`), **Do This Station After All** withdraws it
   and the station is offered again.
+- The current station also has the field **Pair it with** (flow B,
+  step 6), filled with what is stored: changing it rewrites the record,
+  emptying it removes the pairing. Finished stations keep theirs in the
+  plan sentence.
 
 ### 6. Weekly look back
 
@@ -271,10 +283,21 @@ In Pensum, step 2 creates the repeat itself.
    (`skipStage`) and the same screen offers the next stage. Not offered
    for the last stage of a journey, and not once the station has a
    repeating task.
+6. **Pair it with** (#58, design rule 7), one optional text field below
+   the choices, not focused: "Optional: something you enjoy and could
+   save for this step, like "my podcast". Only you see this." While the
+   user types, the plan sentence above shows the result ("…, with my
+   podcast."). Leaving the field writes it (`pairStage`); an empty
+   field withdraws it. At most 60 characters. Nothing is shown, counted
+   or built for filling it in, and nothing asks for it again. It is
+   never written into the task's title or notes and never sent anywhere.
 
 ### C. Continue to the next stage
 
-1. The station's acceptance story and the next stage's plan sentence.
+1. The station's acceptance story and the next stage's plan sentence,
+   with the pairing of the current stage: **Continue** takes it along to
+   the next stage (`continueJourney`), where flow B shows it in the
+   field to keep, change or remove.
 2. Two equal choices (#81): **Continue** and **Stay Here a While**, with
    "Both are fine. Staying costs nothing: everything keeps counting, and
    you can continue whenever you like." The engine's suggestion

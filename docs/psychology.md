@@ -48,7 +48,12 @@ punishment and comparison often backfire.
    user may name the wish, the best outcome, the main obstacle and the
    plan for it. Optional, because its effect is small.
 7. **Optional: "pair it with".** Each stage may name something the user
-   enjoys only while doing the habit (a podcast only while walking).
+   enjoys only while doing the habit (a podcast only while walking). It
+   is the user's own words, asked once when the stage's task is set up,
+   never required and never rewarded (rule 8); it is shown as the end of
+   the plan sentence and goes along to the next stage, where it can be
+   changed or removed. The effect is small (about 10–12 % more workouts
+   in the large replication, [research](research.md)).
 
 ## Progress and feedback
 

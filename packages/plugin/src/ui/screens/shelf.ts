@@ -86,7 +86,7 @@ export const shelfScreen = (ctx: Context): Screen => {
       h(
         'li',
         { class: 'qa-card' },
-        h('p', { class: 'qa-plan' }, planSentence(last)),
+        h('p', { class: 'qa-plan' }, planSentence(last, run.stations.at(-1)?.pair)),
         h('p', { class: 'qa-muted qa-small' }, t('ui.shelf.maintained')),
       ),
     ];

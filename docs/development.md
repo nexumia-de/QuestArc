@@ -104,7 +104,7 @@ npm run screenshots -w @questarc/plugin
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
-`journey`, `met`, `stayed`, `skipped`, `unbound`, `newer`, `build`, `build-ready`,
+`journey`, `paired`, `met`, `stayed`, `skipped`, `unbound`, `newer`, `build`, `build-ready`,
 `build-crossing`; `empty:Settings` clicks the
 button named "Settings" first. In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes

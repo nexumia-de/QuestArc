@@ -32,6 +32,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'graduation',
   'stay',
   'skip',
+  'pair',
 ]);
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
@@ -70,6 +71,8 @@ export interface Choices {
   readonly stays: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` → the day the stage was skipped ("already yours") */
   readonly skips: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` → what the user pairs the stage with, in their words */
+  readonly pairs: ReadonlyMap<string, string>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -116,6 +119,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const checkins = new Map<string, number>();
   const stays = new Map<string, string>();
   const skips = new Map<string, string>();
+  const pairs = new Map<string, string>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -189,6 +193,10 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       if (isDay(value.day))
         (kind === 'stay' ? stays : skips).set(`${parts[1]}:${parts[2]}`, value.day);
       else bad();
+    } else if (kind === 'pair' && parts.length === 3) {
+      const text = str(value.text);
+      if (text) pairs.set(`${parts[1]}:${parts[2]}`, text);
+      else bad();
     } else if (kind === 'build' && parts.length === 2 && parts[1]) {
       const choice: Record<string, string> = {};
       for (const field of ['ladder', 'marker', 'hue'] as const) {
@@ -216,6 +224,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     checkins,
     stays,
     skips,
+    pairs,
     builds,
     userJourneys,
     newer,

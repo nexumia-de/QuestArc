@@ -20,6 +20,7 @@ export {
   chooseBuild,
   continueJourney,
   endJourney,
+  pairStage,
   pauseJourney,
   repeatPause,
   resumeJourney,
@@ -33,6 +34,7 @@ export type { RecordChanges } from './actions';
 export { guardWrite } from './guard';
 export type { GuardedChanges } from './guard';
 export { DATA_FORMAT } from './choices';
+export { PAIR_LIMIT, pairWords } from './words';
 export {
   buildSnapshot,
   isRelevant,

@@ -1,6 +1,7 @@
 import type { Journey } from './types/journey';
 import type { RunView } from './types/view';
 import { CHECKPOINT_FORMAT, SKIP_FORMAT } from './choices';
+import { pairWords } from './words';
 
 /**
  * The choice records each user action writes (docs/data-model.md §2), as
@@ -63,7 +64,8 @@ export const bindStage = (input: {
  * Continue after a met station (behaviour, flow C): the checkpoint of the
  * current stage ([deleted history](../../../../docs/decisions/deleted-history.md))
  * and the acceptance of the next one, or the end of the journey after its
- * last stage.
+ * last stage. What the user pairs the stage with goes along to the next
+ * one, unless that already has its own (design rule 7).
  */
 export const continueJourney = (run: RunView, journey: Journey, today: string): RecordChanges => {
   const index = run.position.stage;
@@ -76,6 +78,9 @@ export const continueJourney = (run: RunView, journey: Journey, today: string): 
     ...(next
       ? { [`stage:${run.runId}:${next.id}`]: { acceptedDay: today } }
       : { [`run-end:${run.runId}`]: { day: today, reason: 'finished' } }),
+    ...(next && station.pair && !run.stations[index + 1]?.pair
+      ? { [`pair:${run.runId}:${next.id}`]: { text: station.pair } }
+      : {}),
   };
 };
 
@@ -174,6 +179,17 @@ export const chooseBuild = (
   return { [`build:${runId}`]: Object.keys(value).length > 0 ? value : '' };
 };
 
+/**
+ * "Pair it with" (design rule 7): something the user enjoys only while
+ * doing the stage's habit, in their own words, one record per stage.
+ * The text is one line without a final full stop, so it fits the plan
+ * sentence; an empty text withdraws the record.
+ */
+export const pairStage = (runId: string, stageId: string, text: string): RecordChanges => {
+  const words = pairWords(text);
+  return { [`pair:${runId}:${stageId}`]: words ? { text: words } : '' };
+};
+
 /** Withdraw a record (undo), the empty string the data model defines. */
 export const withdraw = (key: string): RecordChanges => ({ [key]: '' });
 
@@ -191,5 +207,6 @@ export const actions = {
   repeatPause,
   answerCheckin,
   chooseBuild,
+  pairStage,
   withdraw,
 } as const;

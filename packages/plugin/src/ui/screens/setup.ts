@@ -1,9 +1,10 @@
 import { bindStage, skipStage } from '@questarc/engine';
-import { capitalise, planSentence } from '../../shared/plan';
+import { capitalise } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
 import { weekdayOfId } from '../journey/format';
+import { pairField } from '../journey/pair';
 import { scheduleText, taskOfCfg } from '../repeat';
 import type { Context, Screen } from '../screen';
 
@@ -13,7 +14,8 @@ import type { Context, Screen } from '../screen';
  * the user to set the repeat, or binds a recurring task the user already
  * has. It also handles a task that does not repeat yet, a repeat journeys
  * cannot follow, and a task that is gone. A stage the user already does
- * can be passed with "I Already Do This" (never the last one).
+ * can be passed with "I Already Do This" (never the last one). The
+ * optional "pair it with" field is asked here (design rule 7).
  */
 export const setupScreen = (ctx: Context): Screen => {
   const { view, journeys, records } = ctx.state;
@@ -69,6 +71,8 @@ export const setupScreen = (ctx: Context): Screen => {
   // The same screen then offers the next stage.
   const skip = skipStage(run, journey, view.todayStr);
 
+  const plan = h('p', { class: 'qa-plan' });
+
   let message: string;
   let actions: Node[];
   if (station.state === 'unsupported-repeat') {
@@ -97,10 +101,11 @@ export const setupScreen = (ctx: Context): Screen => {
         'section',
         { class: 'qa-card' },
         h('p', { class: 'qa-overline' }, t('ui.setup.plan')),
-        h('p', { class: 'qa-plan' }, planSentence(stage)),
+        plan,
         h('p', { class: 'qa-muted' }, t('ui.setup.suggested', { schedule: suggested })),
       ),
       h('p', {}, message),
+      pairField(ctx, run, stage, plan),
       prevTask && station.state === 'unbound' && !task
         ? h(
             'div',
