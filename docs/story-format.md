@@ -71,7 +71,10 @@ the ladders in `content/art/` (`<name>.ladder.json`, `markers.json`); pictures a
 ```
 
 The user may choose another ladder, marker and hue when starting; the
-journey only suggests.
+journey only suggests. The `names` were written for the journey's own
+ladder: if the user chose another one, the hosts show that ladder's
+generic version titles instead (#115; the engine's view carries only the
+chosen ladder, so a host compares it with `build.ladder`).
 
 ## Texts
 

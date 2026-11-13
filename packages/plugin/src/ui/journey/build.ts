@@ -38,13 +38,20 @@ export const hueOf = (name: string, ladder?: Ladder): Hue | undefined =>
 /** The marker kind's plural title, from its pictures' list. */
 export const markerTitle = (kind: string): string => art().markers[kind]?.title ?? kind;
 
-/** The state the scene is drawn in, from the engine's view and the journey's names. */
+/**
+ * The state the scene is drawn in, from the engine's view and the journey's
+ * names. The names were written for the journey's own ladder: on another
+ * ladder (chosen when starting) the ladder's generic titles show (#115).
+ */
 export const buildState = (build: BuildView, journey: Journey): BuildState => ({
   progress: build.markerProgress,
   ready: build.ready,
   marker: build.marker,
   versions: build.versions,
-  names: journey.build?.names?.map((key) => (key ? t(key) : undefined)),
+  names:
+    build.ladder === (journey.build?.ladder ?? 'home')
+      ? journey.build?.names?.map((key) => (key ? t(key) : undefined))
+      : undefined,
 });
 
 /** The row of versions: those standing small, the next as a plain step. */

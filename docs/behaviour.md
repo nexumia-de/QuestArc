@@ -105,7 +105,7 @@ as their own page from **What you build** in the journey's menu
   next one as a plain step without a picture, nothing further), then one
   line of state in words ("A plank bridge stands · a stone bridge is on
   its way", "… is ready", or only "A hut stands" before the stage's first
-  counting completion), then the card. The picture's text for
+  counting completion; the journey's own version names only while the run's ladder is the journey's own, else the ladder's titles, #115), then the card. The picture's text for
   screen readers says the same and the marker in words: "A plank bridge,
   version 3 of 5; marker: 2 of 2 posts and 3 of 6 lanterns; not ready
   yet". At 720 px and wider the build is on the left and the card on the
