@@ -1,6 +1,6 @@
 {
   "name": "A window that never held n completions: the best of all days, below 1",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -47,9 +47,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

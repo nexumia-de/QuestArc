@@ -1,6 +1,6 @@
 {
   "name": "The newest open run is active, older open runs are paused, ended runs are finished",
-  "rule": "data-model \u00a72",
+  "rule": "data-model §2",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -38,9 +38,6 @@
         "taskId": "rpt_cfgA_2026-11-05",
         "repeatCfgId": "cfgA"
       },
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r0": {
         "journeyId": "test-daily",
         "journeyVersion": 1,
@@ -59,7 +56,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "mode": "rpg",
     "active": {
       "runId": "r1"
     },

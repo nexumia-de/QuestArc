@@ -1,9 +1,6 @@
 /** The engine's output (docs/data-model.md §3). */
 export interface GameView {
   readonly todayStr: string;
-  readonly mode: 'calm' | 'rpg';
-  readonly totalXp: number;
-  readonly level: number;
   /** The active run; absent when it is read-only (then in `readOnly`). */
   readonly active?: RunView;
   readonly paused: readonly RunView[];
@@ -38,8 +35,8 @@ export interface RunView {
   readonly paused: boolean;
   readonly checkinDue: boolean;
   readonly offerFallback: boolean;
-  /** Game mode only: what the journey builds (docs/game-rules.md §9). */
-  readonly build?: BuildView;
+  /** What the journey builds (docs/game-rules.md §7). */
+  readonly build: BuildView;
 }
 
 /**
@@ -71,15 +68,12 @@ export interface StationView {
   readonly state: StationState;
   readonly progress: number;
   readonly run: StationRun;
-  /** XP earned in this stage (from the checkpoint once done). */
-  readonly xp: number;
   /** Days with a counting completion since the stage was accepted. */
   readonly completions: number;
-  /** First completions after a missed due day (each earns the bonus). */
+  /** First completions after a missed due day (each is greeted once). */
   readonly welcomeBacks: number;
   readonly acceptedDay?: string;
   readonly doneDay?: string;
-  readonly guardian?: { readonly hp: number; readonly damage: number; readonly defeated: boolean };
   /** Current stage only: the last 7 due (or paused) days, oldest first. */
   readonly lastDays?: readonly DayMark[];
 }

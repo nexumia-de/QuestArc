@@ -1,6 +1,6 @@
 {
   "name": "Progress toward days 5 of 7 is completions in the window divided by n",
-  "rule": "game-rules \u00a74",
+  "rule": "game-rules §4",
   "kind": "evaluate",
   "input": {
     "day": {

@@ -1,6 +1,6 @@
 {
   "name": "Continue: the next version stands and the marker starts again",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -60,9 +60,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,
@@ -77,8 +74,7 @@
       },
       "stage-done:r1:a": {
         "day": "2026-11-05",
-        "xp": 50,
-        "damage": 0
+        "dataFormat": 2
       },
       "stage:r1:b": {
         "acceptedDay": "2026-11-05"

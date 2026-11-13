@@ -7,22 +7,46 @@
   "stages": [
     {
       "id": "a",
-      "plan": { "anchor": "test-daily.a.anchor", "action": "test-daily.a.action" },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "days", "n": 5, "of": 7 },
-      "guardian": { "name": "test-daily.a.guardian", "hp": 100 }
+      "plan": {
+        "anchor": "test-daily.a.anchor",
+        "action": "test-daily.a.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      }
     },
     {
       "id": "b",
-      "plan": { "anchor": "test-daily.b.anchor", "action": "test-daily.b.action" },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "count", "n": 3 }
+      "plan": {
+        "anchor": "test-daily.b.anchor",
+        "action": "test-daily.b.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "count",
+        "n": 3
+      }
     },
     {
       "id": "c",
-      "plan": { "anchor": "test-daily.c.anchor", "action": "test-daily.c.action" },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "time_spent", "minutes": 30 }
+      "plan": {
+        "anchor": "test-daily.c.anchor",
+        "action": "test-daily.c.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "time_spent",
+        "minutes": 30
+      }
     }
   ]
 }

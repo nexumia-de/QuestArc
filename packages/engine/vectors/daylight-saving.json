@@ -1,6 +1,6 @@
 {
   "name": "Logical days across the spring daylight-saving change with day start 04:00",
-  "rule": "game-rules \u00a72, logical days",
+  "rule": "game-rules §2, logical days",
   "kind": "evaluate",
   "input": {
     "day": {

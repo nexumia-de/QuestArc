@@ -132,26 +132,12 @@
   "expect": [
     {
       "key": "event.completion",
-      "params": {
-        "xp": 10
-      }
+      "params": {}
     },
     {
       "key": "event.station-reached",
       "params": {
         "stage": "a"
-      }
-    },
-    {
-      "key": "event.guardian-damaged",
-      "params": {
-        "damage": 10
-      }
-    },
-    {
-      "key": "event.level-up",
-      "params": {
-        "level": 2
       }
     }
   ]

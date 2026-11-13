@@ -1,6 +1,6 @@
 {
   "name": "Undoing a completion takes back what it added to the marker (derived, not stored)",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -32,9 +32,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

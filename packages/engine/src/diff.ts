@@ -14,9 +14,9 @@ const currentStation = (run: RunView | undefined): StationView | undefined =>
   run?.stations[run.position.stage];
 
 /**
- * Build events of the journey that was active (game rules §9): a higher
+ * Build events of the journey that was active (game rules §7): a higher
  * version, also when its last stage ended the journey, or else a higher
- * marker progress in the same stage. None in calm mode (no build).
+ * marker progress in the same stage.
  */
 const buildEvents = (before: GameView, after: GameView): GameEvent[] => {
   const was = before.active?.build;
@@ -52,28 +52,17 @@ export const diff = (before: GameView, after: GameView): GameEvent[] => {
     if (newCompletions > 1) {
       events.push({ key: 'event.progress-summary', params: { completions: newCompletions } });
     } else if (newWelcomes > 0) {
-      events.push({ key: 'event.welcome-back', params: { xp: now.xp - then.xp } });
+      events.push({ key: 'event.welcome-back', params: {} });
     } else if (newCompletions === 1) {
-      events.push({ key: 'event.completion', params: { xp: now.xp - then.xp } });
+      events.push({ key: 'event.completion', params: {} });
     }
     if (now.state === 'met' && then.state !== 'met') {
       events.push({ key: 'event.station-reached', params: { stage: now.stageId } });
-    }
-    if (now.guardian?.defeated && !then.guardian?.defeated) {
-      events.push({ key: 'event.guardian-defeated', params: { stage: now.stageId } });
-    } else if (now.guardian && then.guardian && now.guardian.damage > then.guardian.damage) {
-      events.push({
-        key: 'event.guardian-damaged',
-        params: { damage: now.guardian.damage - then.guardian.damage },
-      });
     }
     if (run.offerFallback && !before.active?.offerFallback) {
       events.push({ key: 'event.fallback-offered', params: { stage: now.stageId } });
     }
   }
   events.push(...buildEvents(before, after));
-  if (after.level > before.level) {
-    events.push({ key: 'event.level-up', params: { level: after.level } });
-  }
   return events;
 };

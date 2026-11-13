@@ -5,7 +5,6 @@ import {
   chooseBuild,
   endJourney,
   resumeJourney,
-  setMode,
   withdraw,
 } from '../src';
 
@@ -23,17 +22,15 @@ describe('actions', () => {
       'pauseJourney',
       'repeatPause',
       'resumeJourney',
-      'setMode',
       'startJourney',
       'withdraw',
     ]);
   });
 
-  it('write the weekly answer, the mode and withdrawals', () => {
+  it('write the weekly answer and withdrawals', () => {
     expect(answerCheckin('r', 'walk', '2026-W45', 6)).toEqual({
       'checkin:r:walk:2026-W45': { score: 6 },
     });
-    expect(setMode('rpg')).toEqual({ settings: { mode: 'rpg' } });
     expect(withdraw('run-end:r')).toEqual({ 'run-end:r': '' });
   });
 

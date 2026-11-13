@@ -25,7 +25,6 @@ export const TEXT_LIMITS = {
   anchor: 40,
   action: 120,
   place: 40,
-  guardian: 40,
   arrival: 200,
   accept: 200,
   nugget: 240,
@@ -80,8 +79,6 @@ const uses = (journey: Journey): Use[] => {
     list.push({ key: stage.plan.action, field: 'action', at: `${at}.plan.action` });
     if (stage.plan.place)
       list.push({ key: stage.plan.place, field: 'place', at: `${at}.plan.place` });
-    if (stage.guardian)
-      list.push({ key: stage.guardian.name, field: 'guardian', at: `${at}.guardian.name` });
     if (stage.story?.arrival)
       list.push({ key: stage.story.arrival, field: 'arrival', at: `${at}.story.arrival` });
     if (stage.story?.accept)
@@ -171,7 +168,7 @@ const stageProblems = (journey: Journey): Problem[] => {
   return problems;
 };
 
-/** What the journey builds (game rules §9), against content/art/. */
+/** What the journey builds (game rules §7), against content/art/. */
 const buildProblems = (journey: Journey): Problem[] => {
   const build = journey.build;
   if (!build) return [warning('build', 'name a ladder from content/art/ (issue #42)')];

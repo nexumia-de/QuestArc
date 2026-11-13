@@ -92,12 +92,6 @@
       "params": {
         "completions": 3
       }
-    },
-    {
-      "key": "event.guardian-damaged",
-      "params": {
-        "damage": 30
-      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "Example A: only due weekdays count; two missed due days in a row end the run",
-  "rule": "game-rules \u00a72 (Example A)",
+  "rule": "game-rules §2 (Example A)",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -59,7 +59,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 40,
     "active": {
       "offerFallback": true,
       "stations": [

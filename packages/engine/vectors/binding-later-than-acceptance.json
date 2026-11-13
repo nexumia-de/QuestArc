@@ -1,6 +1,6 @@
 {
   "name": "Days before the task was bound are neither due nor missed",
-  "rule": "game-rules \u00a72, due days (the binding day)",
+  "rule": "game-rules §2, due days (the binding day)",
   "kind": "evaluate",
   "input": {
     "day": {

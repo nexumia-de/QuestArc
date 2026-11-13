@@ -1,6 +1,6 @@
 {
   "name": "Two completions for the same day count once",
-  "rule": "game-rules \u00a72",
+  "rule": "game-rules §2",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -49,7 +49,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 10,
     "active": {
       "stations": [
         {

@@ -1,6 +1,6 @@
 {
   "name": "A journey ended early: its version stands, no marker",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -33,9 +33,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

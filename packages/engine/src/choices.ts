@@ -11,7 +11,7 @@ import type { Journey } from './types/journey';
  */
 
 /** The data format this engine reads and writes (docs/decisions/data-format.md). */
-export const DATA_FORMAT = 1;
+export const DATA_FORMAT = 2;
 
 /** Record kinds that name their run in the key's second part. */
 export const RUN_KINDS: ReadonlySet<string> = new Set([
@@ -46,7 +46,6 @@ export interface Binding {
 }
 
 export interface Choices {
-  readonly mode: 'calm' | 'rpg';
   readonly runs: readonly RunRecord[];
   /** runId → end day */
   readonly runEnds: ReadonlyMap<string, string>;
@@ -54,8 +53,8 @@ export interface Choices {
   readonly accepted: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` → binding */
   readonly bindings: ReadonlyMap<string, Binding>;
-  /** `${runId}:${stageId}` → checkpoint */
-  readonly checkpoints: ReadonlyMap<string, { day: string; xp: number; damage: number }>;
+  /** `${runId}:${stageId}` → the day the stage was finished (its checkpoint) */
+  readonly checkpoints: ReadonlyMap<string, { day: string }>;
   /** runId → pause/resume actions sorted by day */
   readonly pauses: ReadonlyMap<string, readonly { day: string; action: 'pause' | 'resume' }[]>;
   /** `${runId}:${stageId}:${isoWeek}` present when answered */
@@ -97,12 +96,11 @@ const newerRuns = (records: Readonly<Record<string, unknown>>): Map<string, numb
 };
 
 export const parseChoices = (records: Readonly<Record<string, unknown>>): Choices => {
-  let mode: 'calm' | 'rpg' = 'calm';
   const runs: RunRecord[] = [];
   const runEnds = new Map<string, string>();
   const accepted = new Map<string, string>();
   const bindings = new Map<string, Binding>();
-  const checkpoints = new Map<string, { day: string; xp: number; damage: number }>();
+  const checkpoints = new Map<string, { day: string }>();
   const pauses = new Map<string, { day: string; action: 'pause' | 'resume' }[]>();
   const checkins = new Set<string>();
   const builds = new Map<string, BuildChoice>();
@@ -129,7 +127,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     }
 
     if (kind === 'settings') {
-      if (value.mode === 'rpg' || value.mode === 'calm') mode = value.mode;
+      // Written by QuestArc before 3.3 (calm or game mode); nothing is read from it.
     } else if (kind === 'run' && parts.length === 2 && parts[1]) {
       const journeyId = str(value.journeyId);
       const startDay = value.startDay;
@@ -159,11 +157,10 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         });
       } else bad();
     } else if (kind === 'stage-done' && parts.length === 3) {
-      const xp = num(value.xp);
-      const damage = num(value.damage);
-      if (isDay(value.day) && xp !== undefined && damage !== undefined) {
-        checkpoints.set(`${parts[1]}:${parts[2]}`, { day: value.day, xp, damage });
-      } else bad();
+      // Checkpoints written before data format 2 also carry `xp` and
+      // `damage`; they are read like any unknown field: not at all.
+      if (isDay(value.day)) checkpoints.set(`${parts[1]}:${parts[2]}`, { day: value.day });
+      else bad();
     } else if (kind === 'pause' && parts.length === 3 && parts[1] && isDay(parts[2])) {
       if (value.action === 'pause' || value.action === 'resume') {
         const list = pauses.get(parts[1]) ?? [];
@@ -192,7 +189,6 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
 
   for (const list of pauses.values()) list.sort((a, b) => a.day.localeCompare(b.day));
   return {
-    mode,
     runs,
     runEnds,
     accepted,

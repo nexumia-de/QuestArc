@@ -1,6 +1,6 @@
 {
   "name": "guardWrite accepts the user's build choice and its withdrawal",
-  "rule": "data-model \u00a72",
+  "rule": "data-model §2",
   "kind": "guard",
   "input": {
     "day": {
@@ -18,9 +18,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

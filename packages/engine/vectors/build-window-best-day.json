@@ -1,6 +1,6 @@
 {
   "name": "Marker progress is the best day of the stage, not the last one",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -54,9 +54,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

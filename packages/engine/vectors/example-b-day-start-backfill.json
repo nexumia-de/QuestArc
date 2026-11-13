@@ -1,6 +1,6 @@
 {
   "name": "Example B: day start 04:00, backfill until the end of the next day",
-  "rule": "game-rules \u00a72 (Example B)",
+  "rule": "game-rules §2 (Example B)",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -56,7 +56,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 40,
     "active": {
       "stations": [
         {

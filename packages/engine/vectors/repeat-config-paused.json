@@ -1,6 +1,6 @@
 {
   "name": "A paused repeat config without records: days after the last completion are paused",
-  "rule": "game-rules \u00a72, pauses",
+  "rule": "game-rules §2, pauses",
   "kind": "evaluate",
   "input": {
     "day": {

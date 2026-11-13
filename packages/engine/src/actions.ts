@@ -1,5 +1,6 @@
 import type { Journey } from './types/journey';
 import type { RunView } from './types/view';
+import { DATA_FORMAT } from './choices';
 
 /**
  * The choice records each user action writes (docs/data-model.md §2), as
@@ -71,11 +72,7 @@ export const continueJourney = (run: RunView, journey: Journey, today: string): 
   if (!station || !stage || station.state !== 'met') return {};
   const next = journey.stages[index + 1];
   return {
-    [`stage-done:${run.runId}:${stage.id}`]: {
-      day: today,
-      xp: station.xp,
-      damage: station.guardian?.damage ?? 0,
-    },
+    [`stage-done:${run.runId}:${stage.id}`]: { day: today, dataFormat: DATA_FORMAT },
     ...(next
       ? { [`stage:${run.runId}:${next.id}`]: { acceptedDay: today } }
       : { [`run-end:${run.runId}`]: { day: today, reason: 'finished' } }),
@@ -124,7 +121,7 @@ export const answerCheckin = (
 
 /**
  * The user's choice of what a run builds, what hangs on its marker and
- * its hue (game rules §9), one record per run; names come from
+ * its hue (game rules §7), one record per run; names come from
  * content/art/. Choosing nothing withdraws the record, so the
  * journey's suggestion applies again.
  */
@@ -140,9 +137,6 @@ export const chooseBuild = (
   return { [`build:${runId}`]: Object.keys(value).length > 0 ? value : '' };
 };
 
-/** Calm or game mode (design rule 17). */
-export const setMode = (mode: 'calm' | 'rpg'): RecordChanges => ({ settings: { mode } });
-
 /** Withdraw a record (undo), the empty string the data model defines. */
 export const withdraw = (key: string): RecordChanges => ({ [key]: '' });
 
@@ -157,6 +151,5 @@ export const actions = {
   repeatPause,
   answerCheckin,
   chooseBuild,
-  setMode,
   withdraw,
 } as const;

@@ -10,7 +10,7 @@ export interface Journey {
   readonly why?: string;
   readonly stages: readonly Stage[];
   readonly ending?: { readonly story: string };
-  /** What the journey builds in game mode (docs/story-format.md, Build). */
+  /** What the journey builds (docs/story-format.md, Build). */
   readonly build?: {
     readonly ladder: string;
     readonly marker?: string;
@@ -28,7 +28,6 @@ export interface Stage {
   readonly plan: { readonly anchor: string; readonly action: string; readonly place?: string };
   readonly schedule: Schedule;
   readonly condition: Condition;
-  readonly guardian?: { readonly name: string; readonly hp: number };
   readonly story?: { readonly arrival?: string; readonly accept?: string };
   readonly nugget?: string;
 }

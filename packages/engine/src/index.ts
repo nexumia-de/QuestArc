@@ -22,7 +22,6 @@ export {
   pauseJourney,
   repeatPause,
   resumeJourney,
-  setMode,
   startJourney,
   withdraw,
 } from './actions';

@@ -1,6 +1,6 @@
 {
-  "name": "Example G: the days window moves on, progress falls, marker progress stays, not ready",
-  "rule": "game-rules §9",
+  "name": "Example E: the days window moves on, progress falls, marker progress stays, not ready",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -54,9 +54,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,

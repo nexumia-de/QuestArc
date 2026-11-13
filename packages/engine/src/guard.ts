@@ -10,7 +10,10 @@ import type { GameView } from './types/view';
  * understand, and never writes half an action.
  */
 
-/** Kinds this engine writes; `journey` is an imported journey. */
+/**
+ * Kinds this engine writes; `journey` is an imported journey, `settings`
+ * a record of QuestArc before 3.3 that a host may still withdraw.
+ */
 const WRITTEN_KINDS: ReadonlySet<string> = new Set([
   'settings',
   'journey',

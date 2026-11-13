@@ -1,6 +1,6 @@
 {
-  "name": "The first completion after a miss is a welcome back with 20 XP",
-  "rule": "game-rules \u00a75",
+  "name": "The first completion after a miss is a welcome back",
+  "rule": "game-rules §5",
   "kind": "diff",
   "before": {
     "day": {
@@ -90,15 +90,7 @@
   "expect": [
     {
       "key": "event.welcome-back",
-      "params": {
-        "xp": 20
-      }
-    },
-    {
-      "key": "event.guardian-damaged",
-      "params": {
-        "damage": 20
-      }
+      "params": {}
     }
   ]
 }
