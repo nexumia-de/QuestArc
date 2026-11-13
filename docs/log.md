@@ -2,6 +2,7 @@
 
 ## 2026-11-13
 
+- **Decision** (owner): no GitHub milestones for the goals after "More journeys"; the [roadmap](roadmap.md) keeps their order.
 - **Update**: [roadmap](roadmap.md) replanned for one look (3.3.0): the mixed milestone "More journeys" is split into "Habits that last" (#81, #82, #22 with #96 on paper first, #66, #60, #84), "More journeys" (#37, #39, #58, #59), "The Valley" (#114, #88; #87 and #43 only by the owner's decision), "Private journeys" (#40, #89) and "Standalone app" (#93, #91). #42 is closed as shipped; what it left open is #114. #88, #87, #43 and #45 are rewritten without game mode, XP, levels and guardians.
 - **Update**: plan tidied at the owner's word: #8 (2.x tags pushed, Codeberg `Nexumia/QuestArc` archived), #70 (community plugin list) and #16 (gjs spike) are closed; [the engine in gjs](decisions/engine-in-gjs.md) no longer lists the phone measurement as open work.
 - **Update** (#110): the ladders' `keeper` slot is removed from the art files, their generator and checker and the plugin's types ([journey design](journey-design.md), [shared pictures](decisions/shared-pictures.md)); it was meant for a worn-down guardian and was never drawn. A ladder that still names it is refused.
