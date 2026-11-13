@@ -38,3 +38,5 @@ plugin.zip
 # Sub-repos / References
 # super-productivity-repo/
 super-productivity-repo/
+# Agent worktrees
+.claude/worktrees/
