@@ -23,6 +23,10 @@ registerHooks(PluginAPI, brain.refresh);
 const panel = createSidePanel(PluginAPI);
 PluginAPI.onMessage?.((message) => handleMessage(brain, message, panel));
 
+// Super Productivity does not clear a plugin's timers when it switches
+// the plugin off or replaces it (docs/super-productivity-facts.md).
+PluginAPI.onUnload?.(() => brain.stop());
+
 PluginAPI.registerHeaderButton({
   label: 'QuestArc',
   icon: 'route',

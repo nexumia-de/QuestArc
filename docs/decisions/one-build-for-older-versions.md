@@ -49,6 +49,10 @@ Option 3.
 - The real-app check runs against the oldest supported version (19.3.1).
   A check against a newer version is an addition, not a replacement.
 
+State on 2026-11-13, after 20.0.0 was released: the fallbacks are in
+place and 3.2.1 still installs in 19.3.x; every 20.0.0 member QuestArc
+uses is already used where it exists.
+
 ## Consequences
 
 - No second ZIP, no version switch in the build or the release workflow.

@@ -5,6 +5,11 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/quest-arc/releases) with the
 plugin ZIP.
 
+## 3.2.1
+
+- After you switch QuestArc off or install a new version, the old one
+  no longer checks your tasks one more time in the background.
+
 ## 3.2.0
 
 - **With the game, a journey now builds something.** Instead of the path

@@ -51,6 +51,11 @@ export interface Brain {
    * refused as a whole (docs/data-model.md §2, data format).
    */
   write(records: Records): Promise<State>;
+  /**
+   * Ends the brain when the plugin is unloaded: clears the waiting
+   * refresh, ignores later ones and reports no more events.
+   */
+  stop(): void;
 }
 
 export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: BrainOptions): Brain => {
@@ -61,6 +66,7 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
   let timer: ReturnType<typeof setTimeout> | undefined;
   let queue: Promise<State | undefined> = Promise.resolve(undefined);
   let revision = 0;
+  let stopped = false;
   const pauseSeen = new Map<string, boolean>();
 
   const evaluateOnce = async (): Promise<State> => {
@@ -95,7 +101,7 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
     const before = current?.view;
     revision += 1;
     current = { revision, view, journeys, records };
-    if (before) {
+    if (before && !stopped) {
       const events = diff(before, view);
       if (events.length > 0) onEvents(events, view, journeys);
     }
@@ -125,11 +131,16 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
       // A waiting refresh is kept, not restarted: dataChanged fires about
       // once a second while time tracking runs, and a restarted timer
       // would never fire.
-      if (timer !== undefined) return;
+      if (stopped || timer !== undefined) return;
       timer = setTimeout(() => {
         timer = undefined;
         void run().catch(() => undefined);
       }, debounceMs);
+    },
+    stop() {
+      stopped = true;
+      if (timer !== undefined) clearTimeout(timer);
+      timer = undefined;
     },
     async write(proposed) {
       const { changes } = guardWrite((await flush()).view, proposed);

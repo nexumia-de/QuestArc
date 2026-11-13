@@ -15,4 +15,4 @@ export type HostApi = Pick<
   | 'showSnack'
   | 'registerHook'
 > &
-  Partial<Pick<PluginAPI, 'getDayContext' | 'onWindowFocusChange'>>;
+  Partial<Pick<PluginAPI, 'getDayContext' | 'onWindowFocusChange' | 'onUnload'>>;
