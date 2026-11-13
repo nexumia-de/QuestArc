@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, XP, level, welcome back, guardians, graduation, calm mode and the build of a journey (ladder, version, marker progress, ready), with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, welcome back, graduation and the build of a journey (ladder, version, marker progress, ready), with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -20,8 +20,7 @@ and its test vectors together.
 - **Only the current stage's task counts.** A completion counts when it
   is an instance of the recurring task bound to the active journey's
   current stage ([recurring-task setup](decisions/recurring-task-setup.md)).
-  Other tasks give nothing, in calm and in RPG mode: progress shown is
-  progress on the habit.
+  Other tasks give nothing: progress shown is progress on the habit.
 - A task finished as "won't do" (`wontDoOn === doneOn`) does not count.
 - **One active journey** at a time; it can be paused to start another.
 
@@ -85,8 +84,8 @@ A day `d` is due when all of these hold:
 - **Backfill window:** a completion counts for its due day if it was
   ticked off (`doneOn`) by the end of the next logical day. A later
   completion counts for the logical day it was ticked off.
-- A completion on a day that is not due still counts (XP, `count`,
-  `time_spent`, guardians) and ends a series of misses, but does not
+- A completion on a day that is not due still counts (`count`,
+  `time_spent`) and ends a series of misses, but does not
   lengthen a run.
 - **At most one completion counts per day**, also when two instances of
   the task were ticked off for the same day.
@@ -147,42 +146,20 @@ the journey view: `days` → completions in the window ÷ n (capped at 1);
 1, 2, 4, 5, 6 done, 3 and 7 missed: the last 7 due days hold 5
 completions → met on day 6.
 
-## 5. XP and level
+## 5. Welcome back
 
-- **10 XP per counting completion.** Fixed; not based on time spent or
-  estimates (the evidence review advises against tying rewards to
-  performance measures).
-- **Welcome back:** the first counting completion after a missed due day
-  earns 10 extra XP and triggers the welcome-back event. At most once per
-  gap.
-- XP is shown after a completion, never announced beforehand (no "do
-  this for 10 XP" labels), because announced rewards undermine interest
-  in things people already enjoy.
-- **Level** = `floor(sqrt(totalXp / 50)) + 1`: level 2 at 50 XP (5
-  completions), level 5 at 800 XP (80), level 10 at 4,050 XP (about 400).
-  Levels are cosmetic only: each unlocks a title or a look, never power.
-- **Total XP** = XP from the checkpoints of finished stages
-  ([deleted history](decisions/deleted-history.md)) + XP derived for the
-  current stage.
+- The first counting completion after a missed due day is a **welcome
+  back**: the engine counts it per stage (`welcomeBacks`) and the hosts
+  greet it with one sentence (`event.welcome-back`). At most once per
+  gap, also when the gap ended a run.
+- It gives nothing and takes nothing; coming back is what is greeted.
 
-**Example E.** Example C's stage: 6 completions × 10 = 60 XP, plus 10 for
-the welcome back on day 6 = 70 XP → level 2.
+Since 3.3 there are no XP, no levels and no guardians (issue #110): they
+had no effect any more, and the [evidence review](research.md) supports
+real progress in words and a progress picture instead. Messages say the
+real progress ("4 of 5 days"); nothing is announced before it is done.
 
-## 6. Guardians
-
-- A stage may have a guardian with HP (story format; default 100).
-- **Damage** = the XP earned in the stage since it was accepted
-  (completions and welcome-back bonuses). The guardian is defeated when
-  damage ≥ HP. Damage never goes back up after a checkpoint, and
-  guardians never heal.
-- A guardian is an extra, not a condition: the stage is met by its
-  condition; an undefeated guardian simply stays on the path and can be
-  defeated later in the stage.
-
-**Example F.** Guardian HP 100 in Example C's stage: 70 damage after day 7. Day 10 is the first completion after the misses: 10 + 10 welcome back
-= 90. Day 11: 100, the guardian is defeated.
-
-## 7. Graduation
+## 6. Graduation
 
 A habit **qualifies** for graduation when all of these hold:
 
@@ -197,19 +174,10 @@ repeat in Super Productivity. QuestArc asks the weekly question again 2
 and 6 weeks after graduation; an answer of 4 or less, or completion below
 60 % in the 2 weeks before, suggests bringing the habit back (one tap).
 
-## 8. Calm mode
+## 7. Builds
 
-Calm mode hides XP, level and guardians and uses no game words. It
-shows the path, the stations, the current and best run, the conditions,
-the welcome-back text and the weekly question. Switching modes changes
-only what is shown; the engine computes the same values in both, except
-the build (§9), which is only a picture of the game and is left out of
-the view in calm mode.
-
-## 9. Builds
-
-Issues #42 and #99, decided by the owner on 2026-11-12. In game mode a
-journey builds one thing, whole after every stage; the hosts draw it,
+Issues #42, #99 and #110, decided by the owner on 2026-11-12 and
+2026-11-13. Every journey builds one thing, whole after every stage; the hosts draw it,
 the engine gives only names and numbers.
 
 - **Ladder.** A journey names a ladder (story format, `build`): one
@@ -243,7 +211,7 @@ the engine gives only names and numbers.
   never stored ([decision](decisions/marker-progress.md)): undoing a
   completion takes back what it added, and so does deleting a done
   instance, deleting the repeat config or binding another task, as they
-  do for progress and XP. A host shows the first `ceil(p × E)` of a
+  do for progress. A host shows the first `ceil(p × E)` of a
   marker's `E` elements, so "5 of 7 days" and "20 times" fill the same
   marker.
 - **Ready:** the current stage is met now (§4, state `met`). It follows
@@ -259,14 +227,13 @@ the engine gives only names and numbers.
   days are not due, so its marker progress does not change. An **ended**
   journey (a `run-end` record) shows its version standing, without a
   marker (progress 0, not ready).
-- **Calm mode:** the view carries no build and no build events.
-- **Events** (game mode, the active journey): `event.build-element`
+- **Events** (the active journey): `event.build-element`
   `{ from, to }` when the marker progress of the same stage rose (the
   host decides whether that makes a new element and stays quiet in
   between); `event.build-version` `{ version }` when the version rose,
   also when the last stage was finished and the journey ended.
 
-**Example G.** Example D's stage (`days` 5 of 7, due daily, accepted on
+**Example E.** Example D's stage (`days` 5 of 7, due daily, accepted on
 day 1). Days 1 to 5 done: progress and marker progress 1, ready. Days 6
 to 8 missed, day 9 is today: the last 7 due days (3 to 9) hold 3
 completions, so progress is 0.6 and the stage is no longer met; marker

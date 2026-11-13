@@ -58,7 +58,8 @@ unrelated done archived tasks over five years, one journey (`test-daily`)
 with two finished stages and a third met, one bound daily repeat config
 with 1,800 days of history (1,655 instances), 8.2 MB as JSON. Same result
 before and after: all 71 + 35 tests including every vector pass unchanged,
-and the test checks the journey's XP and completions.
+and the test checks the journey's stations and completions (until 3.3
+also its XP).
 
 **Where the time went.** `snapshotFromHost` converted every archived task
 (an object and a map entry each) before `buildSnapshot` dropped the ones no

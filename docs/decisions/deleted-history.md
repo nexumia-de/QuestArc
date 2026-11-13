@@ -14,23 +14,23 @@ Issue #49, decided by the owner on 2026-11-05.
 
 All progress is derived from tasks. If the user deletes archived tasks,
 clears the archive, deletes a single done instance, or deletes a repeat
-config (which clears `repeatCfgId` on all its tasks), derived XP, level
-and stage progress would drop without warning.
+config (which clears `repeatCfgId` on all its tasks), derived stage progress (and, before 3.3, XP and level) would drop
+without warning.
 
 ## Options
 
 1. Accept it and explain it.
 2. Store a small checkpoint per finished stage.
-3. Store all XP (back to counting).
+3. Store all progress (back to counting).
 
 ## Decision
 
 Option 2. When the user accepts the next stage (or ends the journey after
 its last stage), the plugin (or Pensum) writes a checkpoint record `stage-done:<journeyId>:<stageId>` with the day it was
-completed and the XP and guardian damage it earned. The engine then:
+completed. The engine then:
 
 - treats a stage with a checkpoint as finished, whatever the tasks say;
-- takes XP and damage of finished stages from their checkpoints;
+- raises the build's version by one for it ([game rules](../game-rules.md) §7);
 - derives only the **current** stage from tasks.
 
 A finished journey is finished when its last stage has a checkpoint.
@@ -48,5 +48,9 @@ checkpoint write the same content (last writer wins on one record).
 - Between meeting the condition and accepting the next stage, the stage
   is still derived: undoing a completion can take it back below its
   condition. Once accepted, the stage stays finished.
-- Checkpoints are the only counted values QuestArc stores; they are
-  written once and never incremented.
+- Checkpoints are the only finished progress QuestArc stores; they are
+  written once and never changed.
+- Until 3.3 a checkpoint also held the stage's XP and guardian damage.
+  XP and guardians are gone (#110); a checkpoint is now
+  `{ day, dataFormat: 2 }` ([data model](../data-model.md) §2), and old
+  ones are read by their day.

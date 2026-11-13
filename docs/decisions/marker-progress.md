@@ -18,7 +18,7 @@ sources:
 Issue #99[^issue99], from the owner's marker rule in #42[^issue42]
 (2026-11-12): the marker grows element by element from the **best**
 progress reached in the stage and never loses an element. The rule is in
-the [game rules](../game-rules.md) §9.
+the [game rules](../game-rules.md) §7.
 
 ## Problem
 
@@ -81,7 +81,7 @@ again at 0 with every stage.
 
 The engine cannot recompute what is gone. In the **current** stage these
 user actions lower the marker progress, exactly as they lower the
-stage's progress, completions, XP and the seven day marks today:
+stage's progress, completions and the seven day marks today:
 
 - deleting a done instance of the stage's task (Super Productivity never
   deletes a done instance by itself: its clean-up keeps done instances

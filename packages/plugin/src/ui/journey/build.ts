@@ -18,7 +18,7 @@ import {
 } from '../ladder';
 
 /**
- * The build on the journey screen in game mode (docs/behaviour.md screen
+ * The build on the journey screen (docs/behaviour.md screen
  * 4, docs/journey-design.md "The journey screen with the build"): the
  * ladder's scene in the run's hue, the row of versions and one line of
  * state in words. Elements that are new since the last draw grow in.

@@ -1,4 +1,4 @@
-// The journey screen with the build in the real app (#100), game mode:
+// The journey screen with the build in the real app (#100):
 // start "A gentle morning" with another ladder (Crossing instead of its
 // Home), tick the task off and see the first marker element from the
 // message's Show action, tick it off on four more days until the stage is
@@ -29,12 +29,9 @@ try {
   console.log('Super Productivity', version ?? (await install(page)));
   if (version) await install(page);
 
-  // Game mode, then start with another ladder.
+  // Start with another ladder.
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await page.keyboard.press('Escape');
-  await view()
-    .getByRole('radio', { name: /With game/ })
-    .check();
   await name('0-welcome');
   await view().getByRole('button', { name: 'Choose a journey' }).click();
   await view()
@@ -65,7 +62,7 @@ try {
   // Day 1: the first tick, its message opens the build.
   const messages = await tick(page, TASK);
   expect(
-    messages.some((m) => m.includes('+10 XP · 1 of 5 days.') && m.includes('Show')),
+    messages.some((m) => m.includes('done. 1 of 5 days.') && m.includes('Show')),
     `the message has the action Show (${messages.join(' | ')})`,
   );
   await page.locator('.mat-mdc-snack-bar-container button, snack-custom button').first().click();

@@ -88,19 +88,27 @@ overwrite each other. Most records are written once and never changed.
 
 | Key                                   | Value                                                                     | Written when                                                                                         |
 | ------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `settings`                            | `{ mode: "calm" \| "rpg" }`                                               | onboarding, settings                                                                                 |
 | `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? , woop? }`                   | a journey is started (own "why", optional plan check)                                                |
 | `run-end:<runId>`                     | `{ day, reason: "finished" \| "abandoned" }`                              | the last stage is done, or the user ends the journey                                                 |
 | `stage:<runId>:<stageId>`             | `{ acceptedDay }`                                                         | the user accepts a stage                                                                             |
 | `binding:<runId>:<stageId>`           | `{ taskId, repeatCfgId?, day }`; `day`: due days start then at the latest | a recurring task is bound or rebound; `repeatCfgId` is missing while a new task waits for its repeat |
-| `stage-done:<runId>:<stageId>`        | `{ day, xp, damage }`                                                     | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
+| `stage-done:<runId>:<stageId>`        | `{ day, dataFormat: 2 }`                                                  | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
 | `pause:<runId>:<day>`                 | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }`         | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                   |
 | `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 | `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
-- **Build choices** (`build:<runId>`, [game rules](game-rules.md) §9)
+- **No settings record.** QuestArc before 3.3 wrote `settings`
+  (`{ mode: "calm" | "rpg" }`); the mode is gone (#110), the engine
+  reads nothing from the record and never writes it. It can still be
+  withdrawn with the other records.
+- **Checkpoints** (`stage-done`) written before 3.3 also carry `xp` and
+  `damage`; the engine reads only `day`. An engine before 3.3 refuses a
+  checkpoint without these two fields and would show the stage as not
+  finished, so the checkpoint carries `dataFormat: 2`: there the run is
+  read-only until that host is updated (below).
+- **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
   suggestion back. A name the engine does not know, or flowers on
@@ -139,17 +147,18 @@ The plugin and Pensum are released separately, so one may run a newer
 engine than the other on the same records
 ([decision](decisions/data-format.md)).
 
-- **Run-scoped keys:** every key except `settings` and `journey:<id>`
+- **Run-scoped keys:** every key except `journey:<id>` (and the old `settings`)
   names its run in the second part (`<kind>:<runId>:…`). Record kinds
   added later follow this, or are global and must not change what an
   older engine computes.
 - **Data format:** the engine has a data format number (`DATA_FORMAT`,
-  now `1`). A run-scoped record may carry `dataFormat: <n>`; a record
+  now `2`, since checkpoints lost `xp` and `damage` in 3.3). A run-scoped record may carry `dataFormat: <n>`; a record
   without it is format 1. A newer engine writes `dataFormat` only on a
   record that changes what an older engine would compute for its run
-  (graduation, a real step back), and only then raises `DATA_FORMAT`.
+  (a checkpoint, graduation, a real step back), and only then raises
+  `DATA_FORMAT`.
   Everything else (new optional fields, new kinds an older engine may
-  ignore) keeps format 1. Withdrawing such a record lowers the run's
+  ignore) keeps its format. Withdrawing such a record lowers the run's
   format again. `format` on a `journey:` record is the story format, not
   this number.
 - **Unknown kinds and fields:** the engine ignores record kinds and
@@ -160,7 +169,7 @@ engine than the other on the same records
   `dataFormat` above the engine's ("written by a newer QuestArc"), when
   its journey is not available, or when the available journey has a
   lower `version` than the run's `journeyVersion`. The engine does not
-  compute its stations and it adds no XP; the view lists it in
+  compute its stations; the view lists it in
   `readOnly` with the reason and a problem, and it keeps its place in
   the order of runs (active, paused, finished) from its `run`, `pause`
   and `run-end` records. Of a run in a newer format the engine reads
@@ -181,9 +190,6 @@ The types are in `packages/engine/src/types/view.ts`; in short:
 ```ts
 interface GameView {
   todayStr: string;
-  mode: 'calm' | 'rpg'; // from the settings record; calm by default
-  totalXp: number; // computed in both modes, shown only with the game
-  level: number;
   active?: RunView; // the newest open run; absent when that run is read-only
   paused: RunView[]; // other open runs
   finished: RunView[]; // runs with a run-end record (the shelf)
@@ -208,7 +214,7 @@ interface RunView {
   paused: boolean; // by a pause record or a paused repeat config
   checkinDue: boolean; // weekly question not answered this ISO week
   offerFallback: boolean; // second miss in a row, not yet followed by a completion
-  build?: BuildView; // game mode only (game rules §9)
+  build: BuildView; // what the journey builds (game rules §7)
 }
 
 interface BuildView {
@@ -226,26 +232,23 @@ interface StationView {
   state: 'done' | 'met' | 'current' | 'unbound' | 'unsupported-repeat' | 'ahead';
   progress: number; // 0..1
   run: { current: number; best: number; total: number; gap: boolean };
-  xp: number; // earned in this stage; from the checkpoint once done
   completions: number; // days with a counting completion
   welcomeBacks: number;
   acceptedDay?: string;
   doneDay?: string;
-  guardian?: { hp: number; damage: number; defeated: boolean };
   // current stage only: the last 7 due or paused days, oldest first
   lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
 ```
 
-When the user accepts the next stage, the host writes the current
-station's `xp` and guardian `damage` into the checkpoint record.
+When the user accepts the next stage, the host writes the checkpoint
+record with the day (`continueJourney`).
 
 `diff(before, after)` returns events `{ key, params }` for toasts:
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more
 than one new completion at once, e.g. after a sync),
-`event.station-reached`, `event.guardian-damaged`,
-`event.guardian-defeated`, `event.fallback-offered`, `event.level-up`,
-and in game mode `event.build-element` (`{ from, to }`: the marker
+`event.station-reached`, `event.fallback-offered`,
+`event.build-element` (`{ from, to }`: the marker
 progress rose) and `event.build-version` (`{ version }`).
 Graduation follows with issue #22. All numbers follow the
 [game rules](game-rules.md).

@@ -692,7 +692,7 @@ body {
 }
 
 /*
- * The build on the journey screen in game mode (#100,
+ * The build on the journey screen (#100,
  * docs/journey-design.md "The journey screen with the build"): the scene
  * at the full width on a phone (16 : 9, the setting's view box), the row of versions, the line of
  * state. At 720 px and wider it takes the path's place on the left.

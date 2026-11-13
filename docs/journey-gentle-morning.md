@@ -16,21 +16,17 @@ texts in `content/i18n/en.json` (keys `gentle-morning.*`).
 
 ## Stages
 
-| Stage       | Plan ("After getting up, I will …")                                                 | Condition    | Guardian                  |
-| ----------- | ----------------------------------------------------------------------------------- | ------------ | ------------------------- |
-| `water`     | drink a glass of water (in the kitchen)                                             | 5 of 7 days  | —                         |
-| `stretch-1` | drink a glass of water and stretch for one minute                                   | 5 of 7 days  | —                         |
-| `stretch-5` | drink a glass of water and stretch for five minutes                                 | 5 of 7 days  | The Heavy Blanket, 100 HP |
-| `plan-day`  | drink a glass of water, stretch for five minutes and write down one thing for today | 8 of 10 days | The Morning Rush, 150 HP  |
+| Stage       | Plan ("After getting up, I will …")                                                 | Condition    |
+| ----------- | ----------------------------------------------------------------------------------- | ------------ |
+| `water`     | drink a glass of water (in the kitchen)                                             | 5 of 7 days  |
+| `stretch-1` | drink a glass of water and stretch for one minute                                   | 5 of 7 days  |
+| `stretch-5` | drink a glass of water and stretch for five minutes                                 | 5 of 7 days  |
+| `plan-day`  | drink a glass of water, stretch for five minutes and write down one thing for today | 8 of 10 days |
 
-All stages are daily. In game mode the journey builds a **Home**
-([game rules](game-rules.md) §9): four stages use all five versions,
+All stages are daily. The journey builds a **Home**
+([game rules](game-rules.md) §7): four stages use all five versions,
 from a fireplace to a house, with bunting on the marker (the ladder's default); a morning
 routine is something one comes home to every day.
-
-A guardian with 100 HP falls after 10 completions
-(10 XP each, [game rules](game-rules.md) §5–6), so it is usually still
-there when the stage is met: an extra, never a condition.
 
 ## How it follows the design rules
 
@@ -44,7 +40,7 @@ there when the stage is met: an extra, never a condition.
   in the environment (glass by the tap), why one miss is fine, an if-then
   plan for a hard morning, pairing the stretch with a song.
 - **No promised number of days** (rule 4), no quotes (rule 5), kind words
-  only (rule 15): texts say "you could", the guardians are things
-  everyone knows (a heavy blanket, the morning rush), never the user.
-- **Story is seasoning** (rule 20): the path goes from the kitchen at dawn
-  to the sun being up; one sentence per station.
+  only (rule 15): texts say "you could"; there are no opponents (version 3, #110).
+- **Story is seasoning** (rule 20): from the kitchen at dawn to the sun being
+  up, one sentence per station, speaking of pieces that stand and grow
+  without naming what is built.

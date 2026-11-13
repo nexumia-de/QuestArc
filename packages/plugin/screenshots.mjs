@@ -14,7 +14,7 @@ mkdirSync(out, { recursive: true });
 const page = pathToFileURL(resolve('dist', 'preview', 'index.html')).href;
 const artPage = pathToFileURL(resolve('dist', 'preview', 'art.html')).href;
 const scale = Number(process.argv[3] ?? 1);
-const shots = (process.argv[2] ?? 'welcome,empty,journey,journey-rpg,met,unbound').split(',');
+const shots = (process.argv[2] ?? 'welcome,empty,journey,met,unbound,build,build-ready').split(',');
 const sizes = [
   ['phone', 360, 720],
   ['desktop', 1000, 700],

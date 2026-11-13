@@ -1,9 +1,9 @@
 # QuestArc
 
 Habits as journeys: QuestArc turns the habits you build in
-[Super Productivity](https://super-productivity.com) into a journey along
-a path, one small step at a time. Calm by default, with an optional RPG
-layer.
+[Super Productivity](https://super-productivity.com) into a journey of
+small steps, and every journey builds something that grows with you.
+Calm, without points or levels.
 
 QuestArc runs in two places with the same game and the same data:
 
@@ -11,7 +11,7 @@ QuestArc runs in two places with the same game and the same data:
 - inside [Pensum](https://github.com/nexumia-de/pensum), a native app for
   Linux phones (Phosh) on Super Productivity's data (planned).
 
-<img src="docs/screenshots/journey-phone.png" alt="The journey 'A gentle morning' on a phone: the path with the current station, a weekly look back and the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-build-desktop-light.png" alt="The same journey at desktop size with the game layer: the hut the journey has built so far, with a line of pennants in front, next to the station card" width="520">
+<img src="docs/screenshots/journey-build-phone-light.png" alt="The journey 'A gentle morning' on a phone: the hut the journey has built so far, with a line of pennants in front, above the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-build-desktop-light.png" alt="The same journey at desktop size: the hut the journey has built so far, with a line of pennants in front, next to the station card" width="520">
 
 _Screenshots from demo data._
 
@@ -27,10 +27,10 @@ _Screenshots from demo data._
   projects.
 - **Missed days are neutral.** A gap is grey, never red. A hard week
   offers the earlier, smaller step; you can pause a journey at any time.
-- **Calm by default, game if you like.** The game layer adds level,
-  XP, guardians and a build: one thing that is whole at every station
-  and grows with the next, a fireplace that becomes a house. Rewards are fixed and only shown once
-  earned.
+- **Every journey builds something.** One thing that is whole at every
+  station and grows with the next, a fireplace that becomes a house. It
+  follows fixed rules and shows only real progress; there are no points,
+  levels or opponents.
 - **No network, no telemetry.** Everything stays in Super Productivity.
 
 Why it works this way: [How QuestArc motivates you](docs/psychology.md).

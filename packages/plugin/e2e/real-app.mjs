@@ -2,7 +2,7 @@
 // browser profile with throwaway data (docs/development.md, real app):
 // install and enable the ZIP, start "A gentle morning", create the task,
 // make it recurring in Super Productivity's own dialog, tick it off, and
-// check the message and the journey (calm mode). Screenshots go to
+// check the message and the journey. Screenshots go to
 // dist/real-app/.
 //
 //   node e2e/real-app.mjs [width height]
@@ -48,7 +48,7 @@ try {
 
   const messages = await tick(page, 'Getting up: drink a glass of water');
   expect(
-    messages.includes('Drink a glass of water: done. 1 of 5 days.'),
+    messages.some((m) => m.startsWith('Drink a glass of water: done. 1 of 5 days.')),
     `message after the completion (${messages.join(' | ')})`,
   );
 
@@ -59,7 +59,7 @@ try {
     card.includes('1 of 5 days') && card.includes('Calmer mornings'),
     'the card counts the completion',
   );
-  expect((await view().locator('.qa-build').count()) === 0, 'calm mode shows no build');
+  expect((await view().locator('.qa-build').count()) === 1, 'the journey shows its build');
   await shot('', '3-journey');
 } catch (error) {
   await shot('failed-', 'page').catch(() => undefined);

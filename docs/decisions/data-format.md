@@ -70,10 +70,14 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
 
 ## Consequences
 
-- The first record kind that needs it (graduation, #22) writes
-  `dataFormat: 2` and raises `DATA_FORMAT` to 2, with vectors.
-- A read-only run adds no XP on the older host, so its level can be
-  lower there until it is updated; the read-only page says to update.
+- The first record that needed it is the checkpoint of 3.3 (#110): it
+  lost `xp` and `damage`, which an engine before 3.3 requires, so it
+  carries `dataFormat: 2` and `DATA_FORMAT` is 2. A run continued with
+  3.3 is read-only on an older QuestArc until that is updated; old
+  checkpoints are still read. Graduation (#22) will take the next
+  number if it needs one.
+- A read-only run shows no progress on the older host until it is
+  updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through
   `engine-cli.mjs` and show the read-only page (follow-up issue in
   Pensum).
