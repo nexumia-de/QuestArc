@@ -5,6 +5,7 @@ import { createBrain } from './adapter/brain';
 import { useForCurrentStation } from './adapter/context-menu';
 import { registerHooks } from './adapter/hooks';
 import { handleMessage } from './adapter/messages';
+import { registerSettingsEntry } from './adapter/settings-entry';
 import { createSidePanel } from './adapter/side-panel';
 import { snackFor } from './adapter/snacks';
 import { builtInJourneys } from './shared/content';
@@ -21,7 +22,8 @@ const brain = createBrain({
 
 registerHooks(PluginAPI, brain.refresh);
 const panel = createSidePanel(PluginAPI);
-PluginAPI.onMessage?.((message) => handleMessage(brain, message, panel));
+const settings = registerSettingsEntry(PluginAPI);
+PluginAPI.onMessage?.((message) => handleMessage(brain, message, panel, settings));
 
 // Super Productivity does not clear a plugin's timers when it switches
 // the plugin off or replaces it (docs/super-productivity-facts.md).

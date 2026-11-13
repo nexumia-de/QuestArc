@@ -195,7 +195,15 @@ export const createApp = (root: HTMLElement, client: Client) => {
     const first = !state;
     // A shown error goes as soon as an answer comes, even when the data
     // did not change in between.
-    const changed = first || next.revision !== state?.revision || error !== undefined;
+    // The settings button of the plugin list (#67) opens the settings screen
+    // on top of where the view is, so back leads there.
+    const toSettings = next.openSettings === true && stack.at(-1)?.route.name !== 'settings';
+    if (toSettings)
+      stack = [
+        ...(stack.length > 0 ? stack : [entry(firstRoute(next))]),
+        entry({ name: 'settings' }),
+      ];
+    const changed = first || toSettings || next.revision !== state?.revision || error !== undefined;
     state = next;
     error = undefined;
     if (changed) render(first);

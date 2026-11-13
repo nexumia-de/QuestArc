@@ -199,6 +199,12 @@ as their own page from **What you build** in the journey's menu
   answers) with your Super Productivity data. Removing the plugin deletes
   them on all your devices."
 
+The settings button of QuestArc in Super Productivity's plugin list
+(Settings, Plugins; 19.3.0 and later, `registerConfigHandler`) opens the
+view straight on this screen, with the previous screen under it so back
+leads there. Where the host has no such button nothing changes: the
+settings stay in the view's menu.
+
 ### 9. How QuestArc motivates you
 
 Plain words, one paragraph each: small steps that grow (reaching a
@@ -343,5 +349,5 @@ the first answer, also when the data did not change in between.
 | Bound task actions | task context menu "Use for current station"                                       | row menu "Use for current station"           |
 | Messages           | snack (`showSnack`) with the action **Show** (opens the view)                     | toast                                        |
 | Build at a glance  | optional side panel (setting, off by default): the same view beside the task list | strip at the top of Today (later)            |
-| Settings           | plugin settings view                                                              | preferences                                  |
+| Settings           | settings screen of the view; the plugin list's settings button opens it (#67)     | preferences                                  |
 | Main actions       | bottom of the view                                                                | bottom bar (thumb reach)                     |

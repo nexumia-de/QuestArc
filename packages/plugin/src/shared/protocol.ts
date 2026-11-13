@@ -19,6 +19,8 @@ export interface State {
   readonly records: Readonly<Record<string, unknown>>;
   /** Whether the side panel setting is on on this device (#100). */
   readonly sidePanel?: boolean;
+  /** Once, after the settings button in Super Productivity's plugin list (#67). */
+  readonly openSettings?: boolean;
 }
 
 /** The ladders' pictures for the view (#100), sent once by plugin.js. */

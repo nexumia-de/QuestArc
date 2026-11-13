@@ -365,6 +365,11 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   re-registering the same `id` replaces the entry
   (`plugin-task-context-menu-registry.service.ts`, `register`; added in 19.2.0,
   `41324d29`)[^sp].
+- `registerConfigHandler(handler)` (plugin.js only; in 19.3.0 and 20.0.0):
+  one handler per plugin; Settings → Plugins shows a settings button when
+  one exists and runs it on press (`plugin-bridge.service.ts`,
+  `hasConfigHandler`/`invokeConfigHandler`; `plugin-management.component.ts`
+  at `v19.3.0` and `v20.0.0`). The handler may call `showIndexHtmlAsView()`[^sp].
 - `showIndexHtmlAsView()` navigates to `/plugins/<id>/index`
   (`_showIndexHtmlAsView`); manifest `sidePanel: true` loads the UI in the
   right panel (`types.ts`); `showInWorkContext()` mounts it in place of the

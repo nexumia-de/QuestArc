@@ -81,6 +81,17 @@ asks again 300 ms after a hook fires in the view (so plugin.js has marked
 its data stale first), when the page becomes visible, and every 5 s as a
 fallback; it redraws only when the revision changed.
 
+## Settings button of the plugin list
+
+`registerConfigHandler` (plugin.js only; present in 19.3.0 and 20.0.0,
+checked at the tags `v19.3.0` and `v20.0.0`: the host shows the button when
+a handler exists and runs it on press) is registered in
+`adapter/settings-entry.ts`, optional and inside `try`, like the hooks. The
+handler calls `showIndexHtmlAsView()` and sets a one-shot flag; the next
+`questarc:get` answer carries `openSettings: true` and the view pushes the
+settings screen on its stack. The route takes no parameters, so the flag
+travels in the state. A version without the member loses only the button.
+
 ## Task context menu
 
 "Use for current QuestArc station" (Super Productivity 19.2.0 and newer)
