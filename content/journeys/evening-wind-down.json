@@ -1,0 +1,136 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "evening-wind-down",
+  "version": 1,
+  "title": "evening-wind-down.title",
+  "description": "evening-wind-down.description",
+  "why": "evening-wind-down.why",
+  "build": {
+    "ladder": "crossing",
+    "names": [
+      "evening-wind-down.build.v1",
+      "evening-wind-down.build.v2",
+      "evening-wind-down.build.v3",
+      "evening-wind-down.build.v4",
+      "evening-wind-down.build.v5"
+    ]
+  },
+  "stages": [
+    {
+      "id": "charger",
+      "plan": {
+        "anchor": "evening-wind-down.anchor",
+        "action": "evening-wind-down.charger.action",
+        "place": "evening-wind-down.charger.place"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "evening-wind-down.charger.arrival",
+        "accept": "evening-wind-down.charger.accept"
+      },
+      "nugget": "evening-wind-down.charger.nugget"
+    },
+    {
+      "id": "calm-2",
+      "plan": {
+        "anchor": "evening-wind-down.anchor",
+        "action": "evening-wind-down.calm-2.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "evening-wind-down.calm-2.arrival",
+        "accept": "evening-wind-down.calm-2.accept"
+      },
+      "nugget": "evening-wind-down.calm-2.nugget"
+    },
+    {
+      "id": "calm-10",
+      "plan": {
+        "anchor": "evening-wind-down.anchor",
+        "action": "evening-wind-down.calm-10.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "evening-wind-down.calm-10.arrival",
+        "accept": "evening-wind-down.calm-10.accept"
+      },
+      "nugget": "evening-wind-down.calm-10.nugget"
+    },
+    {
+      "id": "lights-out",
+      "plan": {
+        "anchor": "evening-wind-down.anchor",
+        "action": "evening-wind-down.lights-out.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
+      "story": {
+        "arrival": "evening-wind-down.lights-out.arrival",
+        "accept": "evening-wind-down.lights-out.accept"
+      },
+      "nugget": "evening-wind-down.lights-out.nugget"
+    }
+  ],
+  "ending": {
+    "story": "evening-wind-down.ending"
+  },
+  "texts": {
+    "en": {
+      "evening-wind-down.title": "Evening wind-down",
+      "evening-wind-down.description": "From putting your phone on its charger to a short, calm routine that ends your day at about the same time each night.",
+      "evening-wind-down.why": "Why do you want your evenings to end more calmly? In your own words.",
+      "evening-wind-down.anchor": "brushing my teeth in the evening",
+      "evening-wind-down.build.v1": "Stepping stones at dusk",
+      "evening-wind-down.build.v2": "A log over the quiet water",
+      "evening-wind-down.build.v3": "A plank bridge into the evening",
+      "evening-wind-down.build.v4": "A stone bridge at nightfall",
+      "evening-wind-down.build.v5": "A covered bridge for the night",
+      "evening-wind-down.charger.action": "put my phone on its charger for the night",
+      "evening-wind-down.charger.place": "away from my bed",
+      "evening-wind-down.charger.arrival": "It starts small: your phone gets its place for the night, and the first piece is laid.",
+      "evening-wind-down.charger.accept": "The charger is part of your evening now. You could add two calm minutes after it.",
+      "evening-wind-down.charger.nugget": "You could give the charger a fixed spot out of reach of your bed, and put a book or a notepad where the phone used to lie.",
+      "evening-wind-down.calm-2.action": "do one calm thing for two minutes, with my phone on its charger",
+      "evening-wind-down.calm-2.arrival": "The first piece holds. The evening gets a little quieter around it.",
+      "evening-wind-down.calm-2.accept": "Two minutes became easy. You could give your calm thing a little more room.",
+      "evening-wind-down.calm-2.nugget": "The calm thing is yours to choose: a few pages of a book, a stretch, or writing down what is on your list for tomorrow, so it can wait there.",
+      "evening-wind-down.calm-10.action": "give ten minutes to my calm thing, with my phone on its charger",
+      "evening-wind-down.calm-10.arrival": "What you started keeps growing, a few quiet minutes at a time.",
+      "evening-wind-down.calm-10.accept": "Ten quiet minutes have their place now. You could let them end at about the same time each night.",
+      "evening-wind-down.calm-10.nugget": "You could plan for a late night now: \"If it gets late, then I will only put my phone on its charger.\" The smaller step still counts.",
+      "evening-wind-down.lights-out.action": "turn the light out at about my chosen time, after the charger and ten calm minutes",
+      "evening-wind-down.lights-out.arrival": "One more piece: an evening that ends at about the same time.",
+      "evening-wind-down.lights-out.accept": "Your evening has a shape now.",
+      "evening-wind-down.lights-out.nugget": "You could set a quiet alarm for the time you want to start brushing your teeth. A late evening now and then is part of life and changes nothing.",
+      "evening-wind-down.ending": "Your day ends by itself now: the phone on its charger, ten calm minutes and the light out at about the same time."
+    }
+  }
+}
