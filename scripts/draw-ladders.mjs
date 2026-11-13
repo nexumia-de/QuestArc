@@ -710,7 +710,6 @@ const lanternAtPost = ({ posts: [[x, feet]] }) => ({
 
 // ---- ladders --------------------------------------------------------------
 
-const MIDDLE = 24; // a medium picture in the middle band
 const feetOf = (y, size) => y + (size * 30) / 32;
 const at = (art, band, x, feet, size) => ({
   art,
@@ -765,7 +764,6 @@ ladder(
     at('tree', 'far', 26, 45, 20),
     at('tuft', 'middle', 290, 92, 14),
     slot('build', { band: 'middle', ...SLOT }),
-    { ...at('', 'middle', 18, 144, MIDDLE), art: undefined, slot: 'keeper' },
     at('reeds', 'near', 84, 166, 34),
     at('tuft', 'near', 296, 174, 20),
     lanternAtPost(MARKER_LAYOUTS.river),
@@ -795,7 +793,6 @@ ladder(
   [
     at('tree', 'far', 18, 40, 20),
     at('tree', 'far', 284, 41, 20),
-    { ...at('', 'middle', 26, 144, MIDDLE), art: undefined, slot: 'keeper' },
     slot('build', { band: 'middle', ...SLOT }),
     at('flowers', 'middle', 36, 132, 24),
     lanternAtPost(MARKER_LAYOUTS.clearing),
