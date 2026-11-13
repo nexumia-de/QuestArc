@@ -1,0 +1,132 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "pages-before-sleep",
+  "version": 1,
+  "title": "pages-before-sleep.title",
+  "description": "pages-before-sleep.description",
+  "why": "pages-before-sleep.why",
+  "build": {
+    "ladder": "home",
+    "names": [
+      "pages-before-sleep.build.v1",
+      "pages-before-sleep.build.v2",
+      "pages-before-sleep.build.v3",
+      "pages-before-sleep.build.v4",
+      "pages-before-sleep.build.v5"
+    ]
+  },
+  "stages": [
+    {
+      "id": "one-page",
+      "plan": {
+        "anchor": "pages-before-sleep.anchor",
+        "action": "pages-before-sleep.one-page.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "pages-before-sleep.one-page.arrival",
+        "accept": "pages-before-sleep.one-page.accept"
+      },
+      "nugget": "pages-before-sleep.one-page.nugget"
+    },
+    {
+      "id": "read-5",
+      "plan": {
+        "anchor": "pages-before-sleep.anchor",
+        "action": "pages-before-sleep.read-5.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "pages-before-sleep.read-5.arrival",
+        "accept": "pages-before-sleep.read-5.accept"
+      },
+      "nugget": "pages-before-sleep.read-5.nugget"
+    },
+    {
+      "id": "read-10",
+      "plan": {
+        "anchor": "pages-before-sleep.anchor",
+        "action": "pages-before-sleep.read-10.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "pages-before-sleep.read-10.arrival",
+        "accept": "pages-before-sleep.read-10.accept"
+      },
+      "nugget": "pages-before-sleep.read-10.nugget"
+    },
+    {
+      "id": "read-20",
+      "plan": {
+        "anchor": "pages-before-sleep.anchor",
+        "action": "pages-before-sleep.read-20.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
+      "story": {
+        "arrival": "pages-before-sleep.read-20.arrival"
+      },
+      "nugget": "pages-before-sleep.read-20.nugget"
+    }
+  ],
+  "ending": {
+    "story": "pages-before-sleep.ending"
+  },
+  "texts": {
+    "en": {
+      "pages-before-sleep.title": "A few pages before sleep",
+      "pages-before-sleep.description": "From one page of a book in bed to a quiet stretch of reading on most evenings, a few minutes more at a time.",
+      "pages-before-sleep.why": "Why do you want to read more? In your own words.",
+      "pages-before-sleep.anchor": "getting into bed",
+      "pages-before-sleep.build.v1": "A fire to read by",
+      "pages-before-sleep.build.v2": "A tent for one more page",
+      "pages-before-sleep.build.v3": "A hut for quiet evenings",
+      "pages-before-sleep.build.v4": "A cottage with a reading corner",
+      "pages-before-sleep.build.v5": "A house full of stories",
+      "pages-before-sleep.one-page.action": "read one page of my book",
+      "pages-before-sleep.one-page.arrival": "It starts with one page and a book within reach. The first piece stands.",
+      "pages-before-sleep.one-page.accept": "One page belongs to your evening now. You could stay with your book for five minutes.",
+      "pages-before-sleep.one-page.nugget": "You could put the book on your pillow in the morning, so it is the first thing you find when you get into bed.",
+      "pages-before-sleep.read-5.action": "read for 5 minutes in my book",
+      "pages-before-sleep.read-5.arrival": "Five quiet minutes, and what you started has grown a little.",
+      "pages-before-sleep.read-5.accept": "Five minutes became easy. You could give your book ten, or swap it for one you look forward to more.",
+      "pages-before-sleep.read-5.nugget": "An evening without reading changes nothing. You could simply open the book again the next night.",
+      "pages-before-sleep.read-10.action": "read for 10 minutes in my book",
+      "pages-before-sleep.read-10.arrival": "Ten minutes with a book before the light goes out. What you build grows with every evening.",
+      "pages-before-sleep.read-10.accept": "Ten minutes are yours. If you like, you could stay for twenty.",
+      "pages-before-sleep.read-10.nugget": "A printed book suits this moment: in a lab study, people took longer to fall asleep after reading on a lit screen than after a printed book. You could leave your phone out of reach.",
+      "pages-before-sleep.read-20.action": "read for 20 minutes in my book",
+      "pages-before-sleep.read-20.arrival": "A longer stretch of reading, resting on all the pages before it.",
+      "pages-before-sleep.read-20.nugget": "You could plan for a late night: \"If I am too tired to read for long, then I will read one page and close the book.\"",
+      "pages-before-sleep.ending": "You read in bed on most evenings now. What you built stands, and the pages are yours, however many there are tonight."
+    }
+  }
+}
