@@ -120,30 +120,75 @@ release 3.0.0; the owner uses it every day without workarounds.
 journey page with the build, toasts; then
 accepting a stage on the phone with the same choice records.
 
+# Habits that last
+
+Milestone to be created by the owner.
+
+**Goal**: QuestArc fits the person, not only the count, and lets go of a
+habit that runs by itself.
+
+**Exit criteria**, in this order: staying at a stage and skipping one
+(#81); the card after a long break with a real step back (#82); the rules
+for graduation and anchors agreed on paper together, because anchors say
+what happens to a graduated step (#22, #96); graduation by automaticity
+in the engine and the plugin (#22); anchors as the home of QuestArc, with
+only the growing step ticked (#96); the run of maintained habits on the
+shelf (#66); the reminder suggestion that fades (#60); the script for the
+owner's look back after eight weeks of daily use, written first so the
+weeks have something to show (#84).
+
 # More journeys
 
 [Milestone](https://github.com/nexumia-de/quest-arc/milestone/6)
 
-**Goal**: more journeys and the parts of the game that only matter after
-a while.
+**Goal**: more to walk, in two languages.
 
-**Exit criteria**: more built-in journeys written along the psychology
-rules; graduation by automaticity; "pair it with";
-optional plan check (WOOP); reminders that fade; German texts; others
-can publish journeys by pull request: self-contained journey files, the
-journey checker in CI and a guide for people and their agents
-([decision](decisions/journeys-by-pull-request.md)).
+**Exit criteria**: the built-in journeys the owner chose (#37); German
+texts (#39); "pair it with" (#58); the optional plan check (#59). Done
+already: others can publish journeys by pull request, with self-contained
+journey files, the journey checker in CI and a guide for people and
+their agents ([decision](decisions/journeys-by-pull-request.md)).
+
+# The Valley
+
+Milestone to be created by the owner.
+
+**Goal**: what was built stays visible beyond one journey. There is one
+look; nothing here is an optional layer.
+
+**Exit criteria**: a region per anchor with the Map, the place after the
+journey (it stays alive with the maintained habit and gets its lit
+lantern at graduation) and the remaining ladders (#114); the principles
+every display follows (#88). Keepsakes (#87) and the travel companion
+(#43) belong here only if the owner decides for them after the look
+back (#84).
 
 # Private journeys
+
+Milestone to be created by the owner.
 
 **Goal**: users keep journeys of their own without publishing them.
 
 **Exit criteria**: import and export of a journey file in the plugin and
-in Pensum, checked by the same journey checker as CI (#40). Milestone to
-be created by the owner.
+in Pensum, checked by the same journey checker as CI (#40); the quick
+journey form, later the editor (#89).
+
+# Standalone app
+
+Milestone to be created by the owner, after the spike.
+
+**Goal**: QuestArc for people without Super Productivity, on the same
+data format.
+
+**Exit criteria**: the spike answers whether the plugin's screens run on
+a local store with little new code (#93); then the owner decides the
+open points of the plan (#91).
 
 # Backlog
 
-Issues without a milestone: a world map that links journeys into
-regions; companions that reflect the consistency of one area; focus
-sessions as a stage condition; cooperation if it works without a server.
+Issues without a milestone: the plugin API for repeat configs, waiting
+for upstream (#41); focus sessions as a stage condition (#44);
+cooperation if it works without a server (#45); QuestArc's settings from
+Super Productivity's plugin settings (#67); the plugin API types from
+npm (#109). The standing rule for one build on Super Productivity 19.3
+and later is #102.
