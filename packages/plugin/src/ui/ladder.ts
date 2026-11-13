@@ -19,7 +19,7 @@ type Place = Omit<Placed, 'art'> & { readonly art?: string };
 
 export type LadderPlace =
   | (Placed & { readonly slot?: undefined })
-  | (Place & { readonly slot: 'build' | 'lantern' | 'keeper' })
+  | (Place & { readonly slot: 'build' | 'lantern' })
   | (Place & {
       readonly slot: 'marker';
       readonly part: 'post' | 'cord' | 'bead';

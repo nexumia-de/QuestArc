@@ -246,8 +246,7 @@ above.
 
 **Slots** in a ladder's setting, filled by the hosts: `build`, `lantern`
 (after graduation, lit, where the marker's first post stood: the
-marker's lasting form), `keeper` (reserved and not drawn: it was meant for a
-worn-down guardian, and guardians are gone, #110) and the `marker` places above.
+marker's lasting form) and the `marker` places above.
 
 **Row of versions.** Below the build: the standing versions as small
 pictures (60 × 40 px), the next one as a plain outlined step without a

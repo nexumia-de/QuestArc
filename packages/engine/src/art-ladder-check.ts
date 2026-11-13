@@ -9,7 +9,7 @@ import { hasVertex, type Point } from './art-vertices';
  * runs a marker (lanterns, bunting, flowers: `markers.json`) stands as a
  * gate across the path in the foreground: in phases 1–3, and ready (lit,
  * with a centrepiece) while the stage's condition is met. The hosts fill
- * the slots (`build`, `lantern`, `keeper`, and the `marker` places: the
+ * the slots (`build`, `lantern`, and the `marker` places: the
  * first post, the second post, the line, its elements and the centre) and
  * place everything else as the file says. Where the setting's path meets
  * the build (`ways`), every version and the setting have a corner at the
@@ -41,7 +41,7 @@ const FEET = 30 / 32;
 /** How far (in its own units) a corner may lie from a way point. */
 export const WAY_TOLERANCE = 1;
 
-const SLOTS = ['build', 'lantern', 'keeper'] as const;
+const SLOTS = ['build', 'lantern'] as const;
 type Slot = (typeof SLOTS)[number] | 'marker';
 /** The marker's parts: posts, the lines between them, the hanging elements. */
 const MARKER_PARTS = ['post', 'cord', 'bead'] as const;

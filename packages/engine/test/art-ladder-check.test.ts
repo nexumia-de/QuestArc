@@ -66,7 +66,7 @@ const ladder = {
     { slot: 'lantern', band: 'middle', x: 8, y: 107.125, width: 34, height: 34 },
     // a build stands on y = 74 of 80: 10.5 + 140 × 74/80 = 140
     { slot: 'build', band: 'middle', x: 55, y: 10.5, width: 210, height: 140 },
-    { slot: 'keeper', band: 'middle', x: 40, y: 117.5, width: 24, height: 24 },
+    { art: 'tree', band: 'middle', x: 40, y: 117.5, width: 24, height: 24 },
     // the marker: posts of 34 on the post points (feet 138.125 + 31.875 = 170),
     // the line, two hanging elements, in the order they appear
     {
@@ -159,8 +159,10 @@ describe('ladderProblems', () => {
   });
 
   it('wants exactly one of each slot and the build in the fixed slot', () => {
-    const noKeeper = { ...ladder, pictures: ladder.pictures.filter((p) => p.slot !== 'keeper') };
-    expect(at(noKeeper)).toEqual(['pictures']);
+    const noLantern = { ...ladder, pictures: ladder.pictures.filter((p) => p.slot !== 'lantern') };
+    expect(at(noLantern)).toEqual(['pictures']);
+    // The slot for a worn-down guardian is gone with the guardians (#110).
+    expect(at(withPicture(2, { slot: 'keeper' }))).toContain('pictures[2]');
     expect(at(withPicture(3, { width: 180 }))).toContain('pictures[3]');
     expect(at(withPicture(2, { slot: 'scaffold' }))).toContain('pictures[2]');
     expect(at(withPicture(2, { slot: 'flag' }))).toContain('pictures[2]');
