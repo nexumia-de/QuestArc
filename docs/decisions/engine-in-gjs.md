@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: Pensum runs the engine in gjs
-description: The TypeScript engine is built once and run by Pensum through gjs from the GNOME runtime; measured on x86, the phone measurement is still open.
+description: The TypeScript engine is built once and run by Pensum through gjs from the GNOME runtime; measured on x86 and an arm64 runner; it runs on the phone, where no time was measured.
 tags: [engine, gjs, pensum, spike]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -115,9 +115,10 @@ the model is known.
 
 ## Open
 
-- Measurement on the phone (aarch64), with the engine archive of the
-  first release that has one. If a typical dataset takes noticeably long
-  there, Pensum keeps one gjs process running instead of starting one per
-  evaluation; a Python port stays the last resort.
+- No time was measured on the phone. Pensum runs the engine through gjs
+  there and the owner confirmed on 2026-11-06 that journeys work, so #16
+  was closed on 2026-11-13 without the number. If the journey page ever
+  feels slow, Pensum keeps one gjs process running instead of starting
+  one per evaluation; a Python port stays the last resort.
 - The cost grows with the real engine; the speed budget test (above) keeps
   watching it in CI.
