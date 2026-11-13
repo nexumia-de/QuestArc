@@ -1,6 +1,6 @@
 {
   "name": "Days inside a QuestArc pause are not due; the run is shown as paused while paused",
-  "rule": "game-rules \u00a72, pauses",
+  "rule": "game-rules §2, pauses",
   "kind": "evaluate",
   "input": {
     "day": {

@@ -50,7 +50,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 10,
     "active": {
       "runId": "r1",
       "stations": [

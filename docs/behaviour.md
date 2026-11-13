@@ -22,8 +22,8 @@ the journey is in [journey design](journey-design.md).
   back and menu at the top.
 - States are shown with text and shape, never by colour alone.
 - No text field is focused when a screen opens.
-- Calm mode shows the same screens without XP, level, guardians or
-  game words.
+- There is one look and no mode: no XP, no levels, no guardians and no
+  game words (#110). Every journey shows what it builds.
 - Texts are autonomy-supportive ("you could"), never controlling or
   blaming, and never promise a number of days.
 
@@ -33,9 +33,8 @@ the journey is in [journey design](journey-design.md).
 
 - Two sentences: what QuestArc does ("QuestArc turns a habit into a
   journey of small steps.") and how ("You keep using your normal tasks;
-  QuestArc shows where you are on the way.").
-- Choice: **Calm** (selected) or **With game** (XP, levels, guardians).
-  "You can change this any time."
+  QuestArc shows what grows from them."). Shown while QuestArc has no
+  record at all; nothing is written here.
 - Link: "How QuestArc motivates you" (screen 11).
 - Main action: **Choose a journey**.
 
@@ -59,17 +58,16 @@ the journey is in [journey design](journey-design.md).
   Pick a date.
 - **Plan check** (optional, collapsed): wish, best outcome, main
   obstacle, "If …, then I will …".
-- **What you build** (game mode only, #100): the journey's suggested
+- **What you build** (#100): the journey's suggested
   build in words and as its first version, which stands from the start
   ("You build a home · pennants · meadow green"), and **Change**, which
-  opens screen 3a. Nothing is shown of the versions to come. Calm mode
-  has no such section.
+  opens screen 3a. Nothing is shown of the versions to come.
 - Main action: **Start**. Then the flow "Set up the task" (flow B) for
   the first stage. A changed build is written with the start, as one
   `build:<runId>` record ([data model](data-model.md)); an unchanged one
   writes nothing, so the journey's own build applies.
 
-### 3a. What you build (game mode)
+### 3a. What you build
 
 The same choices on screen 3, where **Change** opens them in place, and
 as their own page from **What you build** in the journey's menu
@@ -94,13 +92,11 @@ as their own page from **What you build** in the journey's menu
 
 ### 4. Journey (home)
 
-- Top: journey title; in RPG mode the level; menu (Pause or Resume,
-  End journey, in game mode **What you build** (screen 3a) and
-  **Stations**, Shelf, Settings). **End journey** happens at once and
-  offers **Undo** (it writes one record, withdrawn by Undo).
-- Middle: the path ([journey design](journey-design.md)), scrolled to the
-  current station; finished stations below, coming ones above.
-- **Game mode: the build instead of the path** (#100, [journey
+- Top: journey title; menu (Pause or Resume, End journey, **What you
+  build** (screen 3a), **Stations**, Shelf, Settings). **End journey**
+  happens at once and offers **Undo** (it writes one record, withdrawn
+  by Undo).
+- **The build** (#100, #110, [journey
   design](journey-design.md#the-journey-screen-with-the-build)). The
   upper part is the build in its setting and the run's hue: the ladder's
   current version, the marker with its first `ceil(markerProgress × E)`
@@ -109,12 +105,12 @@ as their own page from **What you build** in the journey's menu
   next one as a plain step without a picture, nothing further), then one
   line of state in words ("A plank bridge stands · a stone bridge is on
   its way", "… is ready", or only "A hut stands" before the stage's first
-  counting completion), then the card unchanged. The picture's text for
+  counting completion), then the card. The picture's text for
   screen readers says the same and the marker in words: "A plank bridge,
   version 3 of 5; marker: 2 of 2 posts and 3 of 6 lanterns; not ready
   yet". At 720 px and wider the build is on the left and the card on the
-  right. Station details (screen 5) stay reachable from the menu
-  ("Stations"), since the path is not shown. Calm mode keeps the path.
+  right. There is no drawn path any more: the stations are a list
+  (**Stations** in the menu), each opening its details (screen 5).
 - **The moment of the tick:** while the screen is open, a completion
   that adds marker elements makes them appear with a short calm
   animation (grow and fade in, about half a second), a new version
@@ -126,7 +122,6 @@ as their own page from **What you build** in the journey's menu
     last week");
   - "Current run 6 · best 9 · 23 in total"; a gap is shown as a gap, not
     as a loss;
-  - in RPG mode the guardian with its HP;
   - the main action, depending on the state:
 
 | Station state                   | Main action                                         |
@@ -143,12 +138,11 @@ as their own page from **What you build** in the journey's menu
   graduate (later, #22). Dismissing a banner and skipping the weekly
   question are remembered on the device only; they are not choices.
 - The card also shows the user's own reason, if they gave one.
-- Tapping any station opens its details (screen 5).
 - **Read-only journey:** when the active journey is read-only
   ([data model](data-model.md) §2: written by a newer QuestArc, or its
   journey or journey version is not here), the screen shows its title
   (or "This journey" when the journey is not here) and one calm
-  sentence instead of the path: "This journey was continued with a newer
+  sentence instead of the build: "This journey was continued with a newer
   QuestArc. Update QuestArc here to go on with it; nothing is lost." or
   "This journey is not available here. Update QuestArc here to go on
   with it; nothing is lost." No progress, no main action, no Pause or
@@ -158,9 +152,8 @@ as their own page from **What you build** in the journey's menu
 ### 5. Station details
 
 - Arrival story (if any), the plan sentence, schedule, condition, the
-  guardian (RPG), the learning nugget as a card titled **Try this**.
-- Finished stations show the day they were finished, their best run and
-  XP (RPG).
+  learning nugget as a card titled **Try this**.
+- Finished stations show the day they were finished, and their best run.
 
 ### 6. Weekly look back
 
@@ -181,8 +174,7 @@ as their own page from **What you build** in the journey's menu
 
 ### 8. Settings
 
-- Mode: Calm / With game.
-- In game mode: **Show the build in the side panel** (off by default, on
+- **Show the build in the side panel** (off by default, on
   this device only). On, Super Productivity gets QuestArc's side-panel
   button (next to the play button; in the bottom bar on a phone), which
   opens QuestArc's page beside the task list, so the build is in view
@@ -201,7 +193,8 @@ as their own page from **What you build** in the journey's menu
 Plain words, one paragraph each: small steps that grow; one plan "after
 X, I will Y"; one missed day is fine, two in a row start a new run but
 never end the journey; welcome back after a gap; the weekly question;
-graduation when a habit runs by itself. What QuestArc does not do:
+graduation when a habit runs by itself; every journey builds something
+that grows with real progress. What QuestArc does not do:
 random rewards, rankings, punishment, collecting data. "Success is your
 habit, not how often you open QuestArc."
 
@@ -212,15 +205,17 @@ habit, not how often you open QuestArc."
 The user ticks off the stage's task in the task list as usual. Within a
 second QuestArc shows a short message (snack or toast):
 
-| Event                        | Calm                                         | With game                                                                                    |
-| ---------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| completion                   | "Drink a glass of water: done. 4 of 5 days." | "+10 XP · 4 of 5 days."                                                                      |
-| first completion after a gap | "Welcome back. Your run goes on."            | "Welcome back! +20 XP, the guardian staggers." (without a guardian: "Welcome back! +20 XP.") |
-| several at once (sync)       | "3 days done. 4 of 5 days."                  | "3 days done · 4 of 5 days."                                                                 |
-| condition met                | "Station reached: you can continue."         | same, plus "Level 3." when it changes                                                        |
-| guardian defeated            | —                                            | "The Heavy Blanket is gone."                                                                 |
+| Event                        | Message                                      |
+| ---------------------------- | -------------------------------------------- |
+| completion                   | "Drink a glass of water: done. 4 of 5 days." |
+| first completion after a gap | "Welcome back. Your run goes on."            |
+| several at once (sync)       | "3 days done. 4 of 5 days."                  |
+| condition met                | "Station reached: you can continue."         |
 
-In game mode, while a journey with a build runs, the message carries
+Messages say the real progress in words; they never say what was added
+to the build and never give points (#110).
+
+The message carries
 the action **Show**, which opens QuestArc's page at the build (Super
 Productivity keeps a message with an action visible longer). Marker
 elements and new versions get no words of their own (Amir & Ariely
@@ -231,8 +226,7 @@ a sync with many changes are summed up in one. The progress ("4 of 5
 days") is the current condition: days, times or minutes.
 
 All texts of screens and messages are in `content/i18n/en.json` (keys
-`ui.*` and `event.*`; a message key ends in `.calm` or `.rpg` when the
-modes differ), next to the journeys' texts, so Pensum can use the same
+`ui.*` and `event.*`), next to the journeys' texts, so Pensum can use the same
 words.
 
 ### B. Set up the task
@@ -264,7 +258,7 @@ In Pensum, step 2 creates the repeat itself.
 
 ### D. Hard days
 
-- After one missed due day: nothing special; the gap shows on the path.
+- After one missed due day: nothing special; the gap shows in the card's last days.
 - After the second missed due day in a row: banner "A hard week? On hard
   days, doing the earlier step (walk for 5 minutes) counts too." with
   **Good to know**. Doing the smaller step and ticking off the task
@@ -279,7 +273,7 @@ same effect.
 
 ### F. Graduation
 
-- When the habit qualifies ([game rules](game-rules.md) §7): banner "This
+- When the habit qualifies ([game rules](game-rules.md) §6): banner "This
   habit seems to run by itself. You could let it graduate." with
   **Graduate** and **Not now**.
 - Graduate: "Keep it repeating quietly" (default) or "End the repeat"
@@ -305,13 +299,13 @@ the first answer, also when the data did not change in between.
 
 ## Where it lands in each host
 
-| Part               | Super Productivity plugin                                                                                                                             | Pensum                                       |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Entry and level    | header button with the path icon; the level is in the view's header (Super Productivity cannot change a header button's label after it is registered) | header bar of the main window                |
-| Journey (home)     | plugin view (`showIndexHtmlAsView`)                                                                                                                   | sidebar page; details pushed with swipe back |
-| Station details    | page inside the view                                                                                                                                  | pushed page                                  |
-| Bound task actions | task context menu "Use for current station"                                                                                                           | row menu "Use for current station"           |
-| Messages           | snack (`showSnack`); in game mode with the action **Show** (opens the view)                                                                           | toast                                        |
-| Build at a glance  | optional side panel (setting, off by default): the same view beside the task list                                                                     | strip at the top of Today (later)            |
-| Settings           | plugin settings view                                                                                                                                  | preferences                                  |
-| Main actions       | bottom of the view                                                                                                                                    | bottom bar (thumb reach)                     |
+| Part               | Super Productivity plugin                                                         | Pensum                                       |
+| ------------------ | --------------------------------------------------------------------------------- | -------------------------------------------- |
+| Entry              | header button with the route icon                                                 | header bar of the main window                |
+| Journey (home)     | plugin view (`showIndexHtmlAsView`)                                               | sidebar page; details pushed with swipe back |
+| Station details    | page inside the view                                                              | pushed page                                  |
+| Bound task actions | task context menu "Use for current station"                                       | row menu "Use for current station"           |
+| Messages           | snack (`showSnack`) with the action **Show** (opens the view)                     | toast                                        |
+| Build at a glance  | optional side panel (setting, off by default): the same view beside the task list | strip at the top of Today (later)            |
+| Settings           | plugin settings view                                                              | preferences                                  |
+| Main actions       | bottom of the view                                                                | bottom bar (thumb reach)                     |

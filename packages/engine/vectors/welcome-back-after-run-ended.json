@@ -1,6 +1,6 @@
 {
-  "name": "Example F: welcome back after the run ended, guardian defeated at 100",
-  "rule": "game-rules \u00a76 (Example F)",
+  "name": "A welcome back after one miss and another after the run ended",
+  "rule": "game-rules §3, §5",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -91,14 +91,11 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 100,
-    "level": 2,
     "active": {
       "offerFallback": false,
       "stations": [
         {
           "stageId": "a",
-          "xp": 100,
           "welcomeBacks": 2,
           "completions": 8,
           "run": {
@@ -106,10 +103,6 @@
             "best": 6,
             "total": 8,
             "gap": false
-          },
-          "guardian": {
-            "damage": 100,
-            "defeated": true
           }
         },
         {},

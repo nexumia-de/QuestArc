@@ -8,8 +8,8 @@ import { lastDaysRow } from './last-days';
 
 /**
  * The current station's card (docs/behaviour.md, screen 4): the plan,
- * the condition in words and as a bar, the last due days, the runs, and
- * in the game the guardian. A gap shows as a gap, never as a loss.
+ * the condition in words and as a bar, the last due days and the runs.
+ * A gap shows as a gap, never as a loss.
  */
 
 export const conditionText = (stage: Stage, station: StationView): string => {
@@ -47,7 +47,6 @@ const hint = (station: StationView, today: string): string | undefined => {
 export const stationCard = (
   run: RunView,
   journey: Journey,
-  rpg: boolean,
   today: string,
 ): HTMLElement | undefined => {
   const index = run.position.stage;
@@ -55,7 +54,6 @@ export const stationCard = (
   const stage = journey.stages[index];
   if (!station || !stage) return undefined;
   const bound = station.state === 'current' || station.state === 'met';
-  const guardian = rpg && stage.guardian && station.guardian ? station.guardian : undefined;
   return h(
     'section',
     { class: 'qa-card qa-station-card', 'aria-label': t('ui.card.label') },
@@ -98,19 +96,6 @@ export const stationCard = (
               total: station.run.total,
             }),
           ),
-        )
-      : null,
-    guardian && stage.guardian
-      ? h(
-          'p',
-          { class: 'qa-small' },
-          guardian.defeated
-            ? t('ui.card.guardian-defeated', { name: t(stage.guardian.name) })
-            : t('ui.card.guardian', {
-                name: t(stage.guardian.name),
-                left: Math.max(0, guardian.hp - guardian.damage),
-                hp: guardian.hp,
-              }),
         )
       : null,
     hint(station, today) ? h('p', { class: 'qa-muted qa-small' }, hint(station, today)) : null,

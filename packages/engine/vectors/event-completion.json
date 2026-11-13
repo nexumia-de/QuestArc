@@ -90,14 +90,13 @@
   "expect": [
     {
       "key": "event.completion",
-      "params": {
-        "xp": 10
-      }
+      "params": {}
     },
     {
-      "key": "event.guardian-damaged",
+      "key": "event.build-element",
       "params": {
-        "damage": 10
+        "from": 0.2,
+        "to": 0.4
       }
     }
   ]

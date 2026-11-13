@@ -123,6 +123,14 @@ describe('journey checker', () => {
     ).toHaveLength(1);
   });
 
+  it('refuses a guardian (issue #110)', () => {
+    const found = errors(
+      (j) =>
+        ((stage(j, 1) as Record<string, unknown>).guardian = { name: 'tea.pot.nugget', hp: 100 }),
+    );
+    expect(found.map((p) => p.at)).toEqual(['stages[1].guardian']);
+  });
+
   it('warns about a condition without room for one miss, a missing nugget and why', () => {
     const journey = good() as Draft;
     stage(journey, 0).condition = { type: 'days', n: 7, of: 7 };

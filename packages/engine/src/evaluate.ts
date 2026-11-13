@@ -5,7 +5,6 @@ import type { Journey } from './types/journey';
 import type { Snapshot } from './types/snapshot';
 import type { GameView, ReadOnlyRun, RunView } from './types/view';
 import { journeyErrors } from './validate';
-import { levelFor } from './xp';
 
 /**
  * Derives the whole game from a snapshot. Pure: the same snapshot gives
@@ -93,18 +92,12 @@ export const evaluate = (snapshot: Snapshot): GameView => {
     }
   }
 
-  const totalXp = [...open, ...finished]
-    .flatMap((run) => run.stations)
-    .reduce((sum, station) => sum + station.xp, 0);
   const [first, ...rest] = open;
   const active = activeReadOnly === undefined ? first : undefined;
   const paused = activeReadOnly === undefined ? rest : open;
 
   return {
     todayStr: today,
-    mode: choices.mode,
-    totalXp,
-    level: levelFor(totalXp),
     ...(active ? { active } : {}),
     paused: paused.map((run) => ({ ...run, paused: true })),
     finished,

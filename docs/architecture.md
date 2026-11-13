@@ -52,8 +52,8 @@ commit `8ec9137`) and on Codeberg (GoVenture, HeroicRPG).
 
 ## Rules that hold everywhere
 
-1. **Derive, don't count.** XP, level, guardian HP, stage progress and
-   streaks are computed from task data on every evaluation. Two devices
+1. **Derive, don't count.** Stage progress, runs and the build are
+   computed from task data on every evaluation. Two devices
    with the same data show the same game, and nothing is lost when sync
    merges.
 2. **Store only choices.** QuestArc stores what the user decided: which
@@ -74,8 +74,8 @@ commit `8ec9137`) and on Codeberg (GoVenture, HeroicRPG).
   tags and projects; QuestArc's choice records; the journey definitions;
   the logical day (`todayStr`) and day-start offset, which Super
   Productivity gives plugins through `getDayContext()`.
-- **Output:** a `GameView` (level, journeys with station states, condition
-  progress, guardian HP, streaks, habits that may graduate) and the events
+- **Output:** a `GameView` (journeys with station states, condition
+  progress, runs, the build, habits that may graduate) and the events
   between two views, for toasts.
 - **Pure:** no clock, no machine time zone, no logging, no global state.
   Same input, same output, in the browser and in GJS.
@@ -102,7 +102,7 @@ Pensum is Python. It starts `gjs -m engine-cli.mjs` from the GNOME
 runtime, passes the snapshot as JSON on stdin and reads the `GameView`
 from stdout: no new dependency, no second implementation. The records a
 user action writes (start, bind, continue, pause, resume, end, a paused repeat, weekly
-answer, mode, undo) are engine functions too (`actions.ts`), which
+answer, build choice, undo) are engine functions too (`actions.ts`), which
 Pensum calls with `{ "action": { "name": …, "args": […] } }`, so both
 hosts write the same records. This needs
 proof first (spike issue): `gjs` in `org.gnome.Platform//51`, and a start
@@ -112,10 +112,10 @@ Python port must pass the same test vectors.
 ## Game rules
 
 The exact rules and numbers are in [game rules](game-rules.md) (decided
-2026-11-05, #11): only the current stage's task counts, 10 XP per
-completion and 10 for a welcome back, cosmetic levels, never miss twice
-over due days with a one-day backfill window, guardians worn down by the
-stage's XP, no player HP (D3), graduation by three
+2026-11-05, #11): only the current stage's task counts, never miss twice
+over due days with a one-day backfill window, a greeting on coming back,
+no player HP (D3), no XP, levels or guardians since 3.3 (#110), a build
+that grows with the stages, graduation by three
 high weekly answers, 80 % completion and reminders already off. Not
 planned: gold and shop, random rewards, login bonuses, leaderboards,
 money commitments.
@@ -149,7 +149,7 @@ milestones.
 - **Compressed plugin data.** Super Productivity stores long plugin data
   as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single
-  instances are deleted, derived XP and progress drop. Decided: finished
+  instances are deleted, derived progress drops. Decided: finished
   stages are kept as checkpoints ([deleted history](decisions/deleted-history.md)).
 - **Large archives.** Every evaluation receives the whole archive. Measured
   and bounded: `snapshotFromHost` drops unrelated archived tasks before
@@ -173,7 +173,7 @@ milestones.
 | D6  | Phosh toolkit rules?       | Only English, knowledge in `docs/`, pinned dependencies, pull requests and CI; not the GTK and Flatpak rules                                                                                                                                                                          |
 | D7  | GoVenture and HeroicRPG?   | Archive on Codeberg with a note pointing here                                                                                                                                                                                                                                         |
 | D8  | Build on 2.x code?         | No: start from scratch and work only from these documents; 2.x stays in git history; no import of 2.x quests                                                                                                                                                                          |
-| D9  | Journey                    | Progress shown as travel along a path, QuestArc's own design ([roadmap](roadmap.md#the-journey))                                                                                                                                                                                      |
+| D9  | Journey                    | Progress shown as one thing that is built, QuestArc's own design; until 3.2 as travel along a path ([roadmap](roadmap.md#the-journey), #110)                                                                                                                                          |
 | D10 | Journeys at once           | One active journey; it can be paused to start another                                                                                                                                                                                                                                 |
 | D11 | Habits after a journey     | They stay: QuestArc never deletes or ends a recurring task; graduation is offered by automaticity, the user decides                                                                                                                                                                   |
 | D12 | Evidence-based rules       | The [design rules](psychology.md) follow the [evidence review](research.md); no telemetry, so no A/B tests and success shown only to the user; a supporter digest needs sharing and waits with cooperation (#45)                                                                      |

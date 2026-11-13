@@ -1,6 +1,6 @@
 {
   "name": "time_spent counts minutes tracked since acceptance",
-  "rule": "game-rules \u00a74",
+  "rule": "game-rules §4",
   "kind": "evaluate",
   "input": {
     "day": {

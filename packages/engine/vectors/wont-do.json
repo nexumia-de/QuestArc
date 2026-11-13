@@ -1,6 +1,6 @@
 {
   "name": "A task finished as won't do does not count and is a miss",
-  "rule": "game-rules \u00a71",
+  "rule": "game-rules §1",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -57,7 +57,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 30,
     "active": {
       "stations": [
         {

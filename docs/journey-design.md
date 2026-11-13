@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Journey design
-description: How the journey is drawn in both hosts: a vertical path of stations with clear states, a progress segment, a calm and a game variant of the same layout, the rules for colours, shapes and accessibility, the builds and ladders of the Valley (one thing whole at every stage, a festive marker growing in front of the build, way points, a hue per region) and the older scene rules for a region; with mockups.
+description: How the journey is drawn in both hosts: the journey's build above the current station's card, the last seven due days, the rules for colours, shapes and accessibility, the builds and ladders of the Valley (one thing whole at every stage, a festive marker growing in front of the build, way points, a hue per region) and the older scene rules for a region; with mockups.
 tags: [design, ui, journey, mockups, pictures, valley]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 sources:
@@ -11,60 +11,31 @@ sources:
 
 # Journey design
 
-Decided on 2026-11-05 (#15) by best practice, as the owner asked: one
-layout with a calm and a game variant, drawn from simple shapes in the
-host's own colours. The screens around it are in [behaviour](behaviour.md).
-
-## Mockups
-
-| Phone, calm                                    | Phone, with game                                               |
-| ---------------------------------------------- | -------------------------------------------------------------- |
-| ![Phone, calm](mockups/journey-phone-calm.svg) | ![Phone, with game](screenshots/journey-build-phone-light.png) |
-
-![Desktop, calm](mockups/journey-desktop.svg)
-
-With the game the screen shows the journey's build instead of the path
-([the journey screen with the build](#the-journey-screen-with-the-build));
-the path below is the calm screen and the game's "Stations" page.
-
-The mockups use neutral placeholder colours (blue accent on light grey).
-In the plugin the colours come from Super Productivity's theme variables,
-in Pensum from libadwaita's accent and named colours, both in light and
-dark style.
+Decided on 2026-11-05 (#15) by best practice, as the owner asked, and
+changed on 2026-11-13 (#110): there is one look. Every journey shows
+what it builds; the drawn path with its stations, the calm and the game
+variant, the level chip and the guardians are gone. The screens around
+it are in [behaviour](behaviour.md).
 
 ## Layout
 
-- **Phone (360 px):** the path fills the upper part and scrolls
-  vertically; the current station's card sits at the bottom with the
-  plan, the condition and the last seven due days. The path opens
-  scrolled so that the current station is in view.
-- **Desktop and wide windows:** the path on the left, the current or
-  selected station's details on the right (plan, reason, condition, last
-  days, learning nugget, arrival story).
-- The path runs from the bottom (start) to the top (goal), so going up
-  means getting further. Finished stations scroll out below.
+| Phone                                               | Desktop                                                 |
+| --------------------------------------------------- | ------------------------------------------------------- |
+| ![Phone](screenshots/journey-build-phone-light.png) | ![Desktop](screenshots/journey-build-desktop-light.png) |
 
-## Path and stations
-
-| Element          | Shape                                                                  | Text next to it            |
-| ---------------- | ---------------------------------------------------------------------- | -------------------------- |
-| finished station | filled circle with a check mark                                        | short name, "Done · date"  |
-| current station  | large ring; calm: a dot inside, game: a pennant (the hero)             | "You are here", short name |
-| met station      | large ring with a check mark ring, button "Continue" in the card       | "Ready to continue"        |
-| station ahead    | small hollow circle                                                    | short name                 |
-| unbound station  | hollow circle with a small plus                                        | "Set up the task"          |
-| goal             | pennant at the end of the path                                         | the ending in a few words  |
-| path behind      | solid line in the accent colour                                        | —                          |
-| current segment  | light line, filled in the accent colour up to the condition's progress | —                          |
-| path ahead       | dotted grey line                                                       | —                          |
-| guardian (game)  | diamond on the segment it guards, with name and HP bar                 | name, "HP / max"           |
-
-- The path is a gentle S-curve with fixed geometry per station count;
-  no map, no landscape art, no characters. This keeps it drawable with
-  SVG in the plugin and with GTK drawing in Pensum, and it stays QuestArc's
-  own look.
-- The hero is a pennant, not a figure: no avatar to customise, nothing
-  to collect.
+- **Phone (360 px):** the build fills the upper part ([the journey
+  screen with the build](#the-journey-screen-with-the-build)); the
+  current station's card sits below it with the plan, the condition and
+  the last seven due days.
+- **Desktop and wide windows:** the build on the left, the card on the
+  right.
+- The stations are a list (**Stations** in the menu): number, name and
+  state in words, each opening its details (plan, schedule, condition,
+  learning nugget, arrival story).
+- No map, no characters, no avatar to customise. The colours come from
+  the host: in the plugin from Super Productivity's theme variables, in
+  Pensum from libadwaita's accent and named colours, both in light and
+  dark style.
 
 ## Last seven due days
 
@@ -82,19 +53,13 @@ A row of marks in the card, oldest left; the engine reports them as
 Weekday letters below each mark. A gap is grey, never red, and no count
 falls to zero; the run text ("Run 4 · best 6") stays next to the marks.
 
-## Calm and game
-
-Same layout. The game variant adds: level chip in the header, the pennant as hero, guardians on the path and XP
-earned on finished stations. XP is never shown before it is earned.
-
 ## Accessibility
 
 - Every state has a shape and a text, not only a colour.
-- Touch targets of stations at least 44 × 44 px, even when the drawn
-  circle is smaller.
-- Texts follow the system font size; the card grows, the path scrolls.
-- Screen readers get the stations as a list in path order with their
-  state ("Station 2 of 3, current: walk for 5 minutes, 4 of 5 days").
+- Touch targets at least 44 × 44 px.
+- Texts follow the system font size; the card grows and scrolls.
+- Screen readers get the build as one sentence and the stations as a
+  list in journey order with their state.
 
 ## Builds and ladders (the Valley, #42)
 
@@ -281,8 +246,8 @@ above.
 
 **Slots** in a ladder's setting, filled by the hosts: `build`, `lantern`
 (after graduation, lit, where the marker's first post stood: the
-marker's lasting form), `keeper` (a worn-down guardian; pictures for
-keepers are not drawn yet) and the `marker` places above.
+marker's lasting form), `keeper` (reserved and not drawn: it was meant for a
+worn-down guardian, and guardians are gone, #110) and the `marker` places above.
 
 **Row of versions.** Below the build: the standing versions as small
 pictures (60 × 40 px), the next one as a plain outlined step without a
@@ -329,8 +294,8 @@ ready only on the hanging elements; [m6](screenshots/ladder-markers-round-6.png)
 
 ## The journey screen with the build
 
-Game mode, issue #100; calm mode keeps the path above unchanged. The
-engine's `build` view ([game rules](game-rules.md) §9) gives the ladder,
+Issue #100, for every journey since #110. The
+engine's `build` view ([game rules](game-rules.md) §7) gives the ladder,
 the version, the versions the journey uses, the marker kind, the hue,
 the marker progress and whether the stage is ready; the screen draws it
 with the ladder's scene of "Builds and ladders" above.
@@ -354,18 +319,17 @@ stations list and Settings with the side panel switch:
 [what you build](screenshots/journey-build-build-page-2.png),
 [stations](screenshots/journey-build-stations.png),
 [settings](screenshots/journey-build-settings.png). In Super Productivity
-19.3.1 (real-app test): [the first post after the first tick](screenshots/journey-build-real-app-first-post.png),
+20.0.0 (real-app test): [the first post after the first tick](screenshots/journey-build-real-app-first-post.png),
 [ready, with the message's Show](screenshots/journey-build-real-app-ready.png),
 [the next version after Continue](screenshots/journey-build-real-app-next-version.png),
 [the side panel beside Today](screenshots/journey-build-real-app-side-panel.png).
 
-- **Phone (360 px):** from the top, the level chip, the build at the
+- **Phone (360 px):** from the top, the build at the
   full width (the setting is 16 : 9, so 360 × 203 px), the row of
-  versions, the line of state, then the card area as on the path screen.
+  versions, the line of state, then the card area.
   The upper part does not scroll; the card area does.
 - **Desktop (720 px and wider):** the build with its row and line on the
-  left, the card on the right, both from the top, as the path layout
-  has it. The build is at most 560 px wide.
+  left, the card on the right, both from the top. The build is at most 560 px wide.
 - **Row of versions:** the versions that stand as 60 × 40 px pictures
   with their number under them, the next as a plain rounded step with its
   number, nothing beyond. A journey uses `versions` = stages + 1; when a
@@ -387,8 +351,8 @@ stations list and Settings with the side panel switch:
   fade, 600 ms, ease-out, from their foot); a new version fades in the
   same way. Under `prefers-reduced-motion: reduce` nothing moves. The
   first draw after opening animates nothing.
-- **Station details** are in the menu (**Stations**) as a list in path
-  order, since the path is not shown in game mode.
+- **Station details** are in the menu (**Stations**) as a list in
+  journey order.
 - **Side panel:** with the setting on, the same page is in Super
   Productivity's right panel beside the task list. The panel is narrow,
   so it shows the phone layout with the build on top: the build is in
@@ -400,7 +364,7 @@ stations list and Settings with the side panel switch:
   palette. Pictures no screen draws yet stay preview-only
   (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
   travel in `plugin.js` and reach the view once at start (message
-  `questarc:art`); until they arrive the screen shows the path. The
+  `questarc:art`); until they arrive the screen shows only the card. The
   view's `index.html` is limited to 102,400 bytes by Super Productivity
   19.3.1, and the view may load no other file of the plugin
   ([facts](super-productivity-facts.md) §1), so the view also takes the

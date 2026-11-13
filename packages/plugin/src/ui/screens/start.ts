@@ -10,7 +10,7 @@ import type { Context, Screen } from '../screen';
 /**
  * Screen 3, start a journey (issue #52): the user's own reason, optional
  * and never focused on open (design rule 5), a self-chosen start day and,
- * in game mode, what the journey builds (screen 3a in place, #100).
+ * what the journey builds (screen 3a in place, #100).
  */
 
 type StartChoice = 'today' | 'monday' | 'month' | 'date';
@@ -47,12 +47,11 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
       h('span', { class: 'qa-option-title' }, label),
     );
 
-  const rpg = view.mode === 'rpg';
   const build = (ctx.draft.build as BuildChoice | undefined) ?? {};
 
   const start = async () => {
     const runId = newRunId();
-    const chosen = rpg && Object.keys(build).length > 0 ? chooseBuild(runId, build) : {};
+    const chosen = Object.keys(build).length > 0 ? chooseBuild(runId, build) : {};
     await ctx.write({
       ...startJourney({
         runId,
@@ -112,7 +111,7 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
             })
           : null,
       ),
-      rpg ? buildPart(ctx, journey, build) : null,
+      buildPart(ctx, journey, build),
       active
         ? h('p', { class: 'qa-callout' }, t('ui.start.pauses', { title: t(active.title) }))
         : null,

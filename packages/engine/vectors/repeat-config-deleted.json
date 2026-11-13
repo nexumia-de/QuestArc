@@ -35,13 +35,11 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 0,
     "active": {
       "stations": [
         {
           "state": "unbound",
-          "progress": 0,
-          "xp": 0
+          "progress": 0
         },
         {},
         {}

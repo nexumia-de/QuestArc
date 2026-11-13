@@ -18,7 +18,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   const entry = (route: Route) => ({ route, draft: {} });
   const firstRoute = (s: State): Route =>
-    'settings' in s.records ? { name: 'home' } : { name: 'welcome' };
+    Object.keys(s.records).length > 0 ? { name: 'home' } : { name: 'welcome' };
 
   const context = (s: State): Context => ({
     state: s,

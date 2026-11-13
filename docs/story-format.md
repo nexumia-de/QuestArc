@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: Story format 3
-description: How a journey is written as one self-contained JSON file: stages with a plan, schedule, condition, optional guardian, story texts and a learning nugget; its own texts per language and author; the journey checker; versioning and what happens when a journey changes while someone walks it.
+description: How a journey is written as one self-contained JSON file: stages with a plan, schedule, condition, story texts and a learning nugget; its own texts per language and author; the journey checker; versioning and what happens when a journey changes while someone walks it.
 tags: [content, journeys, format, schema]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -36,7 +36,7 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `why`         | no       | Text key: the prompt asking for the user's own reason        |
 | `stages`      | yes      | 2 to 12 stages, in order                                     |
 | `ending`      | no       | `{ "story": <text key> }`, shown when the last stage is done |
-| `build`       | no       | What the journey builds in game mode (below)                 |
+| `build`       | no       | What the journey builds (below)                              |
 | `texts`       | yes      | Texts by language: `{ "en": { <text key>: <text> }, … }`     |
 
 ## Stage
@@ -47,7 +47,6 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `plan`      | yes      | `anchor`, `action`, optional `place` (text keys): "After _anchor_, I will _action_ (_place_)" |
 | `schedule`  | yes      | Suggested schedule: `daily`, `everyNDays` with `n` 2–7, or `weekdays` with `days`             |
 | `condition` | yes      | `days` (`n` of the last `of` due days), `count` (`n`), or `time_spent` (`minutes`)            |
-| `guardian`  | no       | `name` (text key) and `hp` (10–1000)                                                          |
 | `story`     | no       | `arrival` (shown on reaching the station) and `accept` (shown when the next stage is offered) |
 | `nugget`    | no       | Text key: one short, concrete "try this" technique for this stage                             |
 
@@ -57,7 +56,7 @@ Productivity, and only the supported kinds can be bound
 
 ## Build
 
-What the journey builds in game mode ([game rules](game-rules.md) §9,
+What the journey builds ([game rules](game-rules.md) §7,
 issue #42). The names come from the built-in list
 the ladders in `content/art/` (`<name>.ladder.json`, `markers.json`); pictures are found by these names in the hosts.
 
@@ -87,7 +86,7 @@ journey only suggests.
 - Anchors and actions are written to fit the plan sentence: anchor
   "lunch", action "walk for 5 minutes".
 - The longest texts per field (360 px): title 40, description 160, why
-  120, anchor 40, action 120, place 40, guardian 40, arrival 200,
+  120, anchor 40, action 120, place 40, arrival 200,
   accept 200, nugget 240, ending 240, build name 40 characters. A station's action is
   also its name on the path, cut after two lines, so the part that
   differs from the previous stage comes early.
@@ -128,7 +127,9 @@ their agents is [Writing a journey](authoring-journeys.md). In short:
 - Nuggets are concrete techniques in autonomy-supportive words ("you
   could"); no quotes, no day-count promises, no blame.
 - Story texts are short and skippable; the habit works without them.
-- Guardians are optional and never punish.
+- Story texts speak of building and growing, without naming what is
+  built (the user may choose another ladder), without a path and
+  without opponents.
 
 ## Versions and changes
 
@@ -142,3 +143,7 @@ their agents is [Writing a journey](authoring-journeys.md). In short:
   - if the current stage's id no longer exists, the user continues at the
     first stage that is not finished;
   - stage ids are never reused for a different habit.
+- **No guardians since 3.3** (#110). The checker and the schema refuse a
+  `guardian` in a stage; the engine ignores the field in a journey
+  written before (an imported `journey:` record), so that journey still
+  works.

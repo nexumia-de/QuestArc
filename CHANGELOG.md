@@ -5,6 +5,21 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/quest-arc/releases) with the
 plugin ZIP.
 
+## 3.3.0
+
+- **One look: every journey builds something.** The choice between
+  "Calm" and "With game" is gone. Every journey now shows what it builds;
+  the stations are a list under **Stations** in the menu, and the drawn
+  path is removed.
+- **No XP, levels or guardians any more.** They had no effect since
+  3.2.0. Messages say your real progress in words ("Drink a glass of
+  water: done. 4 of 5 days.") and always offer **Show**.
+- The stories of _A gentle morning_ and _First Things First_ are
+  rewritten to fit building, without opponents.
+- A journey you continue with 3.3.0 can only be read on a device with an
+  older QuestArc until you update it there. Nothing is lost.
+- For journey authors: a `guardian` in a stage is refused by the checker.
+
 ## 3.2.1
 
 - After you switch QuestArc off or install a new version, the old one

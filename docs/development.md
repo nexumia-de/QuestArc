@@ -105,7 +105,8 @@ npm run screenshots -w @questarc/plugin
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
-`journey`, `journey-rpg`, `met`, `unbound`; `empty:Settings` clicks the
+`journey`, `met`, `unbound`, `newer`, `build`, `build-ready`,
+`build-crossing`; `empty:Settings` clicks the
 button named "Settings" first. In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes
 the view's requests fail as they do while plugin.js is not loaded
@@ -148,9 +149,9 @@ nexumia-de/pensum, through phosh-toolkit's `screenshot.sh -c light|dark`).
 Productivity's web app (`app.super-productivity.com`) in a fresh browser
 profile with throwaway data: install and enable, start "A gentle
 morning", create the task, make it recurring in Super Productivity's own
-dialog, tick it off, check the message and the journey (calm mode).
-`e2e/real-app-build.mjs` walks the journey screen with the build (#100)
-in game mode: start with another ladder (Crossing), tick, open the build
+dialog, tick it off, check the message and the journey.
+`e2e/real-app-build.mjs` walks the journey screen with the build (#100):
+start with another ladder (Crossing), tick, open the build
 from the message's **Show**, see the first marker element, tick on four
 more days (Playwright's clock moves the date; the app is reloaded each
 day) until the stage is ready, continue and see the next version. `e2e/real-app-panel.mjs` checks
@@ -216,8 +217,7 @@ The engine (`packages/engine/src`) has one job per file:
 | `completions.ts`   | Which day a completion counts for, minutes tracked                                    |
 | `timeline.ts`      | Due days, misses, runs, welcome backs                                                 |
 | `conditions.ts`    | Stage conditions                                                                      |
-| `xp.ts`            | XP and level                                                                          |
-| `run.ts`           | One journey run: stations, current stage, guardians, checkpoints                      |
+| `run.ts`           | One journey run: stations, current stage, checkpoints, the build                      |
 | `validate.ts`      | Structural check of journeys                                                          |
 | `evaluate.ts`      | The whole game view                                                                   |
 | `diff.ts`          | Events between two views                                                              |

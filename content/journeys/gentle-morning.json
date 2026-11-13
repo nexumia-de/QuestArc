@@ -2,11 +2,13 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "gentle-morning",
-  "version": 2,
+  "version": 3,
   "title": "gentle-morning.title",
   "description": "gentle-morning.description",
   "why": "gentle-morning.why",
-  "build": { "ladder": "home" },
+  "build": {
+    "ladder": "home"
+  },
   "stages": [
     {
       "id": "water",
@@ -15,8 +17,14 @@
         "action": "gentle-morning.water.action",
         "place": "gentle-morning.water.place"
       },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "days", "n": 5, "of": 7 },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
       "story": {
         "arrival": "gentle-morning.water.arrival",
         "accept": "gentle-morning.water.accept"
@@ -29,8 +37,14 @@
         "anchor": "gentle-morning.anchor",
         "action": "gentle-morning.stretch-1.action"
       },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "days", "n": 5, "of": 7 },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
       "story": {
         "arrival": "gentle-morning.stretch-1.arrival",
         "accept": "gentle-morning.stretch-1.accept"
@@ -43,9 +57,14 @@
         "anchor": "gentle-morning.anchor",
         "action": "gentle-morning.stretch-5.action"
       },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "days", "n": 5, "of": 7 },
-      "guardian": { "name": "gentle-morning.stretch-5.guardian", "hp": 100 },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
       "story": {
         "arrival": "gentle-morning.stretch-5.arrival",
         "accept": "gentle-morning.stretch-5.accept"
@@ -58,9 +77,14 @@
         "anchor": "gentle-morning.anchor",
         "action": "gentle-morning.plan-day.action"
       },
-      "schedule": { "type": "daily" },
-      "condition": { "type": "days", "n": 8, "of": 10 },
-      "guardian": { "name": "gentle-morning.plan-day.guardian", "hp": 150 },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
       "story": {
         "arrival": "gentle-morning.plan-day.arrival",
         "accept": "gentle-morning.plan-day.accept"
@@ -68,7 +92,9 @@
       "nugget": "gentle-morning.plan-day.nugget"
     }
   ],
-  "ending": { "story": "gentle-morning.ending" },
+  "ending": {
+    "story": "gentle-morning.ending"
+  },
   "texts": {
     "en": {
       "gentle-morning.title": "A gentle morning",
@@ -77,21 +103,19 @@
       "gentle-morning.anchor": "getting up",
       "gentle-morning.water.action": "drink a glass of water",
       "gentle-morning.water.place": "in the kitchen",
-      "gentle-morning.water.arrival": "The path starts in your kitchen, with one glass of water.",
+      "gentle-morning.water.arrival": "It starts in your kitchen, with one glass of water.",
       "gentle-morning.water.accept": "The water is part of your morning now. You could add one minute of stretching after it.",
       "gentle-morning.water.nugget": "You could put the glass next to the tap in the evening, so it is the first thing you see in the morning.",
       "gentle-morning.stretch-1.action": "drink a glass of water and stretch for one minute",
-      "gentle-morning.stretch-1.arrival": "A little more light comes through the window.",
+      "gentle-morning.stretch-1.arrival": "The first piece stands. A little more light comes through the window.",
       "gentle-morning.stretch-1.accept": "One minute became easy. You could give your stretch a few more minutes.",
       "gentle-morning.stretch-1.nugget": "Missing one morning is fine. What matters is coming back the next morning.",
       "gentle-morning.stretch-5.action": "drink a glass of water and stretch for five minutes",
-      "gentle-morning.stretch-5.guardian": "The Heavy Blanket",
-      "gentle-morning.stretch-5.arrival": "The morning is getting longer, and something heavy pulls you back to bed.",
-      "gentle-morning.stretch-5.accept": "The blanket stays on the bed now. You could end your routine with a short look at the day ahead.",
+      "gentle-morning.stretch-5.arrival": "The morning is getting longer, and what you started keeps growing.",
+      "gentle-morning.stretch-5.accept": "Five minutes have their place in your morning now. You could end your routine with a short look at the day ahead.",
       "gentle-morning.stretch-5.nugget": "You could plan for a hard morning now: \"If I oversleep, then I will just drink the water.\" The smaller step still counts.",
       "gentle-morning.plan-day.action": "drink a glass of water, stretch for five minutes and write down one thing for today",
-      "gentle-morning.plan-day.guardian": "The Morning Rush",
-      "gentle-morning.plan-day.arrival": "The sun is up. One last stretch of path, and the rush of the day tries to get ahead of you.",
+      "gentle-morning.plan-day.arrival": "The sun is up. One more piece, and your morning is whole.",
       "gentle-morning.plan-day.accept": "Your morning has a shape now.",
       "gentle-morning.plan-day.nugget": "You could pair the stretch with something you enjoy, like a favourite song that you only play then.",
       "gentle-morning.ending": "Your morning starts by itself now: water, a stretch and one thing for the day."

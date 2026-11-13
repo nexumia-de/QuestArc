@@ -1,6 +1,6 @@
 {
   "name": "Example D: 5 completions in the last 7 due days meet the condition",
-  "rule": "game-rules \u00a74 (Example D)",
+  "rule": "game-rules §4 (Example D)",
   "kind": "evaluate",
   "input": {
     "day": {

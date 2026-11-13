@@ -1,0 +1,118 @@
+{
+  "name": "A journey written before 3.3 that still names a guardian is read; the field is ignored",
+  "rule": "story-format, versions and changes",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-04",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-11-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02",
+        "mood": "calm"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02",
+        "note": {
+          "any": "thing"
+        }
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA"
+      }
+    },
+    "journeys": [
+      {
+        "format": 3,
+        "id": "test-daily",
+        "version": 1,
+        "title": "test-daily.title",
+        "description": "test-daily.description",
+        "stages": [
+          {
+            "id": "a",
+            "plan": {
+              "anchor": "test-daily.a.anchor",
+              "action": "test-daily.a.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "days",
+              "n": 5,
+              "of": 7
+            },
+            "guardian": {
+              "name": "test-daily.a.guardian",
+              "hp": 100
+            }
+          },
+          {
+            "id": "b",
+            "plan": {
+              "anchor": "test-daily.b.anchor",
+              "action": "test-daily.b.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "count",
+              "n": 3
+            }
+          },
+          {
+            "id": "c",
+            "plan": {
+              "anchor": "test-daily.c.anchor",
+              "action": "test-daily.c.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "time_spent",
+              "minutes": 30
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "active": {
+      "runId": "r1",
+      "stations": [
+        {
+          "completions": 1
+        },
+        {},
+        {}
+      ]
+    },
+    "problems": []
+  }
+}

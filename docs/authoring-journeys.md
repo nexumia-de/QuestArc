@@ -23,7 +23,7 @@ later milestone (#40); it will accept the same file.
 
 ## What a journey is
 
-A journey turns one habit into a path of 2 to 12 **stages**. Each stage
+A journey turns one habit into 2 to 12 **stages**. Each stage
 is one plan, _"After <anchor>, I will <action> (<place>)."_, done as a
 recurring task in Super Productivity or Pensum. A stage is met when its
 **condition** holds (default: 5 of the last 7 due days); then the user
@@ -61,8 +61,12 @@ can, the reviewer checks the rest.
    with something enjoyable. _CI rejects duplicates and warns if one is
    missing._
 8. **Story is seasoning.** One or two short sentences per station; the
-   habit works without them. Guardians (game mode only) are obstacles
-   everyone knows ("The Morning Rush"), never the user, never scary.
+   habit works without them. Every journey builds something
+   and the user may choose what, so the texts speak of building and
+   growing ("the first piece stands", "what you started keeps growing")
+   without naming a house or a bridge, without a path to walk and
+   without opponents. _CI rejects a `guardian`; journeys have none since
+   3.3._
 9. **Honest claims.** If the journey is about work, health or learning,
    base it on research and name the sources in your pull request. No
    medical or therapeutic claims; no promises of results.
@@ -118,7 +122,6 @@ format is in [story format 3](story-format.md) and the JSON Schema
       "plan": { "anchor": "my-journey.anchor", "action": "my-journey.second.action" },
       "schedule": { "type": "weekdays", "days": ["mon", "tue", "wed", "thu", "fri"] },
       "condition": { "type": "days", "n": 4, "of": 5 },
-      "guardian": { "name": "my-journey.second.guardian", "hp": 100 },
       "story": { "arrival": "my-journey.second.arrival", "accept": "my-journey.second.accept" },
       "nugget": "my-journey.second.nugget"
     }
@@ -135,7 +138,6 @@ format is in [story format 3](story-format.md) and the JSON Schema
       "my-journey.first.accept": "This became easy. You could try a little more.",
       "my-journey.first.nugget": "You could put a cue where you will see it.",
       "my-journey.second.action": "do the tiny first step and a little more",
-      "my-journey.second.guardian": "An Obstacle Everyone Knows",
       "my-journey.second.arrival": "One sentence of story at the second station.",
       "my-journey.second.accept": "One more sentence.",
       "my-journey.second.nugget": "Missing one day is fine. What matters is coming back the next time.",
@@ -149,17 +151,17 @@ format is in [story format 3](story-format.md) and the JSON Schema
 
 Texts must fit a 360 px phone. CI rejects longer ones (characters):
 title 40, description 160, why 120, anchor 40, action 120, place 40,
-guardian 40, arrival 200, accept 200, nugget 240, ending 240.
+arrival 200, accept 200, nugget 240, ending 240.
 
-A stage's action is also the station's name on the path, cut after two
-lines on a phone. Put what is new in a stage early ("give it **45**
+A stage's action is also the station's name in the list of stations,
+cut after two lines on a phone. Put what is new in a stage early ("give it **45**
 quiet minutes", not a long common start), so stations do not look the
 same.
 
 ### What it builds
 
-In game mode a journey builds one thing, a larger whole version after
-every stage ([game rules](game-rules.md) §9). Name a ladder from
+A journey builds one thing, a larger whole version after
+every stage ([game rules](game-rules.md) §7). Name a ladder from
 `content/art/` (`home`, `crossing`: the `<name>.ladder.json` files) in `build`. You may name
 what hangs on its marker (`lanterns`, `bunting`, or `flowers` where the
 ladder's setting has no water) and give the versions names in your own
@@ -168,14 +170,11 @@ stages than the ladder has versions minus one gets a warning: its last
 version then gains small fixed additions. The user may choose another
 ladder when starting.
 
-### Conditions and guardians
+### Conditions
 
 - `days` `n` of the last `of` due days (default 5 of 7; for weekdays 4
   of 5); `count` `n` completions; `time_spent` `minutes` tracked on the
   stage's tasks.
-- A guardian's `hp` (10–1000) falls by 10 per completion. Choose it so
-  the guardian usually falls a little after the condition is met
-  (100 HP for a 5-of-7 stage): an extra, never a condition.
 
 ## Check it
 

@@ -1,6 +1,6 @@
 {
   "name": "After a resume, days are due again",
-  "rule": "game-rules \u00a72, pauses, journey-design (last seven due days)",
+  "rule": "game-rules §2, pauses, journey-design (last seven due days)",
   "kind": "evaluate",
   "input": {
     "day": {

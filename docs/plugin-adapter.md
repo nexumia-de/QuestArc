@@ -99,5 +99,6 @@ same change write the same record.
 
 ## Not yet
 
-- The level in the header button (#32): `registerHeaderButton` cannot
-  update a label ([facts](super-productivity-facts.md) §7).
+- Nothing in the header button besides the icon: `registerHeaderButton`
+  cannot update a label ([facts](super-productivity-facts.md) §7), and
+  there is no level to show since 3.3 (#110).

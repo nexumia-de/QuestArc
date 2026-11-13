@@ -1,5 +1,5 @@
 {
-  "name": "A record in a newer data format makes its run read-only: no stations, no XP, no problem for its changed records; it stays the active run, the older run stays paused",
+  "name": "A record in a newer data format makes its run read-only: no stations, no problem for its changed records; it stays the active run, the older run stays paused",
   "rule": "data-model §2, data format and unknown data",
   "kind": "evaluate",
   "input": {
@@ -51,29 +51,36 @@
         "acceptedDay": "2026-11-03"
       },
       "stage-done:r2:a": {
-        "dataFormat": 2,
+        "dataFormat": 3,
         "day": "2026-11-04",
         "steps": ["changed", "shape"]
       },
       "graduation:r2:a": {
-        "dataFormat": 2,
+        "dataFormat": 3,
         "day": "2026-11-04",
         "choice": "keep"
       },
       "stage:r9:a": {
-        "dataFormat": 3,
+        "dataFormat": 4,
         "acceptedDay": "2026-11-04"
       }
     },
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 10,
     "active": null,
     "paused": [
       {
         "runId": "r1",
-        "paused": true
+        "paused": true,
+        "stations": [
+          {
+            "stageId": "a",
+            "completions": 1
+          },
+          {},
+          {}
+        ]
       }
     ],
     "finished": [],
@@ -86,8 +93,8 @@
       }
     ],
     "problems": [
-      "run r2: written by a newer QuestArc (data format 2)",
-      "run r9: written by a newer QuestArc (data format 3)"
+      "run r2: written by a newer QuestArc (data format 3)",
+      "run r9: written by a newer QuestArc (data format 4)"
     ]
   }
 }

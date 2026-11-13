@@ -1,5 +1,5 @@
 // The side panel setting in the real app (#100): off by default (no
-// side-panel button), on in QuestArc's settings (game mode), then the
+// side-panel button), on in QuestArc's settings, then the
 // button next to the play button opens QuestArc beside the task list.
 //
 //   node e2e/real-app-panel.mjs [width height]
@@ -17,9 +17,6 @@ try {
 
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await page.keyboard.press('Escape');
-  await view()
-    .getByRole('radio', { name: /With game/ })
-    .check();
   await view().getByRole('button', { name: 'Choose a journey' }).click();
   await view().locator('.qa-header button').first().click();
   await view().locator('.qa-menu-wrap button').first().click();

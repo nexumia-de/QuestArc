@@ -51,17 +51,17 @@
         "acceptedDay": "2026-11-03"
       },
       "stage-done:r2:a": {
-        "dataFormat": 2,
+        "dataFormat": 3,
         "day": "2026-11-04",
         "steps": ["changed", "shape"]
       },
       "graduation:r2:a": {
-        "dataFormat": 2,
+        "dataFormat": 3,
         "day": "2026-11-04",
         "choice": "keep"
       },
       "stage:r9:a": {
-        "dataFormat": 3,
+        "dataFormat": 4,
         "acceptedDay": "2026-11-04"
       }
     },
@@ -98,9 +98,7 @@
       }
     },
     {
-      "settings": {
-        "mode": "rpg"
-      }
+      "settings": ""
     }
   ],
   "expect": [
@@ -131,9 +129,7 @@
     },
     {
       "changes": {
-        "settings": {
-          "mode": "rpg"
-        }
+        "settings": ""
       },
       "refused": []
     }

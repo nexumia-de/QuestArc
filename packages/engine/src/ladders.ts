@@ -7,7 +7,7 @@ import palette from '../../../content/art/palette.json';
 import type { Journey } from './types/journey';
 
 /**
- * What a journey can build (docs/game-rules.md §9), read from the picture
+ * What a journey can build (docs/game-rules.md §7), read from the picture
  * files in content/art/ that the art checker checks: each
  * `<name>.ladder.json` (its versions, `water`, default `marker` and `hue`),
  * `markers.json` (`landOnly`) and the hue names of `palette.json`. One

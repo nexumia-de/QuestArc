@@ -1,6 +1,6 @@
 {
-  "name": "Example C/E: one miss is a gap, two in a row end the run; welcome back earns 10",
-  "rule": "game-rules \u00a73, \u00a75 (Example C, E), journey-design (last seven due days)",
+  "name": "Example C: one miss is a gap, two in a row end the run; the first completion after the gap is a welcome back",
+  "rule": "game-rules §3, §5 (Example C), journey-design (last seven due days)",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -77,8 +77,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 70,
-    "level": 2,
     "active": {
       "offerFallback": true,
       "position": {
@@ -88,7 +86,6 @@
         {
           "stageId": "a",
           "state": "current",
-          "xp": 70,
           "completions": 6,
           "welcomeBacks": 1,
           "run": {
@@ -96,11 +93,6 @@
             "best": 6,
             "total": 6,
             "gap": false
-          },
-          "guardian": {
-            "hp": 100,
-            "damage": 70,
-            "defeated": false
           },
           "lastDays": [
             {

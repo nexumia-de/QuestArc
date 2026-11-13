@@ -1,6 +1,6 @@
 {
   "name": "A finished journey: every version stands, no marker",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -11,9 +11,6 @@
     "tasks": [],
     "repeatCfgs": [],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,
@@ -21,21 +18,18 @@
       },
       "stage-done:r1:a": {
         "day": "2026-11-05",
-        "xp": 50,
-        "damage": 0
+        "dataFormat": 2
       },
       "stage-done:r1:b": {
         "day": "2026-11-08",
-        "xp": 30,
-        "damage": 0
+        "dataFormat": 2
       },
       "stage:r1:c": {
         "acceptedDay": "2026-11-08"
       },
       "stage-done:r1:c": {
         "day": "2026-11-12",
-        "xp": 10,
-        "damage": 0
+        "dataFormat": 2
       },
       "run-end:r1": {
         "day": "2026-11-12",

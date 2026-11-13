@@ -1,6 +1,6 @@
 {
-  "name": "Calm mode: the view carries no build",
-  "rule": "game-rules §9",
+  "name": "A settings record of QuestArc before 3.3 (calm or game mode) is ignored: the view carries the build",
+  "rule": "data-model §2; game-rules §7",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -44,14 +44,19 @@
       "binding:r1:a": {
         "taskId": "rpt_cfgA_2026-11-01",
         "repeatCfgId": "cfgA"
+      },
+      "settings": {
+        "mode": "calm"
       }
     },
     "journeys": ["$test-build"]
   },
   "expect": {
-    "mode": "calm",
     "active": {
-      "build": null
-    }
+      "build": {
+        "version": 1
+      }
+    },
+    "problems": []
   }
 }

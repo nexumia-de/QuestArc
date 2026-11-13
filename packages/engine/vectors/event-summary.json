@@ -94,9 +94,10 @@
       }
     },
     {
-      "key": "event.guardian-damaged",
+      "key": "event.build-element",
       "params": {
-        "damage": 30
+        "from": 0,
+        "to": 0.6
       }
     }
   ]

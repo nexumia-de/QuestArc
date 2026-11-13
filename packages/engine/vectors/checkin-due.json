@@ -105,7 +105,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "mode": "calm",
     "active": {
       "checkinDue": true
     }

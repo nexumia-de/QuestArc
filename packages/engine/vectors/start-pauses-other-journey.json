@@ -1,6 +1,6 @@
 {
   "name": "Starting a journey on the day another was resumed: the one not paused is active",
-  "rule": "data-model \u00a72, active journey",
+  "rule": "data-model §2, active journey",
   "kind": "evaluate",
   "input": {
     "day": {

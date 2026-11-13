@@ -39,7 +39,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["ladder"],
-      "description": "What the journey builds in game mode (docs/game-rules.md section 9). Names come from the ladders in content/art/; the journey checker checks them.",
+      "description": "What the journey builds (docs/game-rules.md section 7). Names come from the ladders in content/art/; the journey checker checks them.",
       "properties": {
         "ladder": { "$ref": "#/$defs/id" },
         "marker": {
@@ -92,15 +92,6 @@
         },
         "schedule": { "$ref": "#/$defs/schedule" },
         "condition": { "$ref": "#/$defs/condition" },
-        "guardian": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["name", "hp"],
-          "properties": {
-            "name": { "$ref": "#/$defs/textKey" },
-            "hp": { "type": "integer", "minimum": 10, "maximum": 1000 }
-          }
-        },
         "story": {
           "type": "object",
           "additionalProperties": false,

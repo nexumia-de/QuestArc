@@ -2,8 +2,8 @@
 
 # QuestArc
 
-Habits as journeys: a habit grows in small stages along a path, calm by
-default with an optional game layer. One pure game engine, two hosts: a
+Habits as journeys: a habit grows in small stages, and every journey
+builds one thing that grows with it. One pure game engine, two hosts: a
 plugin for [Super Productivity](https://super-productivity.com) and a
 game page in [Pensum](https://github.com/nexumia-de/pensum), the native
 Phosh app on the same data. Knowledge of this repository:
@@ -31,7 +31,7 @@ rules for 360 px, touch targets and accessibility are in
 
 ## Architecture rules
 
-- **Derive, don't count.** XP, level, progress, runs, guardians are
+- **Derive, don't count.** Progress, runs and the build are
   computed by the engine from task data every time. Only choice records
   are stored ([data model](docs/data-model.md)), one plugin-data key
   each.
@@ -52,9 +52,9 @@ rules for 360 px, touch targets and accessibility are in
 
 ## Design rules
 
-The 27 [design rules](docs/psychology.md) are binding, among them: calm
-mode by default; fixed rewards only, never announced before they are
-earned; no random rewards, login bonuses or rankings; a missed day is a
+The 27 [design rules](docs/psychology.md) are binding, among them: one calm
+look without points, levels or opponents; what grows follows fixed
+rules and is never announced before it is earned; no random rewards, login bonuses or rankings; a missed day is a
 neutral gap, never red, never blamed; autonomy-supportive texts; no
 generic motivational quotes; no promised number of days.
 

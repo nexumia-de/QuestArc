@@ -9,7 +9,6 @@ import { buildTimeline } from './timeline';
 import type { Journey } from './types/journey';
 import type { SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
 import type { BuildView, RunView, StationView } from './types/view';
-import { stageXp } from './xp';
 
 /**
  * One walk through a journey (docs/game-rules.md, docs/data-model.md):
@@ -49,19 +48,9 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
         state: 'done',
         progress: 1,
         run: EMPTY_RUN,
-        xp: checkpoint.xp,
         completions: 0,
         welcomeBacks: 0,
         doneDay: checkpoint.day,
-        ...(stage.guardian
-          ? {
-              guardian: {
-                hp: stage.guardian.hp,
-                damage: checkpoint.damage,
-                defeated: checkpoint.damage >= stage.guardian.hp,
-              },
-            }
-          : {}),
       };
     }
     if (index !== currentIndex) {
@@ -70,7 +59,6 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
         state: 'ahead',
         progress: 0,
         run: EMPTY_RUN,
-        xp: 0,
         completions: 0,
         welcomeBacks: 0,
       };
@@ -79,30 +67,20 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     // The current stage. If its acceptance record is missing (the journey
     // changed under a running walk), it counts from the last finished stage.
     const acceptedDay = choices.accepted.get(key(stage.id)) ?? lastDoneDay;
-    const base = { stageId: stage.id, acceptedDay, xp: 0, completions: 0, welcomeBacks: 0 };
+    const base = { stageId: stage.id, acceptedDay, completions: 0, welcomeBacks: 0 };
     const bindingRecord = choices.bindings.get(key(stage.id));
     const binding = resolveBinding(bindingRecord, ctx.tasks, ctx.repeatCfgs);
     // The station waits until its task is bound: days before that are
     // neither due nor missed (game rules §2).
     const countFrom =
       bindingRecord?.day && bindingRecord.day > acceptedDay ? bindingRecord.day : acceptedDay;
-    const guardianOf = (damage: number): Pick<StationView, 'guardian'> =>
-      stage.guardian
-        ? { guardian: { hp: stage.guardian.hp, damage, defeated: damage >= stage.guardian.hp } }
-        : {};
     if (binding.kind === 'unbound') {
       progress = 0;
-      return { ...base, state: 'unbound', progress: 0, run: EMPTY_RUN, ...guardianOf(0) };
+      return { ...base, state: 'unbound', progress: 0, run: EMPTY_RUN };
     }
     if (!isSupported(binding.cfg)) {
       progress = 0;
-      return {
-        ...base,
-        state: 'unsupported-repeat',
-        progress: 0,
-        run: EMPTY_RUN,
-        ...guardianOf(0),
-      };
+      return { ...base, state: 'unsupported-repeat', progress: 0, run: EMPTY_RUN };
     }
 
     const credited = creditedDays(binding.tasks, binding.cfg.id, countFrom, today, ctx.logicalDay);
@@ -120,7 +98,6 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     };
     const condition = conditionProgress(stage.condition, conditionInput);
     markerProgress = bestProgress(stage.condition, conditionInput);
-    const xp = stageXp(credited.size, timeline.welcomeBacks);
     offerFallback = timeline.offerFallback;
     cfgPaused = binding.cfg.isPaused === true;
     checkinDue =
@@ -132,28 +109,23 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       state: condition.met ? 'met' : 'current',
       progress: condition.progress,
       run: timeline.run,
-      xp,
       completions: credited.size,
       welcomeBacks: timeline.welcomeBacks,
-      ...guardianOf(xp),
       lastDays: timeline.lastDays,
     };
   });
 
   const lastPause = pauses.filter((p) => p.day <= today).at(-1);
-  // The build (game rules §9): game mode only; an ended run shows its
-  // version standing, without a marker.
+  // The build (game rules §7): an ended run shows its version standing,
+  // without a marker.
   const ended = choices.runEnds.has(run.runId);
-  const build: BuildView | undefined =
-    choices.mode === 'rpg'
-      ? {
-          ...resolveBuild(journey, choices.builds.get(run.runId)),
-          version: 1 + stations.filter((s) => s.state === 'done').length,
-          versions: journey.stages.length + 1,
-          markerProgress: ended ? 0 : markerProgress,
-          ready: !ended && stations[currentIndex]?.state === 'met',
-        }
-      : undefined;
+  const build: BuildView = {
+    ...resolveBuild(journey, choices.builds.get(run.runId)),
+    version: 1 + stations.filter((s) => s.state === 'done').length,
+    versions: journey.stages.length + 1,
+    markerProgress: ended ? 0 : markerProgress,
+    ready: !ended && stations[currentIndex]?.state === 'met',
+  };
   return {
     runId: run.runId,
     journeyId: journey.id,
@@ -167,6 +139,6 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     paused: lastPause?.action === 'pause' || cfgPaused,
     checkinDue,
     offerFallback,
-    ...(build ? { build } : {}),
+    build,
   };
 };

@@ -1,6 +1,6 @@
 {
   "name": "Occurrences skipped in Super Productivity's repeat dialog are not misses",
-  "rule": "game-rules \u00a72, due days",
+  "rule": "game-rules §2, due days",
   "kind": "evaluate",
   "input": {
     "day": {

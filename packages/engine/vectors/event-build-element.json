@@ -1,6 +1,6 @@
 {
   "name": "A completion raises the marker progress: build-element with the old and new progress",
-  "rule": "game-rules §9",
+  "rule": "game-rules §7",
   "kind": "diff",
   "before": {
     "day": {
@@ -33,9 +33,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,
@@ -89,9 +86,6 @@
       }
     ],
     "choices": {
-      "settings": {
-        "mode": "rpg"
-      },
       "run:r1": {
         "journeyId": "test-build",
         "journeyVersion": 1,
@@ -110,9 +104,7 @@
   "expect": [
     {
       "key": "event.completion",
-      "params": {
-        "xp": 10
-      }
+      "params": {}
     },
     {
       "key": "event.build-element",

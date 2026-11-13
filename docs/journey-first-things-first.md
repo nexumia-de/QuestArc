@@ -20,16 +20,16 @@ Evidence: [focused work](research.md#focused-work-evidence-for-the-journey-first
 
 All stages on Monday to Friday; anchor "sitting down at my desk".
 
-| Stage        | Plan ("After sitting down at my desk, I will …")                                         | Condition    | Guardian                       |
-| ------------ | ---------------------------------------------------------------------------------------- | ------------ | ------------------------------ |
-| `one-thing`  | write down the one task that matters most today                                          | 4 of 5 days  | —                              |
-| `focus-15`   | write down my one task and give it 15 quiet minutes, notifications off                   | 4 of 5 days  | —                              |
-| `focus-45`   | write down my one task and give it 45 quiet minutes, notifications off                   | 4 of 5 days  | The Notification Swarm, 100 HP |
-| `focus-mail` | write down my one task, give it 45 quiet minutes, then check email and chat in one block | 8 of 10 days | The Inbox Hydra, 150 HP        |
-| `look-back`  | note what moved forward yesterday, write down my one task and give it 45 quiet minutes   | 8 of 10 days | —                              |
+| Stage        | Plan ("After sitting down at my desk, I will …")                                         | Condition    |
+| ------------ | ---------------------------------------------------------------------------------------- | ------------ |
+| `one-thing`  | write down the one task that matters most today                                          | 4 of 5 days  |
+| `focus-15`   | write down my one task and give it 15 quiet minutes, notifications off                   | 4 of 5 days  |
+| `focus-45`   | write down my one task and give it 45 quiet minutes, notifications off                   | 4 of 5 days  |
+| `focus-mail` | write down my one task, give it 45 quiet minutes, then check email and chat in one block | 8 of 10 days |
+| `look-back`  | note what moved forward yesterday, write down my one task and give it 45 quiet minutes   | 8 of 10 days |
 
-In game mode the journey builds a **Crossing**
-([game rules](game-rules.md) §9), with lanterns on the marker (the ladder's default): the
+The journey builds a **Crossing**
+([game rules](game-rules.md) §7), with lanterns on the marker (the ladder's default): the
 journey is about getting across to the one task before the stream of
 email and chat, and each stage makes that way over sturdier, from
 stepping stones to a covered bridge. Five stages need six versions and
@@ -55,12 +55,13 @@ journeys then build different things.
   and the reflection experiments (working paper).
 - **Honest texts** (rules 4, 15, 26): no promise of more output, no
   minutes to refocus, no Pomodoro or 90-minute cycles; the durations
-  are a ramp the user may change. Guardians are the notification swarm
-  and the inbox, never the user.
+  are a ramp the user may change. There are no opponents (version 3,
+  #110); the texts speak of quiet that is built on what is already
+  there.
 - **Nuggets** (rule 22): a pen and sticky notes where you sit down; why
   one missed workday is fine; a parking list for thoughts that come up;
   an if-then plan for a day full of meetings; why the one line helps.
-- The action is also the station's name on the path, cut after two
+- The action is also the station's name in the list of stations, cut after two
   lines, so the part that differs from the previous stage comes early
   ("15" or "45 quiet minutes", "then check email").
 

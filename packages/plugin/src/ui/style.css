@@ -294,15 +294,6 @@ body {
   margin: 0;
 }
 
-.qa-chip {
-  align-self: flex-start;
-  margin: 0;
-  padding: var(--s-half, 4px) calc(1.5 * var(--s, 8px));
-  border: 1px solid var(--chip-outline-color, var(--divider-color, rgba(0, 0, 0, 0.12)));
-  border-radius: var(--radius-pill, 9999px);
-  font-size: var(--font-size-sm, 12px);
-}
-
 .qa-callout {
   margin: 0 auto var(--s2, 16px);
   padding: var(--s, 8px) var(--s2, 16px);
@@ -364,17 +355,6 @@ body {
   min-height: 0;
 }
 
-.qa-level {
-  margin: var(--s, 8px) var(--s2, 16px) 0;
-}
-
-.qa-path-scroll {
-  flex: 1;
-  min-height: 160px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 .qa-station-card {
   flex: none;
   max-height: 55%;
@@ -386,203 +366,23 @@ body {
   .qa-journey {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: 0 var(--s2, 16px);
   }
 
-  .qa-level {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-
-  .qa-path-scroll {
-    grid-row: 2;
-  }
-
   .qa-station-card {
-    grid-row: 2;
+    grid-row: 1;
     align-self: start;
     max-height: 100%;
     margin: var(--s2, 16px);
   }
 }
 
-.qa-path {
-  position: relative;
-  max-width: 480px;
-  margin: 0 auto;
-}
-
-.qa-path-svg {
-  position: absolute;
-  inset: 0 auto auto var(--s, 8px);
-  overflow: visible;
-}
-
-.qa-path-svg path,
-.qa-path-svg circle {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.qa-seg-done {
-  stroke: var(--c-primary, #6495ed);
-  stroke-width: 5;
-}
-
-.qa-seg-open {
-  stroke: color-mix(in srgb, var(--c-primary, #6495ed) 25%, transparent);
-  stroke-width: 5;
-}
-
-.qa-seg-ahead {
-  stroke: var(--text-color-muted, rgba(44, 44, 44, 0.66));
-  stroke-width: 3;
-  stroke-dasharray: 2 9;
-}
-
-.qa-path-svg .qa-fill {
-  fill: var(--c-primary, #6495ed);
-  stroke: none;
-}
-
-.qa-path-svg .qa-on-fill,
-.qa-path-svg .qa-check {
-  stroke: var(--button-primary-label, #fff);
-  stroke-width: 3;
-}
-
-.qa-path-svg .qa-check {
-  stroke: var(--c-primary, #6495ed);
-}
-
-.qa-path-svg .qa-ring {
-  fill: var(--bg-lighter, #fff);
-  stroke: var(--c-primary, #6495ed);
-  stroke-width: 5;
-}
-
-.qa-path-svg .qa-hollow {
-  fill: var(--bg-lighter, #fff);
-  stroke: var(--text-color-muted, rgba(44, 44, 44, 0.66));
-  stroke-width: 3;
-}
-
-.qa-path-svg .qa-plus {
-  stroke: var(--text-color-muted, rgba(44, 44, 44, 0.66));
-  stroke-width: 2.5;
-}
-
-.qa-path-svg .qa-goal {
-  fill: var(--text-color-muted, rgba(44, 44, 44, 0.66));
-}
-
-.qa-path-svg .qa-guardian {
-  fill: var(--color-warning, #ff9800);
-  stroke: var(--bg-lighter, #fff);
-  stroke-width: 2;
-}
-
-.qa-path-svg .qa-guardian-defeated {
-  fill: var(--bg-lighter, #fff);
-  stroke: var(--text-color-muted, rgba(44, 44, 44, 0.66));
-}
-
-.qa-stations {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.qa-stations > li {
-  position: absolute;
-  right: 0;
-  left: 0;
-  height: 60px;
-}
-
-.qa-station-btn {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 0 var(--s2, 16px) 0 104px;
-  border: 0;
-  border-radius: var(--radius-md, 8px);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-
-.qa-station-btn:hover {
-  background: var(--state-hover, rgba(0, 0, 0, 0.06));
-}
-
-.qa-station-btn:focus-visible {
-  outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, #6495ed);
-  outline-offset: -2px;
-}
-
-.qa-station-name {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-height: var(--line-height-snug, 1.3);
-}
-
-.qa-station-current .qa-station-name {
-  font-weight: var(--font-weight-semibold, 600);
-}
-
-.qa-goal-label,
-.qa-guardian-label {
-  position: absolute;
-  right: var(--s2, 16px);
-  left: 104px;
-  margin: 0;
-  font-size: var(--font-size-sm, 12px);
-  pointer-events: none;
-}
-
-.qa-guardian-label {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.qa-guardian-name {
-  font-weight: var(--font-weight-medium, 500);
-}
-
-.qa-hp {
-  display: flex;
-  align-items: center;
-  gap: var(--s, 8px);
-}
-
-.qa-hp-bar,
 .qa-bar {
   display: block;
   overflow: hidden;
   border-radius: var(--radius-pill, 9999px);
   background: color-mix(in srgb, var(--c-primary, #6495ed) 20%, transparent);
-}
-
-.qa-hp-bar {
-  width: 64px;
-  height: 6px;
-  background: color-mix(in srgb, var(--color-warning, #ff9800) 25%, transparent);
-}
-
-.qa-hp-bar > span {
-  display: block;
-  height: 100%;
-  background: var(--color-warning, #ff9800);
 }
 
 .qa-progress {
@@ -712,7 +512,7 @@ body {
 
 @media (min-width: 720px) {
   .qa-card-area {
-    grid-row: 2;
+    grid-row: 1;
     align-self: start;
     max-height: 100%;
     padding: var(--s2, 16px);
@@ -892,7 +692,7 @@ body {
 }
 
 /*
- * The build on the journey screen in game mode (#100,
+ * The build on the journey screen (#100,
  * docs/journey-design.md "The journey screen with the build"): the scene
  * at the full width on a phone (16 : 9, the setting's view box), the row of versions, the line of
  * state. At 720 px and wider it takes the path's place on the left.
@@ -957,7 +757,7 @@ body {
 
 @media (min-width: 720px) {
   .qa-build {
-    grid-row: 2;
+    grid-row: 1;
     align-self: start;
     max-width: 560px;
     margin: var(--s2, 16px) 0 0 var(--s2, 16px);

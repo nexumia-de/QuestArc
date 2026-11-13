@@ -1,5 +1,5 @@
 {
-  "name": "A finished stage keeps its XP from the checkpoint although its tasks are gone",
+  "name": "A finished stage stays finished by its checkpoint although its tasks are gone; a checkpoint written before data format 2 (with xp and damage) is read the same",
   "rule": "decisions/deleted-history.md",
   "kind": "evaluate",
   "input": {
@@ -47,7 +47,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 80,
     "active": {
       "position": {
         "stage": 1
@@ -56,17 +55,11 @@
         {
           "stageId": "a",
           "state": "done",
-          "xp": 70,
-          "doneDay": "2026-11-10",
-          "guardian": {
-            "damage": 70,
-            "defeated": false
-          }
+          "doneDay": "2026-11-10"
         },
         {
           "stageId": "b",
           "state": "current",
-          "xp": 10,
           "completions": 1,
           "progress": 0.3333333333333333
         },

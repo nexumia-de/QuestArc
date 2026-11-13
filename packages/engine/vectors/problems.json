@@ -1,6 +1,6 @@
 {
   "name": "A broken imported journey is reported and ignored; unknown records are ignored; empty records are withdrawn",
-  "rule": "data-model \u00a72, story-format",
+  "rule": "data-model §2, story-format",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -51,7 +51,16 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 10,
+    "active": {
+      "stations": [
+        {
+          "stageId": "a",
+          "completions": 1
+        },
+        {},
+        {}
+      ]
+    },
     "problems": [
       "journey broken: version: invalid; title/description: invalid; stages: 2 to 12 required"
     ]

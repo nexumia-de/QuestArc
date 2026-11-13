@@ -55,11 +55,6 @@ const stageErrors = (stage: unknown, at: string): string[] => {
       (c.type === 'count' && isInt(c.n, 1, 100)) ||
       (c.type === 'time_spent' && isInt(c.minutes, 1, 6000)));
   if (!conditionOk) errors.push(`${at}.condition: invalid`);
-  if (stage.guardian !== undefined) {
-    const g = stage.guardian;
-    if (!isObject(g) || !isKey(g.name) || !isInt(g.hp, 10, 1000))
-      errors.push(`${at}.guardian: invalid`);
-  }
   return errors;
 };
 

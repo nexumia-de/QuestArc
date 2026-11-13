@@ -43,15 +43,15 @@ const report = (runtime: string, what: string, ms: number[]): void => {
 };
 
 interface View {
-  active: { stations: { stageId: string; state: string; xp: number; completions: number }[] };
+  active: { stations: { stageId: string; state: string; completions: number }[] };
 }
 
 /** What the large input must give; a faster engine must not change it. */
 const expectedStations = (view: View): void => {
-  expect(view.active.stations.map((s) => [s.stageId, s.state, s.xp, s.completions])).toEqual([
-    ['a', 'done', 4_000, 0],
-    ['b', 'done', 3_000, 0],
-    ['c', 'met', 6_000, 559],
+  expect(view.active.stations.map((s) => [s.stageId, s.state, s.completions])).toEqual([
+    ['a', 'done', 0],
+    ['b', 'done', 0],
+    ['c', 'met', 559],
   ]);
 };
 

@@ -60,7 +60,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 0,
     "active": null,
     "paused": [
       {

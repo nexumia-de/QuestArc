@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  actions,
-  answerCheckin,
-  chooseBuild,
-  endJourney,
-  resumeJourney,
-  setMode,
-  withdraw,
-} from '../src';
+import { actions, answerCheckin, chooseBuild, endJourney, resumeJourney, withdraw } from '../src';
 
 // The record-writing actions both hosts use (docs/data-model.md §2); the
 // plugin's tests check startJourney, bindStage and continueJourney with
@@ -23,17 +15,15 @@ describe('actions', () => {
       'pauseJourney',
       'repeatPause',
       'resumeJourney',
-      'setMode',
       'startJourney',
       'withdraw',
     ]);
   });
 
-  it('write the weekly answer, the mode and withdrawals', () => {
+  it('write the weekly answer and withdrawals', () => {
     expect(answerCheckin('r', 'walk', '2026-W45', 6)).toEqual({
       'checkin:r:walk:2026-W45': { score: 6 },
     });
-    expect(setMode('rpg')).toEqual({ settings: { mode: 'rpg' } });
     expect(withdraw('run-end:r')).toEqual({ 'run-end:r': '' });
   });
 

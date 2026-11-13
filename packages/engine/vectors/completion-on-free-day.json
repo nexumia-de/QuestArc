@@ -1,6 +1,6 @@
 {
-  "name": "A completion on a free day earns XP and breaks a series of misses, but does not lengthen the run",
-  "rule": "game-rules \u00a72",
+  "name": "A completion on a free day counts and breaks a series of misses, but does not lengthen the run",
+  "rule": "game-rules §2",
   "kind": "evaluate",
   "input": {
     "day": {
@@ -59,7 +59,6 @@
     "journeys": ["$test-daily"]
   },
   "expect": {
-    "totalXp": 50,
     "active": {
       "offerFallback": false,
       "stations": [

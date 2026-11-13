@@ -9,7 +9,7 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 # Design rules from habit psychology
 
 QuestArc exists to help people build habits that last, in Super
-Productivity and in Pensum. The game layer serves that goal and must
+Productivity and in Pensum. What it shows serves that goal and must
 never work against it. Every rule below comes from the
 [evidence review](research.md), which cites the studies, rates how strong
 the evidence is and lists what is still unknown. Where the evidence is
@@ -46,9 +46,9 @@ punishment and comparison often backfire.
 
 ## Progress and feedback
 
-8. **Progress shown is real progress.** The journey, XP, level and
-   guardians show completed stage tasks, nothing else. Nothing grows for
-   opening the app.
+8. **Progress shown is real progress.** The journey and its build show
+   completed stage tasks, nothing else, and messages say it in words
+   ("4 of 5 days"). Nothing grows for opening the app.
 9. **Weekly look back.** Once a week the journey shows the last days, the
    total and best runs, and asks one question,
    the validated single item of the automaticity index with the habit filled
@@ -66,23 +66,30 @@ punishment and comparison often backfire.
 12. **A miss is a neutral gap.** No red marks, no counter falling to zero,
     no "you failed". The view shows total and best runs.
 13. **Welcome back.** The first completion after a miss gets a fixed,
-    friendly acknowledgement: a line in calm mode, an extra guardian hit in
-    RPG mode. This was the strongest single mechanic in the largest study.
+    friendly acknowledgement: one sentence, nothing more. This was the
+    strongest single mechanic in the largest study.
 14. **Pause.** The user can pause a journey (illness, travel); paused days
     are not misses.
 15. **Kind words only.** All texts are autonomy-supportive ("you could"),
     never controlling ("you must") or blaming.
-16. **No permanent failure.** Nothing earned is ever taken away: runs, journeys
-    and guardians are never lost or reset, and there is no HP or any other
-    value that falls because of misses.
+16. **No permanent failure.** Nothing earned is ever taken away: runs,
+    journeys and what a journey has built are never lost or reset, and
+    there is no HP or any other value that falls because of misses.
 
-## Game layer
+## What grows
 
-17. **Calm by default.** The game layer is opt-in and can be switched off
-    at any time without losing anything.
-18. **Fixed rewards only.** XP and guardian damage follow fixed rules. No
-    random rewards, loot boxes, login bonuses or paid extras.
-19. **Levels are cosmetic.** They unlock titles and looks, never power.
+Rules 17 to 19 were rewritten on 2026-11-13 (#110): XP, levels,
+guardians and the game mode are gone, because they had no effect any
+more and the evidence for them is contested or indirect.
+
+17. **One calm look.** There is no game mode, no points, no levels and
+    no opponents. Every journey shows one thing it builds.
+18. **Fixed rules only.** What grows follows fixed rules and is never
+    announced before it is earned. No random rewards, loot boxes, login
+    bonuses or paid extras.
+19. **A picture of progress, not a score.** The build is whole after
+    every stage and shows progress at a glance. It unlocks nothing and
+    gives no power.
 20. **Story is seasoning.** Story texts at stations add flavour; the habit
     works without them. Kept short and skippable.
 21. **Cooperation, never rankings.** No leaderboards and no comparison

@@ -20,17 +20,12 @@ works and green CI, so a pause never leaves a broken state.
 
 # The journey
 
-The heart of QuestArc 3.0. A **journey** is a story drawn as a path:
+The heart of QuestArc 3.0. A **journey** is one habit that grows in
+stages, and one thing that is built along the way:
 
-- The path runs from the bottom of the screen upwards, one **stage** per
-  station. It scrolls vertically, so it fits a 360 px phone.
 - A stage is one habit step ("put the shoes by the door"), anchored to a
-  moment ("after breakfast"). Its condition (e.g. 5 of the last 7 days)
-  fills the path segment to the next station.
-- The hero marker stands where the user's progress is; the position is
-  computed from the tasks, never stored.
-- At the end of some stretches waits a **guardian** (boss). Work on the
-  journey's tasks wears it down.
+  moment ("after breakfast"), with a condition (e.g. 5 of the last 7
+  days). Progress is computed from the tasks, never stored.
 - Reaching a station tells the next piece of the story. The next stage
   starts only when the user accepts it; accepting sets up its recurring
   task. Super Productivity's plugin API cannot create repeat configs
@@ -38,11 +33,16 @@ The heart of QuestArc 3.0. A **journey** is a story drawn as a path:
   decided in _Rules on paper_.
 - Finished journeys stay on a shelf of completed journeys; habits that
   became automatic graduate there.
-- With the game, the journey screen shows the journey's **build**
-  instead of the path: one thing that is whole at every stage and
+- The journey screen shows the journey's **build**: one thing that is
+  whole at every stage and
   becomes a larger version with the next (stepping stones, then a plank
   bridge, then a stone bridge), with a festive marker that grows while a
   stage is under way ([journey design](journey-design.md#builds-and-ladders-the-valley-42)).
+
+Until 3.2 the journey was drawn as a path with XP, levels and guardians
+as an optional game layer; 3.3 removed them and shows the build in every
+journey (#110). Exit criteria of finished milestones below still name
+them as they were.
 
 The journey, its world, names and pictures are QuestArc's own. Other
 habit games show that travelling through a world motivates; QuestArc
@@ -117,7 +117,7 @@ release 3.0.0; the owner uses it every day without workarounds.
 
 **Exit criteria**: tracked in Pensum's repository (nexumia-de/pensum#38,
 #39, #40), started after Pensum's M2 (repeating tasks). Read-only first:
-journey page, level, toasts, game layer switch in preferences; then
+journey page with the build, toasts; then
 accepting a stage on the phone with the same choice records.
 
 # More journeys

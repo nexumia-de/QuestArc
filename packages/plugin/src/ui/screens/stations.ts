@@ -4,8 +4,7 @@ import { h } from '../dom';
 import type { Context, Screen } from '../screen';
 
 /**
- * The stations as a list in path order (game mode, where the journey
- * screen shows the build instead of the path); each opens screen 5.
+ * The stations as a list in journey order; each opens screen 5.
  */
 export const stationsScreen = (ctx: Context): Screen => {
   const { view, journeys } = ctx.state;
