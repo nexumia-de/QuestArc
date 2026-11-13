@@ -40,7 +40,7 @@ for (const demo of shots) {
       const art = demo.startsWith('art');
       await tab.goto(
         art
-          ? `${artPage}?theme=${theme}&part=${route || 'growth'}${hue ? `&hue=${hue}` : ''}`
+          ? `${artPage}?theme=${theme}&part=${route || 'sizes'}${hue ? `&hue=${hue}` : ''}`
           : `${page}?demo=${demo.split(':')[0]}&theme=${theme}`,
       );
       const frame = art ? tab.locator(':root') : tab.frameLocator('#view');

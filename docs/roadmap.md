@@ -38,6 +38,11 @@ The heart of QuestArc 3.0. A **journey** is a story drawn as a path:
   decided in _Rules on paper_.
 - Finished journeys stay on a shelf of completed journeys; habits that
   became automatic graduate there.
+- With the game, the journey screen shows the journey's **build**
+  instead of the path: one thing that is whole at every stage and
+  becomes a larger version with the next (stepping stones, then a plank
+  bridge, then a stone bridge), with a festive marker that grows while a
+  stage is under way ([journey design](journey-design.md#builds-and-ladders-the-valley-42)).
 
 The journey, its world, names and pictures are QuestArc's own. Other
 habit games show that travelling through a world motivates; QuestArc

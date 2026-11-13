@@ -1,5 +1,5 @@
 import type { Problem } from './content-check';
-import { SCENE_BANDS, type SceneBand } from './art-scene-check';
+import { BAND_SIZES, type Band } from './art-bands';
 import { hasVertex, type Point } from './art-vertices';
 
 /**
@@ -21,11 +21,11 @@ import { hasVertex, type Point } from './art-vertices';
 export const SETTING_SIZE = { width: 320, height: 180 } as const;
 
 /**
- * Where feet stand in a setting, per band; the sizes are those of a
- * region's bands (SCENE_BANDS), so plants and the lantern are reused at
- * the same sizes. At most the top fifth (36) is sky.
+ * Where feet stand in a setting, per band; the sizes are the bands' own
+ * (BAND_SIZES), so plants and the lantern keep their sizes in every
+ * setting. At most the top fifth (36) is sky.
  */
-export const SETTING_FEET: Readonly<Record<SceneBand, readonly [number, number]>> = {
+export const SETTING_FEET: Readonly<Record<Band, readonly [number, number]>> = {
   far: [36, 80],
   middle: [80, 145],
   near: [145, 180],
@@ -52,7 +52,7 @@ export const MARKER_PICTURES = ['post', 'bead', 'bead-lit'] as const;
 /** A post's line is tied on at y = 12 of its 32 grid. */
 const TIE = 12 / 32;
 /** Hanging elements: near band sizes, or 24 between the two smaller ones. */
-const HANG_SIZES = [...SCENE_BANDS.near.sizes, 24];
+const HANG_SIZES = [...BAND_SIZES.near, 24];
 
 /** A marker kind in `content/art/markers.json`. */
 export interface MarkerKind {
@@ -79,7 +79,7 @@ export const markerProblems = (value: unknown, names: readonly string[]): Proble
   return problems;
 };
 
-const isBand = (value: unknown): value is SceneBand =>
+const isBand = (value: unknown): value is Band =>
   typeof value === 'string' && Object.hasOwn(SETTING_FEET, value);
 const num = (value: unknown): number => (typeof value === 'number' ? value : NaN);
 
@@ -203,7 +203,7 @@ export const ladderProblems = (
       return;
     }
     const [low, high] = SETTING_FEET[band];
-    const sizes = SCENE_BANDS[band].sizes;
+    const sizes = BAND_SIZES[band];
     const inBand = (feet: number) => feet >= low && feet <= high;
     let feet: number;
     const slot = p.slot as Slot | undefined;

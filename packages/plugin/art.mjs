@@ -1,11 +1,10 @@
-// The module `virtual:questarc-art`: every picture (`<name>.svg`), scene
-// (`<name>.scene.json`), ladder (`<name>.ladder.json`) and the palette in
-// content/art/ as text and data
+// The module `virtual:questarc-art`: every picture (`<name>.svg`) and ladder
+// (`<name>.ladder.json`), the markers and the palette in content/art/ as
+// text and data
 // (docs/decisions/shared-pictures.md). Used by esbuild in preview.mjs;
 // typed in src/virtual-art.d.ts. The plugin itself bundles only what the
 // journey screen draws (`ladderArt`, docs/journey-design.md, "The journey
-// screen with the build"): the same module shape with fewer pictures and
-// no region scenes.
+// screen with the build"): the same module shape with fewer pictures.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -18,14 +17,6 @@ const read = () => {
       .filter((file) => file.endsWith('.svg'))
       .map((file) => [file.slice(0, -4), readFileSync(join(dir, file), 'utf8')]),
   );
-  const scenes = Object.fromEntries(
-    files
-      .filter((file) => file.endsWith('.scene.json'))
-      .map((file) => [
-        file.slice(0, -'.scene.json'.length),
-        JSON.parse(readFileSync(join(dir, file), 'utf8')),
-      ]),
-  );
   const ladders = Object.fromEntries(
     files
       .filter((file) => file.endsWith('.ladder.json'))
@@ -36,7 +27,7 @@ const read = () => {
   );
   const palette = JSON.parse(readFileSync(join(dir, 'palette.json'), 'utf8'));
   const markers = JSON.parse(readFileSync(join(dir, 'markers.json'), 'utf8'));
-  return { pictures, scenes, ladders, palette, markers };
+  return { pictures, ladders, palette, markers };
 };
 
 /** The names of the pictures the journey screen and the build page draw. */
@@ -52,7 +43,7 @@ export const ladderArt = ({ ladders, markers }) => {
 };
 
 const source = (only) => {
-  const { pictures, scenes, ladders, palette, markers } = read();
+  const { pictures, ladders, palette, markers } = read();
   const kept = only ? ladderArt(read()) : undefined;
   return [
     `export const pictures = ${JSON.stringify(
@@ -60,7 +51,6 @@ const source = (only) => {
         ? Object.fromEntries(Object.entries(pictures).filter(([name]) => kept.has(name)))
         : pictures,
     )};`,
-    `export const scenes = ${JSON.stringify(kept ? {} : scenes)};`,
     `export const ladders = ${JSON.stringify(ladders)};`,
     `export const palette = ${JSON.stringify(palette)};`,
     `export const markers = ${JSON.stringify(markers)};`,

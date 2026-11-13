@@ -236,6 +236,6 @@ describe('the pictures for the view (#100)', () => {
     expect(pack).toBe(artPack);
     expect(Object.keys(artPack.ladders).sort()).toEqual(['crossing', 'home']);
     expect(artPack.pictures['build-home-3']).toContain('<svg');
-    expect(artPack.pictures['hedgehog']).toBeUndefined();
+    expect(artPack.pictures['keepsake-first-step']).toBeUndefined();
   });
 });

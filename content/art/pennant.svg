@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <title>Pennant</title>
-  <circle class="fg" cx="9" cy="4.2" r="1.9"/>
-  <rect class="fg" x="8" y="4.2" width="2" height="25.8"/>
-  <path class="accent" d="M10 6.2L28 12L10 17.8Z"/>
-  <rect class="fg" x="5" y="28.4" width="8" height="1.6" rx="0.8"/>
-</svg>

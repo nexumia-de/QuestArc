@@ -154,7 +154,7 @@ describe('ladderProblems', () => {
   });
 
   it('wants the setting first', () => {
-    expect(at(withPicture(0, { art: 'ground-meadow' }))).toEqual(['pictures[0]']);
+    expect(at(withPicture(0, { art: 'tree' }))).toEqual(['pictures[0]']);
     expect(at(withPicture(0, { width: 300 }))).toEqual(['pictures[0]']);
   });
 
