@@ -1,4 +1,4 @@
-import type { PluginAppState } from '@questarc/sp-plugin-api';
+import type { PluginAppState } from '@super-productivity/plugin-api';
 
 import type { Context } from './screen';
 

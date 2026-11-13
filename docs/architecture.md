@@ -145,7 +145,7 @@ milestones.
   and `dayChange` came with Super Productivity 20.0.0. QuestArc uses
   them where they exist and falls back for 19.3.x
   ([decision](decisions/one-build-for-older-versions.md)); the types
-  come from the pinned upstream commit.
+  come from the npm package `@super-productivity/plugin-api` 20.0.0.
 - **Compressed plugin data.** Super Productivity stores long plugin data
   as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single

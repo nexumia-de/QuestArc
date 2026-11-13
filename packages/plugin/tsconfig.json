@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
-    "types": [],
+    "types": ["@super-productivity/plugin-api/global"],
     "resolveJsonModule": true
   },
-  "include": ["src", "test", "preview", "../sp-plugin-api/src/global.ts"]
+  "include": ["src", "test", "preview"]
 }

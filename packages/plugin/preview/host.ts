@@ -2,7 +2,7 @@
 // preview): a fake plugin API with demo data, the real adapter (brain) and
 // the built view in an iframe that talks to it the way Super Productivity's
 // bridge does. Query: ?demo=<scenario in preview/demo.ts>&theme=light|dark.
-import type { Hooks } from '@questarc/sp-plugin-api';
+import type { Hooks } from '@super-productivity/plugin-api';
 
 import { createBrain } from '../src/adapter/brain';
 import { localDay } from '../src/adapter/day';

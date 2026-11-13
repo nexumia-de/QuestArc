@@ -45,8 +45,9 @@ rules for 360 px, touch targets and accessibility are in
 - **No telemetry, no third-party services, no network requests** from the
   plugin.
 - Super Productivity facts come from its source at a recorded commit; the
-  plugin API types are the copy in `packages/sp-plugin-api` (MIT, do not
-  edit; update with `scripts/update-sp-plugin-api.sh`).
+  plugin API types are the npm package `@super-productivity/plugin-api`
+  (MIT, pinned exactly, dev dependency of `packages/plugin`; Dependabot
+  updates it). Types only: nothing of it may end up in the build.
 - Logs name ids and counts, never task titles, notes or the user's own
   reason.
 

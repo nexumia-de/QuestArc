@@ -14,7 +14,9 @@
     "e2e": "node e2e/real-app.mjs 360 720 && node e2e/real-app.mjs 1200 800 && node e2e/real-app-build.mjs 360 720 && node e2e/real-app-build.mjs 1200 800 && node e2e/real-app-panel.mjs 1200 800"
   },
   "dependencies": {
-    "@questarc/engine": "*",
-    "@questarc/sp-plugin-api": "*"
+    "@questarc/engine": "*"
+  },
+  "devDependencies": {
+    "@super-productivity/plugin-api": "20.0.0"
   }
 }

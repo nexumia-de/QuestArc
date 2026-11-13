@@ -1,7 +1,7 @@
 // The view (iframe): asks plugin.js for the game state and draws the
 // screens of docs/behaviour.md. It redraws when Super Productivity reports
 // a change, when the window comes back, and every few seconds as a fallback.
-import type { Hooks } from '@questarc/sp-plugin-api';
+import type { Hooks } from '@super-productivity/plugin-api';
 
 import { createApp } from './app';
 import { setArt } from './art-store';

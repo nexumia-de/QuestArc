@@ -1,5 +1,5 @@
 import { isSupported, toRepeatCfg, type HostRepeatCfg, type Schedule } from '@questarc/engine';
-import type { PluginTaskRepeatCfg, Task } from '@questarc/sp-plugin-api';
+import type { PluginTaskRepeatCfg, Task } from '@super-productivity/plugin-api';
 
 import { t } from '../shared/texts';
 

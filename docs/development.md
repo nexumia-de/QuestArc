@@ -15,7 +15,6 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 | `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                              |
 | `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                           |
 | `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                             |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                          |
 | `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example |
 | `scripts/`                | Maintenance scripts                                                                                                                                 |
 
@@ -197,11 +196,14 @@ check the [facts](super-productivity-facts.md) §10.
 
 ## Plugin API types
 
-The npm package `@super-productivity/plugin-api` is outdated (1.0.1, June
-2025). `packages/sp-plugin-api` holds the types of a pinned upstream
-commit; `scripts/update-sp-plugin-api.sh <commit>` replaces them. Keep
-the commit in that package's README and in
-[Super Productivity facts](super-productivity-facts.md) the same.
+The types come from the npm package `@super-productivity/plugin-api`
+(versioned like the app since 20.0.0), pinned exactly as a dev dependency
+of `packages/plugin`; Dependabot proposes updates. It is imported with
+`import type` only and its global `PluginAPI` is declared through
+`types` in `packages/plugin/tsconfig.json`, so nothing of it is bundled
+and one build serves Super Productivity 19.3.0 and later
+([decision](decisions/one-build-for-older-versions.md)). After an update
+check the [Super Productivity facts](super-productivity-facts.md) §10.
 
 ## Engine and test vectors
 

@@ -29,8 +29,9 @@ that and are not ancestors of that commit. They were released with
 **20.0.0** (tag `v20.0.0`, commit `4db0e112`, 2026-11-06) and are marked
 _since 20.0.0_: on 2026-11-13 every commit named so, and `c5eb3f6`
 itself, was an ancestor of the tag (`git merge-base --is-ancestor`), and
-`packages/plugin-api/src/types.ts` at the tag is identical to the copy in
-`packages/sp-plugin-api`[^sp][^sp20].
+`packages/plugin-api/src/types.ts` at the tag is what QuestArc uses through
+the npm package `@super-productivity/plugin-api` 20.0.0 (`packages/plugin`,
+dev dependency, types only)[^sp][^sp20].
 
 ## 1. Packaging
 

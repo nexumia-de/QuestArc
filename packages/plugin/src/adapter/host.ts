@@ -1,4 +1,4 @@
-import type { PluginAPI } from '@questarc/sp-plugin-api';
+import type { PluginAPI } from '@super-productivity/plugin-api';
 
 /**
  * The part of Super Productivity's plugin API the adapter uses, so tests

@@ -1,4 +1,4 @@
-import type { PluginAPI } from '@questarc/sp-plugin-api';
+import type { PluginAPI } from '@super-productivity/plugin-api';
 
 /**
  * The optional side panel (docs/behaviour.md screen 8, #100): with the

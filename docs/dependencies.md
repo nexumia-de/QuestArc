@@ -15,29 +15,27 @@ rest. Licences read from each package's `package.json` in
 ## Shipped
 
 QuestArc itself is AGPL-3.0-or-later ([LICENSE](../LICENSE)). Nothing
-third-party is bundled into the plugin or the engine; all dependencies
+third-party is bundled into the plugin or the engine (the plugin API types
+are imported with `import type` only); all dependencies
 below are MIT, Apache-2.0 or BlueOak-1.0.0 and compatible with it.
-
-| Copy in the repository   | Version / source                         | Licence | Holder          |
-| ------------------------ | ---------------------------------------- | ------- | --------------- |
-| `packages/sp-plugin-api` | Super Productivity `c5eb3f6`, types only | MIT     | Johannes Millan |
 
 ## Development only
 
-| Package             | Version | Licence    | Use                           |
-| ------------------- | ------- | ---------- | ----------------------------- |
-| `esbuild`           | 0.28.2  | MIT        | Bundling engine and plugin    |
-| `fflate`            | 0.8.3   | MIT        | Packing the plugin ZIP        |
-| `typescript`        | 6.0.3   | Apache-2.0 | Type checking                 |
-| `vitest`            | 5.1.0   | MIT        | Tests                         |
-| `ajv`               | 8.20.0  | MIT        | Journey schema check in tests |
-| `eslint`            | 10.14.0 | MIT        | Lint                          |
-| `@eslint/js`        | 10.0.1  | MIT        | Lint rules                    |
-| `typescript-eslint` | 8.72.1  | MIT        | Lint for TypeScript           |
-| `globals`           | 17.14.0 | MIT        | Lint globals                  |
-| `prettier`          | 3.9.10  | MIT        | Formatting                    |
-| `@types/node`       | 22.20.5 | MIT        | Types for tests and scripts   |
-| `playwright`        | 1.64.1  | Apache-2.0 | Screenshots, real-app test    |
+| Package                          | Version | Licence    | Use                                                                                                                                                   |
+| -------------------------------- | ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `esbuild`                        | 0.28.2  | MIT        | Bundling engine and plugin                                                                                                                            |
+| `fflate`                         | 0.8.3   | MIT        | Packing the plugin ZIP                                                                                                                                |
+| `typescript`                     | 6.0.3   | Apache-2.0 | Type checking                                                                                                                                         |
+| `vitest`                         | 5.1.0   | MIT        | Tests                                                                                                                                                 |
+| `ajv`                            | 8.20.0  | MIT        | Journey schema check in tests                                                                                                                         |
+| `eslint`                         | 10.14.0 | MIT        | Lint                                                                                                                                                  |
+| `@eslint/js`                     | 10.0.1  | MIT        | Lint rules                                                                                                                                            |
+| `typescript-eslint`              | 8.72.1  | MIT        | Lint for TypeScript                                                                                                                                   |
+| `globals`                        | 17.14.0 | MIT        | Lint globals                                                                                                                                          |
+| `prettier`                       | 3.9.10  | MIT        | Formatting                                                                                                                                            |
+| `@types/node`                    | 22.20.5 | MIT        | Types for tests and scripts                                                                                                                           |
+| `playwright`                     | 1.64.1  | Apache-2.0 | Screenshots, real-app test                                                                                                                            |
+| `@super-productivity/plugin-api` | 20.0.0  | MIT        | Plugin API types (`import type` only, nothing bundled; the package ships no LICENSE file, its `package.json` and README say MIT, (c) Johannes Millan) |
 
 The real-app test (CI job `real-app`) runs Super Productivity's Docker
 image `johannesjo/super-productivity` v19.3.1, pinned by digest in

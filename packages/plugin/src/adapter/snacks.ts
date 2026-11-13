@@ -1,5 +1,5 @@
 import type { GameEvent, GameView, Journey } from '@questarc/engine';
-import type { SnackCfg } from '@questarc/sp-plugin-api';
+import type { SnackCfg } from '@super-productivity/plugin-api';
 
 import { capitalise, findStage, progressText } from '../shared/plan';
 import { hasText, t } from '../shared/texts';

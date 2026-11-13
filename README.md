@@ -98,9 +98,9 @@ Work items are [issues](https://github.com/nexumia-de/quest-arc/issues) in
 ## Licence
 
 QuestArc is free software under the GNU Affero General Public License,
-version 3 or later ([LICENSE](LICENSE)), © 2026 suitably. The copy of
-Super Productivity's plugin API types in `packages/sp-plugin-api` keeps
-its MIT licence. Journeys in `content/journeys/` and `content/examples/`
+version 3 or later ([LICENSE](LICENSE)), © 2026 suitably. Super
+Productivity's plugin API types (`@super-productivity/plugin-api`, MIT)
+are a development dependency and not part of the plugin. Journeys in `content/journeys/` and `content/examples/`
 are under [CC BY-SA 4.0](content/LICENSE); their authors are named in
 each file (`author`) or are the QuestArc project. The pictures in
 `content/art/` are the QuestArc project's own work under the same

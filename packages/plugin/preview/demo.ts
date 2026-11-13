@@ -1,4 +1,4 @@
-import type { Task } from '@questarc/sp-plugin-api';
+import type { Task } from '@super-productivity/plugin-api';
 
 /**
  * Demo datasets for the preview and screenshots (never real tasks). Days
