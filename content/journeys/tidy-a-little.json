@@ -1,0 +1,134 @@
+{
+  "$schema": "../schema/journey.schema.json",
+  "format": 3,
+  "id": "tidy-a-little",
+  "version": 1,
+  "title": "tidy-a-little.title",
+  "description": "tidy-a-little.description",
+  "why": "tidy-a-little.why",
+  "build": {
+    "ladder": "home",
+    "names": [
+      "tidy-a-little.build.v1",
+      "tidy-a-little.build.v2",
+      "tidy-a-little.build.v3",
+      "tidy-a-little.build.v4",
+      "tidy-a-little.build.v5"
+    ]
+  },
+  "stages": [
+    {
+      "id": "one-thing",
+      "plan": {
+        "anchor": "tidy-a-little.anchor",
+        "action": "tidy-a-little.one-thing.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "tidy-a-little.one-thing.arrival",
+        "accept": "tidy-a-little.one-thing.accept"
+      },
+      "nugget": "tidy-a-little.one-thing.nugget"
+    },
+    {
+      "id": "table",
+      "plan": {
+        "anchor": "tidy-a-little.anchor",
+        "action": "tidy-a-little.table.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "tidy-a-little.table.arrival",
+        "accept": "tidy-a-little.table.accept"
+      },
+      "nugget": "tidy-a-little.table.nugget"
+    },
+    {
+      "id": "counter",
+      "plan": {
+        "anchor": "tidy-a-little.anchor",
+        "action": "tidy-a-little.counter.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      },
+      "story": {
+        "arrival": "tidy-a-little.counter.arrival",
+        "accept": "tidy-a-little.counter.accept"
+      },
+      "nugget": "tidy-a-little.counter.nugget"
+    },
+    {
+      "id": "one-more",
+      "plan": {
+        "anchor": "tidy-a-little.anchor",
+        "action": "tidy-a-little.one-more.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 8,
+        "of": 10
+      },
+      "story": {
+        "arrival": "tidy-a-little.one-more.arrival",
+        "accept": "tidy-a-little.one-more.accept"
+      },
+      "nugget": "tidy-a-little.one-more.nugget"
+    }
+  ],
+  "ending": {
+    "story": "tidy-a-little.ending"
+  },
+  "texts": {
+    "en": {
+      "tidy-a-little.title": "Tidy a little",
+      "tidy-a-little.description": "From putting one thing back after dinner to five minutes that keep a few spots of your home clear, one area at a time.",
+      "tidy-a-little.why": "Why do you want a tidier home? In your own words.",
+      "tidy-a-little.anchor": "dinner",
+      "tidy-a-little.build.v1": "A fire to come home to",
+      "tidy-a-little.build.v2": "A tent with everything in reach",
+      "tidy-a-little.build.v3": "A hut with a clear table",
+      "tidy-a-little.build.v4": "A cottage in good order",
+      "tidy-a-little.build.v5": "A house where things have a place",
+      "tidy-a-little.one-thing.action": "put one thing back where it belongs",
+      "tidy-a-little.one-thing.arrival": "It starts with one thing in its place. The first piece stands.",
+      "tidy-a-little.one-thing.accept": "One thing finds its place easily now. You could give the table five minutes.",
+      "tidy-a-little.one-thing.nugget": "You could pick the one thing while you are still eating. Getting up from the table is then the moment to carry it back.",
+      "tidy-a-little.table.action": "tidy the table for five minutes, with a timer",
+      "tidy-a-little.table.arrival": "A clear table. What you started has a little more room now.",
+      "tidy-a-little.table.accept": "The table clears quickly now. You could carry on to the kitchen counter in the same five minutes.",
+      "tidy-a-little.table.nugget": "You could keep the timer where you eat. When it rings you are done, whatever is left. Stopping on time keeps the step small enough for tomorrow.",
+      "tidy-a-little.counter.action": "tidy the kitchen counter after the table, five minutes in all",
+      "tidy-a-little.counter.arrival": "Two clear spots, and it keeps growing from the middle outwards.",
+      "tidy-a-little.counter.accept": "Table and counter fit into your five minutes. You could add one more spot that you choose.",
+      "tidy-a-little.counter.nugget": "You could give things that keep landing on the counter a home close by, such as a bowl for keys or a hook. A thing with a home is put away in seconds.",
+      "tidy-a-little.one-more.action": "tidy one more spot of my choice after table and counter, five minutes in all",
+      "tidy-a-little.one-more.arrival": "One more piece, chosen by you, and the round is whole.",
+      "tidy-a-little.one-more.accept": "Your five minutes have a shape now.",
+      "tidy-a-little.one-more.nugget": "You could plan for a full evening now: \"If guests stay or I am tired, then I will put one thing back.\" The smaller step still counts.",
+      "tidy-a-little.ending": "After dinner, five minutes go by themselves now: the table, the counter and the spot you chose."
+    }
+  }
+}
