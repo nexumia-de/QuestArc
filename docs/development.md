@@ -251,6 +251,42 @@ is over budget or when the journey's numbers change. Set
 job `speed-aarch64` writes them to the job summary on an arm64 runner. The
 job is not a required check.
 
+## Look back
+
+`scripts/look-back.mjs` is the owner's look back at the game rules'
+numbers (#84). It reads a Super Productivity backup, runs the built
+engine on it and prints, per run and stage: due days (done, gaps, still
+open, paused), completions, welcome backs, best run, run-ending misses,
+days from acceptance to met, how often the backfill window was used and
+the weekly answers by ISO week (answered of asked). Ids, days and counts
+only, never a title, a note or the user's reason. No network; nothing is
+written.
+
+```sh
+npm run build -w @questarc/engine
+```
+
+```sh
+node scripts/look-back.mjs backup.json
+```
+
+`--today YYYY-MM-DD` and `--tz <zone>` replace the current logical day
+and the system time zone. The day start comes from the backup's
+`globalConfig.misc`; records are decoded as Pensum does (`GZ1:`).
+
+The engine shows these numbers only for today's state, and a finished
+stage keeps none. The script does not copy a rule: it asks the engine
+again, for each day of a stage, with the stage's checkpoint left out and
+only the completions known by the end of that day. Settled day marks
+(done, gap, paused) are collected from the engine's `lastDays`; the
+days to met are the first day the engine says met. A run-ending miss is
+a day on which the engine's current run ends (it is shorter than the new
+done days explain, or the fallback is offered); it can be missed when a
+completion follows on the same day and the run was already empty. The
+backfill count reads the stage's completed instances: ticked off the day
+after their day (in the window), the same day, or later than the window.
+`test/look-back.test.ts` runs the script on a synthetic backup.
+
 ## Engine in gjs
 
 `flatpak run` does not work in the cloud container (no session
