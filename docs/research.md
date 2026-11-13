@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: Habit app psychology evidence
-description: Evidence review of habit formation, motivation, gamification, lapses, social features, persuasive-design ethics, motivational quotes, learning nuggets and focused work, with use/add/avoid recommendations for QuestArc.
+description: Evidence review of habit formation, motivation, gamification, lapses, social features, persuasive-design ethics, motivational quotes, learning nuggets and the topics of the built-in journeys (focused work, evening wind-down, tidying, walking, reading), with use/add/avoid recommendations for QuestArc.
 tags: [psychology, research, habits, gamification, evidence]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -206,6 +206,7 @@ Checked on 2026-11-13 for [Tidy a little](journey-tidy-a-little.md) (#37) agains
 **Five minutes, then stop.** No study of time-limited tidying or of growing a chore by area was found. The five minutes and the timer are design choices that follow the general rules: a step small enough for the worst day (Lally et al., above), a clear end, and the previous stage as the fallback. Popular claims such as a "two-minute rule" or tidying methods from bestsellers have no trial behind them that could be found and are kept out of the texts.
 
 _Recommendation for Tidy a little:_ texts speak of things having a place and of a few clear spots, never of a clean or perfect home; the timer ends the task whatever is left; nothing is promised about mood, stress or productivity; the last area is the user's choice.
+
 ## Movement: evidence for the journey A walk after lunch
 
 Checked on 2026-11-13 for [A walk after lunch](journey-walk-after-lunch.md) (#37) against Crossref metadata and abstracts (`api.crossref.org`) and PubMed abstracts through NCBI's E-utilities (`www.ncbi.nlm.nih.gov`). Full texts were not read: PMC article pages answered with a captcha page, and Europe PMC, Springer, PLOS and WHO were refused by this environment's proxy. So every figure below is from an abstract; what an abstract does not say is marked [unverified]. In short: a walk right after a meal is well placed for **blood glucose after that meal**, in small acute trials; nothing here supports promising weight, fitness or a longer life.
