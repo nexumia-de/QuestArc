@@ -13,6 +13,7 @@ export type Route =
   | { readonly name: 'setup' }
   | { readonly name: 'pick-task' }
   | { readonly name: 'continue' }
+  | { readonly name: 'smaller' }
   | { readonly name: 'finished'; readonly journeyId: string }
   | { readonly name: 'checkin' }
   | { readonly name: 'shelf' }

@@ -13,8 +13,9 @@ import type { Context, Screen } from '../screen';
  * Screen 5, station details: arrival story, plan, schedule, condition
  * and the learning nugget as "Try this" (design rule 22). A skipped
  * station says "already yours" and can be offered again while the engine
- * says so. The current station's "pair it with" can be changed or
- * removed here (design rule 7).
+ * says so; a station left for a smaller one says that it waits. The
+ * current station's "pair it with" can be changed or removed here
+ * (design rule 7).
  */
 
 export const stationScreen = (ctx: Context, index: number): Screen => {
@@ -63,6 +64,9 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
           : null,
         station.state === 'skipped' && station.skippedDay
           ? h('p', {}, t('ui.details.skipped', { date: shortDate(station.skippedDay) }))
+          : null,
+        station.leftDay
+          ? h('p', {}, t('ui.details.left', { date: shortDate(station.leftDay) }))
           : null,
         station.undoable
           ? h(

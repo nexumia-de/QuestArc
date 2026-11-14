@@ -2,15 +2,17 @@ import { isoWeek, resumeJourney, withdraw, type Journey, type RunView } from '@q
 
 import { t } from '../shared/texts';
 import { h } from './dom';
+import { comeBackCard } from './journey/come-back';
 import { shortDate } from './journey/format';
 import type { Context } from './screen';
 import { markSeen, wasSeen } from './seen';
 
 /**
  * Banners on top of the current station's card (docs/behaviour.md,
- * screen 4): paused, a hard week (flow D, with the user's reason and
- * their plan for the obstacle), the weekly look back, a new
- * learning nugget, and the undo after ending a journey.
+ * screen 4): paused, the card after a long break (alone, instead of the
+ * others), a hard week (flow D, with the user's reason and their plan
+ * for the obstacle), the weekly look back, a new learning nugget, and
+ * the undo after ending a journey.
  */
 
 const banner = (text: string, ...buttons: Node[]): HTMLElement =>
@@ -53,6 +55,11 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
           )
         : banner(t('ui.banner.paused-repeat')),
     );
+    return out;
+  }
+
+  if (run.comeBack) {
+    out.push(comeBackCard(ctx, run, journey));
     return out;
   }
 

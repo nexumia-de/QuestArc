@@ -1,4 +1,4 @@
-import { addDays, dayRange } from './days';
+import { addDays, dayRange, daysBetween } from './days';
 import { isScheduled } from './schedule';
 import type { SnapshotRepeatCfg } from './types/snapshot';
 import type { DayMark } from './types/view';
@@ -7,6 +7,9 @@ import type { DayMark } from './types/view';
  * Due days, misses, runs and welcome backs of one stage
  * (docs/game-rules.md §2–3, §5).
  */
+
+/** Days without a counting completion that make a long break (game rules §5, #82). */
+export const BREAK_DAYS = 14;
 
 export interface Timeline {
   /** Due days from the accepted day to today, oldest first. */
@@ -41,8 +44,13 @@ export const buildTimeline = (input: {
   today: string;
   credited: ReadonlySet<string>;
   pauses: readonly { day: string; action: 'pause' | 'resume' }[];
+  /** Days the stage was left for a smaller one (a step back): not due. */
+  away?: (day: string) => boolean;
+  /** The stage is walked again after a step back: its first completion is a welcome back. */
+  again?: boolean;
 }): Timeline => {
   const { cfg, acceptedDay, today, credited, pauses } = input;
+  const away = input.away ?? (() => false);
   const recordPaused = pausedBy(pauses);
   const lastCredit = [...credited].sort().at(-1) ?? addDays(acceptedDay, -1);
   // A paused repeat config carries no dates: while it is paused and no
@@ -53,7 +61,7 @@ export const buildTimeline = (input: {
   const deleted = new Set(cfg.deletedInstanceDates ?? []);
 
   const isPlanned = (day: string): boolean => isScheduled(cfg, day) && !deleted.has(day);
-  const isPaused = (day: string): boolean => recordPaused(day) || cfgPaused(day);
+  const isPaused = (day: string): boolean => recordPaused(day) || cfgPaused(day) || away(day);
   // Today and yesterday are still inside the backfill window.
   const missedBefore = addDays(today, -1);
 
@@ -62,8 +70,9 @@ export const buildTimeline = (input: {
   let current = 0;
   let best = 0;
   let consecutiveMisses = 0;
-  let missSinceCredit = false;
+  let missSinceCredit = input.again === true;
   let welcomeBacks = 0;
+  let previous = addDays(acceptedDay, -1);
 
   for (const day of dayRange(acceptedDay, today)) {
     const planned = isPlanned(day);
@@ -80,7 +89,10 @@ export const buildTimeline = (input: {
       marks.push({ day, mark });
     }
     if (credited.has(day)) {
-      if (missSinceCredit) welcomeBacks += 1;
+      // Coming back is greeted after a miss and after a long break,
+      // whatever lay between (gaps or a pause).
+      if (missSinceCredit || daysBetween(previous, day) >= BREAK_DAYS) welcomeBacks += 1;
+      previous = day;
       missSinceCredit = false;
       consecutiveMisses = 0;
       if (due) current += 1;

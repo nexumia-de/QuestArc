@@ -11,6 +11,8 @@ import type { Task } from '@super-productivity/plugin-api';
  * - met: the current stage's condition is met
  * - stayed: the same, and the user chose to stay a while (#81)
  * - skipped: the first stage was passed with "I already do this" (#81)
+ * - comeback: nothing counted for 18 days: the card after a long break (#82)
+ * - smaller: the same, and the user started smaller three days ago
  * - unbound: the current stage has no recurring task yet
  * - newer: the journey was continued by a newer QuestArc (read-only)
  * - build: stage 3 under way: the hut stands, the marker has its
@@ -29,6 +31,8 @@ export type Scenario =
   | 'met'
   | 'stayed'
   | 'skipped'
+  | 'comeback'
+  | 'smaller'
   | 'unbound'
   | 'newer'
   | 'build'
@@ -54,24 +58,32 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const todayMs = Date.parse(`${today}T12:00:00Z`);
   const day = (offset: number): string =>
     new Date(todayMs - offset * DAY_MS).toISOString().slice(0, 10);
+  const long = scenario === 'comeback' || scenario === 'smaller';
   const current = build ? 2 : 1;
-  const start = day(10 + current * 9);
-  const accepted = day(10);
+  // The day the current stage was accepted, as days before today.
+  const since = long ? 30 : 10;
+  const start = day(since + current * 9);
+  const accepted = day(since);
   const record = (key: string, value: unknown) => {
     data[key] = JSON.stringify(value);
   };
-  record('run:demo', { journeyId: 'gentle-morning', journeyVersion: 1, startDay: start });
+  record('run:demo', {
+    journeyId: 'gentle-morning',
+    journeyVersion: 1,
+    startDay: start,
+    ...(long ? { why: 'I want my mornings to start calmly.' } : {}),
+  });
   if (scenario === 'empty') {
     record('run-end:demo', { day: day(1) });
     return { tasks, repeatCfgs, data };
   }
   for (let i = 0; i < current; i += 1) {
     const stage = STAGES[i] as string;
-    record(`stage:demo:${stage}`, { acceptedDay: day(10 + (current - i) * 9) });
+    record(`stage:demo:${stage}`, { acceptedDay: day(since + (current - i) * 9) });
     if (scenario === 'skipped') record(`skip:demo:${stage}`, { day: day(10), dataFormat: 3 });
     else
       record(`stage-done:demo:${stage}`, {
-        day: day(10 + (current - i - 1) * 9),
+        day: day(since + (current - i - 1) * 9),
         dataFormat: 2,
       });
   }
@@ -107,26 +119,50 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const doneOffsets =
     scenario === 'met' || scenario === 'stayed' || scenario === 'build-ready'
       ? [6, 5, 4, 3, 2, 1]
-      : build
-        ? [4, 2, 1]
-        : scenario === 'hard-week'
-          ? [10, 9, 8, 7, 5, 4]
-          : [10, 9, 8, 7, 5, 4, 2];
-  for (const offset of doneOffsets) {
+      : long
+        ? [30, 29, 28, 26, 25, 23, 22, 20, 19, 18]
+        : build
+          ? [4, 2, 1]
+          : scenario === 'hard-week'
+            ? [10, 9, 8, 7, 5, 4]
+            : [10, 9, 8, 7, 5, 4, 2];
+  const done = (cfgId: string, title: string, offset: number) => {
     const d = day(offset);
-    tasks[`rpt_demo_${d}`] = {
-      id: `rpt_demo_${d}`,
-      title: 'Morning routine',
+    tasks[`rpt_${cfgId}_${d}`] = {
+      id: `rpt_${cfgId}_${d}`,
+      title,
       isDone: true,
       doneOn: Date.parse(`${d}T07:30:00Z`),
-      repeatCfgId: 'demo',
+      repeatCfgId: cfgId,
       dueDay: d,
       created: Date.parse(`${d}T12:00:00Z`),
       timeSpentOnDay: {},
     } as Partial<Task> & { id: string };
+  };
+  for (const offset of doneOffsets) done('demo', 'Morning routine', offset);
+  if (long) {
+    // The first stage's task still repeats, so starting smaller can use it.
+    repeatCfgs.water = {
+      id: 'water',
+      title: 'Glass of water',
+      isPaused: false,
+      repeatCycle: 'DAILY',
+      repeatEvery: 1,
+      startDate: start,
+    };
+    done('water', 'Glass of water', since + 1);
+    record('binding:demo:water', {
+      taskId: `rpt_water_${day(since + 1)}`,
+      repeatCfgId: 'water',
+      day: start,
+    });
+  }
+  if (scenario === 'smaller') {
+    record(`step-back:demo:${stage}:${day(3)}`, { dataFormat: 4 });
+    for (const offset of [3, 2, 1]) done('water', 'Glass of water', offset);
   }
   record(`binding:demo:${stage}`, {
-    taskId: `rpt_demo_${day(10)}`,
+    taskId: `rpt_demo_${day(since)}`,
     repeatCfgId: 'demo',
     day: accepted,
   });
@@ -140,6 +176,6 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   if (scenario === 'stayed') record(`stay:demo:${stage}`, { day: day(1) });
   if (scenario === 'build-crossing')
     record('build:demo', { ladder: 'crossing', marker: 'lanterns', hue: 'sand' });
-  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 4, day: day(1) });
+  if (scenario === 'newer') record(`graduation:demo:${stage}`, { dataFormat: 5, day: day(1) });
   return { tasks, repeatCfgs, data };
 };

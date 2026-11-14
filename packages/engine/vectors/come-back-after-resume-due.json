@@ -1,0 +1,130 @@
+{
+  "name": "A pause the user ended 14 days ago without a completion since: the card is due from the day of the resume",
+  "rule": "game-rules §5, coming back after a long break",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-13",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-10-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1790848800000,
+        "doneOn": 1790856000000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1790935200000,
+        "doneOn": 1790942400000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791021600000,
+        "doneOn": 1791028800000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791108000000,
+        "doneOn": 1791115200000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791194400000,
+        "doneOn": 1791201600000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-06",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791280800000,
+        "doneOn": 1791288000000
+      },
+      {
+        "id": "rpt_cfgB_2026-10-07",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1791367200000,
+        "doneOn": 1791374400000
+      },
+      {
+        "id": "rpt_cfgB_2026-10-08",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1791453600000,
+        "doneOn": 1791460800000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-10-01",
+        "why": "x"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-10-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-10-01",
+        "repeatCfgId": "cfgA",
+        "day": "2026-10-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-10-06",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-10-06"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-10-07",
+        "repeatCfgId": "cfgB",
+        "day": "2026-10-06"
+      },
+      "pause:r1:2026-10-09": {
+        "action": "pause",
+        "source": "user"
+      },
+      "pause:r1:2026-10-31": {
+        "action": "resume",
+        "source": "user"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "comeBack": {
+        "from": "2026-10-31",
+        "smaller": "a"
+      }
+    },
+    "problems": []
+  }
+}

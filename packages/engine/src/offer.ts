@@ -13,13 +13,19 @@ import type { ContinueOffer } from './types/view';
 export const STAY_DAYS = 7;
 
 /** The weekly answer of the latest ISO week for a stage, if any. */
-const latestAnswer = (choices: Choices, runId: string, stageId: string): number | undefined => {
+const latestAnswer = (
+  choices: Choices,
+  runId: string,
+  stageId: string,
+  sinceWeek: string,
+): number | undefined => {
   const prefix = `${runId}:${stageId}:`;
   let week = '';
   let answer: number | undefined;
   for (const [key, score] of choices.checkins) {
-    if (key.startsWith(prefix) && key.slice(prefix.length) > week) {
-      week = key.slice(prefix.length);
+    const at = key.startsWith(prefix) ? key.slice(prefix.length) : '';
+    if (at > week && at >= sinceWeek) {
+      week = at;
       answer = score;
     }
   }
@@ -31,8 +37,10 @@ export const continueOffer = (
   runId: string,
   stageId: string,
   today: string,
+  /** A stage walked again after a step back: only answers from this ISO week on count. */
+  sinceWeek = '',
 ): ContinueOffer => {
-  const answer = latestAnswer(choices, runId, stageId);
+  const answer = latestAnswer(choices, runId, stageId, sinceWeek);
   const stayed = choices.stays.get(`${runId}:${stageId}`);
   const quietUntil = stayed !== undefined && stayed <= today ? addDays(stayed, STAY_DAYS) : '';
   return {

@@ -1,5 +1,5 @@
 // Steps in Super Productivity's web app shared by the real-app tests
-// (real-app.mjs, real-app-build.mjs; docs/development.md, real app): open
+// (real-app.mjs, real-app-build.mjs, real-app-return.mjs; docs/development.md, real app): open
 // the app, install and enable the built ZIP, make the open task recurring,
 // tick a task off and collect the messages. Uses the Playwright of the
 // environment.

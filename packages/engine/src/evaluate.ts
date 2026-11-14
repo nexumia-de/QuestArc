@@ -92,6 +92,10 @@ export const evaluate = (snapshot: Snapshot): GameView => {
     }
   }
 
+  const waiting = (run: RunView): RunView => {
+    const { comeBack, ...rest } = run;
+    return comeBack ? { ...rest, paused: true } : { ...run, paused: true };
+  };
   const [first, ...rest] = open;
   const active = activeReadOnly === undefined ? first : undefined;
   const paused = activeReadOnly === undefined ? rest : open;
@@ -99,7 +103,8 @@ export const evaluate = (snapshot: Snapshot): GameView => {
   return {
     todayStr: today,
     ...(active ? { active } : {}),
-    paused: paused.map((run) => ({ ...run, paused: true })),
+    // A waiting journey gets no card for a long break.
+    paused: paused.map((run) => waiting(run)),
     finished,
     readOnly: readOnly.map(({ ended, ...run }) => ({
       ...run,

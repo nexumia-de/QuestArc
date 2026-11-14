@@ -32,7 +32,9 @@ const hint = (station: StationView, today: string, staying: boolean): string | u
   }
   switch (station.state) {
     case 'current':
-      return t('ui.card.hint');
+      return station.stepBackDay
+        ? t('ui.card.smaller', { date: shortDate(station.stepBackDay) })
+        : t('ui.card.hint');
     case 'met':
       return t(staying ? 'ui.card.staying' : 'ui.card.met');
     case 'unbound':
@@ -100,6 +102,9 @@ export const stationCard = (
         )
       : null,
     words ? h('p', { class: 'qa-muted qa-small' }, words) : null,
-    run.why ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why })) : null,
+    // The card after a long break shows the reason itself.
+    run.why && !run.comeBack
+      ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why }))
+      : null,
   ) as HTMLElement;
 };

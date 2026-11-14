@@ -1,6 +1,6 @@
 import type { Journey } from './types/journey';
 import type { PlanCheck, RunView } from './types/view';
-import { CHECKPOINT_FORMAT, SKIP_FORMAT } from './choices';
+import { CHECKPOINT_FORMAT, SKIP_FORMAT, STEP_BACK_FORMAT } from './choices';
 import { ownWords, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
 
 /**
@@ -65,7 +65,10 @@ export const bindStage = (input: {
  * current stage ([deleted history](../../../../docs/decisions/deleted-history.md))
  * and the acceptance of the next one, or the end of the journey after its
  * last stage. What the user pairs the stage with goes along to the next
- * one, unless that already has its own (design rule 7).
+ * one, unless that already has its own (design rule 7). From a stage
+ * walked again after a step back it only takes up the stage left behind:
+ * that one keeps its acceptance, its own pairing and what it counted,
+ * and the days in between are not due for it.
  */
 export const continueJourney = (run: RunView, journey: Journey, today: string): RecordChanges => {
   const index = run.position.stage;
@@ -73,6 +76,15 @@ export const continueJourney = (run: RunView, journey: Journey, today: string): 
   const stage = journey.stages[index];
   if (!station || !stage || station.state !== 'met') return {};
   const next = journey.stages[index + 1];
+  if (station.stepBackDay !== undefined) {
+    if (!next) return {};
+    return {
+      [`step-back:${run.runId}:${next.id}:${station.stepBackDay}`]: {
+        until: today,
+        dataFormat: STEP_BACK_FORMAT,
+      },
+    };
+  }
   return {
     [`stage-done:${run.runId}:${stage.id}`]: { day: today, dataFormat: CHECKPOINT_FORMAT },
     ...(next
@@ -103,7 +115,10 @@ export const skipStage = (run: RunView, journey: Journey, today: string): Record
   const index = run.position.stage;
   const stage = journey.stages[index];
   const next = journey.stages[index + 1];
-  if (!stage || !next || run.stations[index]?.state !== 'unbound') return {};
+  const station = run.stations[index];
+  // A stage walked again is finished already: it has nothing to pass.
+  if (!stage || !next || station?.state !== 'unbound' || station.stepBackDay !== undefined)
+    return {};
   return {
     [`skip:${run.runId}:${stage.id}`]: { day: today, dataFormat: SKIP_FORMAT },
     [`stage:${run.runId}:${next.id}`]: { acceptedDay: today },
@@ -119,6 +134,47 @@ export const undoSkip = (run: RunView, journey: Journey, stageId: string): Recor
   const next = journey.stages[index + 1];
   if (!next || run.stations[index]?.undoable !== true) return {};
   return { [`skip:${run.runId}:${stageId}`]: '', [`stage:${run.runId}:${next.id}`]: '' };
+};
+
+/**
+ * Carry on after a long break (design rule 14): nothing changes; the
+ * record only closes the card for this gap.
+ */
+export const carryOn = (run: RunView, today: string): RecordChanges => {
+  const station = run.stations[run.position.stage];
+  if (!run.comeBack || !station) return {};
+  return { [`carry-on:${run.runId}:${station.stageId}`]: { day: today } };
+};
+
+/**
+ * Call the gap a pause: pause and resume records for the stretch from
+ * the first day of the gap to yesterday, so those days are not due. It
+ * never reaches back further than the gap.
+ */
+export const callItAPause = (run: RunView, today: string): RecordChanges => {
+  if (!run.comeBack || run.comeBack.from >= today) return {};
+  return {
+    [`pause:${run.runId}:${run.comeBack.from}`]: { action: 'pause', source: 'user' },
+    [`pause:${run.runId}:${today}`]: { action: 'resume', source: 'user' },
+  };
+};
+
+/**
+ * Start smaller: the finished stage before the current one is walked
+ * again from today; the stage left behind waits. With `pause` the gap is
+ * also called a pause (the two choices combined).
+ */
+export const stepBack = (
+  run: RunView,
+  today: string,
+  options: { pause?: boolean } = {},
+): RecordChanges => {
+  const station = run.stations[run.position.stage];
+  if (!run.comeBack?.smaller || !station) return {};
+  return {
+    ...(options.pause ? callItAPause(run, today) : {}),
+    [`step-back:${run.runId}:${station.stageId}:${today}`]: { dataFormat: STEP_BACK_FORMAT },
+  };
 };
 
 const pauseRecord = (runId: string, day: string, action: 'pause' | 'resume'): RecordChanges => ({
@@ -216,6 +272,9 @@ export const actions = {
   stayHere,
   skipStage,
   undoSkip,
+  carryOn,
+  callItAPause,
+  stepBack,
   pauseJourney,
   resumeJourney,
   endJourney,

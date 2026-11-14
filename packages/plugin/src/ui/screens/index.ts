@@ -12,6 +12,7 @@ import { previewScreen } from './preview';
 import { settingsScreen } from './settings';
 import { setupScreen } from './setup';
 import { shelfScreen } from './shelf';
+import { smallerScreen } from './smaller';
 import { startScreen } from './start';
 import { stationsScreen } from './stations';
 import { stationScreen } from './station';
@@ -40,6 +41,8 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
       return pickTaskScreen(ctx);
     case 'continue':
       return continueScreen(ctx);
+    case 'smaller':
+      return smallerScreen(ctx);
     case 'finished':
       return finishedScreen(ctx, route.journeyId);
     case 'checkin':

@@ -51,8 +51,22 @@ export interface RunView {
   readonly offerFallback: boolean;
   /** While the current stage is met: what the continue screen suggests (game rules §4). */
   readonly offer?: ContinueOffer;
+  /** After a long break: the card with its three choices is due (game rules §5). */
+  readonly comeBack?: ComeBack;
   /** What the journey builds (docs/game-rules.md §7). */
   readonly build: BuildView;
+}
+
+/**
+ * The card after a long break (design rule 14): nothing counted for the
+ * current stage for 14 days or more. The user can carry on, call the gap
+ * a pause, or start smaller when a finished stage lies before this one.
+ */
+export interface ComeBack {
+  /** The first day of the gap: after the last counting completion, pause or start of the stage. */
+  readonly from: string;
+  /** The finished stage before the current one, which "Start Smaller" makes current again. */
+  readonly smaller?: string;
 }
 
 /**
@@ -77,7 +91,7 @@ export interface ContinueOffer {
 export interface BuildView {
   /** A ladder in content/art/ (<name>.ladder.json). */
   readonly ladder: string;
-  /** The version standing: 1 + the finished and skipped stages; never goes down. */
+  /** The version standing: 1 + the finished and skipped stages; a step back does not lower it. */
   readonly version: number;
   /** The standing versions that came from a skipped stage ("already yours"). */
   readonly skipped: readonly number[];
@@ -113,6 +127,10 @@ export interface StationView {
   readonly undoable?: boolean;
   /** What the user pairs this stage with, in their own words (design rule 7). */
   readonly pair?: string;
+  /** A finished stage that is walked again after a step back: since this day. */
+  readonly stepBackDay?: string;
+  /** The stage left behind by a step back: the day it was left; it is offered again later. */
+  readonly leftDay?: string;
   /** Current stage only: the last 7 due (or paused) days, oldest first. */
   readonly lastDays?: readonly DayMark[];
 }

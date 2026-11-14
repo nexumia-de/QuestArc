@@ -13,13 +13,16 @@ import { PLAN_CHECK_FIELDS } from './words';
  */
 
 /** The data format this engine reads and writes (docs/decisions/data-format.md). */
-export const DATA_FORMAT = 3;
+export const DATA_FORMAT = 4;
 
 /** The format a checkpoint carries: without `xp` and `damage` since 3.3 (#110). */
 export const CHECKPOINT_FORMAT = 2;
 
 /** The format a skipped stage carries: an older engine would still work on it (#81). */
 export const SKIP_FORMAT = 3;
+
+/** The format a step back carries: an older engine would work on the stage left behind (#82). */
+export const STEP_BACK_FORMAT = 4;
 
 /** Record kinds that name their run in the key's second part. */
 export const RUN_KINDS: ReadonlySet<string> = new Set([
@@ -36,6 +39,8 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'skip',
   'pair',
   'plan-check',
+  'carry-on',
+  'step-back',
 ]);
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
@@ -54,6 +59,13 @@ export interface Binding {
   readonly taskId: string;
   readonly repeatCfgId?: string;
   readonly day?: string;
+}
+
+/** A step back from a stage: the stage before it is walked again from `day` until `until`. */
+export interface StepBack {
+  readonly day: string;
+  /** The day the stage was taken up again; absent while the smaller stage is walked. */
+  readonly until?: string;
 }
 
 export interface Choices {
@@ -78,6 +90,10 @@ export interface Choices {
   readonly pairs: ReadonlyMap<string, string>;
   /** runId → the user's plan check, the answers that are filled in */
   readonly planChecks: ReadonlyMap<string, PlanCheck>;
+  /** `${runId}:${stageId}` → the day the user chose to carry on after a long break */
+  readonly carryOns: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` (the stage left behind) → its step backs sorted by day */
+  readonly stepBacks: ReadonlyMap<string, readonly StepBack[]>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -126,6 +142,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const skips = new Map<string, string>();
   const pairs = new Map<string, string>();
   const planChecks = new Map<string, PlanCheck>();
+  const carryOns = new Map<string, string>();
+  const stepBacks = new Map<string, StepBack[]>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -195,9 +213,12 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       if (score !== undefined && score >= 1 && score <= 7)
         checkins.set(parts.slice(1).join(':'), score);
       else bad();
-    } else if ((kind === 'stay' || kind === 'skip') && parts.length === 3) {
+    } else if ((kind === 'stay' || kind === 'skip' || kind === 'carry-on') && parts.length === 3) {
       if (isDay(value.day))
-        (kind === 'stay' ? stays : skips).set(`${parts[1]}:${parts[2]}`, value.day);
+        (kind === 'stay' ? stays : kind === 'skip' ? skips : carryOns).set(
+          `${parts[1]}:${parts[2]}`,
+          value.day,
+        );
       else bad();
     } else if (kind === 'pair' && parts.length === 3) {
       const text = str(value.text);
@@ -210,6 +231,14 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       });
       if (answers.length > 0) planChecks.set(parts[1], Object.fromEntries(answers) as PlanCheck);
       else bad();
+    } else if (kind === 'step-back' && parts.length === 4 && isDay(parts[3])) {
+      const until = value.until;
+      if (until === undefined || (isDay(until) && until >= parts[3])) {
+        const list = stepBacks.get(`${parts[1]}:${parts[2]}`) ?? [];
+        // Keys are sorted, so the list is sorted by day.
+        list.push({ day: parts[3], ...(until !== undefined ? { until } : {}) });
+        stepBacks.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
     } else if (kind === 'build' && parts.length === 2 && parts[1]) {
       const choice: Record<string, string> = {};
       for (const field of ['ladder', 'marker', 'hue'] as const) {
@@ -239,6 +268,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     skips,
     pairs,
     planChecks,
+    carryOns,
+    stepBacks,
     builds,
     userJourneys,
     newer,

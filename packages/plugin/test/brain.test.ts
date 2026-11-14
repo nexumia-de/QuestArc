@@ -1,3 +1,4 @@
+import { stepBack } from '@questarc/engine';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBrain } from '../src/adapter/brain';
@@ -72,7 +73,7 @@ describe('brain', () => {
 
   it('shows a run written by a newer QuestArc as read-only and writes nothing for it', async () => {
     const { brain, host } = setUp(['2026-10-26']);
-    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 4, choice: 'keep' });
+    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 5, choice: 'keep' });
     const before = { ...host.data };
     const { view } = await brain.state();
     expect(view.active).toBeUndefined();
@@ -171,6 +172,49 @@ describe('brain', () => {
     const state = await brain.write({ [`run:${RUN}`]: '' });
     expect(host.data[`run:${RUN}`]).toBe('');
     expect(state.view.active).toBeUndefined();
+  });
+
+  it('offers the card after a long break and starts smaller with the earlier task (#82)', async () => {
+    const { brain, host, messages } = setUp([
+      '2026-10-26',
+      '2026-10-27',
+      '2026-10-28',
+      '2026-10-29',
+      '2026-10-30',
+    ]);
+    const larger = dailyHabit('cfg2', '2026-10-30', ['2026-10-31', '2026-11-01']);
+    host.repeatCfgs.cfg2 = larger.cfg;
+    for (const task of larger.tasks) host.tasks[task.id] = task;
+    Object.assign(host.data, {
+      [`stage-done:${RUN}:water`]: JSON.stringify({ day: '2026-10-30', dataFormat: 2 }),
+      [`stage:${RUN}:stretch-1`]: JSON.stringify({ acceptedDay: '2026-10-30' }),
+      [`binding:${RUN}:stretch-1`]: JSON.stringify({
+        taskId: larger.tasks[0]?.id,
+        repeatCfgId: 'cfg2',
+        day: '2026-10-30',
+      }),
+    });
+    host.today = '2026-11-14';
+    expect((await brain.state()).view.active?.comeBack).toBeUndefined();
+    host.today = '2026-11-15';
+    brain.refresh('tasks');
+    await settle();
+    const before = (await brain.state()).view.active;
+    expect(before?.comeBack).toEqual({ from: '2026-11-02', smaller: 'water' });
+    if (!before) return;
+
+    const { view } = await brain.write(stepBack(before, '2026-11-15', { pause: true }));
+    expect(host.data[`step-back:${RUN}:stretch-1:2026-11-15`]).toBe('{"dataFormat":4}');
+    expect(view.active?.position.stage).toBe(0);
+    expect(view.active?.stations[0]?.state).toBe('current');
+    expect(view.active?.comeBack).toBeUndefined();
+    expect(view.active?.build.version).toBe(2);
+    expect(view.problems).toEqual([]);
+
+    complete(host, '2026-11-15');
+    brain.refresh('tasks');
+    await settle();
+    expect(messages).toEqual(['Welcome back. Your run goes on.']);
   });
 
   it('rejects unknown requests', async () => {

@@ -165,6 +165,8 @@ page only. They are never written into a task and never sent anywhere.
 | met                             | **Continue** (flow C)                               |
 | met, the user stays a while     | **Continue** as a quiet action (flow C)             |
 
+- After a long break (flow D) one card stands on top of the station's
+  card instead of the banners below.
 - A banner on top of the card when needed: paused (with **Resume**, or a
   note that the repeat is paused in Super Productivity), a hard week
   (flow D, with the user's reason and their plan for the obstacle), weekly look back due (**Answer**), the
@@ -173,10 +175,13 @@ page only. They are never written into a task and never sent anywhere.
   question are remembered on the device only; they are not choices.
 - The card also shows the user's own reason, if they gave one. While
   the user stays at a met station it says "You are staying here a
-  while. You can continue whenever you like."
+  while. You can continue whenever you like." After a step back
+  (flow D) it says "You started smaller on 13 Nov. The larger step
+  waits for you. Tick off the task in your task list as usual."
 - In the row of versions a version that stands for a skipped stage
   carries the words "already yours" under its number (flow B); in the
-  **Stations** list such a station says "Already yours".
+  **Stations** list such a station says "Already yours". A station the
+  user left to start smaller (flow D) says "Waiting for you".
 - **Read-only journey:** when the active journey is read-only
   ([data model](data-model.md) §2: written by a newer QuestArc, or its
   journey or journey version is not here), the screen shows its title
@@ -205,6 +210,9 @@ page only. They are never written into a task and never sent anywhere.
 - A reached station shows the user's plan for the obstacle from the
   plan check, if there is one: "Your plan for the obstacle: …"
   (screen 3b).
+- A station the user left to start smaller (flow D) says "You left this
+  step on 13 Nov to start smaller. It keeps what it counted and waits
+  for you."
 
 ### 6. Weekly look back
 
@@ -252,7 +260,11 @@ station is not the same as the step feeling easy, so staying is always
 possible and the weekly answer suggests when to go on; a step the user
 already does can be passed and counts nothing); one plan "after
 X, I will Y"; one missed day is fine, two in a row start a new run but
-never end the journey; welcome back after a gap; the weekly question;
+never end the journey; welcome back after a gap; after a long break
+(nothing counted for two weeks) QuestArc asks how to go on: carry on,
+call the time a pause, or take up the smaller step before again,
+nothing built is taken away, and the two weeks are QuestArc's choice,
+not a number from a study; the weekly question;
 graduation when a habit runs by itself; every journey builds something
 that grows with real progress. What QuestArc does not do:
 random rewards, rankings, punishment, collecting data. "Success is your
@@ -265,12 +277,12 @@ habit, not how often you open QuestArc."
 The user ticks off the stage's task in the task list as usual. Within a
 second QuestArc shows a short message (snack or toast):
 
-| Event                        | Message                                      |
-| ---------------------------- | -------------------------------------------- |
-| completion                   | "Drink a glass of water: done. 4 of 5 days." |
-| first completion after a gap | "Welcome back. Your run goes on."            |
-| several at once (sync)       | "3 days done. 4 of 5 days."                  |
-| condition met                | "Station reached: you can continue."         |
+| Event                                                 | Message                                      |
+| ----------------------------------------------------- | -------------------------------------------- |
+| completion                                            | "Drink a glass of water: done. 4 of 5 days." |
+| first completion after a gap or a long break (flow D) | "Welcome back. Your run goes on."            |
+| several at once (sync)                                | "3 days done. 4 of 5 days."                  |
+| condition met                                         | "Station reached: you can continue."         |
 
 Messages say the real progress in words; they never say what was added
 to the build and never give points (#110).
@@ -343,6 +355,11 @@ In Pensum, step 2 creates the repeat itself.
    journey; for 7 days **Continue** there is a quiet (outlined) action
    and the station is not announced again. **Continue** writes the
    checkpoint and accepts the next stage, then flow B for its task.
+   From a station the user stepped back to (flow D), **Continue** takes
+   up the station that was left instead: no story, no new checkpoint,
+   "This is the step you left to start smaller. It kept what it
+   counted, and the days in between do not count."; its task is still
+   bound, or the journey offers **Set up the task**.
 4. "You could end or change your earlier task 'walk for 5 minutes' so
    you don't keep both." with **Open the earlier task**; QuestArc never
    ends it itself.
@@ -359,6 +376,42 @@ In Pensum, step 2 creates the repeat itself.
   gave one, and their plan for the obstacle from the plan check, if
   they wrote one ("Your plan for the obstacle: …", screen 3b).
 - The next completion is welcomed back (flow A).
+- **After a long break** (#82, [game rules](game-rules.md) §5: nothing
+  counted for 14 days, the journey not paused): instead of the banners,
+  one calm card on top of the station's card: "Good to see you." "Life
+  happens. How would you like to go on?", the user's own reason, and
+  three choices as equal outlined buttons, each with one line below
+  that says what it does; none is suggested. The card stands alone:
+  the user's plan for the obstacle (screen 3b) belongs to the hard-week
+  hint and is not on it; it stays in the station's details and comes
+  back with the hint after **Carry On**:
+  - **Carry On**: "Nothing changes. You go on where you are." Writes
+    `carryOn`; the card is closed for this gap and the usual screen is
+    back, hard-week hint included.
+  - **Call It a Pause**: "The days since 27 Oct show as paused, not as
+    gaps." Writes `callItAPause`; the days show as paused in the last
+    days and the run stands.
+  - **Start Smaller** (only with a finished station before): "You go
+    back to the earlier step: drink a glass of water. What you built
+    stays." Opens its own page: the smaller station's plan, "You could
+    take up this smaller step again. What you have built stays as it
+    is. The larger step waits for you and is offered again when this
+    one is settled.", whether the earlier task still repeats ("It
+    counts again from today.") or a task is set up next (flow B,
+    without **I Already Do This**), "The task of the larger step stays
+    as it is. Afterwards you could pause or end its repeat in Super
+    Productivity so you don't keep both." (afterwards, because pausing
+    the current station's repeat pauses the journey), and a checkbox **Also call the days since 27 Oct a pause** (off; the two
+    choices combined). Main action: **Start Smaller** (`stepBack`). Back
+    changes nothing.
+
+  The build keeps its version; the marker starts again with the smaller
+  station. The first completion afterwards is a normal welcome back
+  (flow A), whatever was chosen. When the smaller station is met, flow C
+  offers the station that was left. QuestArc never changes either task.
+  Each station keeps its own "pair it with" (flow B, step 6): the smaller
+  station shows the one it had, and continuing from it copies nothing to
+  the station that was left.
 
 ### E. Pause and resume
 

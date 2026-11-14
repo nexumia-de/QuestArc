@@ -90,6 +90,13 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   shown and never evaluated. It became a record of its own instead of
   the `woop` field once planned for `run`, so a later change does not
   rewrite the record every engine places a run by.
+- The third is the step back (#82): an engine that does not know it
+  would keep working on the stage the user left, so `step-back`
+  carries `dataFormat: 4` and `DATA_FORMAT` is 4. The record stays
+  when the stage is taken up again (it gains `until`), because the
+  days in between are not due for that stage; such a run stays
+  read-only on a host with an older engine. `carry-on` only closes a card and carries
+  no format; "call it a pause" writes ordinary pause records.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through

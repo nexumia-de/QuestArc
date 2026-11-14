@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, welcome back, graduation and the build of a journey (ladder, version, marker progress, ready), with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation and the build of a journey (ladder, version, marker progress, ready), with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -67,6 +67,11 @@ A day `d` is due when all of these hold:
 ### Pauses
 
 - A QuestArc pause (pause and resume records) makes its days not due.
+  "Call it a pause" after a long break (§5) writes the same two records
+  for the gap that has already passed.
+- The days a stage waited while the user walked the smaller stage
+  before it again (stepping back, §4) are not due for it either, and
+  its task counts nothing on them.
 - A **paused repeat config** in Super Productivity (`isPaused`) carries no
   dates. When a host sees the bound config change between paused and not
   paused, it writes a pause or resume record for that day. While the
@@ -187,13 +192,87 @@ choices: continue, or stay a while ([design rule 1](psychology.md)).
   asks for more than 5 minutes: the first stage is then the only tiny
   one and skipping it would start the user at a large step.
 
-## 5. Welcome back
+### Stepping back (issue #82)
+
+Decided by the owner on 2026-11-12: after a long break (§5) the user
+can start smaller, with a real step back.
+
+- **Which stage.** A `step-back` record for the current stage with the
+  day makes the stage before it the current one again from that day. It
+  is offered only when the stage before is finished (has a checkpoint):
+  never on the first stage, and not after a skipped stage, which has
+  nothing to go back to. A step-back record without a finished stage
+  before is ignored.
+- **The smaller stage counts from the day of the step back** (and from
+  the day its task is bound, if that is later): its condition, runs and
+  marker start again; completions from its first walk are not counted
+  twice. It uses the task it had if that still repeats; otherwise it
+  waits for a task (state `unbound`) and cannot be skipped. Weekly
+  answers from before the step back suggest nothing for the offer; the
+  first completion is a welcome back (§5). The station keeps its
+  `doneDay` and names the day in `stepBackDay`.
+- **Nothing is taken away.** Checkpoints stay, so the build's version
+  stays (§7). The stage left behind keeps its acceptance, its task and
+  what it counted, is `ahead` with `leftDay`, and its task counts
+  nothing while it waits. Each stage keeps its own pairing (`pair`):
+  taking the stage left up again copies none.
+- **Taking it up again.** When the smaller stage is met it offers
+  continue or stay as always. Continue writes no new checkpoint: it
+  closes the step-back record with `until`, and the stage left behind
+  is the current one again. The days from the step back to that day are
+  not due for it (§2), so its completions, its `count` and `time_spent`
+  totals and its marker progress are as they were.
+- A stage can be left more than once (one record per step back), and
+  after another long break on the smaller stage the user can step back
+  again; the stages are then taken up again in order.
+
+**Example F.** Stage 1 finished on 6 Oct, stage 2 (`count` 3) done on 7
+and 8 Oct, then nothing. On 22 Oct the card is due; the user starts
+smaller. Stage 1 is current again from 22 Oct with progress 0, the
+version stays 2, the marker starts at 0. Stage 1 is done on 22 to 26
+Oct: met; the user continues on 26 Oct. Stage 2 is current again with 2
+of 3; 9 to 21 Oct are gaps (or paused, if the user also called them a
+pause), 22 to 25 Oct are not due.
+
+## 5. Welcome back and coming back
 
 - The first counting completion after a missed due day is a **welcome
   back**: the engine counts it per stage (`welcomeBacks`) and the hosts
   greet it with one sentence (`event.welcome-back`). At most once per
   gap, also when the gap ended a run.
+- So is a counting completion 14 or more days after the one before it
+  (or after the day before the stage began to count), whatever lay
+  between, gaps or a pause, and the first completion of a stage the
+  user stepped back to (§4).
 - It gives nothing and takes nothing; coming back is what is greeted.
+
+### After a long break (issue #82)
+
+Decided by the owner on 2026-11-12 ([design rule 14](psychology.md)).
+
+- **The gap** of the current stage starts on the latest of: the day
+  after its last counting completion, the day the journey was last
+  resumed, the day the stage began to count (accepted, bound, stepped
+  back to) and the day it was taken up again after a step back.
+- **The card is due** (`comeBack` on the run, with the gap's first day
+  `from`) when today is 13 or more days after that first day, so the
+  last day that counted or was paused is at least 14 logical days ago,
+  the stage has a task with a supported repeat, and the journey is the
+  active one, not paused and not ended. With 13 days there is no card.
+  While it is due the hosts show it instead of the hard-week hint.
+- Three choices; none is suggested:
+  1. **Carry on:** a `carry-on` record for the stage with the day.
+     Nothing that is computed changes; the card is closed for this gap
+     (the record's day is in or after the gap). After the next
+     completion a new gap needs 14 days again.
+  2. **Call it a pause:** a pause record on the gap's first day and a
+     resume record today, so the days up to yesterday are paused, not
+     gaps, and the run stands. It never reaches back further than the
+     gap. The gap then starts today, so the card is gone.
+  3. **Start smaller** (`comeBack.smaller` names the stage, when there
+     is a finished stage before): the step back of §4. It can be
+     combined with 2 in one change.
+- 14 days is a design choice; no study defines it.
 
 Since 3.3 there are no XP, no levels and no guardians (issue #110): they
 had no effect any more, and the [evidence review](research.md) supports
@@ -237,7 +316,9 @@ the engine gives only names and numbers.
   one, and so does a skipped stage (§4, #81). So the version is 1 + the
   journey's stages with a checkpoint or a skip; it never goes down by
   itself, because these records are kept whatever happens to the tasks
-  (only the user taking a skip back lowers it). `skipped` lists the
+  (only the user taking a skip back lowers it). A step back (§4) does
+  not lower it either: the larger version stays standing while the
+  smaller stage is walked again, and its marker grows from 0 again. `skipped` lists the
   standing versions that came from a skipped stage, so a host can say
   "already yours" in the row of versions.
   `versions` is the number of versions the journey uses: its stages + 1.
@@ -276,7 +357,8 @@ the engine gives only names and numbers.
   host decides whether that makes a new element and stays quiet in
   between); `event.build-version` `{ version }` when the version rose,
   also when the last stage was finished and the journey ended, and when
-  a stage was skipped.
+  a stage was skipped. After a step back, or when the stage left is
+  taken up again, the marker is another stage's: nothing is announced.
 
 **Example E.** Example D's stage (`days` 5 of 7, due daily, accepted on
 day 1). Days 1 to 5 done: progress and marker progress 1, ready. Days 6

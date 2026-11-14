@@ -85,14 +85,27 @@ punishment and comparison often backfire.
     no "you failed". The view shows total and best runs.
 13. **Welcome back.** The first completion after a miss gets a fixed,
     friendly acknowledgement: one sentence, nothing more. This was the
-    strongest single mechanic in the largest study.
-14. **Pause.** The user can pause a journey (illness, travel); paused days
-    are not misses.
+    strongest single mechanic in the largest study. The first completion
+    after a long break is greeted the same way, whatever the user chose
+    for the break (rule 14).
+14. **Pause, and coming back.** The user can pause a journey (illness,
+    travel); paused days are not misses. Most people leave a habit app
+    without pausing it, and the risk that a miss becomes a quit grows
+    with the length of the gap ([research](research.md)). So when
+    nothing has counted for 14 days, QuestArc does not show a row of
+    gaps and a hint: it greets the user with one calm card, their own
+    reason and three equal choices: carry on, call the gap a pause, or
+    start smaller with the stage before. None is suggested; the user
+    decides. Starting smaller takes nothing away (rule 16): what was
+    built stays, and the larger stage waits and is offered again. The 14
+    days are a design choice; no study defines them.
 15. **Kind words only.** All texts are autonomy-supportive ("you could"),
     never controlling ("you must") or blaming.
 16. **No permanent failure.** Nothing earned is ever taken away: runs,
     journeys and what a journey has built are never lost or reset, and
     there is no HP or any other value that falls because of misses.
+    Going back to a smaller stage (rule 14) is the user's choice and
+    lowers nothing.
 
 ## What grows
 

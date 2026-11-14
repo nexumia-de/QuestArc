@@ -8,6 +8,7 @@ const PARAGRAPHS = [
   'plan',
   'misses',
   'welcome-back',
+  'break',
   'reason',
   'weekly',
   'graduation',

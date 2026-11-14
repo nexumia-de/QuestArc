@@ -99,6 +99,8 @@ overwrite each other. Most records are written once and never changed.
 | `skip:<runId>:<stageId>`              | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
 | `plan-check:<runId>`                  | `{ wish?, outcome?, obstacle?, plan? }`: the user's own words             | a journey is started with the optional plan check, or the user saves it later                        |
 | `pair:<runId>:<stageId>`              | `{ text }`: the user's own words, at most 60 characters                   | the user names what they pair the stage with, or continues from a stage that has one                 |
+| `carry-on:<runId>:<stageId>`          | `{ day }`                                                                 | the user carries on after a long break (closes the card for this gap)                                |
+| `step-back:<runId>:<stageId>:<day>`   | `{ dataFormat: 4, until? }`; `stageId` is the stage left, `day` the day   | the user starts smaller after a long break; `until` is added when the stage left is taken up again   |
 | `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
 | `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 | `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
@@ -142,6 +144,20 @@ overwrite each other. Most records are written once and never changed.
   run's `planCheck`, only the answers that are text, and reads no
   meaning from it; like the pairing it is own words: no data format,
   never in a task, a log or a request.
+- **Coming back** ([game rules](game-rules.md) §5). `carryOn` writes
+  `carry-on`, one record per stage, rewritten for a later gap; it only
+  closes a card, so an older engine may ignore it and it carries no
+  data format. `callItAPause` writes two ordinary `pause` records
+  (`source: "user"`): `pause` on the gap's first day, `resume` today.
+- **Stepping back** (`step-back`, game rules §4) is one record per
+  step back, written by `stepBack` (with `{ pause: true }` together
+  with the two pause records). `continueJourney` from the smaller
+  stage rewrites it with `until`, the day the stage left was taken up
+  again, and writes nothing else. An engine that does not know it (the one
+  before #82) would keep working on the stage left, so the record
+  carries `dataFormat: 4`: there the run is read-only until that host
+  is updated (below). The record stays after `until`, because the days
+  in between must stay not due for the stage left.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -186,8 +202,9 @@ engine than the other on the same records
   added later follow this, or are global and must not change what an
   older engine computes.
 - **Data format:** the engine has a data format number (`DATA_FORMAT`,
-  now `3`: `2` since checkpoints lost `xp` and `damage` in 3.3, `3`
-  since stages can be skipped, #81). A record carries the format that
+  now `4`: `2` since checkpoints lost `xp` and `damage` in 3.3, `3`
+  since stages can be skipped, #81, `4` since a stage can be left for
+  the one before it, #82). A record carries the format that
   first gave it its meaning, not the engine's newest: a checkpoint stays
   `2`, so a run without a skip stays usable on a 3.3 host. A run-scoped
   record may carry `dataFormat: <n>`; a record without it is format 1. A newer engine writes `dataFormat` only on a
@@ -253,6 +270,7 @@ interface RunView {
   checkinDue: boolean; // weekly question not answered this ISO week
   offerFallback: boolean; // second miss in a row, not yet followed by a completion
   offer?: ContinueOffer; // while the current stage is met (game rules §4)
+  comeBack?: ComeBack; // the card after a long break is due (game rules §5)
   build: BuildView; // what the journey builds (game rules §7)
 }
 
@@ -260,6 +278,11 @@ interface ContinueOffer {
   suggest: 'continue' | 'stay' | 'none'; // from the latest weekly answer
   answer?: number; // that answer, 1..7
   quietUntil?: string; // the user stays: the offer is quiet before this day
+}
+
+interface ComeBack {
+  from: string; // the first day of the gap
+  smaller?: string; // the finished stage before, which "Start Smaller" makes current again
 }
 
 interface BuildView {
@@ -285,6 +308,8 @@ interface StationView {
   skippedDay?: string; // a skipped stage ("already yours")
   undoable?: boolean; // a skipped stage whose skip can still be taken back
   pair?: string; // what the user pairs the stage with, in their words
+  stepBackDay?: string; // a finished stage walked again after a step back: since this day
+  leftDay?: string; // the stage left by a step back (state `ahead`): since this day
   // current stage only: the last 7 due or paused days, oldest first
   lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
@@ -295,7 +320,10 @@ record with the day (`continueJourney`, which also takes the stage's
 pairing along); staying writes `stayHere`,
 "I already do this" `skipStage`, taking it back `undoSkip`. Each returns
 no changes when the view does not allow the action (not met, a stage
-with a task, the last stage, a skip that is no longer undoable).
+with a task, the last stage, a skip that is no longer undoable). The
+card after a long break writes `carryOn`, `callItAPause` or `stepBack`;
+each returns no changes while `comeBack` is absent, and `stepBack`
+also without `comeBack.smaller`.
 
 `diff(before, after)` returns events `{ key, params }` for toasts:
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more

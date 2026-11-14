@@ -3,6 +3,8 @@ import {
   actions,
   answerCheckin,
   checkPlan,
+  callItAPause,
+  carryOn,
   chooseBuild,
   continueJourney,
   endJourney,
@@ -11,6 +13,7 @@ import {
   resumeJourney,
   skipStage,
   stayHere,
+  stepBack,
   undoSkip,
   withdraw,
 } from '../src';
@@ -35,6 +38,8 @@ describe('actions', () => {
     expect(Object.keys(actions).sort()).toEqual([
       'answerCheckin',
       'bindStage',
+      'callItAPause',
+      'carryOn',
       'checkPlan',
       'chooseBuild',
       'continueJourney',
@@ -46,6 +51,7 @@ describe('actions', () => {
       'skipStage',
       'startJourney',
       'stayHere',
+      'stepBack',
       'undoSkip',
       'withdraw',
     ]);
@@ -150,5 +156,72 @@ describe('actions', () => {
     expect(undoSkip(skipped.run, skipped.journey, 'a')).toEqual({});
     const counted = fromVector('skip-completions-give-nothing.json');
     expect(undoSkip(counted.run, counted.journey, 'a')).toEqual({});
+  });
+
+  // Coming back after a long break (#82): the three choices of the card.
+  it('carry on, or call the gap a pause, only while the card is due', () => {
+    const { run } = fromVector('come-back-card.json');
+    expect(carryOn(run, '2026-10-22')).toEqual({ 'carry-on:r1:b': { day: '2026-10-22' } });
+    expect(callItAPause(run, '2026-10-22')).toEqual({
+      'pause:r1:2026-10-09': { action: 'pause', source: 'user' },
+      'pause:r1:2026-10-22': { action: 'resume', source: 'user' },
+    });
+    const early = fromVector('come-back-13-days.json').run;
+    expect(carryOn(early, '2026-10-21')).toEqual({});
+    expect(callItAPause(early, '2026-10-21')).toEqual({});
+    expect(stepBack(early, '2026-10-21')).toEqual({});
+  });
+
+  it('start smaller in data format 4, alone or with the pause', () => {
+    const { run } = fromVector('come-back-card.json');
+    expect(stepBack(run, '2026-10-22')).toEqual({
+      'step-back:r1:b:2026-10-22': { dataFormat: 4 },
+    });
+    expect(stepBack(run, '2026-10-22', { pause: true })).toEqual({
+      'pause:r1:2026-10-09': { action: 'pause', source: 'user' },
+      'pause:r1:2026-10-22': { action: 'resume', source: 'user' },
+      'step-back:r1:b:2026-10-22': { dataFormat: 4 },
+    });
+  });
+
+  it('refuse to start smaller without a finished stage before', () => {
+    expect(stepBack(fromVector('come-back-no-completion.json').run, '2026-10-14')).toEqual({});
+    expect(stepBack(fromVector('step-back-needs-finished-stage.json').run, '2026-10-22')).toEqual(
+      {},
+    );
+  });
+
+  it('continue from the smaller stage takes the stage left up again, nothing else', () => {
+    const met = fromVector('step-back-met-offer.json');
+    expect(continueJourney(met.run, met.journey, '2026-10-26')).toEqual({
+      'step-back:r1:b:2026-10-22': { until: '2026-10-26', dataFormat: 4 },
+    });
+    const notMet = fromVector('step-back-counts-again.json');
+    expect(continueJourney(notMet.run, notMet.journey, '2026-10-25')).toEqual({});
+  });
+
+  it('each stage keeps its own pairing over a step back and back', () => {
+    const vector = loadVectors().find((v) => v.file === 'step-back-met-offer.json');
+    if (!vector || vector.kind !== 'evaluate') throw new Error('vector');
+    const snapshot = vector.input as Snapshot;
+    const run = evaluate({
+      ...snapshot,
+      choices: {
+        ...snapshot.choices,
+        'pair:r1:a': { text: 'a podcast' },
+        'pair:r1:b': { text: 'my playlist' },
+      },
+    }).active;
+    if (!run) throw new Error('run');
+    expect(run.stations.map((s) => s.pair)).toEqual(['a podcast', 'my playlist', undefined]);
+    expect(continueJourney(run, snapshot.journeys[0] as Journey, '2026-10-26')).toEqual({
+      'step-back:r1:b:2026-10-22': { until: '2026-10-26', dataFormat: 4 },
+    });
+  });
+
+  it('never skip a stage that is walked again', () => {
+    const gone = fromVector('step-back-task-gone.json');
+    expect(gone.run.stations[0]?.state).toBe('unbound');
+    expect(skipStage(gone.run, gone.journey, '2026-10-22')).toEqual({});
   });
 });

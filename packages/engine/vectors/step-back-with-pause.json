@@ -1,0 +1,214 @@
+{
+  "name": "Call it a pause and start smaller, combined: the stage left has no gaps and its run stands when it is taken up again",
+  "rule": "game-rules §4, stepping back",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-10-27",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-10-01",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1790848800000,
+        "doneOn": 1790856000000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1790935200000,
+        "doneOn": 1790942400000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791021600000,
+        "doneOn": 1791028800000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791108000000,
+        "doneOn": 1791115200000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-05",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791194400000,
+        "doneOn": 1791201600000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-06",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1791280800000,
+        "doneOn": 1791288000000
+      },
+      {
+        "id": "rpt_cfgB_2026-10-07",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1791367200000,
+        "doneOn": 1791374400000
+      },
+      {
+        "id": "rpt_cfgB_2026-10-08",
+        "isDone": true,
+        "repeatCfgId": "cfgB",
+        "created": 1791453600000,
+        "doneOn": 1791460800000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-22",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1792663200000,
+        "doneOn": 1792670400000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-23",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1792749600000,
+        "doneOn": 1792756800000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-24",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1792836000000,
+        "doneOn": 1792843200000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-25",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1792922400000,
+        "doneOn": 1792929600000
+      },
+      {
+        "id": "rpt_cfgA_2026-10-26",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793008800000,
+        "doneOn": 1793016000000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-10-01",
+        "why": "x"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-10-01"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-10-01",
+        "repeatCfgId": "cfgA",
+        "day": "2026-10-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-10-06",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-10-06"
+      },
+      "binding:r1:b": {
+        "taskId": "rpt_cfgB_2026-10-07",
+        "repeatCfgId": "cfgB",
+        "day": "2026-10-06"
+      },
+      "pause:r1:2026-10-09": {
+        "action": "pause",
+        "source": "user"
+      },
+      "pause:r1:2026-10-22": {
+        "action": "resume",
+        "source": "user"
+      },
+      "step-back:r1:b:2026-10-22": {
+        "until": "2026-10-26",
+        "dataFormat": 4
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "position": {
+        "stage": 1
+      },
+      "offerFallback": false,
+      "comeBack": null,
+      "stations": [
+        {},
+        {
+          "state": "current",
+          "completions": 2,
+          "run": {
+            "current": 2,
+            "best": 2,
+            "total": 2,
+            "gap": false
+          },
+          "lastDays": [
+            {
+              "day": "2026-10-21",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-10-22",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-10-23",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-10-24",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-10-25",
+              "mark": "paused"
+            },
+            {
+              "day": "2026-10-26",
+              "mark": "open"
+            },
+            {
+              "day": "2026-10-27",
+              "mark": "open"
+            }
+          ]
+        },
+        {}
+      ]
+    },
+    "problems": []
+  }
+}
