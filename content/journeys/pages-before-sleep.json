@@ -132,6 +132,38 @@
       "pages-before-sleep.read-20.arrival": "A longer stretch of reading, resting on all the pages before it.",
       "pages-before-sleep.read-20.nugget": "You could plan for a late night: \"If I am too tired to read for long, then I will read one page and close the book.\"",
       "pages-before-sleep.ending": "You read in bed on most evenings now. What you built stands, and the pages are yours, however many there are tonight."
+    },
+    "de": {
+      "pages-before-sleep.title": "Ein paar Seiten vor dem Schlafen",
+      "pages-before-sleep.description": "Von einer Seite im Bett zu einer ruhigen Lesezeit an den meisten Abenden, jedes Mal ein paar Minuten mehr.",
+      "pages-before-sleep.why": "Warum möchtest du mehr lesen? In deinen eigenen Worten.",
+      "pages-before-sleep.anchor": "dem Zubettgehen",
+      "pages-before-sleep.moment": "dem Moment, in dem du ins Bett gehst",
+      "pages-before-sleep.build.v1": "Ein Feuer zum Lesen",
+      "pages-before-sleep.build.v2": "Ein Zelt für eine Seite mehr",
+      "pages-before-sleep.build.v3": "Eine Hütte für stille Abende",
+      "pages-before-sleep.build.v4": "Ein Häuschen mit Leseecke",
+      "pages-before-sleep.build.v5": "Ein Haus voller Geschichten",
+      "pages-before-sleep.one-page.action": "eine Seite in meinem Buch lesen",
+      "pages-before-sleep.one-page.action.plan": "lese ich eine Seite in meinem Buch",
+      "pages-before-sleep.one-page.arrival": "Es beginnt mit einer Seite und einem Buch in Reichweite. Das erste Stück steht.",
+      "pages-before-sleep.one-page.accept": "Eine Seite gehört jetzt zu deinem Abend. Du könntest fünf Minuten bei deinem Buch bleiben.",
+      "pages-before-sleep.one-page.nugget": "Du könntest das Buch morgens aufs Kopfkissen legen, dann ist es das Erste, was du findest, wenn du ins Bett gehst.",
+      "pages-before-sleep.read-5.action": "5 Minuten in meinem Buch lesen",
+      "pages-before-sleep.read-5.action.plan": "lese ich 5 Minuten in meinem Buch",
+      "pages-before-sleep.read-5.arrival": "Fünf ruhige Minuten, und was du begonnen hast, ist ein wenig gewachsen.",
+      "pages-before-sleep.read-5.accept": "Fünf Minuten fallen dir jetzt leicht. Du könntest deinem Buch zehn geben oder es gegen eines tauschen, auf das du dich mehr freust.",
+      "pages-before-sleep.read-5.nugget": "Ein Abend ohne Lesen ändert nichts. Du könntest das Buch am nächsten Abend einfach wieder aufschlagen.",
+      "pages-before-sleep.read-10.action": "10 Minuten in meinem Buch lesen",
+      "pages-before-sleep.read-10.action.plan": "lese ich 10 Minuten in meinem Buch",
+      "pages-before-sleep.read-10.arrival": "Zehn Minuten mit einem Buch, bevor das Licht ausgeht. Was du baust, wächst mit jedem Abend.",
+      "pages-before-sleep.read-10.accept": "Zehn Minuten gehören dir. Wenn du magst, könntest du zwanzig daraus machen.",
+      "pages-before-sleep.read-10.nugget": "Ein gedrucktes Buch passt gut zu diesem Moment: Es hat keine Nachrichten und sonst nichts zu öffnen. Du könntest dein Handy außer Reichweite lassen.",
+      "pages-before-sleep.read-20.action": "20 Minuten in meinem Buch lesen",
+      "pages-before-sleep.read-20.action.plan": "lese ich 20 Minuten in meinem Buch",
+      "pages-before-sleep.read-20.arrival": "Eine längere Lesezeit, die auf all den Seiten davor ruht.",
+      "pages-before-sleep.read-20.nugget": "Du könntest für einen späten Abend vorplanen: „Wenn ich zu müde bin, um lange zu lesen, dann lese ich eine Seite und klappe das Buch zu.“",
+      "pages-before-sleep.ending": "Du liest jetzt an den meisten Abenden im Bett. Was du gebaut hast, steht, und die Seiten gehören dir, wie viele es heute Abend auch sind."
     }
   }
 }

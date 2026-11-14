@@ -5,10 +5,11 @@
 import type { Schedule } from '@questarc/engine';
 import { createBrain, type Brain } from '@questarc/plugin/src/adapter/brain';
 import { registerHooks } from '@questarc/plugin/src/adapter/hooks';
-import { artPack } from '@questarc/plugin/src/adapter/art-pack';
+import { artPackIn } from '@questarc/plugin/src/adapter/art-pack';
 import { messageFor } from '@questarc/plugin/src/adapter/snacks';
 import { builtInJourneys } from '@questarc/plugin/src/shared/content';
-import { t } from '@questarc/plugin/src/shared/texts';
+import { useLanguage } from '@questarc/plugin/src/shared/languages';
+import { language, t } from '@questarc/plugin/src/shared/texts';
 import { createApp } from '@questarc/plugin/src/ui/app';
 import { setArt } from '@questarc/plugin/src/ui/art-store';
 import type { Client } from '@questarc/plugin/src/ui/client';
@@ -28,6 +29,17 @@ import { openStore } from './store/store';
 import { at } from './texts';
 
 const DAY_CHECK_MS = 60_000;
+
+/**
+ * The app speaks the language of the device (issue #39): German for a
+ * German locale, English for any other; `?lang=de` says it by hand, as
+ * a host that embeds the app does with its own locale.
+ */
+useLanguage(
+  new URLSearchParams(location.search).get('lang') ?? navigator.language,
+  builtInJourneys,
+);
+document.documentElement.lang = language();
 
 const start = async (root: HTMLElement): Promise<void> => {
   const store = await openStore(indexedDbPersistence(), freshDataset);
@@ -66,13 +78,14 @@ const start = async (root: HTMLElement): Promise<void> => {
   brain.current = game;
   registerHooks(host.api, game.refresh);
 
-  setArt(artPack);
+  const art = artPackIn();
+  setArt(art);
   const client: Client = {
     get: () => game.state(),
     write: (records) => game.write(records),
     sidePanel: () => game.state(),
     // texts and style are part of the app itself (app.js, app.css)
-    content: async () => ({ texts: {}, style: '', art: artPack }),
+    content: async () => ({ language: language(), texts: {}, style: '', art }),
   };
   const journey = createApp(shell.views.journey, client);
   // The view's home is the moments (#96); a message's Show leads to the journey.

@@ -2,6 +2,7 @@ import { isoWeek } from '@questarc/engine';
 import type { Task } from '@super-productivity/plugin-api';
 
 import type { DemoData } from './demo';
+import { own } from './demo-words';
 
 /**
  * Demo datasets for the habit a finished journey leaves (flow F, never
@@ -53,7 +54,7 @@ export const habitDemo = (scenario: HabitScenario, today: string): DemoData => {
     record(`stage-done:demo:${stage}`, { day: day(i === 3 ? 40 : 85 - i * 15), dataFormat: 2 });
   });
   record('run-end:demo', { day: day(40), reason: 'finished' });
-  record('anchor:morning', { kind: 'routine', words: 'getting up' });
+  record('anchor:morning', { kind: 'routine', words: own('getting up') });
   record('run-anchor:demo', { anchorId: 'morning' });
   record(`binding:demo:${LAST}`, {
     taskId: `rpt_demo_${day(55)}`,
@@ -84,7 +85,7 @@ export const habitDemo = (scenario: HabitScenario, today: string): DemoData => {
 
   repeatCfgs.demo = {
     id: 'demo',
-    title: 'Plan the day',
+    title: own('Plan the day'),
     isPaused: false,
     repeatCycle: 'DAILY',
     repeatEvery: 1,
@@ -95,7 +96,7 @@ export const habitDemo = (scenario: HabitScenario, today: string): DemoData => {
     const d = day(offset);
     tasks[`rpt_demo_${d}`] = {
       id: `rpt_demo_${d}`,
-      title: 'Plan the day',
+      title: own('Plan the day'),
       isDone: true,
       doneOn: Date.parse(`${d}T07:30:00Z`),
       repeatCfgId: 'demo',

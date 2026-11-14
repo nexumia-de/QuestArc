@@ -1,6 +1,7 @@
 import type { Task } from '@super-productivity/plugin-api';
 
 import type { DemoData } from './demo';
+import { own } from './demo-words';
 
 /**
  * Demo datasets for the home with several moments (#96, never real
@@ -68,9 +69,9 @@ export const momentsDemo = (scenario: MomentScenario, today: string): DemoData =
     record(`run-end:${run}`, { day: day(end), reason: 'finished' });
   };
 
-  record('anchor:morning', { kind: 'routine', words: 'getting up' });
-  record('anchor:noon', { kind: 'routine', words: 'lunch' });
-  record('anchor:evening', { kind: 'time', time: '21:30', name: 'Evening' });
+  record('anchor:morning', { kind: 'routine', words: own('getting up') });
+  record('anchor:noon', { kind: 'routine', words: own('lunch') });
+  record('anchor:evening', { kind: 'time', time: '21:30', name: own('Evening') });
 
   // A gentle morning: finished 60 days ago, runs by itself for a month.
   finished('morning', 'gentle-morning', ['water', 'stretch-1', 'stretch-5', 'plan-day'], 60);
@@ -86,7 +87,7 @@ export const momentsDemo = (scenario: MomentScenario, today: string): DemoData =
   });
   repeat(
     'pages',
-    'Read in my book',
+    own('Read in my book'),
     35,
     Array.from({ length: 35 }, (_, i) => i + 1).filter((offset) => offset !== 9),
   );
@@ -110,7 +111,7 @@ export const momentsDemo = (scenario: MomentScenario, today: string): DemoData =
     repeatCfgId: 'demo',
     day: day(5),
   });
-  repeat('demo', 'Walk after lunch', 5, [5, 4, 2, 1]);
+  repeat('demo', own('Walk after lunch'), 5, [5, 4, 2, 1]);
   record(
     'run-anchor:demo',
     scenario === 'moments-chain' ? { anchorId: 'morning', after: 'morning' } : { anchorId: 'noon' },

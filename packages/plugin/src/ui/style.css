@@ -557,7 +557,8 @@
 .qa-scale {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: var(--s-half, 4px);
+  /* Half the usual gap keeps each of the seven at least 44 px wide at 360 px. */
+  gap: calc(var(--s-half, 4px) / 2);
 }
 
 .qa-scale-btn {

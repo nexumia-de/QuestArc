@@ -7,7 +7,7 @@ import { loadErrorText, loadProblem, NOT_RUNNING_AFTER_MS } from '../src/ui/load
 
 // Only the texts the view carries itself: these messages are shown before
 // plugin.js has sent the others (docs/plugin-adapter.md).
-addTexts(startTexts);
+addTexts(startTexts.en);
 
 // Super Productivity's answers while plugin.js is not running
 // (plugin-runner.ts, plugin-api.ts at c5eb3f6) and the view's own timeout.

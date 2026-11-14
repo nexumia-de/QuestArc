@@ -1,6 +1,6 @@
 import type { AnchorWords, Journey, RunAnchor, Stage, StationView } from '@questarc/engine';
 
-import { stageAction, t } from './texts';
+import { planAction, stageAction, t } from './texts';
 
 /**
  * Sentences built from a journey's stage: the plan "After X, I will Y"
@@ -44,7 +44,8 @@ export const anchorLabel = (anchor: PlanAnchor): string =>
  * (design rule 7); `anchor` is the run's anchor in the user's words,
  * without it the journey's own suggestion stands. Each form is one
  * whole sentence in content/i18n, so a language orders the parts as it
- * needs.
+ * needs; the action stands in the form the plan sentence needs
+ * (`planAction`: German "gehe ich 15 Minuten spazieren").
  */
 export const planSentence = (
   stage: Stage,
@@ -56,11 +57,23 @@ export const planSentence = (
   const form = !own || own.form === 'after' ? 'sentence' : own.form;
   return t(`ui.plan.${form}${place ? '-place' : ''}${pair ? '-pair' : ''}`, {
     anchor: own?.text ?? t(stage.plan.anchor),
-    action: t(action),
+    action: planAction(action),
     place: place ? t(place) : '',
     pair: pair ?? '',
   });
 };
+
+/**
+ * The start of a task's title, "Lunch" before ": walk for 5 minutes"
+ * (design rule 23). English names the anchor alone; German says "Nach
+ * dem Mittagessen", so each form has its text.
+ */
+export const taskAnchor = (anchor: PlanAnchor | undefined, suggested: string): string =>
+  capitalise(
+    t(`ui.setup.task-anchor${!anchor || anchor.form === 'after' ? '' : `-${anchor.form}`}`, {
+      anchor: anchor?.text ?? suggested,
+    }),
+  );
 
 /** Upper-cases the first letter, for an action used at the start of a sentence. */
 export const capitalise = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);

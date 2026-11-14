@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import file from '../../../content/art/crossing.ladder.json';
 import homeFile from '../../../content/art/home.ladder.json';
 import type { BuildView, Journey } from '@questarc/engine';
+import '../src/shared/languages';
 import { buildState } from '../src/ui/journey/build';
 import {
   appearing,

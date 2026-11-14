@@ -124,6 +124,35 @@
       "gentle-morning.plan-day.accept": "Your morning has a shape now.",
       "gentle-morning.plan-day.nugget": "You could pair the stretch with something you enjoy, like a favourite song that you only play then.",
       "gentle-morning.ending": "Your morning starts by itself now: water, a stretch and one thing for the day."
+    },
+    "de": {
+      "gentle-morning.title": "Ein sanfter Morgen",
+      "gentle-morning.description": "Von einem Glas Wasser zu einer kurzen Morgenroutine, die von selbst beginnt, ein kleiner Schritt nach dem anderen.",
+      "gentle-morning.why": "Warum wünschst du dir einen ruhigeren Start in den Tag? In deinen eigenen Worten.",
+      "gentle-morning.anchor": "dem Aufstehen",
+      "gentle-morning.moment": "einem Moment am Morgen",
+      "gentle-morning.water.action": "ein Glas Wasser trinken",
+      "gentle-morning.water.action.plan": "trinke ich ein Glas Wasser",
+      "gentle-morning.water.place": "in der Küche",
+      "gentle-morning.water.arrival": "Es beginnt in deiner Küche, mit einem Glas Wasser.",
+      "gentle-morning.water.accept": "Das Wasser gehört jetzt zu deinem Morgen. Du könntest danach eine Minute Dehnen anhängen.",
+      "gentle-morning.water.nugget": "Du könntest das Glas abends neben den Wasserhahn stellen, dann ist es morgens das Erste, was du siehst.",
+      "gentle-morning.stretch-1.action": "ein Glas Wasser trinken und mich eine Minute dehnen",
+      "gentle-morning.stretch-1.action.plan": "trinke ich ein Glas Wasser und dehne mich eine Minute",
+      "gentle-morning.stretch-1.arrival": "Das erste Stück steht. Durchs Fenster kommt ein wenig mehr Licht.",
+      "gentle-morning.stretch-1.accept": "Eine Minute fällt dir jetzt leicht. Du könntest dem Dehnen ein paar Minuten mehr geben.",
+      "gentle-morning.stretch-1.nugget": "Ein Morgen Pause ist in Ordnung. Worauf es ankommt: am nächsten Morgen wieder dabei sein.",
+      "gentle-morning.stretch-5.action": "ein Glas Wasser trinken und mich fünf Minuten dehnen",
+      "gentle-morning.stretch-5.action.plan": "trinke ich ein Glas Wasser und dehne mich fünf Minuten",
+      "gentle-morning.stretch-5.arrival": "Der Morgen wird länger, und was du begonnen hast, wächst weiter.",
+      "gentle-morning.stretch-5.accept": "Fünf Minuten haben jetzt ihren Platz in deinem Morgen. Du könntest deine Routine mit einem kurzen Blick auf den Tag abschließen.",
+      "gentle-morning.stretch-5.nugget": "Du könntest jetzt für einen schweren Morgen vorplanen: „Wenn ich verschlafe, dann trinke ich nur das Wasser.“ Der kleinere Schritt zählt trotzdem.",
+      "gentle-morning.plan-day.action": "ein Glas Wasser trinken, mich fünf Minuten dehnen und eine Sache für heute aufschreiben",
+      "gentle-morning.plan-day.action.plan": "trinke ich ein Glas Wasser, dehne mich fünf Minuten und schreibe eine Sache für heute auf",
+      "gentle-morning.plan-day.arrival": "Die Sonne ist aufgegangen. Noch ein Stück, und dein Morgen ist rund.",
+      "gentle-morning.plan-day.accept": "Dein Morgen hat jetzt Gestalt angenommen.",
+      "gentle-morning.plan-day.nugget": "Du könntest das Dehnen mit etwas verbinden, das du gern magst, etwa mit einem Lieblingslied, das du nur dann hörst.",
+      "gentle-morning.ending": "Dein Morgen beginnt jetzt von selbst: Wasser, Dehnen und eine Sache für den Tag."
     }
   }
 }

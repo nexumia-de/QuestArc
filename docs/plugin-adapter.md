@@ -66,6 +66,7 @@ only a few times a day.
 | `finishDay`                                                 | archive     | 19.3.0                                |
 | `taskComplete`, `taskUpdate`, `taskDelete`, `anyTaskUpdate` | tasks       | 19.3.0; local changes only            |
 | window focus regained                                       | archive     | 19.3.0                                |
+| `languageChange`                                            | language    | in 19.3.1 (`c5eb3f6`); optional       |
 
 Each hook is registered on its own: older versions reject unknown hooks.
 On 19.3.0 and 19.3.1, task changes from another device reach QuestArc when
@@ -88,15 +89,15 @@ Super Productivity 19.3 installs an `index.html` of at most 102,400 bytes
 holds the view's code and its start state only; data travels in
 `plugin.js`:
 
-| What                                                       | Where it is                                 | How it reaches the view            |
-| ---------------------------------------------------------- | ------------------------------------------- | ---------------------------------- |
-| The screens' code                                          | `index.html`                                | –                                  |
-| The page and the first message (`src/ui/start.css`)        | `index.html`                                | –                                  |
-| The four texts of the start state (`ui.error.starting`, …) | `index.html`, taken from `en.json` at build | –                                  |
-| All UI and event texts (`content/i18n/en.json`)            | `plugin.js` (`shared/english.ts`)           | once, `questarc:content` → `texts` |
-| The style of the screens (`src/ui/style.css`)              | `plugin.js` (`virtual:questarc-style`)      | once, `questarc:content` → `style` |
-| The ladders' pictures, ladders, palette and markers (#100) | `plugin.js` (`adapter/art-pack.ts`)         | once, `questarc:content` → `art`   |
-| The journeys and their texts                               | `plugin.js` (`shared/content.ts`)           | with every state (`journeys`)      |
+| What                                                       | Where it is                                | How it reaches the view            |
+| ---------------------------------------------------------- | ------------------------------------------ | ---------------------------------- |
+| The screens' code                                          | `index.html`                               | –                                  |
+| The page and the first message (`src/ui/start.css`)        | `index.html`                               | –                                  |
+| The four texts of the start state (`ui.error.starting`, …) | `index.html`, from `en.json` and `de.json` | –                                  |
+| All UI and event texts (`content/i18n/*.json`)             | `plugin.js` (`shared/languages.ts`)        | `questarc:content` → `texts`       |
+| The style of the screens (`src/ui/style.css`)              | `plugin.js` (`virtual:questarc-style`)     | once, `questarc:content` → `style` |
+| The ladders' pictures, ladders, palette and markers (#100) | `plugin.js` (`adapter/art-pack.ts`)        | once, `questarc:content` → `art`   |
+| The journeys and their texts                               | `plugin.js` (`shared/content.ts`)          | with every state (`journeys`)      |
 
 The view's first request is `questarc:content` (`adapter/content-pack.ts`
 answers it, `ui/content.ts` takes it in: texts into `shared/texts.ts`,
@@ -107,14 +108,31 @@ plugin.js does not answer, the view shows "QuestArc is starting" and
 then "is not running" from what it carries itself, and asks again
 (`ui/load-error.ts`); the content is asked for until it has come once.
 
+### Language
+
+plugin.js holds `en.json` and `de.json` (`shared/languages.ts`) and
+shows one of them (`adapter/language.ts`, #39): at start it reads
+`getCurrentLanguage()`, then it follows the hook `languageChange`
+(`{code, newLanguage}`, [facts](super-productivity-facts.md) §7). Both
+are feature-detected: a version without them stays English, and a
+rejected hook registration is caught. "de" and "de-…" give German,
+anything else English; a key German lacks shows English (`textsIn`).
+The content pack carries the texts of the current language and its
+`language`; every state names the `language` too, and when it differs
+from the view's, the view asks for the content again and redraws the
+open screen. Before plugin.js answers, the view shows its start texts in
+German when `getCurrentLanguage()` says so. The journeys' texts follow
+the same language (`addJourneyTexts`). With both languages `index.html`
+is 89,246 of 102,400 bytes.
+
 Rules for new screens:
 
-- A text is a key in `content/i18n/en.json`; a style rule goes into
-  `style.css`. Neither costs room in `index.html`.
+- A text is a key in `content/i18n/en.json` and `de.json`; a style
+  rule goes into `style.css`. Neither costs room in `index.html`.
 - `start.css` and the start texts (`START_TEXT_KEYS` in
   `packages/plugin/view-content.mjs`) grow only for what is shown
   before plugin.js answers.
-- No module under `src/ui/` imports `shared/english.ts` or
+- No module under `src/ui/` imports `shared/languages.ts` or
   `shared/content.ts`: `build.mjs` fails when UI texts are found in
   `index.html`.
 - Long static pages ("How QuestArc motivates you") are texts like any

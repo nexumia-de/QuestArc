@@ -1,5 +1,5 @@
 import { bindStage, skipStage } from '@questarc/engine';
-import { capitalise, planAnchor } from '../../shared/plan';
+import { planAnchor, taskAnchor } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
@@ -51,7 +51,7 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
   const open = (taskId: string) => () => void PluginAPI.selectTask(taskId);
   const create = async () => {
     const title = t('ui.setup.task-title', {
-      anchor: capitalise(planAnchor(run.anchor)?.text ?? t(stage.plan.anchor)),
+      anchor: taskAnchor(planAnchor(run.anchor), t(stage.plan.anchor)),
       action: t(stage.plan.action),
     });
     const taskId = await PluginAPI.addTask({ title, isIgnoreShortSyntax: true });

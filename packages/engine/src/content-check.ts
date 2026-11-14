@@ -1,6 +1,8 @@
 import { LADDERS, markerFits } from './ladders';
+import { FALLBACK_LANGUAGE, PLAN_FORM } from './texts';
 import type { Journey, Stage } from './types/journey';
 import { journeyErrors } from './validate';
+import { BANNED, PLAN_FORM_LANGUAGES } from './wording';
 
 /**
  * The journey checker (docs/authoring-journeys.md): everything about a
@@ -40,30 +42,6 @@ interface Use {
   readonly field: Field;
   readonly at: string;
 }
-
-/** Wording the design rules forbid, checked in the English texts. */
-const BANNED: readonly { readonly pattern: RegExp; readonly message: string }[] = [
-  {
-    pattern: /\b\d+[\s-]*days?\b|\b(twenty-one|sixty-six)[\s-]+days?\b/i,
-    message: 'promises or names a number of days; say "it varies a lot" instead (rule 4)',
-  },
-  {
-    pattern: /\b(must|have to|has to|you should|no excuses?)\b/i,
-    message: 'sounds controlling; use autonomy-supportive words like "you could" (rule 15)',
-  },
-  {
-    pattern: /\b(fail(s|ed|ure|ing)?|lazy|guilt(y)?|break the chain)\b/i,
-    message: 'blames the user; a miss is a neutral gap (rules 12 and 15)',
-  },
-  {
-    pattern: /\bstreaks?\b/i,
-    message: 'QuestArc counts runs that survive one miss, not streaks (rule 11)',
-  },
-  {
-    pattern: /["“][^"”]{8,}["”]\s*[-–—]{1,2}\s*\p{Lu}/u,
-    message: 'looks like a quote with an author; generic quotes are not used (rule 5)',
-  },
-];
 
 /** First parts of the app's own text keys (content/i18n), so journey keys never clash. */
 const RESERVED_IDS = new Set(['ui', 'event']);
@@ -105,29 +83,38 @@ const textProblems = (journey: Journey, used: readonly Use[]): Problem[] => {
   const texts = journey.texts ?? {};
   const english = texts.en;
   if (!english) return [error('texts.en', 'English texts are required')];
-  const usedKeys = new Set(used.map((u) => u.key));
+  // An action may have a second form for the plan sentence (PLAN_FORM).
+  const planForms = used
+    .filter((u) => u.field === 'action')
+    .map((u) => ({ ...u, key: `${u.key}${PLAN_FORM}`, at: `${u.at}${PLAN_FORM}` }));
+  const usedKeys = new Set([...used, ...planForms].map((u) => u.key));
 
-  for (const { key, field, at } of used) {
+  for (const { key, at } of used) {
     if (!key.startsWith(`${journey.id}.`))
       problems.push(error(at, `text key "${key}" must start with "${journey.id}."`));
-    const text = english[key];
-    if (text === undefined) {
-      problems.push(error(at, `no English text for "${key}"`));
-      continue;
-    }
-    for (const { pattern, message } of BANNED) {
-      if (pattern.test(text)) problems.push(error(at, message));
-    }
-    for (const [lang, own] of Object.entries(texts)) {
-      const value = own[key];
-      if (value !== undefined && value.length > TEXT_LIMITS[field])
+    if (english[key] === undefined) problems.push(error(at, `no English text for "${key}"`));
+  }
+  for (const [lang, own] of Object.entries(texts)) {
+    const said = lang === FALLBACK_LANGUAGE ? '' : `${lang} text `;
+    for (const { key, field, at } of [...used, ...planForms]) {
+      const text = own[key];
+      if (text === undefined) continue;
+      for (const { pattern, message } of BANNED[lang] ?? [])
+        if (pattern.test(text)) problems.push(error(at, `${said}${message}`));
+      if (text.length > TEXT_LIMITS[field])
         problems.push(
           error(at, `${lang} text is longer than ${TEXT_LIMITS[field]} characters (360 px)`),
         );
     }
-  }
-
-  for (const [lang, own] of Object.entries(texts)) {
+    if (PLAN_FORM_LANGUAGES.includes(lang))
+      for (const { key, at } of planForms)
+        if (own[key] === undefined && own[key.slice(0, -PLAN_FORM.length)] !== undefined)
+          problems.push(
+            error(
+              at,
+              `${lang} needs the action as the plan sentence says it, under "${key}" (docs/story-format.md, texts)`,
+            ),
+          );
     for (const key of Object.keys(own)) {
       if (usedKeys.has(key)) continue;
       if (lang === 'en') problems.push(warning(`texts.en`, `"${key}" is not used`));
@@ -135,6 +122,22 @@ const textProblems = (journey: Journey, used: readonly Use[]): Problem[] => {
     }
   }
   return problems;
+};
+
+/**
+ * What a built-in journey lacks in `languages` (issue #39): the plugin
+ * ships each of them whole, so every English text has its translation.
+ * A private journey may have English only.
+ */
+export const languageProblems = (journey: Journey, languages: readonly string[]): Problem[] => {
+  const english = Object.keys(journey.texts?.en ?? {});
+  return languages.flatMap((lang) => {
+    const own = journey.texts?.[lang];
+    if (!own) return [error(`texts.${lang}`, `no ${lang} texts`)];
+    return english
+      .filter((key) => own[key] === undefined)
+      .map((key) => error(`texts.${lang}`, `no ${lang} text for "${key}"`));
+  });
 };
 
 /** Number words an action text may use for its minutes. */

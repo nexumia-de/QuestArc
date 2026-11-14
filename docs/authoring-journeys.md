@@ -95,8 +95,13 @@ format is in [story format 3](story-format.md) and the JSON Schema
   the journey is removed later. Leave it out to stay anonymous.
 - Every text is a **key** starting with the id (`first-things-first.title`),
   and the file's `texts.en` holds the English text for every key.
-  Other languages (`texts.de`, …) may leave keys out; those fall back to
-  English.
+  Built-in journeys also have every key in German (`texts.de`), so CI
+  fails without it; if you do not write German, say so in the pull
+  request and the owner adds it. German needs one more text per action,
+  `<action key>.plan`, the action as the plan sentence says it ("gehe
+  ich 5 Minuten spazieren" next to "5 Minuten spazieren gehen"), and
+  writes anchors and moments in the dative ("dem Mittagessen", "einem
+  Moment um die Mittagszeit").
 - Anchors and actions are written to fit the plan sentence: anchor
   "sitting down at my desk", action "write down the one task that
   matters most today".
@@ -189,6 +194,38 @@ ladder when starting.
   of 5); `count` `n` completions; `time_spent` `minutes` tracked on the
   stage's tasks.
 
+## German, and adding a language
+
+German texts are written, not translated word for word: plain, warm
+German with "du", never "Sie"; "du könntest", "wenn du magst", never
+"du musst", "du solltest" or "nicht vergessen"; a miss is "eine Lücke"
+or "ein Tag Pause", never "verpasst", "versäumt", "Fehler" or
+"Rückfall"; the fallback is "der kleinere Schritt". A claim about
+research is exactly as strong as in English. `npm run journeys` checks
+German with its own word lists (`packages/engine/src/wording.ts`).
+
+To add a language (for example `fr`):
+
+1. Copy `content/i18n/en.json` to `content/i18n/fr.json` and write every
+   text; keep each `{placeholder}`. `ui.grammar.*` are regular
+   expressions for the build's words, `ui.plan.*` whole sentences, so
+   the language orders the parts as it needs.
+2. Add a `fr` block to every journey in `content/journeys/` and to
+   `content/examples/`; if the plan sentence needs the action in
+   another form, list the language in `PLAN_FORM_LANGUAGES` and write
+   the `.plan` texts.
+3. Add the language's controlling, blaming and day-promising words to
+   `BANNED` in `packages/engine/src/wording.ts`, with tests in
+   `packages/engine/test/content-check.test.ts`.
+4. Register the table in `packages/plugin/src/shared/languages.ts`
+   (`UI_TEXTS`), the start texts' language in `START_LANGUAGES`
+   (`packages/plugin/view-content.mjs`), the date locale in
+   `packages/plugin/src/ui/journey/format.ts`, and the new language in
+   the test that lists the tables (`packages/engine/test/content.test.ts`).
+5. Check the screens with `node screenshots.mjs <demos> 1 fr`
+   ([development](development.md)): no cut-off text, no horizontal
+   overflow. Then `npm run check`; keep `index.html` within its limit.
+
 ## Check it
 
 You need Node.js 22 or newer.
@@ -229,7 +266,8 @@ text, and that you publish it under CC BY-SA 4.0. The app shows your
 
 - Work only from this page, the schema and the example; do not invent
   research. If you cite a study, give its DOI or link.
-- Write in English first; other languages are welcome as extra
+- Write in English first, then German (`texts.de`, with the `.plan`
+  forms) along the rules above; other languages are welcome as extra
   `texts.<lang>` blocks.
 - Run `npm run journeys` and fix every error before opening the pull
   request; mention remaining warnings and why they are fine.

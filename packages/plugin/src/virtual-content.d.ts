@@ -6,7 +6,10 @@ declare module 'virtual:questarc-style' {
 }
 
 declare module 'virtual:questarc-start-texts' {
-  /** The texts of content/i18n/en.json the view shows before plugin.js answers. */
-  const texts: Readonly<Record<string, string>>;
+  /** The texts the view shows before plugin.js answers, from content/i18n, by language. */
+  const texts: {
+    readonly en: Readonly<Record<string, string>>;
+    readonly de: Readonly<Record<string, string>>;
+  };
   export default texts;
 }

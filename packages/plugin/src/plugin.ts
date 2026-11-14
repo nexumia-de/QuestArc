@@ -4,6 +4,7 @@
 import { createBrain } from './adapter/brain';
 import { useForCurrentStation } from './adapter/context-menu';
 import { registerHooks } from './adapter/hooks';
+import { followLanguage } from './adapter/language';
 import { handleMessage } from './adapter/messages';
 import { registerSettingsEntry } from './adapter/settings-entry';
 import { createShowJourney } from './adapter/show-journey';
@@ -11,6 +12,9 @@ import { createSidePanel } from './adapter/side-panel';
 import { snackFor } from './adapter/snacks';
 import { builtInJourneys } from './shared/content';
 import { t } from './shared/texts';
+
+// Super Productivity's language, before anything is said (#39).
+followLanguage(PluginAPI, builtInJourneys);
 
 const journey = createShowJourney(() => PluginAPI.showIndexHtmlAsView());
 const brain = createBrain({

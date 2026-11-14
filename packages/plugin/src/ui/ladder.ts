@@ -8,6 +8,7 @@
  * rules are in docs/journey-design.md, "Builds and ladders"; Day Planner
  * composes the same scene (pensum/ui/journey/art.py, `ladder_scene`).
  */
+import { inLine as lowered, t } from '../shared/texts';
 import type { Placed, Scene } from './art';
 
 export interface LadderVersion {
@@ -84,7 +85,8 @@ const versionCount = (ladder: Ladder, state: BuildState): number =>
 
 /**
  * A version's name: the journey's own, else the ladder's title; `inLine`
- * lowers the ladder's title for the middle of a sentence ("a stone bridge").
+ * lowers the title for the middle of a sentence ("a stone bridge") where
+ * the language does (`ui.grammar.lower`: German keeps "Trittsteine").
  */
 export const versionName = (
   ladder: Ladder,
@@ -95,7 +97,7 @@ export const versionName = (
   const own = state.names?.[version - 1];
   if (own !== undefined && own !== '') return own;
   const title = versionAt(ladder, version)?.title ?? ladder.title;
-  return inLine ? title.charAt(0).toLowerCase() + title.slice(1) : title;
+  return inLine ? lowered(title) : title;
 };
 
 /** E: how many elements the ladder's marker has (posts and hanging ones). */
@@ -112,12 +114,14 @@ export const rowViewBox = (ladder: Ladder): string => (ladder.row ?? [0, 0, 120,
 /** The state in words, as under the row of versions. */
 export const buildWords = (ladder: Ladder, version: number, state: BuildState = {}): string => {
   const now = versionName(ladder, version, state);
-  const stands = /^(A|An|The) /.test(now) || !now.endsWith('s') ? 'stands' : 'stand';
+  // "A hut stands", "Stepping stones stand": the language says which names are one thing.
+  const one = new RegExp(t('ui.grammar.singular')).test(now);
+  const stands = t(one ? 'ui.build.words.stands' : 'ui.build.words.stand', { name: now });
   const last = version >= versionCount(ladder, state);
   const ready = state.ready === true;
-  if (last || (!ready && (state.progress ?? 0) <= 0)) return `${now} ${stands}`;
+  if (last || (!ready && (state.progress ?? 0) <= 0)) return stands;
   const next = versionName(ladder, version + 1, state, true);
-  return `${now} ${stands} · ${next} ${ready ? 'is ready' : 'is on its way'}`;
+  return t(ready ? 'ui.build.words.ready' : 'ui.build.words.on-its-way', { now: stands, next });
 };
 
 /** What of the marker stands: posts and hanging elements, each shown of all. */
@@ -159,13 +163,22 @@ export const buildLabel = (
   kind: string,
 ): string => {
   const total = versionCount(ladder, state);
-  const head = `${versionName(ladder, version, state)}, version ${version} of ${total}`;
-  if (version >= total) return `${head}; all versions stand`;
+  const head = t('ui.build.label.head', {
+    name: versionName(ladder, version, state),
+    version,
+    total,
+  });
+  if (version >= total) return t('ui.build.label.all', { head });
   const count = markerCount(ladder, version, state);
-  if (count.postsShown === 0) return `${head}; nothing on its way yet`;
-  const posts = `${count.postsShown} of ${count.posts} posts`;
-  const hanging = `${count.hangingShown} of ${count.hanging} ${kind.toLowerCase()}`;
-  return `${head}; marker: ${posts} and ${hanging}; ${state.ready === true ? 'ready' : 'not ready yet'}`;
+  if (count.postsShown === 0) return t('ui.build.label.nothing', { head });
+  return t(state.ready === true ? 'ui.build.label.ready' : 'ui.build.label.not-ready', {
+    head,
+    'posts-shown': count.postsShown,
+    posts: count.posts,
+    'hanging-shown': count.hangingShown,
+    hanging: count.hanging,
+    kind: lowered(kind),
+  });
 };
 
 /** What the screen drew last, to find what is new at the moment of the tick. */

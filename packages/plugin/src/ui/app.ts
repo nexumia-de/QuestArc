@@ -1,5 +1,5 @@
 import type { State } from '../shared/protocol';
-import { addJourneyTexts, t } from '../shared/texts';
+import { addJourneyTexts, language, t } from '../shared/texts';
 import type { Client } from './client';
 import { h, icon, ICONS } from './dom';
 import type { Context, MenuItem, Route, Screen } from './screen';
@@ -189,6 +189,8 @@ export const createApp = (root: HTMLElement, client: Client) => {
     if (navigated) screen.onShow?.();
   };
 
+  /** The language the screen was drawn in: another one draws it again (#39). */
+  let drawnIn = language();
   const update = (next: State): void => {
     // the journeys' own texts come with the state (shared/texts.ts)
     if (next.journeys !== state?.journeys) addJourneyTexts(next.journeys);
@@ -207,7 +209,13 @@ export const createApp = (root: HTMLElement, client: Client) => {
     const toJourney = next.openJourney === true && next.view.active !== undefined;
     if (toJourney) stack = [entry({ name: 'home' }), entry({ name: 'journey' })];
     const changed =
-      first || toSettings || toJourney || next.revision !== state?.revision || error !== undefined;
+      first ||
+      toSettings ||
+      toJourney ||
+      next.revision !== state?.revision ||
+      error !== undefined ||
+      drawnIn !== language();
+    drawnIn = language();
     state = next;
     error = undefined;
     if (changed) render(first);

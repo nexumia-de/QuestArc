@@ -132,6 +132,38 @@
       "walk-after-lunch.walk-20.arrival": "A longer round, resting on all the short ones before it.",
       "walk-after-lunch.walk-20.nugget": "You could plan for rain or a full day: \"If the long round does not fit today, then I will step outside and walk for 5 minutes.\"",
       "walk-after-lunch.ending": "You walk after lunch now, in most kinds of weather. What you built stands, and the round is yours to keep or to change."
+    },
+    "de": {
+      "walk-after-lunch.title": "Ein Spaziergang nach dem Mittagessen",
+      "walk-after-lunch.description": "Von einem Schritt vor die Tür nach dem Mittagessen zu einem täglichen Spaziergang, der jedes Mal um ein paar Minuten wächst.",
+      "walk-after-lunch.why": "Warum möchtest du dich mitten am Tag mehr bewegen? In deinen eigenen Worten.",
+      "walk-after-lunch.anchor": "dem Mittagessen",
+      "walk-after-lunch.moment": "einem Moment um die Mittagszeit",
+      "walk-after-lunch.build.v1": "Eine Reihe Trittsteine",
+      "walk-after-lunch.build.v2": "Ein Baumstamm zum Balancieren",
+      "walk-after-lunch.build.v3": "Eine Bretterbrücke für kurze Runden",
+      "walk-after-lunch.build.v4": "Eine Steinbrücke zum Schlendern",
+      "walk-after-lunch.build.v5": "Eine überdachte Brücke für jedes Wetter",
+      "walk-after-lunch.door.action": "vor die Tür treten und ein paar Atemzüge frische Luft nehmen",
+      "walk-after-lunch.door.action.plan": "trete ich vor die Tür und nehme ein paar Atemzüge frische Luft",
+      "walk-after-lunch.door.arrival": "Es beginnt mit einer offenen Tür und einem Moment frischer Luft. Das erste Stück steht.",
+      "walk-after-lunch.door.accept": "Vor die Tür zu treten gehört jetzt zu deinem Mittag. Du könntest einen kurzen Spaziergang anhängen: fünf Minuten, hin und zurück.",
+      "walk-after-lunch.door.nugget": "Du könntest Schuhe oder Jacke in der Nähe deines Essplatzes lassen, dann ist Rausgehen das Naheliegende.",
+      "walk-after-lunch.walk-5.action": "5 Minuten spazieren gehen, hin und zurück",
+      "walk-after-lunch.walk-5.action.plan": "gehe ich 5 Minuten spazieren, hin und zurück",
+      "walk-after-lunch.walk-5.arrival": "Fünf Minuten auf den Beinen, und was du begonnen hast, ist ein wenig gewachsen.",
+      "walk-after-lunch.walk-5.accept": "Fünf Minuten fallen dir jetzt leicht. Du könntest ein Stück weiter gehen: zusammen zehn Minuten.",
+      "walk-after-lunch.walk-5.nugget": "Ein Tag ohne Spaziergang ändert nichts. Worauf es ankommt: beim nächsten Mal wieder vor die Tür treten.",
+      "walk-after-lunch.walk-10.action": "10 Minuten in gemütlichem Tempo spazieren gehen",
+      "walk-after-lunch.walk-10.action.plan": "gehe ich 10 Minuten in gemütlichem Tempo spazieren",
+      "walk-after-lunch.walk-10.arrival": "Zehn Minuten passen jetzt in deine Pause. Was du baust, wird mit jedem Mal stabiler.",
+      "walk-after-lunch.walk-10.accept": "Zehn Minuten gehören dir. Wenn du magst, könntest du eine längere Runde daraus machen.",
+      "walk-after-lunch.walk-10.nugget": "Kurz nach dem Essen ist ein guter Moment: In kleinen Studien glich ein Spaziergang nach einer Mahlzeit den Blutzucker stärker aus als einer davor. Du könntest wenige Minuten nach dem letzten Bissen losgehen.",
+      "walk-after-lunch.walk-20.action": "20 Minuten spazieren gehen, eine Runde, die ich mag",
+      "walk-after-lunch.walk-20.action.plan": "gehe ich 20 Minuten spazieren, eine Runde, die ich mag",
+      "walk-after-lunch.walk-20.arrival": "Eine längere Runde, die auf all den kurzen davor ruht.",
+      "walk-after-lunch.walk-20.nugget": "Du könntest für Regen oder einen vollen Tag vorplanen: „Wenn die lange Runde heute nicht passt, dann trete ich vor die Tür und gehe 5 Minuten.“",
+      "walk-after-lunch.ending": "Du gehst jetzt nach dem Mittagessen spazieren, bei fast jedem Wetter. Was du gebaut hast, steht, und die Runde gehört dir: Du kannst sie behalten oder ändern."
     }
   }
 }

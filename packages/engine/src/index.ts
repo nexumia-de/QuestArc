@@ -77,8 +77,17 @@ export {
 } from './host-data';
 export type { HostInput, HostRepeatCfg, HostTask, Records, SnapshotInput } from './host-data';
 export { diff } from './diff';
+export {
+  FALLBACK_LANGUAGE,
+  pickLanguage,
+  PLAN_FORM,
+  textsFor,
+  textsIn,
+  translationProblems,
+} from './texts';
+export type { TextTable, TextTables } from './texts';
 export { journeyErrors, isJourney } from './validate';
-export { journeyProblems, TEXT_LIMITS } from './content-check';
+export { journeyProblems, languageProblems, TEXT_LIMITS } from './content-check';
 export type { Problem } from './content-check';
 export { isScheduled, isSupported } from './schedule';
 export { LADDERS, markerFits, resolveBuild } from './ladders';

@@ -1,3 +1,4 @@
+import { language } from '@questarc/plugin/src/shared/texts';
 import { h } from '@questarc/plugin/src/ui/dom';
 
 import type { StoredTask } from '../store/dataset';
@@ -53,11 +54,14 @@ const row = (task: StoredTask, props: TodayProps): Node =>
   );
 
 export const renderToday = (root: HTMLElement, props: TodayProps): void => {
-  const date = new Date(`${props.today}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
+  const date = new Date(`${props.today}T12:00:00`).toLocaleDateString(
+    language() === 'de' ? 'de-DE' : undefined,
+    {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    },
+  );
   root.replaceChildren(
     h('header', { class: 'qa-header app-header' }, h('h1', { class: 'qa-title' }, at('tab.today'))),
     h(

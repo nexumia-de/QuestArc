@@ -40,9 +40,29 @@ the journey is in [journey design](journey-design.md).
   names the habit the same way ("… after my first coffee", "… at
   21:30"). A moment is named as "After getting up" or "At 21:30"
   (`ui.anchor.after`, `ui.anchor.at`), or by the name the user gave it.
-  To the user an anchor is a **moment**; German follows with #39 and
-  uses "Moment" ("Ein neuer Moment", "Diesen Moment erweitern"), with
-  the routine completing "Nach …" as it completes "After …" here.
+  To the user an anchor is a **moment**; German says "Moment" ("Ein
+  neuer Moment", "Diesen Moment erweitern"), and the routine completes
+  "Nach …" as it completes "After …" here, so a German user writes the
+  dative ("dem Mittagessen").
+- **Language** (#39). The hosts show English or German: the plugin
+  follows Super Productivity's language (read at start with
+  `getCurrentLanguage`, then on every `languageChange`), the standalone
+  app the device's language or `?lang=`, Pensum its locale (through the
+  engine's command line, `texts`). Any other language, and any key a
+  language lacks, shows English. A change of language redraws the open
+  screen in place. German texts say "du", never "Sie"; they are written,
+  not translated word for word, and follow the same rules as English:
+  "du könntest", "wenn du magst", never "du musst", "du solltest" or
+  "nicht vergessen"; a miss is "eine Lücke" or "ein Tag Pause"; the
+  fallback is "der kleinere Schritt". German buttons and titles follow
+  German spelling ("Noch eine Weile bleiben"), not English header
+  capitalisation. The German plan sentence puts the verb second ("Nach
+  dem Mittagessen gehe ich 15 Minuten spazieren, mit meinem Podcast."),
+  so each German action has its plan form ([story
+  format](story-format.md), texts); a fixed time reads "Um 21:30 Uhr …",
+  a chain "Nach „ein Glas Wasser trinken“ …". The pairing is the user's
+  text as stored, so the German hint asks for the dative ("meinem
+  Podcast").
 - There is one look and no mode: no XP, no levels, no guardians and no
   game words (#110). Every journey shows what it builds.
 - Texts are autonomy-supportive ("you could"), never controlling or

@@ -3,8 +3,9 @@
 // the view holds only what it needs before plugin.js answers.
 // - `virtual:questarc-style`: src/ui/style.css without whitespace, as a
 //   text for plugin.js, which sends it to the view (`questarc:content`).
-// - `virtual:questarc-start-texts`: the few texts of content/i18n/en.json
-//   the view shows before that answer, so they exist in one place only.
+// - `virtual:questarc-start-texts`: the few texts of content/i18n the
+//   view shows before that answer, in every language ({ en, de }), so
+//   they exist in one place only.
 // For esbuild (build.mjs, preview.mjs) and Vitest (vitest.config.ts);
 // typed in src/virtual-content.d.ts.
 import { readFileSync } from 'node:fs';
@@ -12,7 +13,10 @@ import { join } from 'node:path';
 import { transform } from 'esbuild';
 
 const stylePath = join(import.meta.dirname, 'src', 'ui', 'style.css');
-const textsPath = join(import.meta.dirname, '..', '..', 'content', 'i18n', 'en.json');
+const i18n = join(import.meta.dirname, '..', '..', 'content', 'i18n');
+/** The languages of the view's start state (issue #39). */
+export const START_LANGUAGES = ['en', 'de'];
+const textsPath = (language) => join(i18n, `${language}.json`);
 
 /** The texts the view shows while it has no answer from plugin.js (src/ui/load-error.ts). */
 export const START_TEXT_KEYS = [
@@ -34,15 +38,18 @@ const modules = {
     },
   },
   'virtual:questarc-start-texts': {
-    file: textsPath,
-    source: async () => {
-      const texts = JSON.parse(readFileSync(textsPath, 'utf8'));
-      const missing = START_TEXT_KEYS.filter((key) => typeof texts[key] !== 'string');
-      if (missing.length > 0) throw new Error(`en.json lacks ${missing.join(', ')}`);
-      return `export default ${JSON.stringify(
-        Object.fromEntries(START_TEXT_KEYS.map((key) => [key, texts[key]])),
-      )};`;
-    },
+    file: textsPath('en'),
+    source: async () =>
+      `export default ${JSON.stringify(
+        Object.fromEntries(
+          START_LANGUAGES.map((language) => {
+            const texts = JSON.parse(readFileSync(textsPath(language), 'utf8'));
+            const missing = START_TEXT_KEYS.filter((key) => typeof texts[key] !== 'string');
+            if (missing.length > 0) throw new Error(`${language}.json lacks ${missing.join(', ')}`);
+            return [language, Object.fromEntries(START_TEXT_KEYS.map((key) => [key, texts[key]]))];
+          }),
+        ),
+      )};`,
   },
 };
 
@@ -56,7 +63,10 @@ export const esbuildViewContent = {
     build.onLoad({ filter: /.*/, namespace: 'questarc-view-content' }, async ({ path }) => ({
       contents: await modules[path].source(),
       loader: 'js',
-      watchFiles: [modules[path].file],
+      watchFiles:
+        path === 'virtual:questarc-start-texts'
+          ? START_LANGUAGES.map(textsPath)
+          : [modules[path].file],
     }));
   },
 };

@@ -1,24 +1,27 @@
-/** Dates for the journey view, in English until German follows (#39). */
+import { language } from '../../shared/texts';
 
-const LOCALE = 'en-GB';
+/** Dates for the journey view, written as the language of the texts writes them (#39). */
+
+const LOCALES: Readonly<Record<string, string>> = { en: 'en-GB', de: 'de-DE' };
+const locale = (): string => LOCALES[language()] ?? 'en-GB';
 
 const atNoon = (day: string): Date => new Date(`${day}T12:00:00Z`);
 
-/** "9 Nov" */
+/** "9 Nov", "9. Nov." */
 export const shortDate = (day: string): string =>
-  new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(
+  new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(
     atNoon(day),
   );
 
 /** "Mo" */
 export const weekdayLetters = (day: string): string =>
-  new Intl.DateTimeFormat(LOCALE, { weekday: 'short', timeZone: 'UTC' })
+  new Intl.DateTimeFormat(locale(), { weekday: 'short', timeZone: 'UTC' })
     .format(atNoon(day))
     .slice(0, 2);
 
 /** "Monday" */
 export const weekdayName = (day: string): string =>
-  new Intl.DateTimeFormat(LOCALE, { weekday: 'long', timeZone: 'UTC' }).format(atNoon(day));
+  new Intl.DateTimeFormat(locale(), { weekday: 'long', timeZone: 'UTC' }).format(atNoon(day));
 
 /** A known week (Monday 2 November 2026) to name weekdays by their short id. */
 const WEEK: Record<string, string> = {

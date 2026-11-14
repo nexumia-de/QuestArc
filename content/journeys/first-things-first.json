@@ -149,6 +149,38 @@
       "first-things-first.look-back.arrival": "What you built stands firm, and you can see how far your work has come.",
       "first-things-first.look-back.nugget": "Small steps forward are easy to forget. Your one line keeps them in view, also on slow days.",
       "first-things-first.ending": "Your workday starts with what matters now: a look back, one task and a quiet stretch of focus."
+    },
+    "de": {
+      "first-things-first.title": "Das Wichtigste zuerst",
+      "first-things-first.description": "Von einer Aufgabe auf einem Zettel zu einem konzentrierten Start in deinen Arbeitstag, ein kleiner Schritt nach dem anderen.",
+      "first-things-first.why": "Warum möchtest du deinen Arbeitstag so beginnen? In deinen eigenen Worten.",
+      "first-things-first.anchor": "dem Hinsetzen am Schreibtisch",
+      "first-things-first.moment": "dem Moment, in dem deine Arbeit beginnt",
+      "first-things-first.one-thing.action": "die eine Aufgabe aufschreiben, die heute am meisten zählt",
+      "first-things-first.one-thing.action.plan": "schreibe ich die eine Aufgabe auf, die heute am meisten zählt",
+      "first-things-first.one-thing.arrival": "Es beginnt an deinem Schreibtisch, mit einer Aufgabe auf einem Zettel.",
+      "first-things-first.one-thing.accept": "Deine eine Aufgabe steht jetzt jeden Morgen da. Du könntest ihr fünfzehn ruhige Minuten geben.",
+      "first-things-first.one-thing.nugget": "Du könntest Stift und Klebezettel dort bereitlegen, wo du dich hinsetzt, dann ist der erste Schritt schon in Reichweite.",
+      "first-things-first.focus-15.action": "meine eine Aufgabe aufschreiben und ihr 15 ruhige Minuten geben, Benachrichtigungen aus",
+      "first-things-first.focus-15.action.plan": "schreibe ich meine eine Aufgabe auf und gebe ihr 15 ruhige Minuten, Benachrichtigungen aus",
+      "first-things-first.focus-15.arrival": "Der Lärm des Tages wird ein wenig leiser, während du arbeitest.",
+      "first-things-first.focus-15.accept": "Fünfzehn Minuten fallen dir jetzt leicht. Du könntest deiner einen Aufgabe mehr Zeit am Stück geben.",
+      "first-things-first.focus-15.nugget": "Ein Arbeitstag Pause ist in Ordnung. Worauf es ankommt: beim nächsten Mal zu deiner einen Aufgabe zurückkommen.",
+      "first-things-first.focus-45.action": "meine eine Aufgabe aufschreiben und ihr 45 ruhige Minuten geben, Benachrichtigungen aus",
+      "first-things-first.focus-45.action.plan": "schreibe ich meine eine Aufgabe auf und gebe ihr 45 ruhige Minuten, Benachrichtigungen aus",
+      "first-things-first.focus-45.arrival": "Mehr ruhige Zeit am Stück, gebaut auf den Minuten, die du schon hast.",
+      "first-things-first.focus-45.accept": "Die Benachrichtigungen können jetzt warten. Du könntest auch E-Mail und Chat ihre eigene Zeit geben.",
+      "first-things-first.focus-45.nugget": "Wenn dir beim Konzentrieren etwas anderes einfällt, könntest du es auf eine Merkliste schreiben und zu deiner Aufgabe zurückkehren.",
+      "first-things-first.focus-mail.action": "meine eine Aufgabe aufschreiben, ihr 45 ruhige Minuten geben, dann E-Mail und Chat in einem Block ansehen",
+      "first-things-first.focus-mail.action.plan": "schreibe ich meine eine Aufgabe auf, gebe ihr 45 ruhige Minuten und sehe dann E-Mail und Chat in einem Block an",
+      "first-things-first.focus-mail.arrival": "Nachrichten bekommen ihre eigene Zeit, so bleibt deine ruhige Zeit ungestört.",
+      "first-things-first.focus-mail.accept": "Nachrichten haben ihren Platz in deinem Tag. Du könntest vor dem Start noch einen kurzen Blick zurück werfen.",
+      "first-things-first.focus-mail.nugget": "Du könntest für einen Tag voller Besprechungen vorplanen: „Wenn eine Besprechung meine Fokuszeit braucht, dann mache ich nur den ersten Schritt meiner einen Aufgabe.“",
+      "first-things-first.look-back.action": "notieren, was gestern vorangekommen ist, meine eine Aufgabe aufschreiben und ihr 45 ruhige Minuten geben",
+      "first-things-first.look-back.action.plan": "notiere ich, was gestern vorangekommen ist, schreibe meine eine Aufgabe auf und gebe ihr 45 ruhige Minuten",
+      "first-things-first.look-back.arrival": "Was du gebaut hast, steht fest, und du siehst, wie weit deine Arbeit gekommen ist.",
+      "first-things-first.look-back.nugget": "Kleine Fortschritte geraten leicht aus dem Blick. Deine eine Zeile hält sie sichtbar, auch an zähen Tagen.",
+      "first-things-first.ending": "Dein Arbeitstag beginnt jetzt mit dem, was zählt: ein Blick zurück, eine Aufgabe und ruhige, konzentrierte Zeit."
     }
   }
 }

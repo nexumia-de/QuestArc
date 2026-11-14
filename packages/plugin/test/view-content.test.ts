@@ -1,13 +1,14 @@
 import startTexts from 'virtual:questarc-start-texts';
 import { describe, expect, it } from 'vitest';
 
+import german from '../../../content/i18n/de.json';
 import english from '../../../content/i18n/en.json';
 import { artPack } from '../src/adapter/art-pack';
 import { contentPack } from '../src/adapter/content-pack';
 import { createBrain } from '../src/adapter/brain';
 import { handleMessage } from '../src/adapter/messages';
 import { builtInJourneys } from '../src/shared/content';
-import { hasText, t } from '../src/shared/texts';
+import { hasText, language, t } from '../src/shared/texts';
 import { applyContent } from '../src/ui/content';
 import { art } from '../src/ui/art-store';
 import { createFakeHost } from './fake-host';
@@ -23,31 +24,40 @@ describe('the content for the view (#102)', () => {
     });
     const pack = await handleMessage(brain, { type: 'questarc:content' });
     brain.stop();
-    expect(pack).toBe(contentPack);
-    expect(contentPack.texts).toEqual(english);
-    expect(contentPack.style).toContain('.qa-header{');
-    expect(contentPack.style).not.toMatch(/\n\s/);
-    expect(contentPack.art).toBe(artPack);
+    expect(pack).toEqual(contentPack());
+    expect(contentPack().language).toBe('en');
+    expect(contentPack().texts).toEqual(english);
+    expect(contentPack().style).toContain('.qa-header{');
+    expect(contentPack().style).not.toMatch(/\n\s/);
+    // the titles of content/art are the English texts
+    expect(contentPack().art).toEqual(artPack);
     expect(Object.keys(artPack.ladders).sort()).toEqual(['crossing', 'home']);
     expect(artPack.pictures['build-home-3']).toContain('<svg');
     expect(artPack.pictures['keepsake-first-step']).toBeUndefined();
   });
 
-  it('keeps the texts of the start state in the view, taken from en.json', () => {
-    const all: Record<string, string> = english;
-    expect(Object.keys(startTexts).sort()).toEqual([
-      'ui.error.details',
-      'ui.error.failed',
-      'ui.error.not-running',
-      'ui.error.starting',
-    ]);
-    for (const [key, text] of Object.entries(startTexts)) expect(text).toBe(all[key]);
+  it('keeps the texts of the start state in the view, taken from content/i18n', () => {
+    const all: Record<string, Record<string, string>> = { en: english, de: german };
+    expect(Object.keys(startTexts).sort()).toEqual(['de', 'en']);
+    for (const [language, texts] of Object.entries(startTexts)) {
+      expect(Object.keys(texts).sort()).toEqual([
+        'ui.error.details',
+        'ui.error.failed',
+        'ui.error.not-running',
+        'ui.error.starting',
+      ]);
+      for (const [key, text] of Object.entries(texts)) expect(text).toBe(all[language]?.[key]);
+    }
   });
 
   it('is taken in by the view: texts, pictures and one style element', () => {
     const added: { textContent: string }[] = [];
     const doc = {
-      createElement: () => ({ textContent: '' }),
+      documentElement: { lang: 'en' },
+      createElement: () => {
+        const el = { textContent: '', remove: () => added.splice(added.indexOf(el), 1) };
+        return el;
+      },
       head: { append: (el: { textContent: string }) => added.push(el) },
     } as unknown as Document;
     applyContent(
@@ -58,5 +68,17 @@ describe('the content for the view (#102)', () => {
     expect(t('ui.test.only-here')).toBe('Sent by plugin.js');
     expect(art()).toBe(artPack);
     expect(added.map((el) => el.textContent)).toEqual(['p{}']);
+    expect(language()).toBe('en');
+
+    // Again in another language (#39): the texts and the style are replaced.
+    applyContent(
+      { language: 'de', texts: { 'ui.test.de': 'Von plugin.js' }, style: 'q{}', art: artPack },
+      doc,
+    );
+    expect(language()).toBe('de');
+    expect(doc.documentElement.lang).toBe('de');
+    expect(hasText('ui.test.only-here')).toBe(false);
+    expect(t('ui.test.de')).toBe('Von plugin.js');
+    expect(added.map((el) => el.textContent)).toEqual(['q{}']);
   });
 });

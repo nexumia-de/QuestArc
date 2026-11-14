@@ -23,6 +23,11 @@ export interface State {
   readonly openSettings?: boolean;
   /** Once, after the action Show of a message: the journey, on top of the home (#96). */
   readonly openJourney?: boolean;
+  /**
+   * The language plugin.js holds its texts in (#39). When it is not the
+   * one of the view's content, the view asks for the content again.
+   */
+  readonly language?: string;
 }
 
 /** The ladders' pictures for the view (#100), part of the content pack. */
@@ -41,7 +46,9 @@ export interface ArtPack {
  * (docs/decisions/one-build-for-older-versions.md).
  */
 export interface ContentPack {
-  /** The UI and event texts of content/i18n, by key. */
+  /** The language of the texts: "en" or "de" (#39); English when left out. */
+  readonly language?: string;
+  /** The UI and event texts of content/i18n in that language, by key. */
   readonly texts: Readonly<Record<string, string>>;
   /** The view's style sheet (src/ui/style.css). */
   readonly style: string;

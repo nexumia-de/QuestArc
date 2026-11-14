@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { journeyProblems } from '../src/content-check';
+import { journeyProblems, languageProblems } from '../src/content-check';
 
 // The journey checker on a small journey that passes, and on one broken
 // copy per rule (docs/authoring-journeys.md, what CI checks).
@@ -136,6 +136,80 @@ describe('journey checker', () => {
     ['a quote', '"Tea is the cure for everything." — Someone Famous', 'rule 5'],
   ])('rejects %s', (_name, text, rule) => {
     expect(errors((j) => (en(j)['tea.cup.nugget'] = text))[0]?.message).toContain(rule);
+  });
+
+  // German word lists (issue #39): the same rules in the German texts.
+  const de = (j: Draft) => j.texts.de as Record<string, string>;
+
+  it.each([
+    ['a day count', 'Die meisten brauchen dafür 21 Tage.', 'rule 4'],
+    ['a day count in words', 'Nach einundzwanzig Tagen sitzt es.', 'rule 4'],
+    ['"du musst"', 'Du musst ihn heiß trinken.', 'rule 15'],
+    ['"du solltest"', 'Du solltest den Kessel bereitstellen.', 'rule 15'],
+    ['"nicht vergessen"', 'Nicht vergessen: der Kessel.', 'rule 15'],
+    ['"verpasst"', 'Wenn du gestern verpasst hast, fang neu an.', 'rules 12'],
+    ['"versäumt"', 'Ein versäumter Tag ist nicht schlimm.', 'rules 12'],
+    ['"Fehler"', 'Ein Fehler ist kein Beinbruch.', 'rules 12'],
+    ['"Rückfall"', 'Nach einem Rückfall geht es weiter.', 'rules 12'],
+    ['"zurückstufen"', 'Du könntest dich zurückstufen.', 'rules 12'],
+    ['streaks', 'Halte deine Strähne am Leben.', 'rule 11'],
+    ['a quote', '„Tee ist die Antwort auf fast alles.“ – Irgendwer Berühmtes', 'rule 5'],
+  ])('rejects %s in German', (_name, text, rule) => {
+    const found = errors((j) => (de(j)['tea.cup.nugget'] = text));
+    expect(found).toHaveLength(1);
+    expect(found[0]?.message).toContain(rule);
+    expect(found[0]?.message).toContain('de text');
+  });
+
+  it('accepts the German words the design rules ask for', () => {
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.nugget'] =
+          'Ein Tag Pause ist in Ordnung: eine Lücke, mehr nicht. Der kleinere Schritt zählt trotzdem.';
+        de(j)['tea.pot.nugget'] =
+          'Wenn du magst, könntest du für später vorplanen: „Wenn es spät wird, dann koche ich eine Tasse.“ Die Muße bleibt.';
+      }),
+    ).toEqual([]);
+  });
+
+  it('checks each language with its own list only', () => {
+    expect(errors((j) => (de(j)['tea.cup.nugget'] = 'You must drink it hot.'))).toEqual([]);
+    expect(errors((j) => (en(j)['tea.cup.nugget'] = 'Du musst ihn heiß trinken.'))).toEqual([]);
+  });
+
+  it('wants the German action in the form of the plan sentence too', () => {
+    const found = errors((j) => (de(j)['tea.cup.action'] = 'eine Tasse Tee kochen'));
+    expect(found.map((p) => p.at)).toEqual(['stages[0].plan.action.plan']);
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'koche ich eine Tasse Tee';
+      }),
+    ).toEqual([]);
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'du musst eine Tasse Tee kochen';
+      })[0]?.message,
+    ).toContain('rule 15');
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'x'.repeat(121);
+      })[0]?.message,
+    ).toContain('120');
+  });
+
+  it('says what a built-in journey lacks in a language', () => {
+    const journey = good() as Draft;
+    expect(languageProblems(journey as never, ['en'])).toEqual([]);
+    expect(languageProblems(journey as never, ['de']).map((p) => p.message)).toContain(
+      'no de text for "tea.why"',
+    );
+    expect(languageProblems(journey as never, ['de'])).toHaveLength(9);
+    expect(languageProblems(journey as never, ['fr'])).toEqual([
+      { level: 'error', at: 'texts.fr', message: 'no fr texts' },
+    ]);
   });
 
   it('rejects the same nugget twice', () => {

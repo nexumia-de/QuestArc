@@ -119,7 +119,12 @@ npm run screenshots -w @questarc/plugin
 
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
-horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
+horizontal overflow, text cut off in its box and buttons, links and
+fields smaller than 44 px. The third argument is the language Super
+Productivity would report (#39): `node screenshots.mjs journey,habit 1 de`
+writes `…-de.png` in German, and the preview takes `?lang=de` (or
+`de-AT`; anything else is English). Routes then name German buttons
+(`welcome:Reise auswählen`, `graduated:Menü>Regal`). Demos (`preview/demo.ts`): `welcome`, `empty`,
 `journey`, `reminder` (a reminder on the task and two weekly answers
 of 5 or more, #60), `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
 (the card after a long break, #82), `smaller` (after starting smaller),
@@ -272,7 +277,9 @@ writes `packages/app/dist/app/`: static files for any web server
 (`index.html`, `app.js`, `app.css`, the web manifest, the icon and the
 service worker `sw.js`, which keeps them and answers every request from
 its cache). It needs `http://localhost` or HTTPS; opened from a file it
-has no service worker.
+has no service worker. It shows German for a German device language
+(`navigator.language`) and English for any other; `?lang=de` sets it by
+hand, as a host that embeds it with its own locale would (#39).
 
 ```sh
 npm run e2e -w @questarc/app
@@ -404,6 +411,12 @@ flatpak --user install -y flathub org.gnome.Platform//51
 R=$(flatpak --user info --show-location org.gnome.Platform//51)/files
 bwrap --ro-bind "$R" /usr --symlink usr/lib /lib --symlink usr/lib64 /lib64 --symlink usr/bin /bin --ro-bind "$R/etc" /etc --proc /proc --dev /dev --bind "$PWD" "$PWD" --chdir "$PWD" gjs -m packages/engine/dist/engine-cli.mjs < snapshot.json
 ```
+
+The command line also answers `{ "texts": { "locale": "de_DE.UTF-8",
+"ui": { "en": …, "de": … }, "journeys": [ … ] } }` with `{ "language",
+"texts" }`: the texts of `content/i18n/` and the journeys in the
+locale's language, English behind every missing key, so Pensum shows
+the language of its own locale without a table of its own (#39).
 
 On a normal desktop or the phone, `flatpak run --command=gjs
 --filesystem=host org.gnome.Platform//51 -m …` does the same. Results:

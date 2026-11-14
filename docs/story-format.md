@@ -111,7 +111,22 @@ chosen ladder, so a host compares it with `build.ladder`).
 - The journey's `texts` holds one block per language (`en`, `de`,
   `pt-BR`, …). English is required and has a text for every key; other
   languages fall back to English key by key and may only use keys of
-  the journey.
+  the journey. Built-in journeys have every text in every language of
+  `content/i18n/` (now English and German, #39); a private journey may
+  have English only.
+- The hosts show one language: the one of `content/i18n/` that matches
+  the host's (Super Productivity's language, Pensum's locale), English
+  for any other and behind every missing key (`textsIn`,
+  `pickLanguage` in `packages/engine/src/texts.ts`;
+  [behaviour](behaviour.md), language).
+- **German plan form.** German names a step "15 Minuten spazieren
+  gehen" but plans "Nach dem Mittagessen gehe ich 15 Minuten
+  spazieren", so every action has a second German text under
+  `<action key>.plan` (`walk-after-lunch.walk-5.action.plan`: "gehe
+  ich 5 Minuten spazieren, hin und zurück"); the checker requires it
+  for German. German anchors and moments are written in the dative
+  after "nach"/"von": anchor "dem Mittagessen", moment "einem Moment
+  um die Mittagszeit".
 - Anchors and actions are written to fit the plan sentence: anchor
   "lunch", action "walk for 5 minutes". The user's own anchor takes
   the anchor's place: their words ("After my noon break, …"), a fixed
@@ -137,11 +152,12 @@ private journeys (#40) runs the same function.
 | Level   | Check                                                                                                                | Rule       |
 | ------- | -------------------------------------------------------------------------------------------------------------------- | ---------- |
 | error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist              | —          |
+| error   | a built-in journey without a text in a language of `content/i18n/`; a German action without its `.plan` form         | —          |
 | error   | text lengths above                                                                                                   | —          |
 | error   | a number of days ("21 days")                                                                                         | 4          |
 | error   | quotes with an author                                                                                                | 5          |
-| error   | controlling words (must, have to, you should, no excuses)                                                            | 15         |
-| error   | blame (fail…, lazy, guilt, break the chain) and streaks                                                              | 11, 12, 15 |
+| error   | controlling words (must, have to, you should, no excuses; German: müssen, du solltest, nicht vergessen)              | 15         |
+| error   | blame (fail…, lazy, guilt, break the chain; German: verpasst, versäumt, Fehler, Rückfall, zurückstufen) and streaks  | 11, 12, 15 |
 | error   | the same nugget twice                                                                                                | 22         |
 | warning | a `days` condition without room for one miss, or looking back more than 14 days                                      | 1, 11      |
 | warning | a stage without a nugget, a journey without `why`; English texts no key uses                                         | 5, 22      |

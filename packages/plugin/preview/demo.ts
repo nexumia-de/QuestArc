@@ -4,6 +4,7 @@ import { isoWeek } from '@questarc/engine';
 
 import { habitDemo, isHabitScenario, type HabitScenario } from './demo-habits';
 import { isMomentScenario, momentsDemo, type MomentScenario } from './demo-moments';
+import { own } from './demo-words';
 
 /**
  * Demo datasets for the preview and screenshots (never real tasks). Days
@@ -92,10 +93,10 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     journeyId: 'gentle-morning',
     journeyVersion: 1,
     startDay: start,
-    ...(long ? { why: 'I want my mornings to start calmly.' } : {}),
+    ...(long ? { why: own('I want my mornings to start calmly.') } : {}),
   });
   if (scenario !== 'before-anchors') {
-    record('anchor:morning', { kind: 'routine', words: 'getting up' });
+    record('anchor:morning', { kind: 'routine', words: own('getting up') });
     record('run-anchor:demo', { anchorId: 'morning' });
   }
   if (scenario === 'empty') {
@@ -118,14 +119,14 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     // Recurring tasks the user already has: one a journey can follow, one not.
     repeatCfgs.stretch = {
       id: 'stretch',
-      title: 'Morning stretch',
+      title: own('Morning stretch'),
       isPaused: false,
       repeatCycle: 'DAILY',
       repeatEvery: 1,
     };
     repeatCfgs.bills = {
       id: 'bills',
-      title: 'Pay the bills',
+      title: own('Pay the bills'),
       isPaused: false,
       repeatCycle: 'MONTHLY',
       repeatEvery: 1,
@@ -135,7 +136,7 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
 
   repeatCfgs.demo = {
     id: 'demo',
-    title: 'Morning routine',
+    title: own('Morning routine'),
     isPaused: false,
     repeatCycle: 'DAILY',
     repeatEvery: 1,
@@ -164,18 +165,18 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
       timeSpentOnDay: {},
     } as Partial<Task> & { id: string };
   };
-  for (const offset of doneOffsets) done('demo', 'Morning routine', offset);
+  for (const offset of doneOffsets) done('demo', own('Morning routine'), offset);
   if (long) {
     // The first stage's task still repeats, so starting smaller can use it.
     repeatCfgs.water = {
       id: 'water',
-      title: 'Glass of water',
+      title: own('Glass of water'),
       isPaused: false,
       repeatCycle: 'DAILY',
       repeatEvery: 1,
       startDate: start,
     };
-    done('water', 'Glass of water', since + 1);
+    done('water', own('Glass of water'), since + 1);
     record('binding:demo:water', {
       taskId: `rpt_water_${day(since + 1)}`,
       repeatCfgId: 'water',
@@ -184,7 +185,7 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   }
   if (scenario === 'smaller') {
     record(`step-back:demo:${stage}:${day(3)}`, { dataFormat: 4 });
-    for (const offset of [3, 2, 1]) done('water', 'Glass of water', offset);
+    for (const offset of [3, 2, 1]) done('water', own('Glass of water'), offset);
   }
   record(`binding:demo:${stage}`, {
     taskId: `rpt_demo_${day(since)}`,
@@ -196,12 +197,12 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     record(`checkin:demo:${stage}:${isoWeek(day(7))}`, { score: 5 });
     record(`checkin:demo:${stage}:${isoWeek(today)}`, { score: 6 });
   }
-  if (scenario === 'paired') record(`pair:demo:${stage}`, { text: 'my morning playlist' });
+  if (scenario === 'paired') record(`pair:demo:${stage}`, { text: own('my morning playlist') });
   if (scenario === 'hard-week')
     record('plan-check:demo', {
-      wish: 'A calm start into the day',
-      obstacle: 'Reaching for the phone first',
-      plan: 'If I reach for the phone, then I will put it down and fill the glass',
+      wish: own('A calm start into the day'),
+      obstacle: own('Reaching for the phone first'),
+      plan: own('If I reach for the phone, then I will put it down and fill the glass'),
     });
   if (scenario === 'stayed') record(`stay:demo:${stage}`, { day: day(1) });
   if (scenario === 'build-crossing')

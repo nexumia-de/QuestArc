@@ -102,6 +102,30 @@
       "example-walking.walk-15.accept": "The longer round is yours now.",
       "example-walking.walk-15.nugget": "On a hard day, you could go back to 5 minutes. It still counts as showing up.",
       "example-walking.ending": "You walk after lunch now. It is part of your day."
+    },
+    "de": {
+      "example-walking.title": "Wieder auf den Beinen",
+      "example-walking.description": "Vom Schuheanziehen nach dem Mittagessen zu einem täglichen Spaziergang, ein kleiner Schritt nach dem anderen.",
+      "example-walking.why": "Warum möchtest du mehr zu Fuß gehen? In deinen eigenen Worten.",
+      "example-walking.anchor": "dem Mittagessen",
+      "example-walking.moment": "einem Moment um die Mittagszeit",
+      "example-walking.shoes.action": "meine Schuhe für draußen anziehen",
+      "example-walking.shoes.action.plan": "ziehe ich meine Schuhe für draußen an",
+      "example-walking.shoes.place": "an der Tür",
+      "example-walking.shoes.arrival": "Es beginnt an deiner eigenen Haustür.",
+      "example-walking.shoes.accept": "Deine Schuhe warten. Als Nächstes könntest du mit ihnen eine kleine Runde gehen.",
+      "example-walking.shoes.nugget": "Klein genug für deinen schwersten Tag: Genau das lässt einen ersten Schritt bleiben.",
+      "example-walking.walk-5.action": "5 Minuten spazieren gehen",
+      "example-walking.walk-5.action.plan": "gehe ich 5 Minuten spazieren",
+      "example-walking.walk-5.arrival": "Die Straße vor dem Haus fühlt sich ein wenig vertrauter an.",
+      "example-walking.walk-5.accept": "Fünf Minuten fallen dir jetzt leicht. Du könntest eine längere Runde ausprobieren.",
+      "example-walking.walk-5.nugget": "Ein Tag Pause ist in Ordnung. Worauf es ankommt: beim nächsten Mal wieder dabei sein.",
+      "example-walking.walk-15.action": "15 Minuten spazieren gehen",
+      "example-walking.walk-15.action.plan": "gehe ich 15 Minuten spazieren",
+      "example-walking.walk-15.arrival": "Eine längere Runde, gebaut auf der kurzen, die du schon kennst.",
+      "example-walking.walk-15.accept": "Die längere Runde gehört jetzt dir.",
+      "example-walking.walk-15.nugget": "An einem schweren Tag könntest du zu 5 Minuten zurückgehen. Auch das zählt als Dabeisein.",
+      "example-walking.ending": "Du gehst jetzt nach dem Mittagessen spazieren. Es gehört zu deinem Tag."
     }
   }
 }

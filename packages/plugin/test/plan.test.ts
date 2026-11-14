@@ -1,7 +1,7 @@
 import type { Journey, RunAnchor, Stage } from '@questarc/engine';
 import { describe, expect, it } from 'vitest';
 
-import '../src/shared/english';
+import '../src/shared/languages';
 import { anchorLabel, planAnchor, planSentence } from '../src/shared/plan';
 import { addJourneyTexts } from '../src/shared/texts';
 import { habitName } from '../src/ui/habit';
