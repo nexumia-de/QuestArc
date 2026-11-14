@@ -179,7 +179,11 @@ try {
     }),
   );
   await page.locator('input[type=file]').setInputFiles(file);
-  await page.locator('.app-message:not([hidden])').waitFor();
+  // An earlier message may still be showing: wait for this one's text.
+  await page
+    .locator('.app-message:not([hidden])', { hasText: 'Backup imported.' })
+    .waitFor()
+    .catch(() => {});
   expect((await message()).startsWith('Backup imported.'), 'the export imports again');
   expect(
     JSON.stringify(await stored()) === JSON.stringify(backup.data),
