@@ -1,5 +1,44 @@
 import { describe, expect, it } from 'vitest';
-import { actions, answerCheckin, chooseBuild, endJourney, resumeJourney, withdraw } from '../src';
+import {
+  actions,
+  anchorRun,
+  answerCheckin,
+  answerStill,
+  bringBack,
+  checkPlan,
+  callItAPause,
+  carryOn,
+  chooseBuild,
+  confirmAnchor,
+  continueJourney,
+  endJourney,
+  evaluate,
+  graduate,
+  graduateLater,
+  nameAnchor,
+  pairStage,
+  reminderSeen,
+  removeAnchor,
+  resumeJourney,
+  skipStage,
+  startJourney,
+  stayHere,
+  stepBack,
+  undoSkip,
+  withdraw,
+} from '../src';
+import type { Journey, Snapshot } from '../src';
+import { loadVectors } from './vector-support';
+
+/** The active run and journey of a vector's input. */
+const fromVector = (file: string) => {
+  const vector = loadVectors().find((v) => v.file === file);
+  if (!vector || vector.kind === 'diff') throw new Error(file);
+  const snapshot = vector.input as Snapshot;
+  const run = evaluate(snapshot).active;
+  if (!run) throw new Error(file);
+  return { run, journey: snapshot.journeys[0] as Journey };
+};
 
 // The record-writing actions both hosts use (docs/data-model.md §2); the
 // plugin's tests check startJourney, bindStage and continueJourney with
@@ -7,17 +46,141 @@ import { actions, answerCheckin, chooseBuild, endJourney, resumeJourney, withdra
 describe('actions', () => {
   it('are callable by name for engine-cli.mjs', () => {
     expect(Object.keys(actions).sort()).toEqual([
+      'anchorRun',
       'answerCheckin',
+      'answerStill',
       'bindStage',
+      'bringBack',
+      'callItAPause',
+      'carryOn',
+      'checkPlan',
       'chooseBuild',
+      'confirmAnchor',
       'continueJourney',
       'endJourney',
+      'graduate',
+      'graduateLater',
+      'nameAnchor',
+      'pairStage',
       'pauseJourney',
+      'reminderSeen',
+      'removeAnchor',
       'repeatPause',
       'resumeJourney',
+      'skipStage',
       'startJourney',
+      'stayHere',
+      'stepBack',
+      'undoSkip',
       'withdraw',
     ]);
+  });
+
+  it("name an anchor in the user's words: a routine or a fixed time, one line, with its name", () => {
+    expect(
+      nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: '  getting   up. ' } }),
+    ).toEqual({ 'anchor:m1': { kind: 'routine', words: 'getting up' } });
+    expect(
+      nameAnchor({
+        anchorId: 'm2',
+        anchor: { kind: 'time', time: '21:00', words: 'ignored' },
+        name: ' Evening ',
+      }),
+    ).toEqual({ 'anchor:m2': { kind: 'time', time: '21:00', name: 'Evening' } });
+    expect(
+      nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: 'x'.repeat(50) } }),
+    ).toEqual({ 'anchor:m1': { kind: 'routine', words: 'x'.repeat(40) } });
+    // Without usable words or time nothing is written.
+    expect(nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: ' . ' } })).toEqual({});
+    expect(nameAnchor({ anchorId: 'm1', anchor: { kind: 'time', time: '9 pm' } })).toEqual({});
+  });
+
+  it('tie a run to an anchor, or to a step that stands there; starting a journey does the same', () => {
+    expect(anchorRun({ runId: 'r', anchorId: 'm1' })).toEqual({
+      'run-anchor:r': { anchorId: 'm1' },
+    });
+    expect(anchorRun({ runId: 'r', anchorId: 'm1', after: 'r0' })).toEqual({
+      'run-anchor:r': { anchorId: 'm1', after: 'r0' },
+    });
+    const journey = (loadVectors()[0] as { input: Snapshot }).input.journeys[0] as Journey;
+    const started = startJourney({
+      runId: 'r',
+      journey,
+      startDay: '2026-11-12',
+      anchor: { anchorId: 'm1', after: 'r0' },
+    });
+    expect(started['run-anchor:r']).toEqual({ anchorId: 'm1', after: 'r0' });
+    expect(Object.keys(startJourney({ runId: 'r', journey, startDay: '2026-11-12' }))).toEqual([
+      'run:r',
+      `stage:r:${journey.stages[0]?.id}`,
+    ]);
+  });
+
+  it('confirm the anchor of journeys from before anchors once, for every run of the journey', () => {
+    const vector = loadVectors().find((v) => v.file === 'anchor-before-anchors.json');
+    const view = evaluate((vector as { input: Snapshot }).input);
+    expect(
+      confirmAnchor(view, {
+        journeyId: 'test-daily',
+        anchorId: 'm1',
+        anchor: { kind: 'routine', words: 'getting up' },
+      }),
+    ).toEqual({
+      'anchor:m1': { kind: 'routine', words: 'getting up' },
+      'run-anchor:r2': { anchorId: 'm1' },
+      'run-anchor:r1': { anchorId: 'm1' },
+    });
+    // No such group, words that are none, or an anchor that does not exist: nothing.
+    expect(
+      confirmAnchor(view, {
+        journeyId: 'x',
+        anchorId: 'm1',
+        anchor: { kind: 'time', time: '07:00' },
+      }),
+    ).toEqual({});
+    expect(
+      confirmAnchor(view, { journeyId: 'test-daily', anchorId: 'm1', anchor: { kind: 'routine' } }),
+    ).toEqual({});
+    expect(confirmAnchor(view, { journeyId: 'test-daily', anchorId: 'm1' })).toEqual({});
+    // To an anchor the user already has: only the runs are tied.
+    const resting = loadVectors().find((v) => v.file === 'anchor-record-withdrawn.json');
+    expect(
+      confirmAnchor(evaluate((resting as { input: Snapshot }).input), {
+        journeyId: 'test-daily',
+        anchorId: 'm1',
+      }),
+    ).toEqual({ 'run-anchor:r2': { anchorId: 'm1' } });
+  });
+
+  it('remove an anchor only where nothing stands', () => {
+    const empty = loadVectors().find((v) => v.file === 'anchor-record-withdrawn.json');
+    expect(removeAnchor(evaluate((empty as { input: Snapshot }).input), 'm1')).toEqual({
+      'anchor:m1': '',
+    });
+    const used = loadVectors().find((v) => v.file === 'anchor-resting.json');
+    const view = evaluate((used as { input: Snapshot }).input);
+    expect(removeAnchor(view, 'm1')).toEqual({});
+    expect(removeAnchor(view, 'm2')).toEqual({});
+    expect(removeAnchor(view, 'm0')).toEqual({});
+  });
+
+  it('keep the offer to graduate quiet with "Not Now", only while the habit can graduate', () => {
+    const finished = (file: string) => {
+      const vector = loadVectors().find((v) => v.file === file);
+      return evaluate((vector as { input: Snapshot }).input).finished[0] as NonNullable<
+        ReturnType<typeof evaluate>['active']
+      >;
+    };
+    expect(graduateLater(finished('graduation-qualifies.json'), '2026-11-11')).toEqual({
+      'graduation-later:r1:c': { day: '2026-11-11' },
+    });
+    expect(graduateLater(finished('graduation-not-low-answer.json'), '2026-11-11')).toEqual({});
+  });
+
+  it('record what a host saw of a reminder, one record per stage', () => {
+    expect(reminderSeen('r', 'walk', '2026-11-14', false)).toEqual({
+      'reminder-seen:r:walk': { on: false, day: '2026-11-14' },
+    });
   });
 
   it('write the weekly answer and withdrawals', () => {
@@ -37,10 +200,232 @@ describe('actions', () => {
     });
   });
 
+  it("write what a stage is paired with as one line of the user's words", () => {
+    expect(pairStage('r', 'walk', '  my   podcast. ')).toEqual({
+      'pair:r:walk': { text: 'my podcast' },
+    });
+    expect(pairStage('r', 'walk', 'x'.repeat(80))).toEqual({
+      'pair:r:walk': { text: 'x'.repeat(60) },
+    });
+    expect(pairStage('r', 'walk', ' . ')).toEqual({ 'pair:r:walk': '' });
+  });
+
+  it('take the pairing along when continuing, unless the next stage has its own', () => {
+    const met = fromVector('pair-met-station.json');
+    expect(continueJourney(met.run, met.journey, '2026-11-10')).toEqual({
+      'stage-done:r1:a': { day: '2026-11-10', dataFormat: 2 },
+      'stage:r1:b': { acceptedDay: '2026-11-10' },
+      'pair:r1:b': { text: 'my podcast' },
+    });
+    const own = {
+      ...met.run,
+      stations: met.run.stations.map((s, i) => (i === 1 ? { ...s, pair: 'tea' } : s)),
+    };
+    expect(Object.keys(continueJourney(own, met.journey, '2026-11-10'))).toEqual([
+      'stage-done:r1:a',
+      'stage:r1:b',
+    ]);
+  });
+
+  it('write the plan check as one record of the answers given, none withdraws it', () => {
+    expect(
+      checkPlan('r', {
+        wish: ' more  air ',
+        obstacle: '',
+        plan: `If it rains,\nthen I will walk indoors. ${'x'.repeat(200)}`,
+      }),
+    ).toEqual({
+      'plan-check:r': {
+        wish: 'more air',
+        plan: `If it rains, then I will walk indoors. ${'x'.repeat(121)}`,
+      },
+    });
+    expect(checkPlan('r', { wish: ' ', plan: '' })).toEqual({ 'plan-check:r': '' });
+  });
+
   it("write the user's build choice as one record, empty choice withdraws it", () => {
     expect(chooseBuild('r', { ladder: 'home', marker: 'flowers', hue: '' })).toEqual({
       'build:r': { ladder: 'home', marker: 'flowers' },
     });
     expect(chooseBuild('r', {})).toEqual({ 'build:r': '' });
+  });
+
+  it('stay only at a met station; the record names the day', () => {
+    expect(stayHere(fromVector('stay-no-answer.json').run, '2026-11-10')).toEqual({
+      'stay:r1:a': { day: '2026-11-10' },
+    });
+    expect(stayHere(fromVector('stay-not-met-no-offer.json').run, '2026-11-05')).toEqual({});
+  });
+
+  it('skip a stage that has no task yet, in data format 3, and accept the next', () => {
+    const fresh = fromVector('skip-undone.json');
+    expect(skipStage(fresh.run, fresh.journey, '2026-11-03')).toEqual({
+      'skip:r1:a': { day: '2026-11-03', dataFormat: 3 },
+      'stage:r1:b': { acceptedDay: '2026-11-03' },
+    });
+    const bound = fromVector('stay-not-met-no-offer.json');
+    expect(skipStage(bound.run, bound.journey, '2026-11-05')).toEqual({});
+  });
+
+  it('refuse to skip the last stage', () => {
+    const last = fromVector('skip-last-stage-refused.json');
+    expect(last.run.position.stage).toBe(2);
+    expect(skipStage(last.run, last.journey, '2026-11-05')).toEqual({});
+  });
+
+  it('take the latest skip back while the next stage has no completion', () => {
+    const skipped = fromVector('skip-last-stage-refused.json');
+    expect(undoSkip(skipped.run, skipped.journey, 'b')).toEqual({
+      'skip:r1:b': '',
+      'stage:r1:c': '',
+    });
+    expect(undoSkip(skipped.run, skipped.journey, 'a')).toEqual({});
+    const counted = fromVector('skip-completions-give-nothing.json');
+    expect(undoSkip(counted.run, counted.journey, 'a')).toEqual({});
+  });
+
+  // Coming back after a long break (#82): the three choices of the card.
+  it('carry on, or call the gap a pause, only while the card is due', () => {
+    const { run } = fromVector('come-back-card.json');
+    expect(carryOn(run, '2026-10-22')).toEqual({ 'carry-on:r1:b': { day: '2026-10-22' } });
+    expect(callItAPause(run, '2026-10-22')).toEqual({
+      'pause:r1:2026-10-09': { action: 'pause', source: 'user' },
+      'pause:r1:2026-10-22': { action: 'resume', source: 'user' },
+    });
+    const early = fromVector('come-back-13-days.json').run;
+    expect(carryOn(early, '2026-10-21')).toEqual({});
+    expect(callItAPause(early, '2026-10-21')).toEqual({});
+    expect(stepBack(early, '2026-10-21')).toEqual({});
+  });
+
+  it('start smaller in data format 4, alone or with the pause', () => {
+    const { run } = fromVector('come-back-card.json');
+    expect(stepBack(run, '2026-10-22')).toEqual({
+      'step-back:r1:b:2026-10-22': { dataFormat: 4 },
+    });
+    expect(stepBack(run, '2026-10-22', { pause: true })).toEqual({
+      'pause:r1:2026-10-09': { action: 'pause', source: 'user' },
+      'pause:r1:2026-10-22': { action: 'resume', source: 'user' },
+      'step-back:r1:b:2026-10-22': { dataFormat: 4 },
+    });
+  });
+
+  it('refuse to start smaller without a finished stage before', () => {
+    expect(stepBack(fromVector('come-back-no-completion.json').run, '2026-10-14')).toEqual({});
+    expect(stepBack(fromVector('step-back-needs-finished-stage.json').run, '2026-10-22')).toEqual(
+      {},
+    );
+  });
+
+  it('continue from the smaller stage takes the stage left up again, nothing else', () => {
+    const met = fromVector('step-back-met-offer.json');
+    expect(continueJourney(met.run, met.journey, '2026-10-26')).toEqual({
+      'step-back:r1:b:2026-10-22': { until: '2026-10-26', dataFormat: 4 },
+    });
+    const notMet = fromVector('step-back-counts-again.json');
+    expect(continueJourney(notMet.run, notMet.journey, '2026-10-25')).toEqual({});
+  });
+
+  it('each stage keeps its own pairing over a step back and back', () => {
+    const vector = loadVectors().find((v) => v.file === 'step-back-met-offer.json');
+    if (!vector || vector.kind !== 'evaluate') throw new Error('vector');
+    const snapshot = vector.input as Snapshot;
+    const run = evaluate({
+      ...snapshot,
+      choices: {
+        ...snapshot.choices,
+        'pair:r1:a': { text: 'a podcast' },
+        'pair:r1:b': { text: 'my playlist' },
+      },
+    }).active;
+    if (!run) throw new Error('run');
+    expect(run.stations.map((s) => s.pair)).toEqual(['a podcast', 'my playlist', undefined]);
+    expect(continueJourney(run, snapshot.journeys[0] as Journey, '2026-10-26')).toEqual({
+      'step-back:r1:b:2026-10-22': { until: '2026-10-26', dataFormat: 4 },
+    });
+  });
+
+  it('never skip a stage that is walked again', () => {
+    const gone = fromVector('step-back-task-gone.json');
+    expect(gone.run.stations[0]?.state).toBe('unbound');
+    expect(skipStage(gone.run, gone.journey, '2026-10-22')).toEqual({});
+  });
+
+  /** The finished run of a vector's input, and the snapshot to go on from. */
+  const finishedOf = (file: string) => {
+    const vector = loadVectors().find((v) => v.file === file);
+    if (!vector || vector.kind !== 'evaluate') throw new Error(file);
+    const snapshot = vector.input as Snapshot;
+    const run = evaluate(snapshot).finished[0];
+    if (!run) throw new Error(file);
+    return { run, snapshot };
+  };
+
+  it('let a habit graduate only while it can, with what the user does with the task', () => {
+    const { run } = finishedOf('graduation-qualifies.json');
+    expect(graduate(run, '2026-11-11', 'end')).toEqual({
+      'graduation:r1:c:2026-11-11': { choice: 'end' },
+    });
+    expect(graduate(run, '2026-11-11', 'keep')).toEqual({
+      'graduation:r1:c:2026-11-11': { choice: 'keep' },
+    });
+    expect(graduate(run, '2026-11-11', 'other' as never)).toEqual({});
+    expect(graduate(finishedOf('graduation-not-low-answer.json').run, '2026-11-11', 'end')).toEqual(
+      {},
+    );
+    expect(graduate(finishedOf('graduated-not-followed.json').run, '2026-11-11', 'end')).toEqual(
+      {},
+    );
+  });
+
+  it('a graduated habit is graduated in the next view, whatever its task does', () => {
+    const { run, snapshot } = finishedOf('graduation-qualifies.json');
+    const after = evaluate({
+      ...snapshot,
+      choices: { ...snapshot.choices, ...graduate(run, '2026-11-11', 'keep') },
+    }).finished[0];
+    expect(after?.habit).toMatchObject({
+      state: 'graduated',
+      canGraduate: false,
+      checkinDue: false,
+      graduated: { day: '2026-11-11', choice: 'keep' },
+    });
+  });
+
+  it('answer the question after graduation under the date it was due', () => {
+    const due = finishedOf('graduated-check-asked-once.json');
+    expect(answerStill(due.run, '2026-11-11', true)).toEqual({
+      'graduation-check:r1:c:2026-11-01': { day: '2026-11-11', still: true },
+    });
+    const no = answerStill(due.run, '2026-11-11', false);
+    expect(no).toEqual({
+      'graduation-check:r1:c:2026-11-01': { day: '2026-11-11', still: false },
+    });
+    const after = evaluate({
+      ...due.snapshot,
+      choices: { ...due.snapshot.choices, ...no },
+    }).finished[0];
+    expect(after?.habit?.graduated).toEqual({
+      day: '2026-09-20',
+      choice: 'end',
+      suggestBack: true,
+    });
+    // Nothing is due: nothing is written.
+    expect(answerStill(finishedOf('graduated-check-not-yet.json').run, '2026-11-11', true)).toEqual(
+      {},
+    );
+    expect(answerStill(finishedOf('graduation-qualifies.json').run, '2026-11-11', true)).toEqual(
+      {},
+    );
+  });
+
+  it('bring a graduated habit back by closing its record, never by withdrawing it', () => {
+    const { run, snapshot } = finishedOf('graduated-kept-repeating.json');
+    const back = bringBack(run, '2026-11-11');
+    expect(back).toEqual({ 'graduation:r1:c:2026-11-01': { choice: 'keep', until: '2026-11-11' } });
+    const after = evaluate({ ...snapshot, choices: { ...snapshot.choices, ...back } }).finished[0];
+    expect(after?.habit).toMatchObject({ state: 'maintained', backDay: '2026-11-11' });
+    expect(after?.habit?.graduated).toBeUndefined();
+    expect(bringBack(finishedOf('graduation-qualifies.json').run, '2026-11-11')).toEqual({});
   });
 });

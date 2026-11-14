@@ -1,0 +1,191 @@
+{
+  "name": "A chain holds only to the habit of a finished journey at the same anchor: a step at another anchor, an open journey, the run itself or an unknown run is not followed",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "anchor:m2": {
+        "kind": "routine",
+        "words": "lunch"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m2"
+      },
+      "run:r2": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "run-anchor:r2": {
+        "anchorId": "m1",
+        "after": "r1"
+      },
+      "run:r3": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-10-20"
+      },
+      "stage:r3:a": {
+        "acceptedDay": "2026-10-20"
+      },
+      "pause:r3:2026-11-02": {
+        "action": "pause",
+        "source": "user"
+      },
+      "run-anchor:r3": {
+        "anchorId": "m1",
+        "after": "r3"
+      },
+      "run:r4": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-10-10"
+      },
+      "stage:r4:a": {
+        "acceptedDay": "2026-10-10"
+      },
+      "pause:r4:2026-10-20": {
+        "action": "pause",
+        "source": "user"
+      },
+      "run-anchor:r4": {
+        "anchorId": "m1",
+        "after": "r3"
+      },
+      "run:r5": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-10-05"
+      },
+      "stage:r5:a": {
+        "acceptedDay": "2026-10-05"
+      },
+      "pause:r5:2026-10-10": {
+        "action": "pause",
+        "source": "user"
+      },
+      "run-anchor:r5": {
+        "anchorId": "m1",
+        "after": "r0"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": {
+      "runId": "r2",
+      "anchor": {
+        "id": "m1",
+        "after": null
+      }
+    },
+    "paused": [
+      {
+        "runId": "r3",
+        "anchor": {
+          "id": "m1",
+          "after": null
+        }
+      },
+      {
+        "runId": "r4",
+        "anchor": {
+          "id": "m1",
+          "after": null
+        }
+      },
+      {
+        "runId": "r5",
+        "anchor": {
+          "id": "m1",
+          "after": null
+        }
+      }
+    ],
+    "anchors": [
+      {
+        "id": "m2",
+        "state": "resting",
+        "growing": null,
+        "steps": [
+          {
+            "runId": "r1"
+          }
+        ]
+      },
+      {
+        "id": "m1",
+        "state": "growing",
+        "growing": {
+          "runId": "r2",
+          "after": null
+        },
+        "resting": [
+          {
+            "runId": "r3",
+            "after": null
+          },
+          {
+            "runId": "r4",
+            "after": null
+          },
+          {
+            "runId": "r5",
+            "after": null
+          }
+        ],
+        "steps": []
+      }
+    ],
+    "problems": []
+  }
+}

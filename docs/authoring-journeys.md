@@ -42,9 +42,15 @@ can, the reviewer checks the rest.
 1. **One habit, starting tiny.** The first stage is so small it works on
    the worst day (one glass of water, writing down one task). Each next
    stage is the same habit, a little bigger; ideally it contains the
-   previous stage, so the smaller step is the fallback on hard days.
+   previous stage, so the smaller step is the fallback on hard days. A
+   user who already does the first stage can skip it, so keep the
+   second one small too. _CI warns when it asks for more than 5 minutes._
 2. **One anchor for all stages.** Every stage starts with the same
-   "After …" (an existing routine or a fixed time). _CI checks this._
+   "After …". The anchor is the user's: they name the moment in their
+   own words when they start, or pick one they already have, and their
+   words stand in the plan. Your journey says what kind of moment it
+   starts from and gives example words (`anchor`, below). _CI warns
+   when stages name different anchors or the hint is missing._
 3. **Reachable conditions.** Use `days` with room for one miss (5 of 7,
    4 of 5, 8 of 10). Never require every day: one missed day changes
    nothing in QuestArc. _CI warns otherwise._
@@ -89,11 +95,21 @@ format is in [story format 3](story-format.md) and the JSON Schema
   the journey is removed later. Leave it out to stay anonymous.
 - Every text is a **key** starting with the id (`first-things-first.title`),
   and the file's `texts.en` holds the English text for every key.
-  Other languages (`texts.de`, …) may leave keys out; those fall back to
-  English.
+  Built-in journeys also have every key in German (`texts.de`), so CI
+  fails without it; if you do not write German, say so in the pull
+  request and the owner adds it. German needs one more text per action,
+  `<action key>.plan`, the action as the plan sentence says it ("gehe
+  ich 5 Minuten spazieren" next to "5 Minuten spazieren gehen"), and
+  writes anchors and moments in the dative ("dem Mittagessen", "einem
+  Moment um die Mittagszeit").
 - Anchors and actions are written to fit the plan sentence: anchor
   "sitting down at my desk", action "write down the one task that
   matters most today".
+- `anchor`: `moment` says what kind of moment the journey starts from,
+  to end the sentence "This journey starts from …" ("the moment your
+  work begins"); `example` is the words you suggest after "After …",
+  usually the same key your stages use. With `time` ("21:30") the
+  start screen suggests a fixed time instead.
 
 ### Template
 
@@ -107,6 +123,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
   "title": "my-journey.title",
   "description": "my-journey.description",
   "why": "my-journey.why",
+  "anchor": { "moment": "my-journey.moment", "example": "my-journey.anchor" },
   "build": { "ladder": "home" },
   "stages": [
     {
@@ -133,6 +150,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
       "my-journey.description": "One or two sentences: from the first tiny step to the habit.",
       "my-journey.why": "Why do you want this? In your own words.",
       "my-journey.anchor": "lunch",
+      "my-journey.moment": "a moment around midday",
       "my-journey.first.action": "do the tiny first step",
       "my-journey.first.arrival": "One sentence of story at the first station.",
       "my-journey.first.accept": "This became easy. You could try a little more.",
@@ -150,7 +168,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
 ### Text lengths
 
 Texts must fit a 360 px phone. CI rejects longer ones (characters):
-title 40, description 160, why 120, anchor 40, action 120, place 40,
+title 40, description 160, why 120, anchor 40, moment 60, action 120, place 40,
 arrival 200, accept 200, nugget 240, ending 240.
 
 A stage's action is also the station's name in the list of stations,
@@ -175,6 +193,38 @@ ladder when starting.
 - `days` `n` of the last `of` due days (default 5 of 7; for weekdays 4
   of 5); `count` `n` completions; `time_spent` `minutes` tracked on the
   stage's tasks.
+
+## German, and adding a language
+
+German texts are written, not translated word for word: plain, warm
+German with "du", never "Sie"; "du könntest", "wenn du magst", never
+"du musst", "du solltest" or "nicht vergessen"; a miss is "eine Lücke"
+or "ein Tag Pause", never "verpasst", "versäumt", "Fehler" or
+"Rückfall"; the fallback is "der kleinere Schritt". A claim about
+research is exactly as strong as in English. `npm run journeys` checks
+German with its own word lists (`packages/engine/src/wording.ts`).
+
+To add a language (for example `fr`):
+
+1. Copy `content/i18n/en.json` to `content/i18n/fr.json` and write every
+   text; keep each `{placeholder}`. `ui.grammar.*` are regular
+   expressions for the build's words, `ui.plan.*` whole sentences, so
+   the language orders the parts as it needs.
+2. Add a `fr` block to every journey in `content/journeys/` and to
+   `content/examples/`; if the plan sentence needs the action in
+   another form, list the language in `PLAN_FORM_LANGUAGES` and write
+   the `.plan` texts.
+3. Add the language's controlling, blaming and day-promising words to
+   `BANNED` in `packages/engine/src/wording.ts`, with tests in
+   `packages/engine/test/content-check.test.ts`.
+4. Register the table in `packages/plugin/src/shared/languages.ts`
+   (`UI_TEXTS`), the start texts' language in `START_LANGUAGES`
+   (`packages/plugin/view-content.mjs`), the date locale in
+   `packages/plugin/src/ui/journey/format.ts`, and the new language in
+   the test that lists the tables (`packages/engine/test/content.test.ts`).
+5. Check the screens with `node screenshots.mjs <demos> 1 fr`
+   ([development](development.md)): no cut-off text, no horizontal
+   overflow. Then `npm run check`; keep `index.html` within its limit.
 
 ## Check it
 
@@ -216,7 +266,8 @@ text, and that you publish it under CC BY-SA 4.0. The app shows your
 
 - Work only from this page, the schema and the example; do not invent
   research. If you cite a study, give its DOI or link.
-- Write in English first; other languages are welcome as extra
+- Write in English first, then German (`texts.de`, with the `.plan`
+  forms) along the rules above; other languages are welcome as extra
   `texts.<lang>` blocks.
 - Run `npm run journeys` and fix every error before opening the pull
   request; mention remaining warnings and why they are fine.

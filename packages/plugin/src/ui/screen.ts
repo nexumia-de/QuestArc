@@ -5,19 +5,25 @@ import type { State } from '../shared/protocol';
 export type Route =
   | { readonly name: 'welcome' }
   | { readonly name: 'home' }
-  | { readonly name: 'choose' }
-  | { readonly name: 'preview'; readonly journeyId: string }
+  | { readonly name: 'journey' }
+  | { readonly name: 'moment'; readonly anchorId: string; readonly journeyId?: string }
+  | { readonly name: 'choose'; readonly anchorId?: string }
+  | { readonly name: 'preview'; readonly journeyId: string; readonly anchorId?: string }
   | { readonly name: 'settings' }
   | { readonly name: 'station'; readonly index: number }
-  | { readonly name: 'start'; readonly journeyId: string }
-  | { readonly name: 'setup' }
-  | { readonly name: 'pick-task' }
+  | { readonly name: 'start'; readonly journeyId: string; readonly anchorId?: string }
+  | { readonly name: 'setup'; readonly runId?: string }
+  | { readonly name: 'pick-task'; readonly runId?: string }
   | { readonly name: 'continue' }
+  | { readonly name: 'smaller' }
   | { readonly name: 'finished'; readonly journeyId: string }
-  | { readonly name: 'checkin' }
+  | { readonly name: 'checkin'; readonly runId?: string }
+  | { readonly name: 'graduate'; readonly runId: string }
+  | { readonly name: 'still'; readonly runId: string }
   | { readonly name: 'shelf' }
   | { readonly name: 'motivates' }
   | { readonly name: 'build' }
+  | { readonly name: 'plan-check' }
   | { readonly name: 'stations' };
 
 export interface Context {
@@ -29,7 +35,11 @@ export interface Context {
   readonly draft: Record<string, unknown>;
   go(route: Route): void;
   back(): void;
-  /** Replaces the whole navigation stack, e.g. after onboarding; `draft` seeds the new screen's. */
+  /**
+   * Replaces the whole navigation stack, e.g. after onboarding; `draft`
+   * seeds the new screen's. The journey keeps the home under it, so back
+   * leads to the moments.
+   */
   reset(route: Route, draft?: Record<string, unknown>): void;
   /** Redraws the current screen, e.g. after it loaded data of its own. */
   redraw(): void;

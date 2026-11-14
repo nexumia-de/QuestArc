@@ -1,0 +1,67 @@
+{
+  "name": "A stage that never counted: the card is due 14 days after the day before it started; on the first stage there is no smaller one",
+  "rule": "game-rules §5, coming back after a long break",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-10-14",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      },
+      {
+        "id": "cfgB",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-10-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-10-01"
+      },
+      "binding:r1:a": {
+        "taskId": "t1",
+        "repeatCfgId": "cfgA",
+        "day": "2026-10-01"
+      },
+      "step-back:r1:a:2026-10-14": {
+        "dataFormat": 4
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "position": {
+        "stage": 0
+      },
+      "comeBack": {
+        "from": "2026-10-01",
+        "smaller": null
+      },
+      "stations": [
+        {
+          "state": "current",
+          "stepBackDay": null,
+          "acceptedDay": "2026-10-01"
+        },
+        {},
+        {}
+      ]
+    },
+    "problems": []
+  }
+}

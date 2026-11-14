@@ -17,6 +17,15 @@ export interface Journey {
     /** Text keys naming the versions, version 1 first. */
     readonly names?: readonly string[];
   };
+  /** The kind of moment the journey starts from (docs/story-format.md, Anchor). */
+  readonly anchor?: {
+    /** Text key: the kind of moment, e.g. "a moment in your morning". */
+    readonly moment: string;
+    /** Text key: example words that complete "After …", e.g. "getting up". */
+    readonly example: string;
+    /** Suggests a fixed time instead of a routine, "HH:MM". */
+    readonly time?: string;
+  };
   /** Texts by language, then text key; `en` is required in content files. */
   readonly texts?: Texts;
 }

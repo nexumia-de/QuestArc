@@ -45,14 +45,16 @@ rules for 360 px, touch targets and accessibility are in
 - **No telemetry, no third-party services, no network requests** from the
   plugin.
 - Super Productivity facts come from its source at a recorded commit; the
-  plugin API types are the copy in `packages/sp-plugin-api` (MIT, do not
-  edit; update with `scripts/update-sp-plugin-api.sh`).
+  plugin API types are the npm package `@super-productivity/plugin-api`
+  (MIT, pinned exactly, dev dependency of `packages/plugin`; Dependabot
+  updates it). Types only: nothing of it may end up in the build.
 - Logs name ids and counts, never task titles, notes or the user's own
   reason.
 
 ## Design rules
 
-The 27 [design rules](docs/psychology.md) are binding, among them: one calm
+The 28 [design rules](docs/psychology.md) are binding, among them: the
+anchor is the user's, in their words; what runs by itself is not tracked; one calm
 look without points, levels or opponents; what grows follows fixed
 rules and is never announced before it is earned; no random rewards, login bonuses or rankings; a missed day is a
 neutral gap, never red, never blamed; autonomy-supportive texts; no

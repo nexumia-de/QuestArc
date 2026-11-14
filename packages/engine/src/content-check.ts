@@ -1,6 +1,8 @@
 import { LADDERS, markerFits } from './ladders';
+import { FALLBACK_LANGUAGE, PLAN_FORM } from './texts';
 import type { Journey, Stage } from './types/journey';
 import { journeyErrors } from './validate';
+import { BANNED, PLAN_FORM_LANGUAGES } from './wording';
 
 /**
  * The journey checker (docs/authoring-journeys.md): everything about a
@@ -23,6 +25,7 @@ export const TEXT_LIMITS = {
   description: 160,
   why: 120,
   anchor: 40,
+  moment: 60,
   action: 120,
   place: 40,
   arrival: 200,
@@ -40,30 +43,6 @@ interface Use {
   readonly at: string;
 }
 
-/** Wording the design rules forbid, checked in the English texts. */
-const BANNED: readonly { readonly pattern: RegExp; readonly message: string }[] = [
-  {
-    pattern: /\b\d+[\s-]*days?\b|\b(twenty-one|sixty-six)[\s-]+days?\b/i,
-    message: 'promises or names a number of days; say "it varies a lot" instead (rule 4)',
-  },
-  {
-    pattern: /\b(must|have to|has to|you should|no excuses?)\b/i,
-    message: 'sounds controlling; use autonomy-supportive words like "you could" (rule 15)',
-  },
-  {
-    pattern: /\b(fail(s|ed|ure|ing)?|lazy|guilt(y)?|break the chain)\b/i,
-    message: 'blames the user; a miss is a neutral gap (rules 12 and 15)',
-  },
-  {
-    pattern: /\bstreaks?\b/i,
-    message: 'QuestArc counts runs that survive one miss, not streaks (rule 11)',
-  },
-  {
-    pattern: /["“][^"”]{8,}["”]\s*[-–—]{1,2}\s*\p{Lu}/u,
-    message: 'looks like a quote with an author; generic quotes are not used (rule 5)',
-  },
-];
-
 /** First parts of the app's own text keys (content/i18n), so journey keys never clash. */
 const RESERVED_IDS = new Set(['ui', 'event']);
 
@@ -73,6 +52,10 @@ const uses = (journey: Journey): Use[] => {
     { key: journey.description, field: 'description', at: 'description' },
   ];
   if (journey.why) list.push({ key: journey.why, field: 'why', at: 'why' });
+  if (journey.anchor) {
+    list.push({ key: journey.anchor.moment, field: 'moment', at: 'anchor.moment' });
+    list.push({ key: journey.anchor.example, field: 'anchor', at: 'anchor.example' });
+  }
   journey.stages.forEach((stage: Stage, i) => {
     const at = `stages[${i}]`;
     list.push({ key: stage.plan.anchor, field: 'anchor', at: `${at}.plan.anchor` });
@@ -100,29 +83,38 @@ const textProblems = (journey: Journey, used: readonly Use[]): Problem[] => {
   const texts = journey.texts ?? {};
   const english = texts.en;
   if (!english) return [error('texts.en', 'English texts are required')];
-  const usedKeys = new Set(used.map((u) => u.key));
+  // An action may have a second form for the plan sentence (PLAN_FORM).
+  const planForms = used
+    .filter((u) => u.field === 'action')
+    .map((u) => ({ ...u, key: `${u.key}${PLAN_FORM}`, at: `${u.at}${PLAN_FORM}` }));
+  const usedKeys = new Set([...used, ...planForms].map((u) => u.key));
 
-  for (const { key, field, at } of used) {
+  for (const { key, at } of used) {
     if (!key.startsWith(`${journey.id}.`))
       problems.push(error(at, `text key "${key}" must start with "${journey.id}."`));
-    const text = english[key];
-    if (text === undefined) {
-      problems.push(error(at, `no English text for "${key}"`));
-      continue;
-    }
-    for (const { pattern, message } of BANNED) {
-      if (pattern.test(text)) problems.push(error(at, message));
-    }
-    for (const [lang, own] of Object.entries(texts)) {
-      const value = own[key];
-      if (value !== undefined && value.length > TEXT_LIMITS[field])
+    if (english[key] === undefined) problems.push(error(at, `no English text for "${key}"`));
+  }
+  for (const [lang, own] of Object.entries(texts)) {
+    const said = lang === FALLBACK_LANGUAGE ? '' : `${lang} text `;
+    for (const { key, field, at } of [...used, ...planForms]) {
+      const text = own[key];
+      if (text === undefined) continue;
+      for (const { pattern, message } of BANNED[lang] ?? [])
+        if (pattern.test(text)) problems.push(error(at, `${said}${message}`));
+      if (text.length > TEXT_LIMITS[field])
         problems.push(
           error(at, `${lang} text is longer than ${TEXT_LIMITS[field]} characters (360 px)`),
         );
     }
-  }
-
-  for (const [lang, own] of Object.entries(texts)) {
+    if (PLAN_FORM_LANGUAGES.includes(lang))
+      for (const { key, at } of planForms)
+        if (own[key] === undefined && own[key.slice(0, -PLAN_FORM.length)] !== undefined)
+          problems.push(
+            error(
+              at,
+              `${lang} needs the action as the plan sentence says it, under "${key}" (docs/story-format.md, texts)`,
+            ),
+          );
     for (const key of Object.keys(own)) {
       if (usedKeys.has(key)) continue;
       if (lang === 'en') problems.push(warning(`texts.en`, `"${key}" is not used`));
@@ -130,6 +122,58 @@ const textProblems = (journey: Journey, used: readonly Use[]): Problem[] => {
     }
   }
   return problems;
+};
+
+/**
+ * What a built-in journey lacks in `languages` (issue #39): the plugin
+ * ships each of them whole, so every English text has its translation.
+ * A private journey may have English only.
+ */
+export const languageProblems = (journey: Journey, languages: readonly string[]): Problem[] => {
+  const english = Object.keys(journey.texts?.en ?? {});
+  return languages.flatMap((lang) => {
+    const own = journey.texts?.[lang];
+    if (!own) return [error(`texts.${lang}`, `no ${lang} texts`)];
+    return english
+      .filter((key) => own[key] === undefined)
+      .map((key) => error(`texts.${lang}`, `no ${lang} text for "${key}"`));
+  });
+};
+
+/** Number words an action text may use for its minutes. */
+const NUMBER_WORDS: Readonly<Record<string, number>> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  fifteen: 15,
+  twenty: 20,
+  thirty: 30,
+  'forty-five': 45,
+  sixty: 60,
+};
+
+/** A step of more minutes than this is no longer tiny (rule 1). */
+const TINY_MINUTES = 5;
+
+/**
+ * The minutes a stage asks for, as far as the file says: its `time_spent`
+ * condition or the largest "n minutes" in the English action text.
+ */
+const stageMinutes = (stage: Stage, english: Readonly<Record<string, string>>): number => {
+  const text = (english[stage.plan.action] ?? '').toLowerCase();
+  const number = `\\d+|${Object.keys(NUMBER_WORDS).join('|')}`;
+  const named = [
+    ...text.matchAll(new RegExp(`\\b(${number})[\\s-]+(?:\\w+\\s+)?minutes?\\b`, 'g')),
+  ].map((m) => Number(m[1]) || (NUMBER_WORDS[m[1] ?? ''] ?? 0));
+  const required = stage.condition.type === 'time_spent' ? stage.condition.minutes : 0;
+  return Math.max(required, ...named);
 };
 
 const stageProblems = (journey: Journey): Problem[] => {
@@ -140,11 +184,27 @@ const stageProblems = (journey: Journey): Problem[] => {
   const first = journey.stages[0];
   const nuggets = new Map<string, number>();
 
+  // The first stage can be skipped ("I already do this", #81): the user
+  // then starts at the second one, which should still be a small step.
+  const second = journey.stages[1];
+  if (second && stageMinutes(second, english) > TINY_MINUTES)
+    problems.push(
+      warning(
+        'stages[1].plan.action',
+        `more than ${TINY_MINUTES} minutes: the first stage is the only tiny one, and a user who skips it starts here (rule 1)`,
+      ),
+    );
+
   journey.stages.forEach((stage, i) => {
     const at = `stages[${i}]`;
+    // The user names the anchor and their words stand in every plan
+    // sentence (#96); the stages' own words are only the suggestion.
     if (first && anchor(stage) !== anchor(first))
       problems.push(
-        error(`${at}.plan.anchor`, 'every stage keeps the anchor of the first stage (rule 2)'),
+        warning(
+          `${at}.plan.anchor`,
+          'names another anchor than the first stage; a journey starts from one moment (rule 2)',
+        ),
       );
     if ('guardian' in stage)
       problems.push(error(`${at}.guardian`, 'journeys have no guardians any more (issue #110)'));
@@ -219,6 +279,9 @@ export const journeyProblems = (value: unknown): Problem[] => {
     ...stageProblems(journey),
     ...buildProblems(journey),
     ...(journey.why ? [] : [warning('why', "asking for the user's own reason helps (rule 5)")]),
+    ...(journey.anchor
+      ? []
+      : [warning('anchor', 'say what kind of moment the journey starts from (rule 2, issue #96)')]),
   ];
   return [
     ...problems.filter((p) => p.level === 'error'),

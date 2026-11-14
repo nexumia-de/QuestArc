@@ -2,18 +2,21 @@ import { bindStage } from '@questarc/engine';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
+import { targetOf } from '../habit';
 import { weekdayOfId } from '../journey/format';
 import { scheduleOf, scheduleText, taskOfCfg } from '../repeat';
 import type { Context, Screen } from '../screen';
 
-/** Flow B, step 3: bind a recurring task the user already has. */
-export const pickTaskScreen = (ctx: Context): Screen => {
-  const { view, journeys } = ctx.state;
-  const run = view.active;
-  const journey = run && journeys.find((j) => j.id === run.journeyId);
-  const stage = run && journey?.stages[run.position.stage];
+/**
+ * Flow B, step 3: bind a recurring task the user already has, to the
+ * current station or, with `runId`, to a finished journey's habit.
+ */
+export const pickTaskScreen = (ctx: Context, runId?: string): Screen => {
+  const { view } = ctx.state;
+  const target = targetOf(ctx.state, runId);
   const app = appState(ctx);
-  if (!run || !stage) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
+  if (!target) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
+  const { run, stage } = target;
 
   const tasks = app ? Object.values(app.tasks) : [];
   const choices = app
@@ -34,7 +37,7 @@ export const pickTaskScreen = (ctx: Context): Screen => {
         day: view.todayStr,
       }),
     );
-    ctx.reset({ name: 'home' });
+    ctx.reset({ name: target.habit ? 'shelf' : 'journey' });
   };
 
   return {

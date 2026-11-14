@@ -26,15 +26,17 @@ export const conditionText = (stage: Stage, station: StationView): string => {
   });
 };
 
-const hint = (station: StationView, today: string): string | undefined => {
+const hint = (station: StationView, today: string, staying: boolean): string | undefined => {
   if (station.acceptedDay && station.acceptedDay > today) {
     return t('ui.card.starts', { date: shortDate(station.acceptedDay) });
   }
   switch (station.state) {
     case 'current':
-      return t('ui.card.hint');
+      return station.stepBackDay
+        ? t('ui.card.smaller', { date: shortDate(station.stepBackDay) })
+        : t('ui.card.hint');
     case 'met':
-      return t('ui.card.met');
+      return t(staying ? 'ui.card.staying' : 'ui.card.met');
     case 'unbound':
       return t('ui.card.unbound');
     case 'unsupported-repeat':
@@ -54,6 +56,7 @@ export const stationCard = (
   const stage = journey.stages[index];
   if (!station || !stage) return undefined;
   const bound = station.state === 'current' || station.state === 'met';
+  const words = hint(station, today, !!run.offer?.quietUntil);
   return h(
     'section',
     { class: 'qa-card qa-station-card', 'aria-label': t('ui.card.label') },
@@ -62,7 +65,7 @@ export const stationCard = (
       { class: 'qa-overline' },
       t('ui.station.of', { n: index + 1, total: run.stations.length }),
     ),
-    h('p', { class: 'qa-plan' }, planSentence(stage)),
+    h('p', { class: 'qa-plan' }, planSentence(stage, station.pair, run.anchor)),
     bound
       ? h(
           'div',
@@ -98,7 +101,10 @@ export const stationCard = (
           ),
         )
       : null,
-    hint(station, today) ? h('p', { class: 'qa-muted qa-small' }, hint(station, today)) : null,
-    run.why ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why })) : null,
+    words ? h('p', { class: 'qa-muted qa-small' }, words) : null,
+    // The card after a long break shows the reason itself.
+    run.why && !run.comeBack
+      ? h('p', { class: 'qa-why' }, t('ui.card.why', { why: run.why }))
+      : null,
   ) as HTMLElement;
 };

@@ -1,6 +1,9 @@
 import { isDay } from './days';
 import type { BuildChoice } from './ladders';
+import type { ReminderSeen } from './reminder';
 import type { Journey } from './types/journey';
+import type { AnchorWords, PlanCheck } from './types/view';
+import { PLAN_CHECK_FIELDS } from './words';
 
 /**
  * Parses the choice records (docs/data-model.md §2) from plugin-data keys.
@@ -11,7 +14,16 @@ import type { Journey } from './types/journey';
  */
 
 /** The data format this engine reads and writes (docs/decisions/data-format.md). */
-export const DATA_FORMAT = 2;
+export const DATA_FORMAT = 4;
+
+/** The format a checkpoint carries: without `xp` and `damage` since 3.3 (#110). */
+export const CHECKPOINT_FORMAT = 2;
+
+/** The format a skipped stage carries: an older engine would still work on it (#81). */
+export const SKIP_FORMAT = 3;
+
+/** The format a step back carries: an older engine would work on the stage left behind (#82). */
+export const STEP_BACK_FORMAT = 4;
 
 /** Record kinds that name their run in the key's second part. */
 export const RUN_KINDS: ReadonlySet<string> = new Set([
@@ -24,8 +36,32 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'build',
   'checkin',
   'graduation',
-  'build',
+  'graduation-check',
+  'stay',
+  'skip',
+  'pair',
+  'plan-check',
+  'carry-on',
+  'step-back',
+  'run-anchor',
+  'reminder-seen',
+  'graduation-later',
 ]);
+
+/**
+ * Kinds that belong to no run and change nothing an older engine
+ * computes: an anchor is the user's words for a moment in their day (#96).
+ */
+export const GLOBAL_KINDS: ReadonlySet<string> = new Set(['anchor']);
+
+/** A fixed time of day, "HH:MM" in 24 hours. */
+export const isTime = (value: unknown): value is string =>
+  typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+
+/** An anchor record: the user's words, and the name they gave its place. */
+export interface AnchorRecord extends AnchorWords {
+  readonly name?: string;
+}
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
 const PLACING_KINDS: ReadonlySet<string> = new Set(['run', 'run-end', 'pause']);
@@ -45,6 +81,27 @@ export interface Binding {
   readonly day?: string;
 }
 
+/** A step back from a stage: the stage before it is walked again from `day` until `until`. */
+export interface StepBack {
+  readonly day: string;
+  /** The day the stage was taken up again; absent while the smaller stage is walked. */
+  readonly until?: string;
+}
+
+/** A habit runs by itself from `day` (game rules §6); `until` is the day it was brought back. */
+export interface Graduation {
+  readonly day: string;
+  /** What the user chose for the task: end its repeat themselves, or keep it repeating quietly. */
+  readonly choice: 'end' | 'keep';
+  readonly until?: string;
+}
+
+/** The answer to "does it still run by itself?", asked on or after the day `due`. */
+export interface StillCheck {
+  readonly due: string;
+  readonly still: boolean;
+}
+
 export interface Choices {
   readonly runs: readonly RunRecord[];
   /** runId → end day */
@@ -57,8 +114,32 @@ export interface Choices {
   readonly checkpoints: ReadonlyMap<string, { day: string }>;
   /** runId → pause/resume actions sorted by day */
   readonly pauses: ReadonlyMap<string, readonly { day: string; action: 'pause' | 'resume' }[]>;
-  /** `${runId}:${stageId}:${isoWeek}` present when answered */
-  readonly checkins: ReadonlySet<string>;
+  /** `${runId}:${stageId}:${isoWeek}` → the weekly answer, 1..7 */
+  readonly checkins: ReadonlyMap<string, number>;
+  /** `${runId}:${stageId}` → the day the user chose to stay a while */
+  readonly stays: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` → the day the stage was skipped ("already yours") */
+  readonly skips: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` → what the user pairs the stage with, in their words */
+  readonly pairs: ReadonlyMap<string, string>;
+  /** runId → the user's plan check, the answers that are filled in */
+  readonly planChecks: ReadonlyMap<string, PlanCheck>;
+  /** `${runId}:${stageId}` → the day the user chose to carry on after a long break */
+  readonly carryOns: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` (the stage left behind) → its step backs sorted by day */
+  readonly stepBacks: ReadonlyMap<string, readonly StepBack[]>;
+  /** `${runId}:${stageId}` → the times the habit graduated, sorted by day */
+  readonly graduations: ReadonlyMap<string, readonly Graduation[]>;
+  /** `${runId}:${stageId}` → the answered check-ins after graduation, sorted by due day */
+  readonly stillChecks: ReadonlyMap<string, readonly StillCheck[]>;
+  /** `${runId}:${stageId}` → the day the user answered the offer to graduate with "Not Now" */
+  readonly graduationLaters: ReadonlyMap<string, string>;
+  /** `${runId}:${stageId}` → what a host saw of the stage's reminder */
+  readonly reminders: ReadonlyMap<string, ReminderSeen>;
+  /** anchor id → the user's anchor */
+  readonly anchors: ReadonlyMap<string, AnchorRecord>;
+  /** runId → the anchor the run starts from, and the run of the step it follows */
+  readonly runAnchors: ReadonlyMap<string, { anchorId: string; after?: string }>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -102,7 +183,19 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const bindings = new Map<string, Binding>();
   const checkpoints = new Map<string, { day: string }>();
   const pauses = new Map<string, { day: string; action: 'pause' | 'resume' }[]>();
-  const checkins = new Set<string>();
+  const checkins = new Map<string, number>();
+  const stays = new Map<string, string>();
+  const skips = new Map<string, string>();
+  const pairs = new Map<string, string>();
+  const planChecks = new Map<string, PlanCheck>();
+  const carryOns = new Map<string, string>();
+  const stepBacks = new Map<string, StepBack[]>();
+  const graduations = new Map<string, Graduation[]>();
+  const stillChecks = new Map<string, StillCheck[]>();
+  const graduationLaters = new Map<string, string>();
+  const reminders = new Map<string, ReminderSeen>();
+  const anchors = new Map<string, AnchorRecord>();
+  const runAnchors = new Map<string, { anchorId: string; after?: string }>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -114,7 +207,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     const parts = key.split(':');
     const kind = parts[0] ?? '';
     // Kinds of a newer engine are its own: ignored, never reported.
-    if (kind !== 'settings' && kind !== 'journey' && !RUN_KINDS.has(kind)) continue;
+    if (!['settings', 'journey'].includes(kind) && !RUN_KINDS.has(kind) && !GLOBAL_KINDS.has(kind))
+      continue;
     const runId = runOf(key);
     const tooNew = runId !== undefined && newer.has(runId);
     if (tooNew && !PLACING_KINDS.has(kind)) continue;
@@ -169,8 +263,35 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       } else bad();
     } else if (kind === 'checkin' && parts.length === 4) {
       const score = num(value.score);
-      if (score !== undefined && score >= 1 && score <= 7) checkins.add(parts.slice(1).join(':'));
+      if (score !== undefined && score >= 1 && score <= 7)
+        checkins.set(parts.slice(1).join(':'), score);
       else bad();
+    } else if ((kind === 'stay' || kind === 'skip' || kind === 'carry-on') && parts.length === 3) {
+      if (isDay(value.day))
+        (kind === 'stay' ? stays : kind === 'skip' ? skips : carryOns).set(
+          `${parts[1]}:${parts[2]}`,
+          value.day,
+        );
+      else bad();
+    } else if (kind === 'pair' && parts.length === 3) {
+      const text = str(value.text);
+      if (text) pairs.set(`${parts[1]}:${parts[2]}`, text);
+      else bad();
+    } else if (kind === 'plan-check' && parts.length === 2 && parts[1]) {
+      const answers = PLAN_CHECK_FIELDS.flatMap((field) => {
+        const text = str(value[field]);
+        return text ? [[field, text]] : [];
+      });
+      if (answers.length > 0) planChecks.set(parts[1], Object.fromEntries(answers) as PlanCheck);
+      else bad();
+    } else if (kind === 'step-back' && parts.length === 4 && isDay(parts[3])) {
+      const until = value.until;
+      if (until === undefined || (isDay(until) && until >= parts[3])) {
+        const list = stepBacks.get(`${parts[1]}:${parts[2]}`) ?? [];
+        // Keys are sorted, so the list is sorted by day.
+        list.push({ day: parts[3], ...(until !== undefined ? { until } : {}) });
+        stepBacks.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
     } else if (kind === 'build' && parts.length === 2 && parts[1]) {
       const choice: Record<string, string> = {};
       for (const field of ['ladder', 'marker', 'hue'] as const) {
@@ -178,10 +299,46 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         if (name) choice[field] = name;
       }
       builds.set(parts[1], choice);
+    } else if (kind === 'graduation-later' && parts.length === 3) {
+      if (isDay(value.day)) graduationLaters.set(`${parts[1]}:${parts[2]}`, value.day);
+      else bad();
+    } else if (kind === 'reminder-seen' && parts.length === 3) {
+      if (typeof value.on === 'boolean' && isDay(value.day))
+        reminders.set(`${parts[1]}:${parts[2]}`, { on: value.on, day: value.day });
+      else bad();
+    } else if (kind === 'anchor' && parts.length === 2 && parts[1]) {
+      const words = str(value.words);
+      const name = str(value.name);
+      const naming = name ? { name } : {};
+      if (value.kind === 'time' && isTime(value.time))
+        anchors.set(parts[1], { kind: 'time', time: value.time, ...naming });
+      else if (value.kind === 'routine' && words)
+        anchors.set(parts[1], { kind: 'routine', words, ...naming });
+      else bad();
+    } else if (kind === 'run-anchor' && parts.length === 2 && parts[1]) {
+      const anchorId = str(value.anchorId);
+      const after = str(value.after);
+      if (anchorId) runAnchors.set(parts[1], { anchorId, ...(after ? { after } : {}) });
+      else bad();
     } else if (kind === 'journey' && parts.length === 2) {
       userJourneys.push(value as unknown as Journey);
-    } else if (kind === 'graduation') {
-      // Graduation is evaluated with the More journeys milestone (#22).
+    } else if (kind === 'graduation' && parts.length === 4 && isDay(parts[3])) {
+      const { choice, until } = value;
+      if (
+        (choice === 'end' || choice === 'keep') &&
+        (until === undefined || (isDay(until) && until >= parts[3]))
+      ) {
+        const list = graduations.get(`${parts[1]}:${parts[2]}`) ?? [];
+        // Keys are sorted, so the list is sorted by day.
+        list.push({ day: parts[3], choice, ...(until !== undefined ? { until } : {}) });
+        graduations.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
+    } else if (kind === 'graduation-check' && parts.length === 4 && isDay(parts[3])) {
+      if (typeof value.still === 'boolean') {
+        const list = stillChecks.get(`${parts[1]}:${parts[2]}`) ?? [];
+        list.push({ due: parts[3], still: value.still });
+        stillChecks.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
     } else if (!tooNew) {
       problems.push(`record ${key}: unexpected key`);
     }
@@ -196,6 +353,18 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     checkpoints,
     pauses,
     checkins,
+    stays,
+    skips,
+    pairs,
+    planChecks,
+    carryOns,
+    stepBacks,
+    graduations,
+    stillChecks,
+    graduationLaters,
+    reminders,
+    anchors,
+    runAnchors,
     builds,
     userJourneys,
     newer,

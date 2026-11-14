@@ -1,4 +1,4 @@
-import type { ArtPack, Request, State } from '../shared/protocol';
+import type { ContentPack, Request, State } from '../shared/protocol';
 
 /**
  * Sends requests to plugin.js. Super Productivity forwards
@@ -51,7 +51,7 @@ export const createClient = (target: Window = window.parent, source: Window = wi
     get: () => request({ type: 'questarc:get' }),
     write: (records: Record<string, unknown>) => request({ type: 'questarc:write', records }),
     sidePanel: (on: boolean) => request({ type: 'questarc:side-panel', on }),
-    art: () => request<ArtPack>({ type: 'questarc:art' }),
+    content: () => request<ContentPack>({ type: 'questarc:content' }),
   };
 };
 

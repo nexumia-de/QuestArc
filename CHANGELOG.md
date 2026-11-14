@@ -5,6 +5,52 @@ Changes that users notice, newest first. Versions follow the plugin's
 [GitHub release](https://github.com/nexumia-de/quest-arc/releases) with the
 plugin ZIP.
 
+## 4.0.0
+
+- **Start from the moments in your day.** You name a moment in your own
+  words ("after my first coffee", "at 21:30"), and journeys add one step
+  to it. QuestArc opens on your moments, each with the one step that is
+  growing there; the journey and what it builds open from it. A journey
+  you started earlier asks once whether its moment is yours.
+- **A habit that runs by itself can graduate.** When the weekly question
+  says it has become automatic and you do it steadily, QuestArc offers
+  to stop following it. It then stands at its moment without a box to
+  tick, QuestArc asks now and then whether it still runs by itself, and
+  you can bring it back at any time without losing anything. "Not Now"
+  is remembered on all your devices; the offer returns after four weeks
+  at the earliest.
+- **Stay at a stage, or pass one you already do.** A reached station
+  offers **Continue** and **Stay Here a While** as equals; your latest
+  weekly answer suggests one. A station whose step is already part of
+  your day can be passed with **I Already Do This**.
+- **Coming back after a long break.** After two weeks without a
+  completion, one calm card lets you carry on, call the time a pause, or
+  start again with the smaller step before. What you built stays.
+- **QuestArc speaks German** when Super Productivity is set to German.
+- **Four new journeys:** _Evening wind-down_, _Tidy a little_, _A walk
+  after lunch_ and _A few pages before sleep_.
+- **Pair a step with something you enjoy**, like a podcast; it becomes
+  part of your plan sentence and stays with you from step to step.
+- **An optional plan check** when you start a journey: your wish, the
+  best outcome, the main obstacle and your plan for it. Your plan for the
+  obstacle comes back in a hard week.
+- **Reminders:** QuestArc suggests a reminder on your task for the first
+  weeks and tells you when you may not need it any more. It never sets or
+  removes one itself. A habit graduates only once its task has had no
+  reminder for two weeks.
+- The weekly look back shows your answers so far, week by week; the
+  shelf shows the last days and the run of the habits that stay after a
+  journey. After a journey the weekly question comes weekly for eight
+  weeks, then every four weeks.
+- The settings button next to QuestArc in Super Productivity's plugin
+  list opens QuestArc's settings.
+- When you build something other than a journey suggests, the versions
+  are named after what you build.
+- Compatibility: QuestArc 4.0.0 still runs on Super Productivity 19.3.0
+  and later. Journeys you continue with 4.0.0 can only be read with an
+  older QuestArc, or in Day Planner before its update, until you update
+  there. Nothing is lost.
+
 ## 3.3.0
 
 - **One look: every journey builds something.** The choice between

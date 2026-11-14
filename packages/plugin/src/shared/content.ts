@@ -2,6 +2,7 @@ import type { Journey } from '@questarc/engine';
 
 import journeys from 'virtual:questarc-journeys';
 
+import './languages';
 import { addJourneyTexts } from './texts';
 
 /**

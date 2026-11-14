@@ -1,16 +1,16 @@
 import type { RunView } from '@questarc/engine';
 
 import { resumeJourney } from '@questarc/engine';
-import { planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { shortDate } from '../journey/format';
 import type { Context, Screen } from '../screen';
+import { graduatedCards, maintainedCards } from './shelf-habits';
 
 /**
- * Screen 7, the shelf (issue #33): journeys that wait, finished journeys
- * and the habits that stay after them (design rule 24). Graduation and the
- * run of a maintained habit come with the More journeys milestone (#22).
+ * Screen 7, the shelf (issue #33): journeys that wait, the habits that
+ * stay after finished journeys (design rule 24), those that run by
+ * themselves (rule 25, shelf-habits.ts) and the finished journeys.
  */
 export const shelfScreen = (ctx: Context): Screen => {
   const { view, journeys, records } = ctx.state;
@@ -48,7 +48,7 @@ export const shelfScreen = (ctx: Context): Screen => {
             type: 'button',
             onclick: async () => {
               await ctx.write(resumeJourney(run.runId, view.todayStr, view.active?.runId));
-              ctx.reset({ name: 'home' });
+              ctx.reset({ name: 'journey' });
             },
           },
           t('ui.action.resume'),
@@ -78,20 +78,6 @@ export const shelfScreen = (ctx: Context): Screen => {
     ];
   });
 
-  const habits = view.finished.flatMap((run) => {
-    const journey = journeyOf(run);
-    const last = journey?.stages.at(-1);
-    if (!journey || !last || endOf(run)?.reason === 'abandoned') return [];
-    return [
-      h(
-        'li',
-        { class: 'qa-card' },
-        h('p', { class: 'qa-plan' }, planSentence(last)),
-        h('p', { class: 'qa-muted qa-small' }, t('ui.shelf.maintained')),
-      ),
-    ];
-  });
-
   const empty = paused.length + finished.length === 0;
   return {
     title: t('ui.shelf.title'),
@@ -100,7 +86,8 @@ export const shelfScreen = (ctx: Context): Screen => {
       { class: 'qa-stack' },
       empty ? h('p', { class: 'qa-muted' }, t('ui.shelf.empty')) : null,
       section(t('ui.shelf.paused'), paused),
-      section(t('ui.shelf.habits'), habits),
+      section(t('ui.shelf.habits'), maintainedCards(ctx)),
+      section(t('ui.shelf.graduated'), graduatedCards(ctx)),
       section(t('ui.shelf.journeys'), finished),
     ),
   };

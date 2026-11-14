@@ -1,0 +1,327 @@
+{
+  "name": "The run counts due days only: Monday, Wednesday and Friday since 1 September",
+  "rule": "game rules §3 and §6",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgC_2026-09-02",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1788346800000,
+        "doneOn": 1788368400000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-04",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1788519600000,
+        "doneOn": 1788541200000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-07",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1788778800000,
+        "doneOn": 1788800400000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-09",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1788951600000,
+        "doneOn": 1788973200000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-11",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1789124400000,
+        "doneOn": 1789146000000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-14",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1789383600000,
+        "doneOn": 1789405200000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-16",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1789556400000,
+        "doneOn": 1789578000000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-18",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1789729200000,
+        "doneOn": 1789750800000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-21",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1789988400000,
+        "doneOn": 1790010000000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-23",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1790161200000,
+        "doneOn": 1790182800000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-25",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1790334000000,
+        "doneOn": 1790355600000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-28",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1790593200000,
+        "doneOn": 1790614800000
+      },
+      {
+        "id": "rpt_cfgC_2026-09-30",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1790766000000,
+        "doneOn": 1790787600000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-02",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1790938800000,
+        "doneOn": 1790960400000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-05",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1791198000000,
+        "doneOn": 1791219600000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-07",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1791370800000,
+        "doneOn": 1791392400000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-09",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1791543600000,
+        "doneOn": 1791565200000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-12",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1791802800000,
+        "doneOn": 1791824400000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-14",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1791975600000,
+        "doneOn": 1791997200000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-16",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1792148400000,
+        "doneOn": 1792170000000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-19",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1792407600000,
+        "doneOn": 1792429200000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-21",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1792580400000,
+        "doneOn": 1792602000000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-23",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1792753200000,
+        "doneOn": 1792774800000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-26",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793012400000,
+        "doneOn": 1793034000000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-28",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793185200000,
+        "doneOn": 1793206800000
+      },
+      {
+        "id": "rpt_cfgC_2026-10-30",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793358000000,
+        "doneOn": 1793379600000
+      },
+      {
+        "id": "rpt_cfgC_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgC_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      },
+      {
+        "id": "rpt_cfgC_2026-11-06",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1793962800000,
+        "doneOn": 1793984400000
+      },
+      {
+        "id": "rpt_cfgC_2026-11-09",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1794222000000,
+        "doneOn": 1794243600000
+      },
+      {
+        "id": "rpt_cfgC_2026-11-11",
+        "isDone": true,
+        "repeatCfgId": "cfgC",
+        "created": 1794394800000,
+        "doneOn": 1794416400000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "WEEKLY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01",
+        "monday": true,
+        "wednesday": true,
+        "friday": true
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "finished": [
+      {
+        "runId": "r1",
+        "habit": {
+          "state": "maintained",
+          "run": {
+            "current": 31,
+            "best": 31,
+            "total": 31,
+            "gap": false
+          },
+          "lastDays": [
+            {
+              "day": "2026-10-28",
+              "mark": "done"
+            },
+            {
+              "day": "2026-10-30",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-02",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-04",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-06",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-09",
+              "mark": "done"
+            },
+            {
+              "day": "2026-11-11",
+              "mark": "done"
+            }
+          ]
+        }
+      }
+    ],
+    "problems": []
+  }
+}

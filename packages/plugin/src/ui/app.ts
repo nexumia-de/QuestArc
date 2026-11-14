@@ -1,5 +1,5 @@
 import type { State } from '../shared/protocol';
-import { addJourneyTexts, t } from '../shared/texts';
+import { addJourneyTexts, language, t } from '../shared/texts';
 import type { Client } from './client';
 import { h, icon, ICONS } from './dom';
 import type { Context, MenuItem, Route, Screen } from './screen';
@@ -35,7 +35,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
     redraw: () => render(false),
     reset: (route, draft = {}) => {
       menuOpen = false;
-      stack = [{ route, draft }];
+      stack = [...(route.name === 'journey' ? [entry({ name: 'home' })] : []), { route, draft }];
       render(true);
     },
     write: async (records) => {
@@ -189,13 +189,33 @@ export const createApp = (root: HTMLElement, client: Client) => {
     if (navigated) screen.onShow?.();
   };
 
+  /** The language the screen was drawn in: another one draws it again (#39). */
+  let drawnIn = language();
   const update = (next: State): void => {
     // the journeys' own texts come with the state (shared/texts.ts)
     if (next.journeys !== state?.journeys) addJourneyTexts(next.journeys);
     const first = !state;
     // A shown error goes as soon as an answer comes, even when the data
     // did not change in between.
-    const changed = first || next.revision !== state?.revision || error !== undefined;
+    // The settings button of the plugin list (#67) opens the settings screen
+    // on top of where the view is, so back leads there.
+    const toSettings = next.openSettings === true && stack.at(-1)?.route.name !== 'settings';
+    if (toSettings)
+      stack = [
+        ...(stack.length > 0 ? stack : [entry(firstRoute(next))]),
+        entry({ name: 'settings' }),
+      ];
+    // A message's Show (flow A) opens the journey on top of the home.
+    const toJourney = next.openJourney === true && next.view.active !== undefined;
+    if (toJourney) stack = [entry({ name: 'home' }), entry({ name: 'journey' })];
+    const changed =
+      first ||
+      toSettings ||
+      toJourney ||
+      next.revision !== state?.revision ||
+      error !== undefined ||
+      drawnIn !== language();
+    drawnIn = language();
     state = next;
     error = undefined;
     if (changed) render(first);
@@ -203,6 +223,12 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   return {
     update,
+    /** Opens the journey on top of the home, for a host that shows the view itself. */
+    openJourney: () => {
+      if (!state?.view.active) return;
+      stack = [entry({ name: 'home' }), entry({ name: 'journey' })];
+      render(true);
+    },
     showError: (text: string, detail?: string) => {
       error = { text, ...(detail ? { detail } : {}) };
       if (state) render(false);

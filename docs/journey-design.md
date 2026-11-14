@@ -252,6 +252,17 @@ marker's lasting form) and the `marker` places above.
 pictures (60 × 40 px), the next one as a plain outlined step without a
 picture, like stations ahead; nothing further is shown.
 
+**A region is an anchor** (#96, which changes #42: not one region per
+journey). Every journey started from an anchor builds on in the same
+region, and a new anchor opens a new region, which carries the
+anchor's words as its name unless the user gives it another. A
+graduated step stands there with its lantern lit, from QuestArc's own
+records ([game rules](game-rules.md) §8). The engine already groups its
+view by anchor (`anchors`); the regions themselves, the map and the
+lantern are drawn with #114. Until then the home lists the anchors in
+words ([behaviour](behaviour.md), screen 0), a journey's build is shown
+on its own screen as below, and the hue belongs to the run.
+
 **Colour per region.** A region's scene takes `accent`, `tint` and
 `tint-strong` from one hue of `content/art/palette.json` (eight named
 hues, a light and a dark value each); `fg`, `bg` and `dim` stay the
@@ -363,7 +374,7 @@ stations list and Settings with the side panel switch:
   palette. Pictures no screen draws yet stay preview-only
   (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
   travel in `plugin.js` and reach the view once at start (message
-  `questarc:art`); until they arrive the screen shows only the card. The
+  `questarc:content`, with the texts and the style, #102). The
   view's `index.html` is limited to 102,400 bytes by Super Productivity
   19.3.1, and the view may load no other file of the plugin
   ([facts](super-productivity-facts.md) §1), so the view also takes the

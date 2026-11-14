@@ -22,14 +22,18 @@ const buildEvents = (before: GameView, after: GameView): GameEvent[] => {
   const was = before.active?.build;
   const runId = before.active?.runId;
   if (!was) return [];
-  const is = [after.active, ...after.paused, ...after.finished].find(
+  const now = [after.active, ...after.paused, ...after.finished].find(
     (run) => run?.runId === runId,
-  )?.build;
+  );
+  const is = now?.build;
   if (!is) return [];
   if (is.version > was.version) {
     return [{ key: 'event.build-version', params: { version: is.version } }];
   }
-  if (is.version === was.version && is.markerProgress > was.markerProgress) {
+  // The marker of another stage (after a step back or taking the larger
+  // stage up again) did not grow: it is another marker.
+  const sameStage = now?.position.stage === before.active?.position.stage;
+  if (sameStage && is.version === was.version && is.markerProgress > was.markerProgress) {
     return [
       { key: 'event.build-element', params: { from: was.markerProgress, to: is.markerProgress } },
     ];
@@ -42,9 +46,15 @@ export const diff = (before: GameView, after: GameView): GameEvent[] => {
   const run = after.active;
   const now = currentStation(run);
   const sameRun = before.active?.runId === run?.runId;
-  const then = sameRun
+  const earlier = sameRun
     ? before.active?.stations.find((s) => s.stageId === now?.stageId)
     : undefined;
+  // A stage stepped back to or taken up again (#82) starts another count:
+  // what it holds is not new.
+  const then =
+    earlier?.leftDay === undefined && earlier?.stepBackDay === now?.stepBackDay
+      ? earlier
+      : undefined;
 
   if (run && now && then) {
     const newCompletions = now.completions - then.completions;
@@ -56,7 +66,8 @@ export const diff = (before: GameView, after: GameView): GameEvent[] => {
     } else if (newCompletions === 1) {
       events.push({ key: 'event.completion', params: {} });
     }
-    if (now.state === 'met' && then.state !== 'met') {
+    // A stage the user chose to stay at is not announced again (game rules §4).
+    if (now.state === 'met' && then.state !== 'met' && !run.offer?.quietUntil) {
       events.push({ key: 'event.station-reached', params: { stage: now.stageId } });
     }
     if (run.offerFallback && !before.active?.offerFallback) {

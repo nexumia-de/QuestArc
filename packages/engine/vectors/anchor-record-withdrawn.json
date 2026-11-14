@@ -1,0 +1,59 @@
+{
+  "name": "A run whose anchor was withdrawn is one from before anchors again; an anchor where nothing stands yet is still the user's and is listed",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "anchor:m9": "",
+      "run:r2": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "run-anchor:r2": {
+        "anchorId": "m9"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": {
+      "runId": "r2",
+      "anchor": null
+    },
+    "anchors": [
+      {
+        "id": "m1",
+        "words": "getting up",
+        "state": "resting",
+        "growing": null,
+        "resting": [],
+        "steps": [],
+        "due": []
+      },
+      {
+        "id": null,
+        "suggest": "test-daily",
+        "state": "growing",
+        "growing": {
+          "runId": "r2"
+        }
+      }
+    ],
+    "problems": []
+  }
+}

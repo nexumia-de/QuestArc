@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { journeyProblems } from '../src/content-check';
+import { journeyProblems, languageProblems } from '../src/content-check';
 
 // The journey checker on a small journey that passes, and on one broken
 // copy per rule (docs/authoring-journeys.md, what CI checks).
@@ -11,6 +11,11 @@ const good = () => ({
   title: 'tea.title',
   description: 'tea.description',
   why: 'tea.why',
+  anchor: { moment: 'tea.moment', example: 'tea.anchor' } as {
+    moment: string;
+    example: string;
+    time?: string;
+  },
   build: { ladder: 'home', names: ['tea.build.tent'] } as {
     ladder: string;
     marker?: string;
@@ -38,6 +43,7 @@ const good = () => ({
       'tea.description': 'From one cup to a calm tea break.',
       'tea.why': 'Why do you want a tea break? In your own words.',
       'tea.anchor': 'lunch',
+      'tea.moment': 'a moment around midday',
       'tea.cup.action': 'make a cup of tea',
       'tea.cup.nugget': 'You could put the kettle where you see it.',
       'tea.pot.action': 'make a pot of tea',
@@ -94,13 +100,28 @@ describe('journey checker', () => {
     );
   });
 
-  it('requires the same anchor in every stage', () => {
-    expect(
-      errors((j) => {
-        stage(j, 1).plan.anchor = 'tea.other';
-        en(j)['tea.other'] = 'getting up';
-      })[0]?.message,
-    ).toContain('rule 2');
+  it('warns when the stages name different anchors (#96)', () => {
+    const journey = good() as Draft;
+    stage(journey, 1).plan.anchor = 'tea.other';
+    en(journey)['tea.other'] = 'getting up';
+    expect(journeyProblems(journey)).toEqual([
+      expect.objectContaining({ level: 'warning', at: 'stages[1].plan.anchor' }),
+    ]);
+  });
+
+  it('warns when the journey does not say what kind of moment it starts from (#96)', () => {
+    const journey = good() as Draft;
+    delete (journey as Record<string, unknown>).anchor;
+    delete en(journey)['tea.moment'];
+    expect(journeyProblems(journey)).toEqual([
+      expect.objectContaining({ level: 'warning', at: 'anchor' }),
+    ]);
+  });
+
+  it('checks the anchor hint: its texts and a time of day', () => {
+    expect(errors((j) => delete en(j)['tea.moment'])[0]?.at).toBe('anchor.moment');
+    expect(errors((j) => (j.anchor.time = '25:00'))[0]?.message).toBe('anchor: invalid');
+    expect(errors((j) => (j.anchor.time = '21:30'))).toEqual([]);
   });
 
   it('limits text length for 360 px', () => {
@@ -115,6 +136,80 @@ describe('journey checker', () => {
     ['a quote', '"Tea is the cure for everything." — Someone Famous', 'rule 5'],
   ])('rejects %s', (_name, text, rule) => {
     expect(errors((j) => (en(j)['tea.cup.nugget'] = text))[0]?.message).toContain(rule);
+  });
+
+  // German word lists (issue #39): the same rules in the German texts.
+  const de = (j: Draft) => j.texts.de as Record<string, string>;
+
+  it.each([
+    ['a day count', 'Die meisten brauchen dafür 21 Tage.', 'rule 4'],
+    ['a day count in words', 'Nach einundzwanzig Tagen sitzt es.', 'rule 4'],
+    ['"du musst"', 'Du musst ihn heiß trinken.', 'rule 15'],
+    ['"du solltest"', 'Du solltest den Kessel bereitstellen.', 'rule 15'],
+    ['"nicht vergessen"', 'Nicht vergessen: der Kessel.', 'rule 15'],
+    ['"verpasst"', 'Wenn du gestern verpasst hast, fang neu an.', 'rules 12'],
+    ['"versäumt"', 'Ein versäumter Tag ist nicht schlimm.', 'rules 12'],
+    ['"Fehler"', 'Ein Fehler ist kein Beinbruch.', 'rules 12'],
+    ['"Rückfall"', 'Nach einem Rückfall geht es weiter.', 'rules 12'],
+    ['"zurückstufen"', 'Du könntest dich zurückstufen.', 'rules 12'],
+    ['streaks', 'Halte deine Strähne am Leben.', 'rule 11'],
+    ['a quote', '„Tee ist die Antwort auf fast alles.“ – Irgendwer Berühmtes', 'rule 5'],
+  ])('rejects %s in German', (_name, text, rule) => {
+    const found = errors((j) => (de(j)['tea.cup.nugget'] = text));
+    expect(found).toHaveLength(1);
+    expect(found[0]?.message).toContain(rule);
+    expect(found[0]?.message).toContain('de text');
+  });
+
+  it('accepts the German words the design rules ask for', () => {
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.nugget'] =
+          'Ein Tag Pause ist in Ordnung: eine Lücke, mehr nicht. Der kleinere Schritt zählt trotzdem.';
+        de(j)['tea.pot.nugget'] =
+          'Wenn du magst, könntest du für später vorplanen: „Wenn es spät wird, dann koche ich eine Tasse.“ Die Muße bleibt.';
+      }),
+    ).toEqual([]);
+  });
+
+  it('checks each language with its own list only', () => {
+    expect(errors((j) => (de(j)['tea.cup.nugget'] = 'You must drink it hot.'))).toEqual([]);
+    expect(errors((j) => (en(j)['tea.cup.nugget'] = 'Du musst ihn heiß trinken.'))).toEqual([]);
+  });
+
+  it('wants the German action in the form of the plan sentence too', () => {
+    const found = errors((j) => (de(j)['tea.cup.action'] = 'eine Tasse Tee kochen'));
+    expect(found.map((p) => p.at)).toEqual(['stages[0].plan.action.plan']);
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'koche ich eine Tasse Tee';
+      }),
+    ).toEqual([]);
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'du musst eine Tasse Tee kochen';
+      })[0]?.message,
+    ).toContain('rule 15');
+    expect(
+      errors((j) => {
+        de(j)['tea.cup.action'] = 'eine Tasse Tee kochen';
+        de(j)['tea.cup.action.plan'] = 'x'.repeat(121);
+      })[0]?.message,
+    ).toContain('120');
+  });
+
+  it('says what a built-in journey lacks in a language', () => {
+    const journey = good() as Draft;
+    expect(languageProblems(journey as never, ['en'])).toEqual([]);
+    expect(languageProblems(journey as never, ['de']).map((p) => p.message)).toContain(
+      'no de text for "tea.why"',
+    );
+    expect(languageProblems(journey as never, ['de'])).toHaveLength(9);
+    expect(languageProblems(journey as never, ['fr'])).toEqual([
+      { level: 'error', at: 'texts.fr', message: 'no fr texts' },
+    ]);
   });
 
   it('rejects the same nugget twice', () => {
@@ -141,6 +236,22 @@ describe('journey checker', () => {
     const problems = journeyProblems(journey);
     expect(problems.every((p) => p.level === 'warning')).toBe(true);
     expect(problems.map((p) => p.at)).toEqual(['stages[0].condition', 'stages[1].nugget', 'why']);
+  });
+
+  it('warns when a user who skips the first stage would start at a large step (#81)', () => {
+    const at = (action: string, condition?: object) => {
+      const journey = good() as Draft;
+      en(journey)['tea.pot.action'] = action;
+      if (condition) (stage(journey, 1) as { condition: object }).condition = condition;
+      return journeyProblems(journey).map((p) => [p.level, p.at]);
+    };
+    expect(at('make tea and sit with it for 15 quiet minutes')).toEqual([
+      ['warning', 'stages[1].plan.action'],
+    ]);
+    expect(at('make tea and sit with it for fifteen minutes')).toHaveLength(1);
+    expect(at('make a pot of tea', { type: 'time_spent', minutes: 20 })).toHaveLength(1);
+    expect(at('make tea and sit with it for five minutes')).toEqual([]);
+    expect(at('make tea and sit for 1 minute')).toEqual([]);
   });
 
   it('checks the build against content/art/', () => {

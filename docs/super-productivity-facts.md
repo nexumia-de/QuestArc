@@ -29,8 +29,9 @@ that and are not ancestors of that commit. They were released with
 **20.0.0** (tag `v20.0.0`, commit `4db0e112`, 2026-11-06) and are marked
 _since 20.0.0_: on 2026-11-13 every commit named so, and `c5eb3f6`
 itself, was an ancestor of the tag (`git merge-base --is-ancestor`), and
-`packages/plugin-api/src/types.ts` at the tag is identical to the copy in
-`packages/sp-plugin-api`[^sp][^sp20].
+`packages/plugin-api/src/types.ts` at the tag is what QuestArc uses through
+the npm package `@super-productivity/plugin-api` 20.0.0 (`packages/plugin`,
+dev dependency, types only)[^sp][^sp20].
 
 ## 1. Packaging
 
@@ -97,8 +98,9 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   cannot load a second script, a JSON or an SVG file of the plugin. What
   the view needs beyond its own `index.html` must come from `plugin.js`
   by message. QuestArc's view is built without whitespace (#103), gets
-  the journeys' texts with each state and the ladders' pictures once
-  (`questarc:art`) from `plugin.js` (#100); `build.mjs` fails above
+  the journeys' texts with each state and the UI texts, the style and
+  the ladders' pictures once (`questarc:content`) from `plugin.js`
+  (#100, #102); `build.mjs` fails above
   102,400 bytes[^sp].
 - Uploaded plugin code is cached per device in IndexedDB `SUPPluginCache`
   (`plugin-cache.service.ts`); enabled plugins are activated at startup
@@ -298,6 +300,35 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   day. `deletedInstanceDates` is written only by "skip instance" in the repeat
   dialog (`dialog-edit-task-repeat-cfg.component.ts`,
   `deleteTaskRepeatCfgInstance`)[^sp].
+- **Reminders** (checked at `v20.0.0`, commit `4db0e112`, for #60). A
+  repeat config has `startTime?` (`H:MM`, checked with
+  `isValidSplitTime`: two numbers, hours 0 to 24, minutes 0 to 59) and
+  `remindAt?`, a `TaskReminderOptionId` (`task.model.ts`: `DoNotRemind`,
+  `AtStart`, `m5`, `m10`, `m15`, `m30`, `h1`, and the long leads `d1`,
+  `d3`, `w1`, which are not offered where the id itself is stored, as in
+  a repeat config). It carries them to its instances: when an instance
+  is created and `startTime` is valid and `remindAt` is set, the
+  instance is scheduled with `dueWithTime` and a `remindAt` timestamp
+  from `remindOptionToMilliseconds`, which gives none for `DoNotRemind`
+  (`task-repeat-cfg.service.ts`, `_getActionsForTaskRepeatCfg`;
+  `tasks/util/remind-option-to-milliseconds.ts`). So a repeat's
+  instances have a reminder exactly when the config has a valid
+  `startTime` and a `remindAt` other than `DoNotRemind`. In the repeat
+  dialog the "Start date" field opens the schedule dialog, where date,
+  time and "Remind at" are picked together; the Schedule Task dialog
+  has the same Time and Remind fields beside "Repeat"
+  (`dialog-edit-task-repeat-cfg.component.html`,
+  `planner/dialog-schedule-task/dialog-schedule-task.component.html`,
+  `ui/datetime-picker/datetime-picker.component.html`)[^sp20].
+- **What a plugin reads of it:** `getAppState()` returns the repeat
+  configs' entities as stored, so `startTime` and `remindAt` are there
+  (`plugin-bridge.service.ts`, `getAppState`; `PluginTaskRepeatCfg` in
+  `packages/plugin-api/src/types.ts` types `remindAt?: string` and
+  `startTime?: string`), and a live task has `remindAt` (ms) and
+  `dueWithTime`. Neither carries a date for when the reminder was set
+  or removed, and no hook reports a change of a repeat config (§3), so
+  a reminder's history is not in the data. A plugin cannot set or
+  remove one: no API method changes a repeat config (§6)[^sp20].
 - Deleting a repeat config clears `repeatCfgId` on all live tasks
   (`src/app/root-store/meta/task-shared-meta-reducers/task-repeat-cfg-shared.reducer.ts`)
   **and** on archived tasks
@@ -364,6 +395,11 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   re-registering the same `id` replaces the entry
   (`plugin-task-context-menu-registry.service.ts`, `register`; added in 19.2.0,
   `41324d29`)[^sp].
+- `registerConfigHandler(handler)` (plugin.js only; in 19.3.0 and 20.0.0):
+  one handler per plugin; Settings → Plugins shows a settings button when
+  one exists and runs it on press (`plugin-bridge.service.ts`,
+  `hasConfigHandler`/`invokeConfigHandler`; `plugin-management.component.ts`
+  at `v19.3.0` and `v20.0.0`). The handler may call `showIndexHtmlAsView()`[^sp].
 - `showIndexHtmlAsView()` navigates to `/plugins/<id>/index`
   (`_showIndexHtmlAsView`); manifest `sidePanel: true` loads the UI in the
   right panel (`types.ts`); `showInWorkContext()` mounts it in place of the

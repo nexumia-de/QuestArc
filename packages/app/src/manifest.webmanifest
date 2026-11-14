@@ -1,0 +1,12 @@
+{
+  "name": "QuestArc",
+  "short_name": "QuestArc",
+  "description": "Habits as journeys: a habit grows in small stages.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f8f7",
+  "theme_color": "#6495ed",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

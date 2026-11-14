@@ -19,9 +19,18 @@ export interface State {
   readonly records: Readonly<Record<string, unknown>>;
   /** Whether the side panel setting is on on this device (#100). */
   readonly sidePanel?: boolean;
+  /** Once, after the settings button in Super Productivity's plugin list (#67). */
+  readonly openSettings?: boolean;
+  /** Once, after the action Show of a message: the journey, on top of the home (#96). */
+  readonly openJourney?: boolean;
+  /**
+   * The language plugin.js holds its texts in (#39). When it is not the
+   * one of the view's content, the view asks for the content again.
+   */
+  readonly language?: string;
 }
 
-/** The ladders' pictures for the view (#100), sent once by plugin.js. */
+/** The ladders' pictures for the view (#100), part of the content pack. */
 export interface ArtPack {
   readonly pictures: Readonly<Record<string, string>>;
   readonly ladders: Readonly<Record<string, Ladder>>;
@@ -31,19 +40,34 @@ export interface ArtPack {
   >;
 }
 
+/**
+ * What the view does not carry itself, sent once by plugin.js: the view's
+ * index.html is limited to 100 KB in Super Productivity 19.3
+ * (docs/decisions/one-build-for-older-versions.md).
+ */
+export interface ContentPack {
+  /** The language of the texts: "en" or "de" (#39); English when left out. */
+  readonly language?: string;
+  /** The UI and event texts of content/i18n in that language, by key. */
+  readonly texts: Readonly<Record<string, string>>;
+  /** The view's style sheet (src/ui/style.css). */
+  readonly style: string;
+  readonly art: ArtPack;
+}
+
 export type Request =
   | { readonly type: 'questarc:get' }
   /** Writes choice records; an empty string withdraws one (docs/data-model.md §2). */
   | { readonly type: 'questarc:write'; readonly records: Readonly<Record<string, unknown>> }
   /** Turns the side panel setting of this device on or off. */
   | { readonly type: 'questarc:side-panel'; readonly on: boolean }
-  /** The ladders' pictures (an ArtPack). */
-  | { readonly type: 'questarc:art' };
+  /** Texts, style and the ladders' pictures (a ContentPack). */
+  | { readonly type: 'questarc:content' };
 
 export const isRequest = (message: unknown): message is Request => {
   if (typeof message !== 'object' || message === null) return false;
   const { type, records, on } = message as { type?: unknown; records?: unknown; on?: unknown };
-  if (type === 'questarc:get' || type === 'questarc:art') return true;
+  if (type === 'questarc:get' || type === 'questarc:content') return true;
   if (type === 'questarc:side-panel') return typeof on === 'boolean';
   return type === 'questarc:write' && typeof records === 'object' && records !== null;
 };

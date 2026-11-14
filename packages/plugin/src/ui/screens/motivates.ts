@@ -6,10 +6,13 @@ import type { Screen } from '../screen';
 const PARAGRAPHS = [
   'small-steps',
   'plan',
+  'moments',
   'misses',
   'welcome-back',
+  'break',
   'reason',
   'weekly',
+  'reminders',
   'graduation',
   'game',
   'not',

@@ -34,7 +34,11 @@ export const stationsScreen = (ctx: Context): Screen => {
               t('ui.station.of', { n: index + 1, total: run.stations.length }),
             ),
             h('span', { class: 'qa-section-title' }, capitalise(t(stage.plan.action))),
-            h('span', { class: 'qa-muted' }, t(`ui.build.station.${station?.state ?? 'ahead'}`)),
+            h(
+              'span',
+              { class: 'qa-muted' },
+              t(`ui.build.station.${station?.leftDay ? 'left' : (station?.state ?? 'ahead')}`),
+            ),
           ),
         );
       }),

@@ -1,0 +1,77 @@
+{
+  "name": "A skipped stage is passed without a run or completions; the next stage is current and the version rises",
+  "rule": "game-rules §4, skipping",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-03",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:a": {
+        "day": "2026-11-02",
+        "dataFormat": 3
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-11-02"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "state": "skipped",
+          "skippedDay": "2026-11-02",
+          "undoable": true,
+          "completions": 0,
+          "welcomeBacks": 0,
+          "run": {
+            "current": 0,
+            "best": 0,
+            "total": 0
+          },
+          "doneDay": null
+        },
+        {
+          "state": "unbound",
+          "acceptedDay": "2026-11-02"
+        },
+        {
+          "state": "ahead"
+        }
+      ],
+      "position": {
+        "stage": 1
+      },
+      "build": {
+        "version": 2,
+        "versions": 4,
+        "skipped": [2],
+        "markerProgress": 0,
+        "ready": false
+      }
+    },
+    "readOnly": [],
+    "problems": []
+  }
+}

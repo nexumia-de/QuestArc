@@ -1,0 +1,58 @@
+{
+  "name": "A skip taken back: the stage is offered again and the version is as before",
+  "rule": "game-rules §4, skipping",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-03",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "skip:r1:a": "",
+      "stage:r1:b": ""
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "stations": [
+        {
+          "state": "unbound",
+          "skippedDay": null
+        },
+        {
+          "state": "ahead"
+        },
+        {
+          "state": "ahead"
+        }
+      ],
+      "position": {
+        "stage": 0
+      },
+      "build": {
+        "version": 1,
+        "skipped": []
+      }
+    },
+    "problems": []
+  }
+}

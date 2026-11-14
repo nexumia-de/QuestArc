@@ -116,7 +116,8 @@ The exact rules and numbers are in [game rules](game-rules.md) (decided
 over due days with a one-day backfill window, a greeting on coming back,
 no player HP (D3), no XP, levels or guardians since 3.3 (#110), a build
 that grows with the stages, graduation by three
-high weekly answers, 80 % completion and reminders already off. Not
+high weekly answers and 80 % completion over four and over two weeks
+(a graduated habit is no longer ticked off, #22). Not
 planned: gold and shop, random rewards, login bonuses, leaderboards,
 money commitments.
 
@@ -145,7 +146,7 @@ milestones.
   and `dayChange` came with Super Productivity 20.0.0. QuestArc uses
   them where they exist and falls back for 19.3.x
   ([decision](decisions/one-build-for-older-versions.md)); the types
-  come from the pinned upstream commit.
+  come from the npm package `@super-productivity/plugin-api` 20.0.0.
 - **Compressed plugin data.** Super Productivity stores long plugin data
   as `GZ1:` plus gzip in the backup; Pensum must decode it.
 - **Deleting history changes the game.** If archived tasks or single

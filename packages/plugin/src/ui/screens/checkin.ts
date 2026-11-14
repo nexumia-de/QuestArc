@@ -1,30 +1,30 @@
 import { answerCheckin, isoWeek } from '@questarc/engine';
 
-import { capitalise } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
+import { habitName, targetOf } from '../habit';
+import { answersRow } from '../journey/answers-row';
 import { lastDaysRow } from '../journey/last-days';
 import type { Context, Screen } from '../screen';
 import { markSeen } from '../seen';
 
 /**
  * Screen 6, weekly look back (design rule 9, issue #53): the last due
- * days, the runs, and the validated single automaticity item with the
- * habit filled in, answered 1–7 or skipped. A skipped week stays empty.
+ * days, the runs, the answers so far week by week (#88), and the
+ * validated single automaticity item with the habit filled in, answered
+ * 1–7 or skipped. A skipped week stays empty. With `runId` it asks about
+ * the habit a finished journey left (flow F).
  */
-export const checkinScreen = (ctx: Context): Screen => {
-  const { view, journeys } = ctx.state;
-  const run = view.active;
-  const journey = run && journeys.find((j) => j.id === run.journeyId);
-  const station = run?.stations[run.position.stage];
-  const stage = journey?.stages[run?.position.stage ?? 0];
-  if (!run || !station || !stage)
-    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
+export const checkinScreen = (ctx: Context, runId?: string): Screen => {
+  const { view } = ctx.state;
+  const target = targetOf(ctx.state, runId);
+  if (!target) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
+  const { run, stage } = target;
+  // The last due days and the run: the station's, or the habit's (#66).
+  const followed = target.habit ?? run.stations[target.index];
+  const counted = followed?.run;
+  const answers = target.habit ? target.habit.answers : run.answers;
   const week = isoWeek(view.todayStr);
-  const habit = t('ui.checkin.habit', {
-    action: capitalise(t(stage.plan.action)),
-    anchor: t(stage.plan.anchor),
-  });
   const answer = (score: number) => async () => {
     await ctx.write(answerCheckin(run.runId, stage.id, week, score));
     ctx.back();
@@ -34,24 +34,31 @@ export const checkinScreen = (ctx: Context): Screen => {
     ctx.back();
   };
   return {
-    title: t('ui.checkin.title'),
+    title: t(target.habit?.fourWeekly ? 'ui.checkin.title-4' : 'ui.checkin.title'),
     body: h(
       'div',
       { class: 'qa-stack' },
-      station.lastDays?.length ? lastDaysRow(station.lastDays) : null,
-      h(
-        'p',
-        { class: 'qa-muted' },
-        t('ui.card.run', {
-          current: station.run.current,
-          best: station.run.best,
-          total: station.run.total,
-        }),
-      ),
+      followed?.lastDays?.length ? lastDaysRow(followed.lastDays) : null,
+      counted
+        ? h(
+            'p',
+            { class: 'qa-muted' },
+            t('ui.card.run', {
+              current: counted.current,
+              best: counted.best,
+              total: counted.total,
+            }),
+          )
+        : null,
+      answers ? answersRow(answers) : null,
       h(
         'fieldset',
         { class: 'qa-fieldset' },
-        h('legend', { class: 'qa-plan' }, t('ui.checkin.question', { habit })),
+        h(
+          'legend',
+          { class: 'qa-plan' },
+          t('ui.checkin.question', { habit: habitName(stage, run.anchor) }),
+        ),
         h(
           'div',
           { class: 'qa-scale' },

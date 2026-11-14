@@ -7,6 +7,10 @@
  *   { "evaluateHost": HostInput }           → GameView (from raw SP objects)
  *   { "action": { "name": "startJourney", "args": [ … ] } } → record changes
  *   { "guardWrite": { "view": GameView, "changes": { … } } } → { changes, refused }
+ *   { "texts": { "locale": "de_DE.UTF-8", "ui": { "en": { … }, "de": { … } }, "journeys": [ … ] } }
+ *     → { "language": "de", "texts": { key: text } }: the texts of
+ *     content/i18n and the journeys in the host's language, English
+ *     behind every missing key (texts.ts, issue #39)
  *   { "batch": [request, …] }                → [answer, …]
  * Run with `gjs -m engine-cli.mjs < request.json`.
  */
@@ -17,6 +21,8 @@ import { diff } from './diff';
 import { evaluate } from './evaluate';
 import { guardWrite } from './guard';
 import { snapshotFromHost, type HostInput } from './host-data';
+import { pickLanguage, textsFor, type TextTables } from './texts';
+import type { Journey } from './types/journey';
 import type { Snapshot } from './types/snapshot';
 import type { GameView } from './types/view';
 
@@ -29,6 +35,7 @@ type Request =
   | { diff: { before: GameView; after: GameView } }
   | { action: Action }
   | { guardWrite: { view: GameView; changes: Record<string, unknown> } }
+  | { texts: { locale?: string; ui: TextTables; journeys?: Journey[] } }
   | { batch: Request[] };
 
 const act = ({ name, args }: Action): unknown => {
@@ -43,6 +50,11 @@ const answer = (request: Request): unknown => {
   if ('action' in request) return act(request.action);
   if ('guardWrite' in request)
     return guardWrite(request.guardWrite.view, request.guardWrite.changes);
+  if ('texts' in request) {
+    const { locale, ui, journeys } = request.texts;
+    const language = pickLanguage(locale, Object.keys(ui));
+    return { language, texts: textsFor(language, ui, journeys) };
+  }
   if ('batch' in request) return request.batch.map(answer);
   return { error: 'unknown request' };
 };

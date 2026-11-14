@@ -1,14 +1,21 @@
+import { undoSkip } from '@questarc/engine';
+
 import { capitalise, planSentence } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { conditionText } from '../journey/card';
 import { shortDate, weekdayOfId } from '../journey/format';
+import { pairField } from '../journey/pair';
 import { scheduleText } from '../repeat';
 import type { Context, Screen } from '../screen';
 
 /**
  * Screen 5, station details: arrival story, plan, schedule, condition
- * and the learning nugget as "Try this" (design rule 22).
+ * and the learning nugget as "Try this" (design rule 22). A skipped
+ * station says "already yours" and can be offered again while the engine
+ * says so; a station left for a smaller one says that it waits. The
+ * current station's "pair it with" can be changed or removed here
+ * (design rule 7).
  */
 
 export const stationScreen = (ctx: Context, index: number): Screen => {
@@ -21,6 +28,7 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
     return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   }
   const reached = station.state !== 'ahead';
+  const plan = h('p', { class: 'qa-plan' }, planSentence(stage, station.pair, run.anchor));
   const condition = stage.condition;
   const conditionRule =
     condition.type === 'days'
@@ -45,7 +53,7 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
       h(
         'section',
         { class: 'qa-card' },
-        h('p', { class: 'qa-plan' }, planSentence(stage)),
+        plan,
         h('p', { class: 'qa-muted' }, scheduleText(stage.schedule, weekdayOfId)),
         h('p', { class: 'qa-muted' }, conditionRule),
         station.state === 'current' || station.state === 'met'
@@ -54,7 +62,31 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
         station.state === 'done' && station.doneDay
           ? h('p', {}, t('ui.details.finished', { date: shortDate(station.doneDay) }))
           : null,
+        station.state === 'skipped' && station.skippedDay
+          ? h('p', {}, t('ui.details.skipped', { date: shortDate(station.skippedDay) }))
+          : null,
+        station.leftDay
+          ? h('p', {}, t('ui.details.left', { date: shortDate(station.leftDay) }))
+          : null,
+        station.undoable
+          ? h(
+              'button',
+              {
+                class: 'qa-btn qa-btn-secondary',
+                type: 'button',
+                onclick: () =>
+                  void ctx.write(undoSkip(run, journey, stage.id)).then(() => ctx.back()),
+              },
+              t('ui.details.skip-undo'),
+            )
+          : null,
       ),
+      reached && run.planCheck?.plan
+        ? h('p', { class: 'qa-why' }, t('ui.check.yours', { plan: run.planCheck.plan }))
+        : null,
+      index === run.position.stage && !['done', 'skipped'].includes(station.state)
+        ? pairField(ctx, run, stage, plan)
+        : null,
       reached && stage.nugget
         ? h(
             'section',

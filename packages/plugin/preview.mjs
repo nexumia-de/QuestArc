@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { build } from 'esbuild';
 import { esbuildArt, esbuildLadderArt } from './art.mjs';
 import { esbuildJourneys } from './journeys.mjs';
+import { esbuildViewContent } from './view-content.mjs';
 
 const out = join('dist', 'preview');
 mkdirSync(out, { recursive: true });
@@ -17,7 +18,7 @@ const host = await build({
   target: 'es2022',
   write: false,
   define: { VIEW_HTML: JSON.stringify(view) },
-  plugins: [esbuildJourneys, esbuildLadderArt],
+  plugins: [esbuildJourneys, esbuildLadderArt, esbuildViewContent],
 });
 const script = host.outputFiles[0].text.replaceAll('</script', '<\\/script');
 const page = readFileSync('preview/index.html', 'utf8').replace(
@@ -36,7 +37,9 @@ const art = await build({
   write: false,
   plugins: [esbuildArt],
 });
-const style = readFileSync(join('src', 'ui', 'style.css'), 'utf8');
+const style = ['start.css', 'style.css']
+  .map((file) => readFileSync(join('src', 'ui', file), 'utf8'))
+  .join('\n');
 writeFileSync(
   join(out, 'art.html'),
   `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QuestArc pictures</title><style>\n${style}</style></head><body>\n<script>\n${art.outputFiles[0].text.replaceAll('</script', '<\\/script')}</script></body></html>\n`,

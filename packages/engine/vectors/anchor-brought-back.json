@@ -1,0 +1,105 @@
+{
+  "name": "A step that was brought back stands at its anchor as one that is followed again: its weekly question is due there, and nothing was lost",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [
+      {
+        "id": "cfgC",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-09-01"
+      }
+    ],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "graduation:r1:c:2026-10-28": {
+        "choice": "keep",
+        "until": "2026-11-10"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m1"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": null,
+    "finished": [
+      {
+        "runId": "r1",
+        "habit": {
+          "state": "maintained",
+          "backDay": "2026-11-10",
+          "graduated": null
+        }
+      }
+    ],
+    "anchors": [
+      {
+        "id": "m1",
+        "state": "resting",
+        "growing": null,
+        "steps": [
+          {
+            "runId": "r1",
+            "stageId": "c",
+            "state": "maintained"
+          }
+        ],
+        "due": [
+          {
+            "runId": "r1",
+            "stageId": "c",
+            "ask": "weekly"
+          }
+        ]
+      }
+    ],
+    "problems": []
+  }
+}

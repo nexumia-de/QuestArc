@@ -20,12 +20,16 @@ links. Change history is in [log.md](log.md).
 - [Data model](data-model.md) - Engine input (snapshot), choice records as one plugin-data key each, the game view and events, what Pensum reads and writes.
 - [Journey: A gentle morning](journey-gentle-morning.md) - The first built-in journey: from one glass of water to a short morning routine, four stages; how it follows the design rules.
 - [Journey: First Things First](journey-first-things-first.md) - The second built-in journey, for work: one task written down, 15 then 45 quiet minutes on it, email in blocks, a one-line look back.
+- [Journey: Evening wind-down](journey-evening-wind-down.md) - Built-in journey: after brushing teeth, from the phone on its charger to a short calm routine and a steady time for lights out; what the sleep evidence allows.
+- [Journey: Tidy a little](journey-tidy-a-little.md) - Built-in journey: after dinner, from one thing put back to five minutes for the table, the counter and one more spot.
+- [Journey: A walk after lunch](journey-walk-after-lunch.md) - Built-in journey for movement: from stepping outside the door to a 20-minute walk in four stages.
+- [Journey: A few pages before sleep](journey-pages-before-sleep.md) - Built-in journey for reading: after getting into bed, from one page to 20 minutes of reading in four stages.
 - [Story format 3](story-format.md) - Journeys as one self-contained JSON file: stages with plan, schedule, condition, story texts and nugget; own texts and author; the journey checker; versions.
 - [Writing a journey](authoring-journeys.md) - Guide for people and their agents: the rules in short, the file, a template, the check, publishing by pull request, the CC BY-SA licence.
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, welcome back, graduation, the build of a journey (ladder, version, marker progress, ready), with worked examples.
 
 - [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; focused work; changes to the design rules; open gaps.
-- [Design rules from habit psychology](psychology.md) - 27 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
+- [Design rules from habit psychology](psychology.md) - 28 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
 
 # Super Productivity
 
@@ -48,3 +52,4 @@ links. Change history is in [log.md](log.md).
 - [One plugin build for older Super Productivity versions](decisions/one-build-for-older-versions.md) - `minSupVersion` stays 19.3.0; one ZIP within 19.3.x's limits (index.html ≤ 100 KB), larger content via `plugin.js`, newer API members feature-detected.
 - [A data format number on the record that needs it](decisions/data-format.md) - Hosts on different engine versions: `dataFormat` on the run-scoped record an older engine would misread makes that run read-only there; unknown kinds and fields are ignored and kept; `guardWrite` refuses writes into such runs.
 - [Others publish journeys by pull request](decisions/journeys-by-pull-request.md) - One self-contained file, checked in CI, merged by the owner; CC BY-SA 4.0 with "Written by …"; private journeys later with the same file.
+- [Spike: the screens and the engine as a standalone web app](decisions/standalone-app-spike.md) - Go: screens, adapter and engine run unchanged as an offline web app on a dataset in Super Productivity's backup format; what a shared package and the host interface need first.

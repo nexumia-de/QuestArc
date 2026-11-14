@@ -38,13 +38,20 @@ export const hueOf = (name: string, ladder?: Ladder): Hue | undefined =>
 /** The marker kind's plural title, from its pictures' list. */
 export const markerTitle = (kind: string): string => art().markers[kind]?.title ?? kind;
 
-/** The state the scene is drawn in, from the engine's view and the journey's names. */
+/**
+ * The state the scene is drawn in, from the engine's view and the journey's
+ * names. The names were written for the journey's own ladder: on another
+ * ladder (chosen when starting) the ladder's generic titles show (#115).
+ */
 export const buildState = (build: BuildView, journey: Journey): BuildState => ({
   progress: build.markerProgress,
   ready: build.ready,
   marker: build.marker,
   versions: build.versions,
-  names: journey.build?.names?.map((key) => (key ? t(key) : undefined)),
+  names:
+    build.ladder === (journey.build?.ladder ?? 'home')
+      ? journey.build?.names?.map((key) => (key ? t(key) : undefined))
+      : undefined,
 });
 
 /** The row of versions: those standing small, the next as a plain step. */
@@ -53,6 +60,7 @@ export const versionRow = (
   version: number,
   state: BuildState,
   hue: Hue | undefined,
+  skipped: readonly number[] = [],
 ): HTMLElement => {
   const total = state.versions ?? ladder.versions.length;
   const items: Node[] = [];
@@ -63,12 +71,15 @@ export const versionRow = (
     svg.setAttribute('aria-hidden', 'true');
     svg.removeAttribute('role');
     svg.removeAttribute('aria-label');
+    // A version that stands for a skipped stage says so in words.
+    const given = skipped.includes(v) ? t('ui.build.given') : undefined;
+    const name = versionName(ladder, v, state);
     items.push(
       h(
         'li',
-        { class: 'qa-version', 'aria-label': `${v}: ${versionName(ladder, v, state)}` },
+        { class: 'qa-version', 'aria-label': `${v}: ${given ? `${name}, ${given}` : name}` },
         svg,
-        h('span', { 'aria-hidden': 'true' }, v),
+        h('span', { 'aria-hidden': 'true' }, given ? `${v} · ${given}` : v),
       ),
     );
   }
@@ -127,7 +138,7 @@ export const buildSection = (run: RunView, journey: Journey): HTMLElement | null
     'section',
     { class: 'qa-build', 'aria-label': t('ui.build.title') },
     h('div', { class: 'qa-build-scene' }, svg),
-    versionRow(ladder, build.version, state, hue),
+    versionRow(ladder, build.version, state, hue, build.skipped),
     h('p', { class: 'qa-build-state' }, buildWords(ladder, build.version, state)),
   ) as HTMLElement;
 };

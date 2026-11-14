@@ -1,4 +1,4 @@
-import type { Hooks } from '@questarc/sp-plugin-api';
+import type { Hooks } from '@super-productivity/plugin-api';
 
 import type { HostApi } from '../src/adapter/host';
 

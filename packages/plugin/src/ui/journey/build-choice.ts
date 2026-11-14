@@ -6,7 +6,7 @@ import {
   type Journey,
 } from '@questarc/engine';
 
-import { t } from '../../shared/texts';
+import { inLine, t } from '../../shared/texts';
 import { art } from '../art-store';
 import { picture } from '../art';
 import { h } from '../dom';
@@ -171,8 +171,8 @@ export const buildSummary = (journey: Journey, choice: BuildChoice): string => {
   const title = art().ladders[shown.ladder]?.title ?? shown.ladder;
   return [
     title,
-    markerTitle(shown.marker).toLowerCase(),
-    (art().palette[shown.hue]?.title ?? shown.hue).toLowerCase(),
+    inLine(markerTitle(shown.marker)),
+    inLine(art().palette[shown.hue]?.title ?? shown.hue),
   ].join(' · ');
 };
 

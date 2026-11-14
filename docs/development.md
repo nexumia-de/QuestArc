@@ -15,7 +15,7 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 | `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                              |
 | `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                           |
 | `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                             |
-| `packages/sp-plugin-api`  | Unchanged copy of Super Productivity's plugin API types at a pinned commit                                                                          |
+| `packages/app`            | Spike, private and not released (#93): the plugin's adapter and screens as a standalone web app ([standalone app](#standalone-app-spike))           |
 | `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example |
 | `scripts/`                | Maintenance scripts                                                                                                                                 |
 
@@ -31,7 +31,8 @@ npm run check
 `check` runs, in this order: `format:check` (Prettier), `lint` (ESLint;
 the engine has extra rules: no clock, no `Math.random`, no console, no
 host globals), `typecheck`, `test` (Vitest: engine, then the plugin's
-adapter against a fake plugin API in `packages/plugin/test/`), `build`.
+adapter against a fake plugin API in `packages/plugin/test/`, then the
+standalone app's store and host), `build`.
 
 `npm run journeys` runs only the journey files' schema check and the
 journey checker ([story format](story-format.md#the-journey-checker)).
@@ -42,7 +43,10 @@ journey checker ([story format](story-format.md#the-journey-checker)).
   pull request and push to `main` (job `check`, the required check in
   `.github/rulesets/main.json`; the owner imports the ruleset) and keeps
   the plugin ZIP as an artifact. Job `real-app`, also required, tries the
-  ZIP in Super Productivity ([in the real app](#in-the-real-app)).
+  ZIP in Super Productivity ([in the real app](#in-the-real-app)). Job
+  `standalone-app` (not required) walks the spike of the standalone app
+  and imports its export into the same Super Productivity
+  ([standalone app](#standalone-app-spike)).
 - `.github/workflows/release.yml` runs on tags `v<version>`: the tag must
   match `packages/plugin/src/manifest.json`; it runs the checks and
   attaches the ZIP and `SHA256SUMS` to a GitHub release (a tag with `-`
@@ -66,11 +70,22 @@ journey checker ([story format](story-format.md#the-journey-checker)).
 
 - `plugin.js` as a classic script (IIFE): Super Productivity runs it with
   `new Function`, so it must not contain `import`.
-- `index.html` with the view's script and `style.css` inlined: iframe
+- `index.html` with the view's script and `start.css` inlined: iframe
   plugins get no other files from the ZIP. Both are built without
   whitespace (`minifyWhitespace`; names stay readable), because
   Super Productivity 19.3 installs an `index.html` of at most 100 KB; the
   build fails above it. `plugin.js` stays as it is (limit 5 MB).
+- What is data and not code is not in `index.html`: the UI texts
+  (`content/i18n/en.json`), the screens' style (`src/ui/style.css`) and
+  the ladders' pictures are in `plugin.js` and reach the view once by
+  message ([plugin adapter](plugin-adapter.md), "What the view carries").
+  `packages/plugin/view-content.mjs` builds two modules for this (esbuild
+  and Vitest): `virtual:questarc-style`, the style without whitespace as
+  a text for `plugin.js`, and `virtual:questarc-start-texts`, the four
+  texts the view shows before `plugin.js` answers. The build fails when
+  it finds other UI texts in `index.html`. Measured on 2026-11-14:
+  `index.html` 64,127 of 102,400 bytes (89,774 before, #102); a new text
+  or style rule no longer adds to it.
 - `dist/questarc-<version>.zip` with `manifest.json`, `plugin.js`,
   and `index.html`, packed with fflate. No `icon.svg`: the manifest's
   `"icon": "route"` is a Material icon name.
@@ -80,13 +95,13 @@ Use test data, not real tasks.
 
 The plugin's files, one job each:
 
-| Path            | Job                                                                                                                                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                               |
-| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `messages`, `host` (API subset)                                             |
-| `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n), `plan` (sentences), `content` (built-in journeys)                                                                                            |
-| `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `dom`, `screen` (types), `screens/` (one file per screen), `style.css` |
-| `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                        |
+| Path            | Job                                                                                                                                                                                                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                                                                                                                     |
+| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `show-journey` (the message's Show), `reminder-seen`, `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                    |
+| `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n, holds no texts itself), `plan` (sentences); plugin.js only: `english` (the UI texts), `content` (built-in journeys)                                                                                                                 |
+| `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `content` (takes in what plugin.js sends), `dom`, `screen` (types), `screens/` (one file per screen), `start.css` (inlined), `style.css` (sent by plugin.js) |
+| `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                                                                                                              |
 
 ## Preview and screenshots
 
@@ -104,10 +119,31 @@ npm run screenshots -w @questarc/plugin
 
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
-horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
-`journey`, `met`, `unbound`, `newer`, `build`, `build-ready`,
-`build-crossing`; `empty:Settings` clicks the
-button named "Settings" first. In the browser console,
+horizontal overflow, text cut off in its box and buttons, links and
+fields smaller than 44 px. The third argument is the language Super
+Productivity would report (#39): `node screenshots.mjs journey,habit 1 de`
+writes `…-de.png` in German, and the preview takes `?lang=de` (or
+`de-AT`; anything else is English). Routes then name German buttons
+(`welcome:Reise auswählen`, `graduated:Menü>Regal`). Demos (`preview/demo.ts`): `welcome`, `empty`,
+`journey`, `reminder` (a reminder on the task and two weekly answers
+of 5 or more, #60), `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
+(the card after a long break, #82), `smaller` (after starting smaller),
+`unbound`, `newer`, `build`, `build-ready`, `build-crossing`,
+`before-anchors` (a journey from before #96: the home asks once whether
+its moment is the user's), the home with several moments
+(`preview/demo-moments.ts`: `moments`, `moments-chain`, `moments-rest`),
+and for
+the habit a finished journey leaves (`preview/demo-habits.ts`, #22):
+`habit` (maintained, the weekly question due, answers of eight weeks),
+`graduate` (it can graduate), `graduate-later` (the same after "Not
+Now": the offer is quiet), `graduated` (the question after two
+weeks is due), `not-really` (answered so) and `brought-back` (back,
+its repeat gone). After a colon come the buttons or menu items to
+click first, in order, separated by `>`:
+`empty:Menu>Settings`, `graduate:Have a Look`, `journey:Station` (the
+growing step on the home, which opens the journey screen),
+`habit:Menu>Shelf` (a name with a comma cannot be given; spaces need
+quotes in the shell). In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes
 the view's requests fail as they do while plugin.js is not loaded
 (`preview.failMessages(null)` ends it; any other text shows the "could
@@ -154,7 +190,35 @@ dialog, tick it off, check the message and the journey.
 start with another ladder (Crossing), tick, open the build
 from the message's **Show**, see the first marker element, tick on four
 more days (Playwright's clock moves the date; the app is reloaded each
-day) until the stage is ready, continue and see the next version. `e2e/real-app-panel.mjs` checks
+day) until the stage is ready, stay a while, continue and see the next
+version, then pass the next stage with **I Already Do This** (#81).
+`e2e/real-app-return.mjs` walks coming back after a long break (#82):
+the second station ticked once, no card after 13 days, the card after
+14, **Start Smaller** with the gap called a pause, the first station
+current again with the version standing, and the first tick as a
+welcome back. `e2e/real-app-graduation.mjs` walks graduation (#22) with
+prepared data: a real recurring task ticked once, then the records of a
+finished journey and three high weekly answers written through the
+view's own message to plugin.js (`questarc:write`, so they pass
+`guardWrite`); the offer, **Not Now** as a choice record with the
+shelf keeping **Let It Graduate**, the page with its two choices, "Runs by
+itself" with **Open the task**, the shelf, no message when the task is
+ticked afterwards, no question after 13 days, the question after 14,
+**Not Really**, **Bring It Back** and the habit on the shelf again.
+`e2e/real-app-moments.mjs` walks the moments (#96): a journey started
+from a moment in the user's own words, the task titled with them, the
+home with that moment, its growing step and no box to tick, a name for
+the moment; then, with prepared data, the finished journey's step in
+"Runs by itself", **Extend This Moment** with the new journey tied to
+that step (a chain), and a journey from before anchors confirmed once.
+`e2e/real-app-reminder.mjs` walks reminders (#60): the suggestion at
+set-up, a start time and a reminder set on the repeat in Super
+Productivity's own dialogs (`makeRecurring` with `time` in
+`e2e/sp.mjs`), QuestArc reading it (`reminder.set`, the `reminder-seen`
+record), and, with two weekly answers of 5 or more written through
+plugin.js, the banner "You may not need the reminder any more" with
+**Open the task**.
+`e2e/real-app-panel.mjs` checks
 the side panel setting: no button by default, the button after turning
 it on, QuestArc in the right panel (320 px wide at 1200 px). They share
 the app steps in `e2e/sp.mjs`. Screenshots go to
@@ -195,13 +259,62 @@ The image stays on the oldest supported version (`minSupVersion`
 proposes only minor and patch updates. When the pinned version changes,
 check the [facts](super-productivity-facts.md) §10.
 
+## Standalone app (spike)
+
+`packages/app` (#93) is the plugin's adapter and screens on a second
+host: its own dataset in Super Productivity's backup format, kept in
+IndexedDB, with a Today screen, export and import. It imports the
+plugin's and the engine's sources and copies none. What it showed and
+what has to change before it becomes a product:
+[decision](decisions/standalone-app-spike.md). It is private and not
+released.
+
+```sh
+npm run build -w @questarc/app
+```
+
+writes `packages/app/dist/app/`: static files for any web server
+(`index.html`, `app.js`, `app.css`, the web manifest, the icon and the
+service worker `sw.js`, which keeps them and answers every request from
+its cache). It needs `http://localhost` or HTTPS; opened from a file it
+has no service worker. It shows German for a German device language
+(`navigator.language`) and English for any other; `?lang=de` sets it by
+hand, as a host that embeds it with its own locale would (#39).
+
+```sh
+npm run e2e -w @questarc/app
+```
+
+walks the built app at 360 × 720 and 1200 × 800 (`e2e/walk.mjs`, served
+by `e2e/serve.mjs` on a free port): a journey from start over three
+logical days, offline after the first day, export and import; it prints
+the start time with the CPU slowed four times. Screenshots and the
+exported backup go to `packages/app/dist/walk/`.
+
+```sh
+QUESTARC_SP_URL=http://localhost:8080/ npm run e2e:import -w @questarc/app
+```
+
+imports that backup into Super Productivity (the same image and variable
+as [in the real app](#in-the-real-app); without the variable the live web
+app) and fails on a validation failure, a repair or a dialog, then
+installs the plugin ZIP and compares the journey. It needs `npm run
+build` and the walk first. Where Playwright's own Chromium is not
+installed, `QUESTARC_CHROMIUM` names the binary for both scripts (in the
+cloud image
+`/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell`).
+Neither is part of `npm run check`.
+
 ## Plugin API types
 
-The npm package `@super-productivity/plugin-api` is outdated (1.0.1, June
-2025). `packages/sp-plugin-api` holds the types of a pinned upstream
-commit; `scripts/update-sp-plugin-api.sh <commit>` replaces them. Keep
-the commit in that package's README and in
-[Super Productivity facts](super-productivity-facts.md) the same.
+The types come from the npm package `@super-productivity/plugin-api`
+(versioned like the app since 20.0.0), pinned exactly as a dev dependency
+of `packages/plugin`; Dependabot proposes updates. It is imported with
+`import type` only and its global `PluginAPI` is declared through
+`types` in `packages/plugin/tsconfig.json`, so nothing of it is bundled
+and one build serves Super Productivity 19.3.0 and later
+([decision](decisions/one-build-for-older-versions.md)). After an update
+check the [Super Productivity facts](super-productivity-facts.md) §10.
 
 ## Engine and test vectors
 
@@ -249,6 +362,42 @@ is over budget or when the journey's numbers change. Set
 job `speed-aarch64` writes them to the job summary on an arm64 runner. The
 job is not a required check.
 
+## Look back
+
+`scripts/look-back.mjs` is the owner's look back at the game rules'
+numbers (#84). It reads a Super Productivity backup, runs the built
+engine on it and prints, per run and stage: due days (done, gaps, still
+open, paused), completions, welcome backs, best run, run-ending misses,
+days from acceptance to met, how often the backfill window was used and
+the weekly answers by ISO week (answered of asked). Ids, days and counts
+only, never a title, a note or the user's reason. No network; nothing is
+written.
+
+```sh
+npm run build -w @questarc/engine
+```
+
+```sh
+node scripts/look-back.mjs backup.json
+```
+
+`--today YYYY-MM-DD` and `--tz <zone>` replace the current logical day
+and the system time zone. The day start comes from the backup's
+`globalConfig.misc`; records are decoded as Pensum does (`GZ1:`).
+
+The engine shows these numbers only for today's state, and a finished
+stage keeps none. The script does not copy a rule: it asks the engine
+again, for each day of a stage, with the stage's checkpoint left out and
+only the completions known by the end of that day. Settled day marks
+(done, gap, paused) are collected from the engine's `lastDays`; the
+days to met are the first day the engine says met. A run-ending miss is
+a day on which the engine's current run ends (it is shorter than the new
+done days explain, or the fallback is offered); it can be missed when a
+completion follows on the same day and the run was already empty. The
+backfill count reads the stage's completed instances: ticked off the day
+after their day (in the window), the same day, or later than the window.
+`test/look-back.test.ts` runs the script on a synthetic backup.
+
 ## Engine in gjs
 
 `flatpak run` does not work in the cloud container (no session
@@ -263,27 +412,40 @@ R=$(flatpak --user info --show-location org.gnome.Platform//51)/files
 bwrap --ro-bind "$R" /usr --symlink usr/lib /lib --symlink usr/lib64 /lib64 --symlink usr/bin /bin --ro-bind "$R/etc" /etc --proc /proc --dev /dev --bind "$PWD" "$PWD" --chdir "$PWD" gjs -m packages/engine/dist/engine-cli.mjs < snapshot.json
 ```
 
+The command line also answers `{ "texts": { "locale": "de_DE.UTF-8",
+"ui": { "en": …, "de": … }, "journeys": [ … ] } }` with `{ "language",
+"texts" }`: the texts of `content/i18n/` and the journeys in the
+locale's language, English behind every missing key, so Pensum shows
+the language of its own locale without a table of its own (#39).
+
 On a normal desktop or the phone, `flatpak run --command=gjs
 --filesystem=host org.gnome.Platform//51 -m …` does the same. Results:
 [engine in gjs](decisions/engine-in-gjs.md).
 
 ## Cloud environment hosts
 
-Needed beyond the package registries; tested 2026-11-05:
+Needed beyond the package registries; tested 2026-11-05, the research
+hosts again on 2026-11-14. "Refused by site" means the proxy lets the
+request through and the site itself answers automated requests with
+403; "blocked" means the proxy refuses the host.
 
-| Host                                                                                                        | For                                                                                                               | State           |
-| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------- |
-| `github.com`                                                                                                | Git, Super Productivity source for the facts and API types                                                        | allowed         |
-| `dl.flathub.org`                                                                                            | GNOME runtime for the gjs check                                                                                   | allowed         |
-| `www.nature.com`, `pmc.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `www.ebi.ac.uk`                           | Research: nature.com and PubMed Central pages go through bot checks; full texts come from the Europe PMC API      | allowed         |
-| `doi.org`, `api.crossref.org`                                                                               | Research: DOI metadata from Crossref                                                                              | allowed         |
-| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org`                          | Research: open full texts in university and author repositories                                                   | allowed         |
-| `www.europarl.europa.eu`                                                                                    | Research: status of EU legislation (Digital Fairness Act)                                                         | allowed         |
-| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`                                              | Research: reachable, but the sites refuse automated requests (403); use Crossref and open copies instead          | refused by site |
-| `app.super-productivity.com`                                                                                | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data                 | allowed         |
-| `raw.githubusercontent.com`                                                                                 | SPDX licence texts (`content/LICENSE` is SPDX's CC-BY-SA-4.0 text, license-list-data v3.27.0)                     | allowed         |
-| `www.interruptions.net`, `hbr.org`                                                                          | Research: author PDFs of interruption studies (index `literature.htm`), HBR article text                          | allowed         |
-| `www.hbs.edu`                                                                                               | Research: HBS working papers; reachable, but HBS answers automated requests with 403                              | refused by site |
-| `creativecommons.org`, `papers.ssrn.com`, `www.ics.uci.edu`, `pubmed.ncbi.nlm.nih.gov`, `journals.plos.org` | Licence texts; research for First Things First (tested 2026-11-06); PubMed abstracts come from Europe PMC instead | refused         |
-| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`                                | Super Productivity's Docker image for the pinned real-app test                                                    | allowed         |
-| `test-app.super-productivity.com`                                                                           | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                         | allowed         |
+| Host                                                                                                                                                                                                                                                    | For                                                                                                                                                                                                                                     | State              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `github.com`                                                                                                                                                                                                                                            | Git, Super Productivity source for the facts and API types                                                                                                                                                                              | allowed            |
+| `dl.flathub.org`                                                                                                                                                                                                                                        | GNOME runtime for the gjs check                                                                                                                                                                                                         | allowed            |
+| `www.ebi.ac.uk`, `eutils.ncbi.nlm.nih.gov`, `www.ncbi.nlm.nih.gov`, `pubmed.ncbi.nlm.nih.gov`, `pmc.ncbi.nlm.nih.gov`                                                                                                                                   | Research: Europe PMC REST API (search by DOI, abstracts, full-text XML of open articles), NCBI E-utilities (PubMed abstracts, PMC XML), PMC article pages for articles whose publisher forbids the XML; a generic client name is enough | allowed            |
+| `api.openalex.org`, `api.unpaywall.org`, `api.semanticscholar.org`                                                                                                                                                                                      | Research: where an open copy of a paper is; Unpaywall wants an `email` parameter                                                                                                                                                        | allowed            |
+| `journals.plos.org`, `www.frontiersin.org`, `trialsjournal.biomedcentral.com`, `www.who.int`                                                                                                                                                            | Research: open-access publishers and WHO pages (the WHO guideline documents are on `iris.who.int`, blocked)                                                                                                                             | allowed            |
+| `link.springer.com`, `www.nature.com`                                                                                                                                                                                                                   | Research: allowed, but article pages and PDFs redirect to `idp.springer.com` and `idp.nature.com`, which are blocked, so no article can be read                                                                                         | allowed, of no use |
+| `doi.org`, `api.crossref.org`                                                                                                                                                                                                                           | Research: DOI metadata from Crossref                                                                                                                                                                                                    | allowed            |
+| `refubium.fu-berlin.de`, `kops.uni-konstanz.de`, `www.selfdeterminationtheory.org`                                                                                                                                                                      | Research: open full texts in university and author repositories                                                                                                                                                                         | allowed            |
+| `www.europarl.europa.eu`                                                                                                                                                                                                                                | Research: status of EU legislation (Digital Fairness Act)                                                                                                                                                                               | allowed            |
+| `dl.acm.org`, `www.sciencedirect.com`, `informahealthcare.com`, `europepmc.org`, `academic.oup.com`, `www.pnas.org`, `journals.sagepub.com`, `onlinelibrary.wiley.com`, `psycnet.apa.org`                                                               | Research: reachable, but the sites refuse automated requests (403); use the Europe PMC API on `www.ebi.ac.uk`, Crossref and open copies instead                                                                                         | refused by site    |
+| `app.super-productivity.com`                                                                                                                                                                                                                            | Trying the plugin ZIP in the real app (current release, 19.3.1 on 2026-11-06) with throwaway data                                                                                                                                       | allowed            |
+| `raw.githubusercontent.com`                                                                                                                                                                                                                             | SPDX licence texts (`content/LICENSE` is SPDX's CC-BY-SA-4.0 text, license-list-data v3.27.0)                                                                                                                                           | allowed            |
+| `www.interruptions.net`, `hbr.org`                                                                                                                                                                                                                      | Research: author PDFs of interruption studies (index `literature.htm`), HBR article text                                                                                                                                                | allowed            |
+| `www.hbs.edu`                                                                                                                                                                                                                                           | Research: HBS working papers; reachable, but HBS answers automated requests with 403                                                                                                                                                    | refused by site    |
+| `creativecommons.org`, `papers.ssrn.com`, `www.ics.uci.edu`                                                                                                                                                                                             | Licence texts; research for First Things First (tested 2026-11-06; `creativecommons.org` and `papers.ssrn.com` again on 2026-11-14)                                                                                                     | blocked            |
+| `registry-1.docker.io`, `auth.docker.io`, `production.cloudflare.docker.com`                                                                                                                                                                            | Super Productivity's Docker image for the pinned real-app test                                                                                                                                                                          | allowed            |
+| `test-app.super-productivity.com`                                                                                                                                                                                                                       | Super Productivity's test build; it ran 18.1.0 on 2026-11-06, older than the plugin needs                                                                                                                                               | allowed            |
+| `idp.springer.com`, `idp.nature.com`, `www.science.org`, `www.thelancet.com`, `bjsm.bmj.com`, `www.sleephealthjournal.org`, `clutejournals.com`, `osf.io`, `lirias.kuleuven.be`, `dspace.lboro.ac.uk`, `figshare.com`, `hdl.handle.net`, `iris.who.int` | Research for the journeys of 2026-11-13: publisher logins and the repositories that hold the open copies of the sources still marked abstract-only or unverified in [research](research.md)                                             | blocked            |

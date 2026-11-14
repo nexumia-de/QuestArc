@@ -8,6 +8,7 @@ import type { Journey } from './types/journey';
 
 const ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const KEY = /^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)+$/;
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const WEEKDAYS = new Set(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
 
 const isObject = (v: unknown): v is Record<string, unknown> =>
@@ -80,6 +81,15 @@ export const journeyErrors = (value: unknown): string[] => {
           b.names.length <= 13 &&
           b.names.every(isKey)));
     if (!ok) errors.push('build: invalid');
+  }
+  if (value.anchor !== undefined) {
+    const a = value.anchor;
+    const ok =
+      isObject(a) &&
+      isKey(a.moment) &&
+      isKey(a.example) &&
+      (a.time === undefined || (typeof a.time === 'string' && TIME.test(a.time)));
+    if (!ok) errors.push('anchor: invalid');
   }
   const stages = value.stages;
   if (!Array.isArray(stages) || stages.length < 2 || stages.length > 12) {

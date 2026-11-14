@@ -1,22 +1,33 @@
 ---
 type: Plan
 title: Roadmap
-description: Goals and exit criteria of QuestArc's milestones on the way to one engine with two hosts (Super Productivity plugin, Pensum); the work items are GitHub issues.
+description: Goals, their order and exit criteria on the way to one engine with two hosts (Super Productivity plugin, Pensum); the work items are GitHub issues.
 tags: [plan, roadmap, milestones]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
 
 # How the plan is tracked
 
-Work items are [issues](https://github.com/nexumia-de/quest-arc/issues),
-grouped by [milestones](https://github.com/nexumia-de/quest-arc/milestones);
-issues without a milestone are the backlog. This file keeps only the
-goals. The architecture and the reasons behind it are in
-[architecture](architecture.md); the design rules come from
-[psychology](psychology.md). Work on the lowest open milestone first.
+Work items are [issues](https://github.com/nexumia-de/quest-arc/issues).
+This file keeps the goals and their order; work goes from the top open
+goal downwards. The goals up to _Journey in Pensum_ and _More journeys_
+have a GitHub milestone from the time the plan used them; the owner
+decided on 2026-11-13 that later goals get none, because the work moves
+faster than milestones are worth keeping. The architecture and the
+reasons behind it are in [architecture](architecture.md); the design
+rules come from [psychology](psychology.md).
 
-Milestones have no dates. Every milestone ends with something that
-works and green CI, so a pause never leaves a broken state.
+Every goal ends with something that works and green CI, so a pause never
+leaves a broken state.
+
+# Releases
+
+Decided by the owner on 2026-11-14:
+
+- **4.0.0**: _Habits that last_ and _More journeys_ below, complete with
+  the German texts (#39).
+- **4.1.0**: _The Valley_ and _Private journeys_.
+- The _Standalone app_ goes on next to them and is released on its own.
 
 # The journey
 
@@ -122,8 +133,6 @@ accepting a stage on the phone with the same choice records.
 
 # Habits that last
 
-Milestone to be created by the owner.
-
 **Goal**: QuestArc fits the person, not only the count, and lets go of a
 habit that runs by itself.
 
@@ -151,8 +160,6 @@ their agents ([decision](decisions/journeys-by-pull-request.md)).
 
 # The Valley
 
-Milestone to be created by the owner.
-
 **Goal**: what was built stays visible beyond one journey. There is one
 look; nothing here is an optional layer.
 
@@ -165,8 +172,6 @@ back (#84).
 
 # Private journeys
 
-Milestone to be created by the owner.
-
 **Goal**: users keep journeys of their own without publishing them.
 
 **Exit criteria**: import and export of a journey file in the plugin and
@@ -174,8 +179,6 @@ in Pensum, checked by the same journey checker as CI (#40); the quick
 journey form, later the editor (#89).
 
 # Standalone app
-
-Milestone to be created by the owner, after the spike.
 
 **Goal**: QuestArc for people without Super Productivity, on the same
 data format.
@@ -186,7 +189,7 @@ open points of the plan (#91).
 
 # Backlog
 
-Issues without a milestone: the plugin API for repeat configs, waiting
+Not planned yet: the plugin API for repeat configs, waiting
 for upstream (#41); focus sessions as a stage condition (#44);
 cooperation if it works without a server (#45); QuestArc's settings from
 Super Productivity's plugin settings (#67); the plugin API types from

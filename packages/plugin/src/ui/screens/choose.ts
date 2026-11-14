@@ -3,8 +3,11 @@ import { t } from '../../shared/texts';
 import { h } from '../dom';
 import type { Context, Screen } from '../screen';
 
-/** Screen 2: the journeys with their first step as a plan sentence. */
-export const chooseScreen = (ctx: Context): Screen => ({
+/**
+ * Screen 2: the journeys with their first step as a plan sentence. With
+ * `anchorId` the journey extends that moment (screen 0).
+ */
+export const chooseScreen = (ctx: Context, anchorId?: string): Screen => ({
   title: t('ui.choose.title'),
   body: h(
     'ul',
@@ -19,7 +22,8 @@ export const chooseScreen = (ctx: Context): Screen => ({
           {
             class: 'qa-card qa-card-button',
             type: 'button',
-            onclick: () => ctx.go({ name: 'preview', journeyId: journey.id }),
+            onclick: () =>
+              ctx.go({ name: 'preview', journeyId: journey.id, ...(anchorId ? { anchorId } : {}) }),
           },
           h('span', { class: 'qa-section-title' }, t(journey.title)),
           h('span', {}, t(journey.description)),

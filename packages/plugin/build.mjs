@@ -9,6 +9,7 @@ import { build, transform } from 'esbuild';
 import { zipSync } from 'fflate';
 import { esbuildLadderArt } from './art.mjs';
 import { esbuildJourneys } from './journeys.mjs';
+import { esbuildViewContent, START_LANGUAGES, START_TEXT_KEYS } from './view-content.mjs';
 
 const out = 'dist';
 const files = join(out, 'plugin');
@@ -20,7 +21,7 @@ const common = {
   format: 'iife',
   target: 'es2022',
   legalComments: 'none',
-  plugins: [esbuildJourneys, esbuildLadderArt],
+  plugins: [esbuildJourneys, esbuildLadderArt, esbuildViewContent],
 };
 
 await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'plugin.js') });
@@ -29,14 +30,15 @@ await build({ ...common, entryPoints: ['src/plugin.ts'], outfile: join(files, 'p
 // Super Productivity 19.3 installs an index.html of at most 100 KB (below).
 const view = await build({
   ...common,
-  // the pictures come from plugin.js (questarc:art), not inlined
-  plugins: [esbuildJourneys],
+  // the texts, the style and the pictures come from plugin.js
+  // (questarc:content), not inlined; only the start state is in the view
+  plugins: [esbuildViewContent],
   entryPoints: ['src/ui/main.ts'],
   write: false,
   minifyWhitespace: true,
 });
 const script = view.outputFiles[0].text.replaceAll('</script', '<\\/script');
-const { code: style } = await transform(readFileSync('src/ui/style.css', 'utf8'), {
+const { code: style } = await transform(readFileSync('src/ui/start.css', 'utf8'), {
   loader: 'css',
   minifyWhitespace: true,
 });
@@ -59,6 +61,23 @@ if (indexBytes > INDEX_HTML_LIMIT) {
   );
 }
 console.log(`index.html: ${indexBytes} of ${INDEX_HTML_LIMIT} bytes`);
+
+// The UI texts travel in plugin.js. A module of the view that imports
+// them (shared/languages.ts, shared/content.ts) would put all of them
+// back into index.html without anyone noticing.
+const inlined = START_LANGUAGES.flatMap((language) =>
+  Object.entries(
+    JSON.parse(readFileSync(join('..', '..', 'content', 'i18n', `${language}.json`), 'utf8')),
+  )
+    .filter(([key, text]) => !START_TEXT_KEYS.includes(key) && text.length >= 30)
+    .filter(([, text]) => html.includes(JSON.stringify(text).slice(1, -1)))
+    .map(([key]) => `${language}: ${key}`),
+);
+if (inlined.length > 0) {
+  throw new Error(
+    `index.html contains ${inlined.length} UI texts (${inlined.slice(0, 3).join(', ')}, …); they belong in plugin.js`,
+  );
+}
 
 copyFileSync(join('src', 'manifest.json'), join(files, 'manifest.json'));
 

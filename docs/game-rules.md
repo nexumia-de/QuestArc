@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, welcome back, graduation and the build of a journey (ladder, version, marker progress, ready), with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation, the build of a journey (ladder, version, marker progress, ready), anchors and reminders, with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -23,6 +23,7 @@ and its test vectors together.
   Other tasks give nothing: progress shown is progress on the habit.
 - A task finished as "won't do" (`wontDoOn === doneOn`) does not count.
 - **One active journey** at a time; it can be paused to start another.
+  It is the one growing step; the other anchors rest (§8).
 
 ## 2. Days
 
@@ -67,6 +68,11 @@ A day `d` is due when all of these hold:
 ### Pauses
 
 - A QuestArc pause (pause and resume records) makes its days not due.
+  "Call it a pause" after a long break (§5) writes the same two records
+  for the gap that has already passed.
+- The days a stage waited while the user walked the smaller stage
+  before it again (stepping back, §4) are not due for it either, and
+  its task counts nothing on them.
 - A **paused repeat config** in Super Productivity (`isPaused`) carries no
   dates. When a host sees the bound config change between paused and not
   paused, it writes a pause or resume record for that day. While the
@@ -123,6 +129,17 @@ instance ticked off on Tuesday evening still counts for Monday
   ([behaviour](behaviour.md), flow D). No task or record changes; nothing
   else happens.
 
+- **After the journey** (issue #66): the habit a finished journey
+  leaves (§6) keeps the run of its last stage. The engine reports it on
+  the finished run (`habit.run`, with `habit.lastDays`, the last 7 due
+  or paused days) by the same rules, counted from the day the last
+  stage began to count: finishing the journey neither ends the run nor
+  starts a new one, and nothing else changes (no `offerFallback`, no
+  events). Days the habit ran by itself before it was brought back are
+  not due and count nothing, so the run stands. A graduated habit has
+  no run and no days ("runs by itself"), and neither has a habit
+  without a task that can be followed.
+
 **Example C.** Due daily. Days 1–4 done, day 5 missed, days 6–7 done:
 current run 6 completions, one gap, best run 6. Day 8 and 9 missed: the
 run ends with 6, `offerFallback` is set, best run stays 6, total 6.
@@ -146,13 +163,137 @@ the journey view: `days` → completions in the window ÷ n (capped at 1);
 1, 2, 4, 5, 6 done, 3 and 7 missed: the last 7 due days hold 5
 completions → met on day 6.
 
-## 5. Welcome back
+### Staying (issue #81)
+
+Decided by the owner on 2026-11-12. A met stage is offered two equal
+choices: continue, or stay a while ([design rule 1](psychology.md)).
+
+- **The suggestion** (`offer.suggest`) comes from the latest weekly
+  answer for this stage (the answer of the latest ISO week, rule 9):
+  3 or lower, or no answer yet → `stay`; 5 or more → `continue`; 4 →
+  `none`. It is only a suggestion; both choices are always there.
+- **Staying costs nothing and changes nothing.** The stage keeps
+  counting, its runs go on, the station stays met and the build stays
+  ready. The `stay` record only quiets the offer for 7 days from its
+  day (`offer.quietUntil`, the first day the offer is back): the hosts
+  show Continue as a quiet action and do not announce the station as
+  reached again. Staying again rewrites the record. The user can
+  continue on any day.
+- The 3/4/5 limits and the 7 days are design choices; no study defines
+  them.
+
+### Skipping (issue #81)
+
+- A stage that is offered and has no task yet (state `unbound`) can be
+  passed with "I already do this": a `skip` record with the day, and the
+  next stage is accepted on that day.
+- **A skipped stage earns nothing** (rule 8): no run, no completions,
+  no welcome back, also when a task bound to it is ticked off. Its
+  station has the state `skipped` ("already yours"): neither done nor a
+  gap. It raises the build's version like a finished stage (§7); the
+  view names those versions (`build.skipped`).
+- **The last stage cannot be skipped:** a journey ends with a habit the
+  user does. A skip record for the last stage is ignored, and so is one
+  for a stage that has a checkpoint.
+- **Undo:** the latest skip can be taken back while the stage after it
+  is the current one and has no counting completion yet (`undoable` on
+  the station). Taking it back withdraws the skip record and the
+  acceptance of the stage after it; the version goes back, because
+  nothing was earned.
+- The [journey checker](story-format.md) warns when the second stage
+  asks for more than 5 minutes: the first stage is then the only tiny
+  one and skipping it would start the user at a large step.
+
+### Stepping back (issue #82)
+
+Decided by the owner on 2026-11-12: after a long break (§5) the user
+can start smaller, with a real step back.
+
+- **Which stage.** A `step-back` record for the current stage with the
+  day makes the stage before it the current one again from that day. It
+  is offered only when the stage before is finished (has a checkpoint):
+  never on the first stage, and not after a skipped stage, which has
+  nothing to go back to (confirmed by the owner on 2026-11-14). A step-back record without a finished stage
+  before is ignored.
+- **The smaller stage counts from the day of the step back** (and from
+  the day its task is bound, if that is later): its condition, runs and
+  marker start again; completions from its first walk are not counted
+  twice. It uses the task it had if that still repeats; otherwise it
+  waits for a task (state `unbound`) and cannot be skipped. A repeat
+  that still exists but **has ended by its end date** (`repeatUntilDay`
+  before today) counts as gone, like a deleted one (decided by the
+  owner on 2026-11-14): the user is led to set up a new task. Weekly
+  answers from before the step back suggest nothing for the offer; the
+  first completion is a welcome back (§5). The station keeps its
+  `doneDay` and names the day in `stepBackDay`.
+- **Nothing is taken away.** Checkpoints stay, so the build's version
+  stays (§7). The stage left behind keeps its acceptance, its task and
+  what it counted, is `ahead` with `leftDay`, and its task counts
+  nothing while it waits. Each stage keeps its own pairing (`pair`):
+  taking the stage left up again copies none.
+- **Taking it up again.** When the smaller stage is met it offers
+  continue or stay as always. Continue writes no new checkpoint: it
+  closes the step-back record with `until`, and the stage left behind
+  is the current one again. The days from the step back to that day are
+  not due for it (§2), so its completions, its `count` and `time_spent`
+  totals and its marker progress are as they were.
+- A stage can be left more than once (one record per step back), and
+  after another long break on the smaller stage the user can step back
+  again; the stages are then taken up again in order.
+
+**Example F.** Stage 1 finished on 6 Oct, stage 2 (`count` 3) done on 7
+and 8 Oct, then nothing. On 22 Oct the card is due; the user starts
+smaller. Stage 1 is current again from 22 Oct with progress 0, the
+version stays 2, the marker starts at 0. Stage 1 is done on 22 to 26
+Oct: met; the user continues on 26 Oct. Stage 2 is current again with 2
+of 3; 9 to 21 Oct are gaps (or paused, if the user also called them a
+pause), 22 to 25 Oct are not due.
+
+## 5. Welcome back and coming back
 
 - The first counting completion after a missed due day is a **welcome
   back**: the engine counts it per stage (`welcomeBacks`) and the hosts
   greet it with one sentence (`event.welcome-back`). At most once per
   gap, also when the gap ended a run.
+- So is a counting completion 14 or more days after the one before it
+  (or after the day before the stage began to count), whatever lay
+  between, gaps or an ordinary pause (confirmed by the owner on
+  2026-11-14), and the first completion of a stage the user stepped
+  back to (§4).
 - It gives nothing and takes nothing; coming back is what is greeted.
+
+### After a long break (issue #82)
+
+Decided by the owner on 2026-11-12 ([design rule 14](psychology.md)).
+
+- **The gap** of the current stage starts on the latest of: the day
+  after its last counting completion, the day the journey was last
+  resumed, the day the stage began to count (accepted, bound, stepped
+  back to) and the day it was taken up again after a step back.
+- **The card is due** (`comeBack` on the run, with the gap's first day
+  `from`) when today is 13 or more days after that first day, so the
+  last day that counted or was paused is at least 14 logical days ago,
+  the stage has a task with a supported repeat, and the journey is the
+  active one, not paused and not ended. With 13 days there is no card.
+- **Not at a met station** (decided by the owner on 2026-11-14): while
+  the current stage is met and the user has not chosen to stay, only
+  the offer to continue or stay stands (§4) and there is no card. Once
+  the user stays (a `stay` record for the stage), or the stage is no
+  longer met, the rule above applies as before.
+  While it is due the hosts show it instead of the hard-week hint.
+- Three choices; none is suggested:
+  1. **Carry on:** a `carry-on` record for the stage with the day.
+     Nothing that is computed changes; the card is closed for this gap
+     (the record's day is in or after the gap). After the next
+     completion a new gap needs 14 days again.
+  2. **Call it a pause:** a pause record on the gap's first day and a
+     resume record today, so the days up to yesterday are paused, not
+     gaps, and the run stands. It never reaches back further than the
+     gap. The gap then starts today, so the card is gone.
+  3. **Start smaller** (`comeBack.smaller` names the stage, when there
+     is a finished stage before): the step back of §4. It can be
+     combined with 2 in one change.
+- 14 days is a design choice; no study defines it.
 
 Since 3.3 there are no XP, no levels and no guardians (issue #110): they
 had no effect any more, and the [evidence review](research.md) supports
@@ -161,18 +302,152 @@ real progress ("4 of 5 days"); nothing is announced before it is done.
 
 ## 6. Graduation
 
-A habit **qualifies** for graduation when all of these hold:
+Issue #22; what a graduated habit is was decided by the owner on
+2026-11-12 together with the anchors (#96, point 4): it is no longer
+ticked off ([design rule 25](psychology.md)).
 
-- the last 3 weekly automaticity answers ("… is something I do
-  automatically", 1–7) are each 6 or 7, from 3 consecutive weeks;
-- completions on at least 80 % of due days over the last 28 logical days;
-- reminders have been off (or never set) for at least 14 days, and
-  completion did not fall below 80 % in that time.
+### The habit of a finished journey
 
-The user then chooses: keep the task repeating quietly, or end the
-repeat in Super Productivity. QuestArc asks the weekly question again 2
-and 6 weeks after graduation; an answer of 4 or less, or completion below
-60 % in the 2 weeks before, suggests bringing the habit back (one tap).
+- A journey that was finished (its last stage has a checkpoint) leaves
+  **one habit**: its last stage's, with that stage's recurring task. A
+  journey that is still open, or was ended early, has none.
+- While it is **maintained** it is followed exactly as before (§1 to §3):
+  due days and completions count from the day the last stage began to
+  count, across the day the journey was finished, and its run goes on
+  (§3). The weekly question goes on for this habit: once per ISO week
+  in the week the journey was finished and the eight weeks after it,
+  then **once per four weeks** (decided by the owner on 2026-11-14;
+  `habit.fourWeekly`). The four weeks are counted from the Monday after
+  those eight weeks; a question is due from the start of its four weeks
+  until an answer falls into them, and an answer in any of their weeks
+  answers it. A habit that was brought back is asked weekly again for
+  eight weeks from that day.
+- Without a task that can be followed (the repeat was deleted or is of
+  an unsupported kind) the habit is `unbound` or `unsupported-repeat`:
+  nothing is asked, it cannot graduate, and the hosts offer to set up a
+  task for it.
+
+### When it can graduate
+
+A maintained habit **can graduate** (`habit.canGraduate`) when all of
+these hold:
+
+1. **Three high answers in a row:** the answers ("… is something I do
+   automatically", 1–7) to 3 consecutive questions are each 6 or 7, and
+   the last of the three is the current question or the one before. A
+   question is that of one ISO week or, once the habit is asked every
+   four weeks, that of its four weeks (the latest answer in them
+   counts); a question that passed unanswered breaks the row. While
+   questions are weekly this is "3 consecutive ISO weeks"; afterwards
+   the row may begin in the weekly weeks and go on into the four-weekly
+   ones, so it stays earnable: two weekly answers and the first
+   four-weekly one, or three four-weekly ones.
+2. **Steady over four weeks:** completions on at least 80 % of the due
+   days in the last 28 logical days (today included), or since the
+   stage began to count if that is later. Only decided days are looked
+   at: a due day with a completion, or one whose backfill window has
+   passed (§2). Today and yesterday without a completion are still open
+   and are left out; with no decided day the habit is not steady.
+3. **No drop in the last two weeks:** the same 80 % over the last 14
+   logical days.
+4. **No reminder in those two weeks** (#60, §9): the habit's repeat
+   has no reminder now, and no host saw one on it in the last 14
+   logical days. Super Productivity's data says only whether a repeat
+   has a reminder at present, never since when
+   ([facts](super-productivity-facts.md) §5). So a host records the
+   day it sees one come or go (`reminder-seen`, §9), and the engine
+   reads that: with a record "off since" a day, that day is 14 or more
+   days ago; with a record that still says "on" while the repeat has
+   none, it went off today at the earliest, so the habit waits; with
+   **no record at all** a reminder counts as **never set**, and no
+   data is invented. A reminder outside the task (a phone alarm) is
+   not known to QuestArc; the graduation page says so.
+
+It is offered, never pushed and never announced before it holds: no
+progress towards it is shown, and the user can leave the offer alone for
+as long as they like. **Not now** (decided by the owner on 2026-11-14)
+is a choice, stored as a `graduation-later` record with the day
+(`graduateLater`), so it holds on every device: the offer is quiet for
+28 days from that day (`habit.offerQuietUntil`, the first day it is
+back) and then returns if the habit still can graduate. `canGraduate`
+is not changed by it: the quiet way to graduation (the shelf) stays
+open all the time.
+
+### Graduating
+
+- The user's yes writes a `graduation` record with the day and what
+  they do with the task (`graduate`): **end** its repeat themselves, or
+  **keep** it repeating quietly. Neither is suggested. QuestArc never
+  ends a repeat (the plugin API cannot, and the task is the user's):
+  the hosts lead to the task.
+- From that day the habit is **graduated**: it runs by itself. Nothing
+  is followed: no due days, no runs, no weekly question, no messages,
+  whatever the task does. With **keep**, ticking the task off counts for
+  nothing. What the view shows of a graduated habit comes from its
+  records alone, so it stays when the task is ended or deleted.
+
+### Afterwards
+
+- QuestArc asks **once** whether the habit still runs by itself 14 and
+  42 days after graduation, and then every 182 days (at most twice a
+  year; the dates, the two answers and that a question which passed
+  unanswered is not asked again were confirmed by the owner on
+  2026-11-14). The question is due (`habit.graduated.checkDue`) from its date
+  until it is answered; when a later date has come, only that one is
+  due, so a question that passed unanswered is not asked again.
+- The answer is yes or "not really" (`answerStill`, a
+  `graduation-check` record under the date it was due). Yes changes
+  nothing. "Not really" changes nothing either: the view says so
+  (`suggestBack`) and the hosts offer to bring the habit back.
+- **Bringing it back** (`bringBack`, at any time, not only after the
+  question) closes the graduation record with `until`. From that day
+  the habit is maintained again, as a growing step: followed, asked
+  weekly, able to graduate anew. **Nothing is lost:** the days from
+  graduation to that day are not due and count nothing (like the days
+  of a step back, §4), so they never become gaps and the run stands.
+  The day of graduation itself was still followed until the user's
+  yes: a completion on it counts, and without one it is not due.
+  If its repeat is gone, it waits for a task.
+- Completion cannot suggest bringing a habit back any more ("below
+  60 % in the 2 weeks before", the rule until 2026-11-14): a graduated
+  habit is not ticked off, so there is nothing to count.
+
+The numbers (3 answers, 6 of 7, 80 %, 28 and 14 days, 14 days without
+a reminder, 8 weeks of weekly questions and then every 4, 28 quiet days
+after "not now", 14, 42 and 182 days) are design choices; no study defines them, and the texts say so.
+
+**Example G.** A journey was finished on 1 Oct; its last stage's task
+is due daily and done every day. The answers of the weeks 44, 45 and 46
+are 6, 7 and 6: on Wednesday of week 46 the habit can graduate. With a
+5 in week 45, with week 45 skipped, or with the three answers in weeks
+42 to 44 it cannot. With 6 misses between 15 and 28 Oct it cannot
+either (22 of 28, 79 %), with 5 it can (23 of 28). With 3 misses in
+the last 14 days it cannot (11 of 14), although 25 of 28 are done.
+
+**Example L.** The journey was finished on Thursday 1 Oct (week 40).
+Up to week 48 the habit is asked every week. From Monday 30 Nov one
+question covers weeks 49 to 52, the next week 53 to week 3, the next
+weeks 4 to 7. Answered in week 49, nothing is asked in weeks 50 to 52.
+Answers of 6, 6 and 7 in weeks 47, 48 and 50 are three questions in a
+row: the habit can graduate. So are 6, 7 and 6 in weeks 50, 1 and 5.
+Answers in weeks 47, 50 and 5 are not (the question of week 53 to
+week 3 passed), and neither are three answers in weeks 49, 50 and 51
+(one question). The user says "not now" on 20 Oct: the offer is quiet
+until 16 Nov and back on 17 Nov, if the habit still can graduate.
+
+**Example H.** The habit graduates on 28 Oct. On 10 Nov nothing is
+asked; from 11 Nov the question is due. Answered "not really", the
+habit stays graduated and bringing it back is suggested. Brought back
+on 11 Nov, the days from 28 Oct to 10 Nov are not due: a run of 30
+before goes on with the next completion.
+
+**Example I.** The last stage began on 1 Sep and the journey was
+finished on 1 Oct; the task is done every day up to 11 Nov: the habit's
+run is 72, not 42. With 3 and 4 Nov missed the run ended at 63 and the
+current one is 7, the total 70. Graduated on 1 Oct and brought back on
+28 Oct, with 28 Oct to 11 Nov done: the run is 45 (30 and 15), whether
+or not the kept task was ticked off in between; 46 if it was also done
+on 1 Oct, the day it graduated.
 
 ## 7. Builds
 
@@ -193,9 +468,14 @@ the engine gives only names and numbers.
 - **Version.** Version 1 stands when the journey starts. Every finished
   stage (a stage with a checkpoint,
   [deleted history](decisions/deleted-history.md)) raises the version by
-  one, and so will a skipped stage once skipping exists (#81). So the
-  version is 1 + the journey's stages with a checkpoint; it never goes
-  down, because checkpoints are kept whatever happens to the tasks.
+  one, and so does a skipped stage (§4, #81). So the version is 1 + the
+  journey's stages with a checkpoint or a skip; it never goes down by
+  itself, because these records are kept whatever happens to the tasks
+  (only the user taking a skip back lowers it). A step back (§4) does
+  not lower it either: the larger version stays standing while the
+  smaller stage is walked again, and its marker grows from 0 again. `skipped` lists the
+  standing versions that came from a skipped stage, so a host can say
+  "already yours" in the row of versions.
   `versions` is the number of versions the journey uses: its stages + 1.
   If that is more than the ladder has, the ladder's last version stands
   for the rest and gains one fixed addition per version beyond it (a
@@ -231,7 +511,9 @@ the engine gives only names and numbers.
   `{ from, to }` when the marker progress of the same stage rose (the
   host decides whether that makes a new element and stays quiet in
   between); `event.build-version` `{ version }` when the version rose,
-  also when the last stage was finished and the journey ended.
+  also when the last stage was finished and the journey ended, and when
+  a stage was skipped. After a step back, or when the stage left is
+  taken up again, the marker is another stage's: nothing is announced.
 
 **Example E.** Example D's stage (`days` 5 of 7, due daily, accepted on
 day 1). Days 1 to 5 done: progress and marker progress 1, ready. Days 6
@@ -239,3 +521,145 @@ to 8 missed, day 9 is today: the last 7 due days (3 to 9) hold 3
 completions, so progress is 0.6 and the stage is no longer met; marker
 progress stays 1, ready is false. Continue on day 5 instead: version 2,
 marker progress 0.
+
+## 8. Anchors
+
+Issue #96, decided by the owner on 2026-11-12
+([design rules 2, 3 and 28](psychology.md)): the user names an anchor,
+a moment that already exists in their day, and journeys start from it.
+
+### The records
+
+- An **anchor** is an `anchor` record ([data model](data-model.md) §2):
+  a routine in the user's words that completes "After …" ("getting
+  up"), or a fixed time of day (`HH:MM`), and optionally the name the
+  user gives its place. The words are the user's: the engine stores and
+  returns them and reads no meaning from them.
+- A **run names its anchor** with a `run-anchor` record. Starting a
+  journey writes it (`startJourney` with `anchor`); the anchor is an
+  existing one or a new one named in the same change.
+- **Nothing that is counted changes.** Due days, runs, conditions, the
+  build, the weekly question and graduation are computed exactly as
+  without anchors (§1 to §7). An anchor changes the words of the plan
+  and where a step stands, nothing else.
+
+### What stands at an anchor
+
+The view groups what the engine has computed by anchor (`anchors`), so
+a host can show the home and, later, the Valley (#114) from it:
+
+- **`steps`:** the habits finished journeys left there (§6), oldest
+  journey first, each with its state: `maintained` (still followed and
+  ticked off), `graduated` (runs by itself), `unbound` or
+  `unsupported-repeat` (waits for a task). A journey that was ended
+  early leaves no step.
+- **`growing`:** the current stage of the active journey, when that
+  journey starts from this anchor. The anchor's `state` is then
+  `growing`; every other anchor is `resting`. There is at most one
+  growing step (§1).
+- **`resting`:** open journeys that wait here (paused), with their
+  current stage.
+- **`due`:** the questions that are due here: `weekly` for the growing
+  step (not while its journey is paused) and for a maintained habit,
+  `still` for a graduated one (§6).
+- Anchors are listed by the earliest start day of a run that names
+  them, then by id, so the order does not change when another step
+  grows; an anchor where nothing stands yet comes after those and is
+  still listed, because it is the user's.
+- Runs this engine cannot compute (read-only, data model §2) stand at
+  no anchor.
+
+### A graduated step stands on its records
+
+Everything the view shows of a graduated step comes from choice
+records: its run, the checkpoints of its stages (so its build has all
+its versions), the end of its journey, its graduation and its anchor.
+None of it is read from a task. Ending the repeat, or deleting the task
+or its done instances later, therefore changes nothing that stands at
+the anchor: the step keeps its place, its state and its build. What a
+graduated step never shows is a run or its last days (§3), because
+those come from tasks. A habit that is not graduated and loses its
+repeat stays at its anchor too and waits for a task (`unbound`).
+
+### Chains
+
+- With `after`, a `run-anchor` record ties the run to a **step** that
+  stands at the same anchor instead of to the anchor itself. It is the
+  user's choice when they start the journey, never the default.
+- The chain holds (`anchor.after` on the run, `after` on its step)
+  while the run it names is another run, starts from the same anchor
+  and is a finished journey with a habit. Anything else (a step at
+  another anchor, an open journey, an unknown run) is ignored without
+  a problem, and the run is tied to the anchor itself.
+- A chain is words only: the plan reads "After I drink a glass of
+  water, I will …". Nothing is computed from it. If the step it
+  follows is brought back (§6), the chain stays and the hosts show
+  that step with its state; `anchorRun` without `after` ties the run to
+  the anchor itself again.
+
+### Journeys from before anchors
+
+- A run without a `run-anchor` record, or whose anchor record was
+  withdrawn, has **no anchor yet** (`anchor` is absent on the run).
+  Such runs are grouped by journey: one group per journey, without an
+  id, with `suggest` (the journey whose plan sentence suggests the
+  words) and, when the journey's hint names a time, that time. They
+  are listed after the user's anchors.
+- **Confirmed once:** `confirmAnchor` writes the anchor in the user's
+  words (the suggestion, or what they changed it to) and a
+  `run-anchor` record for every run of the group; or, with the id of
+  an anchor the user already has, only those records. Until then
+  everything works as before, with the journey's own words.
+- `removeAnchor` withdraws an anchor where nothing stands: no growing
+  step, no journey that waits, no habit. It returns no changes
+  otherwise.
+
+**Example J.** The user's anchor is "getting up". _A gentle morning_
+was finished on 1 Oct and graduated on 28 Oct; its task was ended and
+later deleted. On 2 Nov the user extends the moment with a second
+journey, done on 2, 3 and 4 Nov. On 5 Nov the anchor is `growing`, its
+step is the first journey's last stage, `graduated`, with all five
+versions standing, and the growing step has 3 of 5 days: exactly what
+it has without an anchor. Tied to the first journey's step instead, the
+plan reads "After I …" and the numbers are the same. A third journey
+started from "lunch" on 9 Nov makes "getting up" `resting`: the second
+journey waits there, and on 11 Nov the first step's question "does it
+still run by itself?" is due there.
+
+## 9. Reminders
+
+Issue #60, decided by the owner on 2026-11-12
+([design rule 23](psychology.md)). QuestArc sends no notifications. A
+reminder is the host's own: the user sets it on the stage's recurring
+task, and QuestArc only reads it.
+
+- **Set or not** (`reminder.set`, on the active run for its current
+  stage and on a maintained habit, while the stage has a task with a
+  supported repeat): the bound repeat config gives its instances a
+  reminder now. In Super Productivity's data that is a valid
+  `startTime` together with a `remindAt` other than `DoNotRemind`
+  ([facts](super-productivity-facts.md) §5); `reminder.time` is that
+  start time. A snapshot without these fields reads as no reminder.
+- **What a host saw** (`reminder-seen`, one record per stage): the data
+  has no date for a reminder, so a host writes the day it sees one that
+  no record knows (`on`), and the day it sees none where the record
+  says `on` (`off`, since that day). It writes nothing while what it
+  sees is what is recorded, and nothing for a stage that never had a
+  reminder. Graduation reads it (§6, condition 4).
+- **Fading is a suggestion** (`reminder.fade`): with a reminder set,
+  when the stage's weekly answers have risen: the answers of 2
+  consecutive ISO weeks are each 5 or more, and the later of the two is
+  this week or the one before. A skipped week breaks the row. The hosts
+  then say that the reminder may not be needed any more and lead to
+  the task. Nothing that is counted changes, nothing is announced as
+  an event, and QuestArc never removes a reminder: when the user turns
+  it off, the suggestion is gone.
+- The 2 answers and the 5 are design choices; no study defines them.
+
+**Example K.** The task of the growing step has the start time 12:30
+and "10 minutes before". The answers of weeks 44 and 45 are 5 and 6: on
+Thursday of week 45 the reminder may not be needed any more. With 4 and
+6, with weeks 43 and 45, or with only week 45 answered, nothing is
+said. Example G's habit with a reminder on its task cannot graduate.
+The user turns it off on 28 Oct, and a host sees that the same day: on
+10 Nov (13 days) the habit still waits, on 11 Nov it can graduate.

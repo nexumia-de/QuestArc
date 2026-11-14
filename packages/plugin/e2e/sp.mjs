@@ -1,5 +1,5 @@
 // Steps in Super Productivity's web app shared by the real-app tests
-// (real-app.mjs, real-app-build.mjs; docs/development.md, real app): open
+// (real-app.mjs, real-app-build.mjs, real-app-return.mjs, real-app-graduation.mjs, real-app-moments.mjs, real-app-reminder.mjs; docs/development.md, real app): open
 // the app, install and enable the built ZIP, make the open task recurring,
 // tick a task off and collect the messages. Uses the Playwright of the
 // environment.
@@ -67,13 +67,59 @@ export const install = async (page) => {
   return settingsText.match(/\d+\.\d+\.\d+/)?.[0];
 };
 
-/** Makes the open task recurring, as the user would: Schedule Task → Repeat → Save. */
-export const makeRecurring = async (page) => {
+/**
+ * Opens QuestArc's page from another page, as a user who comes back to
+ * it does. Going to the route QuestArc is already on keeps the view where
+ * it was (for example on the journey screen), so the tests leave first.
+ */
+export const reopen = async (page, view) => {
+  await page.goto(`${BASE}#/tag/TODAY/tasks`);
+  await page.waitForTimeout(500);
+  await page.goto(`${BASE}#/plugins/questarc/index`);
+  await view().locator('.qa-header').first().waitFor();
+  await page.waitForTimeout(2000);
+};
+
+/**
+ * Opens the journey from the home: the view's home is the user's moments
+ * (#96), and the growing step there opens its journey.
+ */
+export const journey = async (view) => {
+  await view().locator('.qa-growing, .qa-station-card').first().waitFor();
+  if ((await view().locator('.qa-growing').count()) > 0)
+    await view().locator('.qa-growing').click();
+  await view().locator('.qa-station-card').waitFor();
+};
+
+/**
+ * Makes the open task recurring, as the user would: Schedule Task → Repeat
+ * → Save. With `time` the repeat also gets that start time and the
+ * reminder Super Productivity suggests for it (#60): the repeat dialog's
+ * "Start date" field opens the schedule dialog, where date, time and
+ * "Remind at" are picked together (Super Productivity 20.0.0,
+ * docs/super-productivity-facts.md §5).
+ */
+export const makeRecurring = async (page, { time } = {}) => {
   await page.getByText('Schedule Task', { exact: true }).click({ force: true });
   await page
     .locator('mat-dialog-container')
     .getByText('Repeat', { exact: true })
     .click({ force: true });
+  if (time) {
+    await page.locator('mat-dialog-container .planned-start-date-btn').last().click();
+    const picker = page.locator('mat-dialog-container').last();
+    const input = picker.locator('.time-form-field input').first();
+    await input.waitFor();
+    // A native time input, or a text field where the locale differs.
+    if ((await input.getAttribute('type')) === 'time') await input.fill(time);
+    else {
+      await input.fill(time);
+      await input.press('Tab');
+    }
+    await picker.locator('.reminder-form-field').waitFor();
+    await picker.locator('[data-test-id=schedule-submit-btn]').click();
+    await page.waitForTimeout(500);
+  }
   await page.locator('mat-dialog-container').getByRole('button', { name: /Save/ }).click();
   await page.waitForTimeout(1000);
   await page.keyboard.press('Escape');

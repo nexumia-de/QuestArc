@@ -1,5 +1,5 @@
 import { isSupported, toRepeatCfg, type HostRepeatCfg, type Schedule } from '@questarc/engine';
-import type { PluginTaskRepeatCfg, Task } from '@questarc/sp-plugin-api';
+import type { PluginTaskRepeatCfg, Task } from '@super-productivity/plugin-api';
 
 import { t } from '../shared/texts';
 
@@ -40,6 +40,29 @@ export const taskOfCfg = (tasks: readonly Task[], cfgId: string): Task | undefin
   tasks
     .filter((task) => task.repeatCfgId === cfgId)
     .sort((a, b) => Number(a.isDone) - Number(b.isDone) || (b.created ?? 0) - (a.created ?? 0))[0];
+
+/**
+ * A live task of a binding's repeat to open. A binding written before
+ * its task repeated names no config: the bound task's own is used, as
+ * the engine does.
+ */
+export const taskOfBinding = (
+  tasks: readonly Task[],
+  binding: { taskId?: string; repeatCfgId?: string } | undefined,
+): Task | undefined => {
+  const cfgId =
+    binding?.repeatCfgId ?? tasks.find((task) => task.id === binding?.taskId)?.repeatCfgId;
+  return cfgId ? taskOfCfg(tasks, cfgId) : undefined;
+};
+
+/**
+ * A repeat that has ended by its end date counts as gone for the earlier
+ * task of a station walked again (game rules §4, stepping back).
+ */
+export const hasEnded = (cfg: PluginTaskRepeatCfg | undefined, today: string): boolean => {
+  const until = (cfg as { repeatUntilDay?: string | null } | undefined)?.repeatUntilDay;
+  return typeof until === 'string' && until !== '' && until < today;
+};
 
 export const scheduleText = (schedule: Schedule, weekdayName: (d: string) => string): string => {
   if (schedule.type === 'daily') return t('ui.schedule.daily');

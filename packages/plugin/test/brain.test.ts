@@ -1,8 +1,9 @@
+import { stepBack } from '@questarc/engine';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBrain } from '../src/adapter/brain';
 import { registerHooks } from '../src/adapter/hooks';
-import { artPack, handleMessage } from '../src/adapter/messages';
+import { handleMessage } from '../src/adapter/messages';
 import type { State } from '../src/shared/protocol';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
@@ -72,7 +73,7 @@ describe('brain', () => {
 
   it('shows a run written by a newer QuestArc as read-only and writes nothing for it', async () => {
     const { brain, host } = setUp(['2026-10-26']);
-    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 3, choice: 'keep' });
+    host.data[`graduation:${RUN}:water`] = JSON.stringify({ dataFormat: 5, choice: 'keep' });
     const before = { ...host.data };
     const { view } = await brain.state();
     expect(view.active).toBeUndefined();
@@ -173,6 +174,49 @@ describe('brain', () => {
     expect(state.view.active).toBeUndefined();
   });
 
+  it('offers the card after a long break and starts smaller with the earlier task (#82)', async () => {
+    const { brain, host, messages } = setUp([
+      '2026-10-26',
+      '2026-10-27',
+      '2026-10-28',
+      '2026-10-29',
+      '2026-10-30',
+    ]);
+    const larger = dailyHabit('cfg2', '2026-10-30', ['2026-10-31', '2026-11-01']);
+    host.repeatCfgs.cfg2 = larger.cfg;
+    for (const task of larger.tasks) host.tasks[task.id] = task;
+    Object.assign(host.data, {
+      [`stage-done:${RUN}:water`]: JSON.stringify({ day: '2026-10-30', dataFormat: 2 }),
+      [`stage:${RUN}:stretch-1`]: JSON.stringify({ acceptedDay: '2026-10-30' }),
+      [`binding:${RUN}:stretch-1`]: JSON.stringify({
+        taskId: larger.tasks[0]?.id,
+        repeatCfgId: 'cfg2',
+        day: '2026-10-30',
+      }),
+    });
+    host.today = '2026-11-14';
+    expect((await brain.state()).view.active?.comeBack).toBeUndefined();
+    host.today = '2026-11-15';
+    brain.refresh('tasks');
+    await settle();
+    const before = (await brain.state()).view.active;
+    expect(before?.comeBack).toEqual({ from: '2026-11-02', smaller: 'water' });
+    if (!before) return;
+
+    const { view } = await brain.write(stepBack(before, '2026-11-15', { pause: true }));
+    expect(host.data[`step-back:${RUN}:stretch-1:2026-11-15`]).toBe('{"dataFormat":4}');
+    expect(view.active?.position.stage).toBe(0);
+    expect(view.active?.stations[0]?.state).toBe('current');
+    expect(view.active?.comeBack).toBeUndefined();
+    expect(view.active?.build.version).toBe(2);
+    expect(view.problems).toEqual([]);
+
+    complete(host, '2026-11-15');
+    brain.refresh('tasks');
+    await settle();
+    expect(messages).toEqual(['Welcome back. Your run goes on.']);
+  });
+
   it('rejects unknown requests', async () => {
     const { brain } = setUp([]);
     await expect(handleMessage(brain, { type: 'other' })).rejects.toThrow();
@@ -241,15 +285,35 @@ describe('repeat paused in Super Productivity', () => {
     await brain.state();
     expect(Object.keys(host.data).some((key) => key.startsWith('pause:'))).toBe(false);
   });
-});
 
-describe('the pictures for the view (#100)', () => {
-  it('are sent once on request, only the ladders’ pictures', async () => {
-    const { brain } = setUp([]);
-    const pack = await handleMessage(brain, { type: 'questarc:art' });
-    expect(pack).toBe(artPack);
-    expect(Object.keys(artPack.ladders).sort()).toEqual(['crossing', 'home']);
-    expect(artPack.pictures['build-home-3']).toContain('<svg');
-    expect(artPack.pictures['keepsake-first-step']).toBeUndefined();
+  it('records a reminder it sees on the task, also when the host reports its own write at once', async () => {
+    const { brain, host, api } = setUp(['2026-11-01']);
+    registerHooks(api, brain.refresh);
+    // Super Productivity fires persistedDataChanged for a plugin's own writes too.
+    const persist = api.persistDataSynced;
+    api.persistDataSynced = async (value, key) => {
+      await persist(value, key);
+      host.hooks.get('persistedDataChanged')?.();
+    };
+    Object.assign(host.repeatCfgs.cfg1 as object, { startTime: '7:00', remindAt: 'AtStart' });
+    const state = await brain.state();
+    expect(JSON.parse(host.data[`reminder-seen:${RUN}:water`] ?? '')).toEqual({
+      on: true,
+      day: '2026-11-02',
+    });
+    // The evaluation went on with every record, not only the one it wrote.
+    expect(state.view.active?.runId).toBe(RUN);
+    expect(state.view.active?.reminder).toEqual({ set: true, time: '7:00' });
+    expect(Object.keys(state.records)).toContain(`run:${RUN}`);
+
+    host.today = '2026-11-05';
+    Object.assign(host.repeatCfgs.cfg1 as object, { remindAt: 'DoNotRemind' });
+    brain.refresh('tasks');
+    await settle();
+    expect(JSON.parse(host.data[`reminder-seen:${RUN}:water`] ?? '')).toEqual({
+      on: false,
+      day: '2026-11-05',
+    });
+    expect((await brain.state()).view.active?.reminder).toEqual({ set: false });
   });
 });

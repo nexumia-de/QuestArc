@@ -1,18 +1,21 @@
 // Preview of the view outside Super Productivity (docs/development.md,
 // preview): a fake plugin API with demo data, the real adapter (brain) and
 // the built view in an iframe that talks to it the way Super Productivity's
-// bridge does. Query: ?demo=<scenario in preview/demo.ts>&theme=light|dark.
-import type { Hooks } from '@questarc/sp-plugin-api';
+// bridge does. Query: ?demo=<scenario in preview/demo.ts>&theme=light|dark
+// &lang=de|en (the language Super Productivity would report, issue #39).
+import type { Hooks } from '@super-productivity/plugin-api';
 
 import { createBrain } from '../src/adapter/brain';
 import { localDay } from '../src/adapter/day';
 import { registerHooks } from '../src/adapter/hooks';
+import { followLanguage } from '../src/adapter/language';
 import type { HostApi } from '../src/adapter/host';
 import { handleMessage } from '../src/adapter/messages';
 import { createSidePanel } from '../src/adapter/side-panel';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
 import { demoData, type Scenario } from './demo';
+import { own, previewLanguage } from './demo-words';
 import { themeCss } from './theme';
 
 declare const VIEW_HTML: string;
@@ -29,6 +32,7 @@ const api: HostApi & Record<string, unknown> = {
   getAppState: async () => ({ tasks: demo.tasks, taskRepeatCfgs: demo.repeatCfgs }) as never,
   getArchivedTasks: async () => [],
   getDayContext: async () => ({ todayStr: today, startOfNextDayDiffMs: 0 }),
+  getCurrentLanguage: () => previewLanguage(),
   listSyncedDataKeys: async () =>
     Object.keys(demo.data)
       .filter((k) => demo.data[k])
@@ -78,7 +82,7 @@ Object.assign(window, {
       const id = `rpt_demo_${today}`;
       demo.tasks[id] = {
         id,
-        title: 'Morning routine',
+        title: own('Morning routine'),
         isDone: true,
         doneOn: Date.now(),
         repeatCfgId: 'demo',
@@ -107,6 +111,7 @@ Object.assign(window, {
   },
 });
 
+followLanguage(api as never, builtInJourneys);
 const brain = createBrain({
   api,
   journeys: builtInJourneys,

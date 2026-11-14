@@ -1,0 +1,104 @@
+{
+  "name": "What stands at an anchor does not depend on the tasks: a habit whose repeat was deleted stays there and waits for a task; a journey ended early leaves no step",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m1"
+      },
+      "run:r0": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-07-01"
+      },
+      "stage:r0:a": {
+        "acceptedDay": "2026-07-01"
+      },
+      "run-end:r0": {
+        "day": "2026-07-10",
+        "reason": "abandoned"
+      },
+      "run-anchor:r0": {
+        "anchorId": "m1"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": null,
+    "finished": [
+      {
+        "runId": "r1",
+        "build": {
+          "version": 4
+        }
+      },
+      {
+        "runId": "r0",
+        "habit": null
+      }
+    ],
+    "anchors": [
+      {
+        "id": "m1",
+        "state": "resting",
+        "steps": [
+          {
+            "runId": "r1",
+            "stageId": "c",
+            "state": "unbound"
+          }
+        ],
+        "due": []
+      }
+    ],
+    "problems": []
+  }
+}

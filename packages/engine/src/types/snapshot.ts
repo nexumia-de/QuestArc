@@ -42,6 +42,10 @@ export interface SnapshotRepeatCfg {
   readonly repeatCycle: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   readonly repeatEvery: number;
   readonly startDate?: string;
+  /** The time of day instances are scheduled for, "H:MM"; with `remindAt` they get a reminder. */
+  readonly startTime?: string;
+  /** Super Productivity's reminder option for instances, e.g. "AtStart" or "DoNotRemind". */
+  readonly remindAt?: string;
   readonly repeatUntilDay?: string;
   readonly monday?: boolean;
   readonly tuesday?: boolean;

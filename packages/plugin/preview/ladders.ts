@@ -9,6 +9,7 @@
 // every hue and each ladder in two hues. Not part of the plugin; the real
 // journey screen is unchanged.
 import { ladders, palette, pictures } from 'virtual:questarc-art';
+import '../src/shared/languages';
 import { picture, scene, type Hue } from '../src/ui/art';
 import {
   buildWords,

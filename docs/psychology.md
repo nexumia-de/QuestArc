@@ -25,14 +25,31 @@ punishment and comparison often backfire.
 
 1. **Start tiny, grow in stages.** A journey starts with a step too small
    to fail and offers the next, larger stage only when the current one has
-   become easy. Stages are short, and the distance to the next station is
-   always visible.
+   become easy. Completing a stage's condition is not ease: at a met
+   station staying a while is as good a choice as continuing, costs
+   nothing, and the user's own weekly answer (rule 9) suggests which one
+   fits; the user decides. A stage the user already does can be passed
+   ("already yours"); it earns nothing (rule 8), and a journey always
+   ends with a habit the user does. Stages are short, and the distance
+   to the next station is always visible. Growing the action is the
+   least tested part of the design ([research](research.md#open-evidence-gaps)).
 2. **Every stage is one plan: "After X, I will Y."** The plan names the
-   anchor (an existing routine or a fixed time; both work), the action and
-   optionally the place. The same anchor stays across the stages of a
-   journey.
-3. **One active journey.** Several plans at once weaken each other, so
-   one journey runs at a time; it can be paused to start another.
+   anchor, the action and optionally the place. **The anchor is the
+   user's** (decided 2026-11-12, #96): a moment that already exists in
+   their day, in their own words: an existing routine or a fixed time;
+   both work. A journey suggests a kind of moment ("a moment in your
+   morning") with example words and never dictates them. The same
+   anchor stays across the stages of a journey, and further journeys
+   can start from it: habits form by repeating one action in a stable
+   situation, the best supported finding of the
+   [evidence review](research.md), and the anchor is that situation.
+3. **One growing step.** Several plans at once weaken each other, so
+   one journey runs at a time; it can be paused to start another, and
+   the other anchors rest. The next step at an anchor is tied to that
+   anchor again. The user may instead tie it to a step that has become
+   a habit there ("After I drink a glass of water, I will …"): a chain
+   is the user's choice and never the default, because a broken link
+   takes what follows with it.
 4. **No day count is promised.** Texts say "most simple habits take about
    two to five months, and it varies a lot", never "21 days" or "66 days".
 5. **The user's own reason.** Each journey starts by asking why the user
@@ -40,9 +57,22 @@ punishment and comparison often backfire.
    stations and after a miss. Generic motivational quotes are not used.
 6. **Optional: a quick plan check (WOOP).** At the start of a journey the
    user may name the wish, the best outcome, the main obstacle and the
-   plan for it. Optional, because its effect is small.
+   plan for it ("If …, then I will …"). Optional, short and collapsed,
+   because its effect is small (g ≈ 0.28–0.34 with publication bias,
+   [research](research.md)); skipping it takes no tap, any answer may
+   stay empty, and nothing is rewarded for filling it in (rule 8). The
+   plan for the obstacle comes back where it helps, in the user's
+   words: in the hint after a second miss and in the station details.
+   Nothing asks for it again; it can be filled in, changed or emptied
+   later.
 7. **Optional: "pair it with".** Each stage may name something the user
-   enjoys only while doing the habit (a podcast only while walking).
+   enjoys only while doing the habit (a podcast only while walking). It
+   is the user's own words, asked once when the stage's task is set up,
+   never required and never rewarded (rule 8); it is shown as the end of
+   the plan sentence and goes along to the next stage on Continue
+   (confirmed by the owner on 2026-11-14), where it can be changed or
+   removed. The effect is small (about 10–12 % more workouts
+   in the large replication, [research](research.md)).
 
 ## Progress and feedback
 
@@ -53,6 +83,14 @@ punishment and comparison often backfire.
    total and best runs, and asks one question,
    the validated single item of the automaticity index with the habit filled
    in: "Walking after lunch is something I do automatically" (1–7). The answers drive graduation and reminder fading.
+   The look back shows the answers so far as a row of seven-step marks,
+   week by week, and says "easier than four weeks ago" or "about the
+   same" when that is so, and nothing when the answer is lower: no
+   target line and no number to reach (rule 12). After a journey the
+   question goes on for the habit it leaves, until that graduates
+   (rule 25): weekly for eight weeks, then every four weeks (decided
+   2026-11-14), so that a habit which takes long is not asked 52 times
+   a year.
 10. **Misses count against the user's own schedule.** A day is missed only
     if the recurring task was due that day. A task done late for yesterday
     (within a short backfill window) counts for yesterday.
@@ -67,14 +105,29 @@ punishment and comparison often backfire.
     no "you failed". The view shows total and best runs.
 13. **Welcome back.** The first completion after a miss gets a fixed,
     friendly acknowledgement: one sentence, nothing more. This was the
-    strongest single mechanic in the largest study.
-14. **Pause.** The user can pause a journey (illness, travel); paused days
-    are not misses.
+    strongest single mechanic in the largest study. The first completion
+    after a long break is greeted the same way, whatever the user chose
+    for the break (rule 14).
+14. **Pause, and coming back.** The user can pause a journey (illness,
+    travel); paused days are not misses. Most people leave a habit app
+    without pausing it, and the risk that a miss becomes a quit grows
+    with the length of the gap ([research](research.md)). So when
+    nothing has counted for 14 days, QuestArc does not show a row of
+    gaps and a hint: it greets the user with one calm card, their own
+    reason and three equal choices: carry on, call the gap a pause, or
+    start smaller with the stage before. None is suggested; the user
+    decides. At a station that is met the card waits: there only the
+    offer to continue or stay stands, one question at a time (decided
+    2026-11-14). Starting smaller takes nothing away (rule 16): what was
+    built stays, and the larger stage waits and is offered again. The 14
+    days are a design choice; no study defines them.
 15. **Kind words only.** All texts are autonomy-supportive ("you could"),
     never controlling ("you must") or blaming.
 16. **No permanent failure.** Nothing earned is ever taken away: runs,
     journeys and what a journey has built are never lost or reset, and
     there is no HP or any other value that falls because of misses.
+    Going back to a smaller stage (rule 14) is the user's choice and
+    lowers nothing.
 
 ## What grows
 
@@ -103,22 +156,64 @@ more and the evidence for them is contested or indirect.
     smaller, planning for a hard day, why one miss is fine). Shown in the
     app when the user arrives at a station, never as a push message, and
     never the same one twice.
-23. **Reminders restate the plan and fade.** A reminder repeats the user's
-    own plan ("after lunch: walk 15 minutes"). As the weekly answers rise,
-    reminders go from daily to weekly to off, and QuestArc says so ("you
-    won't need me for this one").
+23. **Reminders restate the plan and fade.** Reminders help repetition
+    but can keep the phone as the cue instead of the user's routine
+    ([research](research.md)). So QuestArc sends no notifications of its
+    own (decided 2026-11-12, #60): the reminder is the host's own task
+    reminder, which the user sets on their task, and the task's title
+    restates the plan in short ("After lunch: walk 15 minutes").
+    QuestArc suggests one at set-up, for the first weeks. As the weekly
+    answers rise (two in a row of 5 or more) it says "you may not need
+    the reminder any more" and leads to the task; it never sets or
+    removes one. A habit graduates only without a reminder (rule 25).
+    The two answers and the 5 are design choices; no study defines
+    them.
 
 ## When a habit is done
 
 24. **Habits stay.** The recurring task is the user's; QuestArc never
-    deletes or ends it. After a journey, its last habit keeps running as a
-    normal task and appears on the shelf as maintained.
+    deletes it and, in Super Productivity and Day Planner, never ends
+    it. After a journey, its last habit stands at its anchor (rule 28),
+    keeps running as a normal task and appears on the shelf as
+    maintained, its run going on past the journey's end, with the
+    weekly question going on, until it graduates (rule 25). A task ends
+    only with the user's yes: by the user's hand where QuestArc cannot
+    or may not end a repeat (it then leads to the task), and by a host
+    that keeps the tasks itself (the standalone app) only for a repeat
+    it created.
 25. **Graduation by automaticity, not days.** A habit can graduate when
-    the weekly answer stays high (for example 6 of 7 for three weeks in a
-    row), completion is steady and reminders are already off without a
-    drop. The user decides: keep it repeating quietly or end it. QuestArc
-    checks in two and six weeks later, and one tap brings it back. The
-    threshold is a design choice; no study defines it.
+    the weekly answer stays high (6 or 7 to three questions in a row) and
+    completion is steady (four of five planned days over four weeks,
+    with no drop in the last two, in which the task had no reminder
+    as far as QuestArc saw; one it never saw counts as never set). Graduation is offered once it holds, never pushed
+    and never announced before: no progress towards it is shown. "Not
+    now" is respected for four weeks on every device, after which the
+    offer may come back; the quiet way to it stays (decided
+    2026-11-14). A
+    graduated habit is **no longer ticked off** (rule 28). The user
+    decides what happens to the task: end its repeat
+    themselves, or keep it repeating quietly, where it counts for
+    nothing. QuestArc asks once, two and six weeks later and then at
+    most twice a year, whether it still runs by itself; "not really"
+    offers to bring it back as a growing step, and bringing it back
+    takes nothing away (rule 16): the time it ran by itself never
+    becomes gaps. The thresholds and the dates are design choices; no
+    study defines them, and the texts say so.
+
+26. **Tracking ends when the habit runs by itself.** Decided by the
+    owner on 2026-11-12 (#96); the rule keeps its number at the end so
+    that the other numbers stay. QuestArc is not a list of habits: its
+    home is the user's anchors. Each shows the one step that is growing
+    there and, in one line without boxes, what already runs by itself.
+    Only a step that is still becoming a habit is ticked off: the
+    growing step of the active journey, and the habit of a finished
+    journey until it graduates. A graduated step is not followed,
+    counted or reminded; it stands at its anchor from QuestArc's own
+    records, also when its task is ended or deleted. So the list gets
+    shorter, not longer. That ticking a habit which has become
+    automatic is only work, and wears people out, is the owner's
+    observation, not a study result; the page "How QuestArc motivates
+    you" says why the list gets shorter (rule 26).
 
 ## Honesty and privacy
 

@@ -2,14 +2,20 @@ import { isoWeek, resumeJourney, withdraw, type Journey, type RunView } from '@q
 
 import { t } from '../shared/texts';
 import { h } from './dom';
+import { comeBackCard } from './journey/come-back';
+import { daysApart } from './journey/format';
 import { shortDate } from './journey/format';
+import { reminderBanner, reminderQuestion } from './reminder';
 import type { Context } from './screen';
 import { markSeen, wasSeen } from './seen';
 
 /**
  * Banners on top of the current station's card (docs/behaviour.md,
- * screen 4): paused, a hard week (flow D), the weekly look back, a new
- * learning nugget, and the undo after ending a journey.
+ * screen 4): paused, the card after a long break (alone, instead of the
+ * others), a hard week (flow D, with the user's reason and their plan
+ * for the obstacle), the weekly look back, a new learning nugget, the
+ * task's reminder (suggested in a station's first weeks, and when it may
+ * not be needed any more), and the undo after ending a journey.
  */
 
 const banner = (text: string, ...buttons: Node[]): HTMLElement =>
@@ -55,6 +61,11 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
     return out;
   }
 
+  if (run.comeBack) {
+    out.push(comeBackCard(ctx, run, journey));
+    return out;
+  }
+
   const fallbackKey = `fallback:${run.runId}:${today}`;
   if (run.offerFallback && !wasSeen(fallbackKey) && stage) {
     const previous = journey.stages[index - 1];
@@ -63,7 +74,13 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
       : t('ui.banner.fallback-first');
     out.push(
       banner(
-        run.why ? `${text} ${t('ui.banner.why', { why: run.why })}` : text,
+        [
+          text,
+          run.why && t('ui.banner.why', { why: run.why }),
+          run.planCheck?.plan && t('ui.check.yours', { plan: run.planCheck.plan }),
+        ]
+          .filter(Boolean)
+          .join(' '),
         button(t('ui.action.good-to-know'), () => {
           markSeen(fallbackKey);
           ctx.redraw();
@@ -94,5 +111,24 @@ export const banners = (ctx: Context, run: RunView, journey: Journey): HTMLEleme
       ),
     );
   }
+  const station = run.stations[index];
+  // One thing at a time: the reminder waits for the other banners.
+  if (stage && station && out.length === 0)
+    out.push(
+      ...reminderBanner(
+        ctx,
+        {
+          runId: run.runId,
+          stageId: stage.id,
+          reminder: run.reminder,
+          age: daysApart(station.acceptedDay ?? today, today),
+          texts: {
+            fade: t('ui.banner.fade'),
+            suggest: reminderQuestion(run, 'ui.banner.reminder'),
+          },
+        },
+        isoWeek(today),
+      ),
+    );
   return out;
 };

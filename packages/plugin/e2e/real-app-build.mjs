@@ -8,7 +8,7 @@
 // Screenshots go to dist/real-app/build-*.
 //
 //   node e2e/real-app-build.mjs [width height]
-import { BASE, expect, install, makeRecurring, open, start, tick } from './sp.mjs';
+import { BASE, expect, install, journey, makeRecurring, open, start, tick } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const DAY_MS = 86_400_000;
@@ -22,6 +22,8 @@ const questArc = async () => {
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await view().locator('.qa-header').first().waitFor();
   await page.waitForTimeout(2000);
+  // The home is the moments (#96); the growing step opens the journey.
+  await journey(view);
 };
 
 try {
@@ -88,6 +90,18 @@ try {
   );
   await name('3-ready');
 
+  // Stay Here a While (#81): nothing changes, the offer turns quiet.
+  await view().getByRole('button', { name: 'Continue' }).click();
+  await view().getByRole('button', { name: 'Stay Here a While' }).click();
+  await view().locator('.qa-build').waitFor();
+  await page.waitForTimeout(1000);
+  expect(
+    (await view().locator('.qa-station-card').innerText()).includes('You are staying here a while'),
+    'the card says the user stays',
+  );
+  expect(/; ready$/.test((await label()) ?? ''), 'staying keeps the build ready');
+  await name('3a-staying');
+
   // Continue: the next version stands, the marker is gone. Flow C ends
   // on "Set up the task" for the next stage; back leads to the journey.
   await view().getByRole('button', { name: 'Continue' }).click();
@@ -109,6 +123,22 @@ try {
     'the row shows 1, 2 and the next step',
   );
   await name('4-next-version');
+
+  // I Already Do This (#81): the offered stage is passed without a task,
+  // the next version stands and says "already yours".
+  await view().getByRole('button', { name: 'Set up the task' }).click();
+  await view().getByRole('button', { name: 'I Already Do This' }).click();
+  await page.waitForTimeout(1000);
+  await view().locator('.qa-header button').first().click();
+  await view().locator('.qa-build').waitFor();
+  await page.waitForTimeout(1000);
+  const skipped = await label();
+  expect(skipped?.includes('version 3 of 5'), `a skipped stage raises the version: ${skipped}`);
+  expect(
+    (await view().locator('.qa-versions li').nth(2).innerText()).includes('already yours'),
+    'the row says which version is already yours',
+  );
+  await name('5-already-yours');
 } catch (error) {
   await shot('failed-', 'page').catch(() => undefined);
   throw error;

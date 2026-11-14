@@ -74,14 +74,86 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   lost `xp` and `damage`, which an engine before 3.3 requires, so it
   carries `dataFormat: 2` and `DATA_FORMAT` is 2. A run continued with
   3.3 is read-only on an older QuestArc until that is updated; old
-  checkpoints are still read. Graduation (#22) will take the next
-  number if it needs one.
+  checkpoints are still read. Graduation (#22) did not need one (below).
+- The second is the skip record (#81): an engine that does not know skipping (3.3 and older) would keep
+  working on a skipped stage, so `skip` carries `dataFormat: 3` and
+  `DATA_FORMAT` is 3. A record carries the format that first gave it its
+  meaning: checkpoints still say 2, so only a run with a skip is
+  read-only on a 3.3 host, and taking the skip back makes it usable
+  there again. `stay` only quiets an offer and carries no format.
+- The pairing record (`pair`, #58) holds only the user's words for the
+  plan sentence. An engine that does not know it computes the same run
+  and shows the plan without them, so it carries no format; an older
+  host cannot write it (`guardWrite`) and keeps it untouched. The same
+  holds for the plan check (`plan-check`, #59): the user's four answers,
+  shown and never evaluated. It became a record of its own instead of
+  the `woop` field once planned for `run`, so a later change does not
+  rewrite the record every engine places a run by.
+- The third is the step back (#82): an engine that does not know it
+  would keep working on the stage the user left, so `step-back`
+  carries `dataFormat: 4` and `DATA_FORMAT` is 4. The record stays
+  when the stage is taken up again (it gains `until`), because the
+  days in between are not due for that stage; such a run stays
+  read-only on a host with an older engine. `carry-on` only closes a card and carries
+  no format; "call it a pause" writes ordinary pause records.
+- Graduation (#22) needs **no new number**; `DATA_FORMAT` stays 4. The
+  `graduation` and `graduation-check` records belong to the habit of a
+  finished journey, and an engine that does not know them computes
+  nothing for such a habit: no run, no due days, no weekly question. So
+  it cannot show wrong progress, which is what the number guards
+  against; it shows the finished journey as before and the habit as one
+  that stays. It cannot write or withdraw the records either
+  (`guardWrite`: `graduation` was a kind no engine wrote, and
+  `graduation-check` is unknown to it) and keeps them untouched. A
+  number would only make finished journeys read-only on the older host
+  for no gain. Two things would change this, and then that change
+  raises the number: an engine released with the run of a maintained
+  habit (#66) but without graduation, which does not exist because both
+  come in one release; and a graduated step inside an open journey,
+  as anchors (#96) were first sketched, which an engine of today would
+  keep working on. Anchors were built without that case (next point).
+- Anchors (#96) need **no new number** either; `DATA_FORMAT` stays 4.
+  The case named above does not exist: a step at an anchor is the
+  habit of one journey, a graduated step is always that of a finished
+  journey, and the next step at the same anchor is a new run, never a
+  further stage of an open one. The `anchor` record belongs to no run
+  and holds only the user's words; `run-anchor` names the anchor of a
+  run and, for a chain, the step it follows. An engine that does not
+  know them computes the same stations, due days, runs, conditions and
+  habits for every run: it shows the plan with the journey's own words
+  instead of the user's and has no grouping by anchor. That is a
+  missing addition, like the pairing, not wrong progress, which is what
+  the number guards against. The older host cannot write or withdraw
+  either record (`guardWrite`) and keeps them untouched. A number
+  would make every journey started from an anchor read-only on an
+  older host for no gain. `run-anchor` is its own record and not a
+  field of `run`, so confirming the anchor of an earlier journey never
+  rewrites the record every engine places a run by. What would change
+  this: a rule that counts differently by anchor (several steps of one
+  anchor followed through one task, a chain that pauses what follows).
+  The built-in journeys were raised by one version for their `anchor`
+  hint, so a run started with them is read-only on a host that still
+  has the older files until that host is updated (`journey-version`,
+  the rule above); runs started before are not affected.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through
   `engine-cli.mjs` and show the read-only page (follow-up issue in
   Pensum).
+- "Not Now" to the offer to graduate (`graduation-later`, decided
+  2026-11-14) only quiets an offer, like `stay`, and carries no
+  number. The questions every four weeks after eight weeks and the
+  card that waits at a met station change what a newer engine asks and
+  shows for the same records, not what the records mean: an older
+  engine asks weekly and shows the card, and both write the same
+  answers. No number.
+- What a host saw of a reminder (`reminder-seen`, #60) carries no
+  number: an engine that does not know it treats every reminder as
+  never set, which is what every engine did before, so it may offer
+  graduation up to two weeks earlier than a newer one. That is an
+  offer the user can leave alone, not wrong progress.
 - The vectors `unknown-records-kept`, `newer-format-read-only`,
-  `journey-version-missing` and `guard-write` hold the rule.
+  `journey-version-missing`, `guard-write`, `guard-anchor` and
+  `guard-reminder` hold the rule.
 
 [^issue]: <https://github.com/nexumia-de/QuestArc/issues/85>

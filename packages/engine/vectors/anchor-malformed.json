@@ -1,0 +1,62 @@
+{
+  "name": "Malformed anchor records are reported and ignored: a routine without words, a time that is none, an unknown kind, a key with a part too many, a run without an anchor id",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine"
+      },
+      "anchor:m2": {
+        "kind": "time",
+        "time": "25:00"
+      },
+      "anchor:m3": {
+        "kind": "place",
+        "words": "the kitchen"
+      },
+      "anchor:m4:x": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "run-anchor:r1": {
+        "after": "r0"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": {
+      "runId": "r1",
+      "anchor": null
+    },
+    "anchors": [
+      {
+        "id": null,
+        "suggest": "test-daily"
+      }
+    ],
+    "problems": [
+      "record anchor:m1: unexpected value",
+      "record anchor:m2: unexpected value",
+      "record anchor:m3: unexpected value",
+      "record anchor:m4:x: unexpected key",
+      "record run-anchor:r1: unexpected value"
+    ]
+  }
+}

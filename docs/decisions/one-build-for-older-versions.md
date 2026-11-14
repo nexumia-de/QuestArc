@@ -41,8 +41,14 @@ Option 3.
 - `packages/plugin/build.mjs` keeps failing above 102,400 bytes for
   `index.html`, as long as 19.3.x is supported.
 - What does not fit in the view travels in `plugin.js` (up to 5 MiB) and
-  reaches the view by message, as the ladders' pictures (`questarc:art`)
-  and the journeys' texts already do.
+  reaches the view by message, as the ladders' pictures and the journeys'
+  texts did first. Since 2026-11-14 this holds for everything that is
+  data and not code: the view asks once for `questarc:content` and gets
+  the UI texts (`content/i18n/en.json`), the screens' style
+  (`style.css`) and the pictures. `index.html` keeps the code and its
+  start state: `start.css` and the four texts shown while `plugin.js`
+  does not answer ([plugin adapter](../plugin-adapter.md), "What the
+  view carries").
 - API members that only newer versions have (`DATA_CHANGED`,
   `DAY_CHANGE`, `getDayContext`, …) are optional and feature-detected;
   QuestArc works without them.
@@ -59,5 +65,19 @@ uses is already used where it exists.
 - The view's size budget remains a constraint for new screens; the build
   reports the bytes left.
 - Stripping whitespace (#103) stays.
+- Making room (2026-11-14, before graduation, anchors and the map):
+  `index.html` went from 89,774 to 64,127 bytes, 38,273 bytes free. The
+  UI texts were 14,762 bytes of it and the style about 11,800. From now
+  on only code grows the view; a new text or style rule adds to
+  `plugin.js` (5 MiB). The build fails when it finds UI texts in
+  `index.html`, so an import in the wrong place cannot undo this
+  unnoticed.
+- The first screen needs one more answer from `plugin.js` (the content,
+  then the state). Both are asked in the same start; without the content
+  nothing but the start message is drawn.
+- Not done, and still possible when code alone gets near the limit:
+  shortening names in the view's script (esbuild `minifyIdentifiers`)
+  and moving the record-writing functions the view bundles from the
+  engine (about 4 KB) behind a message.
 
 [^issue102]: https://github.com/nexumia-de/quest-arc/issues/102

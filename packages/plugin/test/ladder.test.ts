@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import file from '../../../content/art/crossing.ladder.json';
 import homeFile from '../../../content/art/home.ladder.json';
+import type { BuildView, Journey } from '@questarc/engine';
+import '../src/shared/languages';
+import { buildState } from '../src/ui/journey/build';
 import {
   appearing,
   buildLabel,
@@ -113,6 +116,18 @@ describe('the build on the journey screen', () => {
         names: [undefined, undefined, 'The Morning Bridge', 'The Stone Way'],
       }),
     ).toBe('The Morning Bridge stands · The Stone Way is ready');
+  });
+
+  it("shows the journey's names only on the journey's own ladder (#115)", () => {
+    const journey = {
+      build: { ladder: 'crossing', names: ['ui.build.given'] },
+    } as unknown as Journey;
+    const view = (ladder: string) =>
+      ({ ladder, markerProgress: 0, ready: false, marker: 'lanterns', versions: 5 }) as BuildView;
+    expect(buildState(view('crossing'), journey).names).toHaveLength(1);
+    const other = buildState(view('home'), journey);
+    expect(other.names).toBeUndefined();
+    expect(buildWords(home, 1, other)).toBe(buildWords(home, 1, { progress: 0 }));
   });
 
   it('names the marker in numbers for screen readers', () => {
