@@ -22,6 +22,11 @@ const LAST = 'plan-day';
 const STEP = 'drink a glass of water, stretch for five minutes and write down one thing for today';
 
 const questArc = async () => {
+  // Leave the page first: going to the same route keeps the view as it
+  // was (for example on the journey screen), as Super Productivity does
+  // for a user who opens QuestArc while it is already open.
+  await page.goto(`${BASE}#/tag/TODAY/tasks`);
+  await page.waitForTimeout(500);
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await view().locator('.qa-header').first().waitFor();
   await page.waitForTimeout(2000);
