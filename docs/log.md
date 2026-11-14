@@ -2,6 +2,7 @@
 
 ## 2026-11-14
 
+- **Creation**: coming back after a long break (#82): after 14 days without a counting completion the journey shows one card with **Carry On**, **Call It a Pause** and **Start Smaller**; records `carry-on` and `step-back` (data format 4), `comeBack` on the run, actions `carryOn`, `callItAPause`, `stepBack`; the build's version stays and the marker follows the smaller stage; a completion 14 or more days after the one before is a welcome back; real-app test `real-app-return.mjs` ([game rules](game-rules.md) §4, [behaviour](behaviour.md) flow D, [data model](data-model.md)).
 - **Creation**: spike of the standalone app (#93). `packages/app` (private, not released) runs the plugin's adapter and screens and the engine unchanged on its own host: a dataset in Super Productivity's backup format in IndexedDB, a Today screen, instances `rpt_<cfgId>_<day>`, "Create the task" that creates the repeat config, export and import, a service worker. 161 KB built, about 1,250 new lines; its export imports into Super Productivity 19.3.1 and 20.0.0 without repair and the plugin shows the same journey. The engine exports `isScheduled`; CI has the job `standalone-app` (not required). Answer and what has to change before #91 goes on: [decision](decisions/standalone-app-spike.md); how to run it: [development](development.md#standalone-app-spike).
 
 ## 2026-11-13
