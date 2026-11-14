@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-11-14
+
+- **Creation**: spike of the standalone app (#93). `packages/app` (private, not released) runs the plugin's adapter and screens and the engine unchanged on its own host: a dataset in Super Productivity's backup format in IndexedDB, a Today screen, instances `rpt_<cfgId>_<day>`, "Create the task" that creates the repeat config, export and import, a service worker. 161 KB built, about 1,250 new lines; its export imports into Super Productivity 19.3.1 and 20.0.0 without repair and the plugin shows the same journey. The engine exports `isScheduled`; CI has the job `standalone-app` (not required). Answer and what has to change before #91 goes on: [decision](decisions/standalone-app-spike.md); how to run it: [development](development.md#standalone-app-spike).
+
 ## 2026-11-13
 
 - **Creation**: "pair it with" per stage (#58, design rule 7): record `pair:<runId>:<stageId>`, action `pairStage`; asked in flow B, kept across Continue, changed or removed in the station details; the plan sentence is one whole sentence per form and ends with the pairing ([behaviour](behaviour.md), [data model](data-model.md) §2). No data format ([decision](decisions/data-format.md)).
