@@ -11,7 +11,7 @@ QuestArc runs in two places with the same game and the same data:
 - inside [Pensum](https://github.com/nexumia-de/pensum), a native app for
   Linux phones (Phosh) on Super Productivity's data (planned).
 
-<img src="docs/screenshots/journey-build-phone-light.png" alt="The journey 'A gentle morning' on a phone: the hut the journey has built so far, with a line of pennants in front, above the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-build-desktop-light.png" alt="The same journey at desktop size: the hut the journey has built so far, with a line of pennants in front, next to the station card" width="520">
+<img src="docs/screenshots/moments-phone-light.png" alt="QuestArc's home on a phone: the moment 'After lunch' with the step growing there and today's state, a weekly question and a habit that graduated a while ago" width="270"> <img src="docs/screenshots/journey-build-phone-light.png" alt="The journey 'A gentle morning' on a phone: the hut the journey has built so far, with a line of pennants in front, above the station card with the last seven due days" width="270"> <img src="docs/screenshots/journey-build-desktop-light.png" alt="The same journey at desktop size: the hut the journey has built so far, with a line of pennants in front, next to the station card" width="520">
 
 _Screenshots from demo data._
 
@@ -29,10 +29,18 @@ _Screenshots from demo data._
   projects.
 - **Missed days are neutral.** A gap is grey, never red. A hard week
   offers the earlier, smaller step; you can pause a journey at any time.
+  After a long break, one calm card lets you carry on, call it a pause,
+  or start smaller, and what you built stays.
+- **At your pace.** A reached station offers to continue or to stay a
+  while; a step you already do can be passed.
 - **Every journey builds something.** One thing that is whole at every
   station and grows with the next, a fireplace that becomes a house. It
   follows fixed rules and shows only real progress; there are no points,
   levels or opponents.
+- **Six journeys to start with:** a gentle morning, first things first
+  at work, an evening wind-down, tidying a little, a walk after lunch and
+  a few pages before sleep. Others can add journeys by pull request.
+- **English and German**, following Super Productivity's language.
 - **No network, no telemetry.** Everything stays in Super Productivity.
 
 Why it works this way: [How QuestArc motivates you](docs/psychology.md).
@@ -77,7 +85,7 @@ app as "Written by …". Guide: [Writing a journey](docs/authoring-journeys.md).
 
 ## Documents
 
-- [Roadmap](docs/roadmap.md): milestones and the journey.
+- [Roadmap](docs/roadmap.md): goals, their order and the releases.
 - [Architecture](docs/architecture.md): one engine, two hosts, decisions.
 - [Psychology](docs/psychology.md): what helps people build habits, and
   the design rules that follow.
