@@ -149,7 +149,8 @@ more and the evidence for them is contested or indirect.
 
 24. **Habits stay.** The recurring task is the user's; QuestArc never
     deletes or ends it. After a journey, its last habit keeps running as a
-    normal task and appears on the shelf as maintained, with the weekly
+    normal task and appears on the shelf as maintained, its run going on
+    past the journey's end, with the weekly
     question going on. A task ends only with the user's yes and by the
     user's hand: where QuestArc cannot end a repeat, it leads to the
     task.

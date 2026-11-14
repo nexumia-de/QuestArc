@@ -315,6 +315,10 @@ interface HabitView {
     suggestBack?: true; // the latest answer was "not really"
   };
   backDay?: string; // not graduated any more: the day it was last brought back
+  // maintained only (#66): the last stage's run carried on past the
+  // journey's end, and its last 7 due or paused days, oldest first
+  run?: { current: number; best: number; total: number; gap: boolean };
+  lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
 }
 
 interface ContinueOffer {

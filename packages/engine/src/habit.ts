@@ -84,12 +84,14 @@ export const habitOf = (
     bindingRecord?.day && bindingRecord.day > acceptedDay ? bindingRecord.day : acceptedDay;
   // Days the stage was left for a smaller one, and days the habit ran by
   // itself before it was brought back, are not due and count nothing.
-  const away = awayBy([...(choices.stepBacks.get(key) ?? []), ...graduations]);
-  const credited = new Set(
-    [...creditedDays(binding.tasks, binding.cfg.id, countFrom, today, ctx.logicalDay)].filter(
-      (day) => !away(day),
-    ),
-  );
+  // The day of graduation was still followed until the user's yes: a
+  // completion on it counts; without one it is not due either.
+  const ticked = creditedDays(binding.tasks, binding.cfg.id, countFrom, today, ctx.logicalDay);
+  const left = awayBy(choices.stepBacks.get(key) ?? []);
+  const ranByItself = awayBy(graduations);
+  const away = (day: string): boolean =>
+    left(day) || (ranByItself(day) && !(ticked.has(day) && graduations.some((g) => g.day === day)));
+  const credited = new Set([...ticked].filter((day) => !away(day)));
   const timeline = buildTimeline({
     cfg: binding.cfg,
     acceptedDay: countFrom,
@@ -103,5 +105,8 @@ export const habitOf = (
     state: 'maintained',
     checkinDue: daysBetween(acceptedDay, today) >= 7 && !answers.has(isoWeek(today)),
     canGraduate: qualifies({ today, answers, dueDays: timeline.dueDays, credited }),
+    // The run of the last stage, carried on past the journey's end (#66).
+    run: timeline.run,
+    lastDays: timeline.lastDays,
   };
 };

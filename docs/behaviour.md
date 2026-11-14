@@ -233,19 +233,23 @@ page only. They are never written into a task and never sent anywhere.
   something I do automatically" with 1 (not at all) to 7 (completely).
 - Actions: the seven answers, **Skip**.
 - The same screen asks about the habit a finished journey left (flow
-  F), reached from its banner or from the shelf.
+  F), reached from its banner or from the shelf, with that habit's
+  last due days and run.
 
 ### 7. Shelf
 
 - Waiting journeys, with **Resume**.
 - **Habits that stay**: the habits of finished journeys that are still
-  followed: plan sentence, "Keeps repeating as a normal task.", and
+  followed: plan sentence, the last 7 due days as marks and "Current
+  run 53 · best 53 · 53 in total" (the run of the last stage, carried
+  on past the journey's end, #66; a gap is a gap, never a loss),
+  "Keeps repeating as a normal task.", and
   quiet actions when they apply: **Let It Graduate**, **Weekly look
   back**. A habit whose task no longer repeats says so and offers
   **Set up the task** (flow B for that habit); one that was brought
   back says "Back with you since 11 Nov. Nothing was lost."
 - **Running by themselves**: graduated habits: plan sentence, "Runs by
-  itself since 28 Oct.", and one action: **Answer One Question** while
+  itself since 28 Oct." instead of days and a run, and one action: **Answer One Question** while
   the question is due, else **Bring It Back**; both open the same page
   (flow F). After "not really" the entry says so, without blame.
 - Finished journeys: title, start and end day.

@@ -68,7 +68,10 @@ describe('graduation in the plugin (#22)', () => {
       state: 'maintained',
       checkinDue: true,
       canGraduate: false,
+      // 15 September to 1 November, past the journey's end on 1 October (#66)
+      run: { current: 48, best: 48, total: 48, gap: false },
     });
+    expect(entry?.habit.lastDays?.at(-1)).toEqual({ day: '2026-11-02', mark: 'open' });
     // The look back and the task screens work on the habit when its run is named.
     expect(targetOf(state, RUN)).toMatchObject({ index: 3, state: 'maintained' });
     expect(targetOf(state)).toBeUndefined();

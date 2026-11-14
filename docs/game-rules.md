@@ -128,6 +128,17 @@ instance ticked off on Tuesday evening still counts for Monday
   ([behaviour](behaviour.md), flow D). No task or record changes; nothing
   else happens.
 
+- **After the journey** (issue #66): the habit a finished journey
+  leaves (§6) keeps the run of its last stage. The engine reports it on
+  the finished run (`habit.run`, with `habit.lastDays`, the last 7 due
+  or paused days) by the same rules, counted from the day the last
+  stage began to count: finishing the journey neither ends the run nor
+  starts a new one, and nothing else changes (no `offerFallback`, no
+  events). Days the habit ran by itself before it was brought back are
+  not due and count nothing, so the run stands. A graduated habit has
+  no run and no days ("runs by itself"), and neither has a habit
+  without a task that can be followed.
+
 **Example C.** Due daily. Days 1–4 done, day 5 missed, days 6–7 done:
 current run 6 completions, one gap, best run 6. Day 8 and 9 missed: the
 run ends with 6, `offerFallback` is set, best run stays 6, total 6.
@@ -292,8 +303,8 @@ ticked off ([design rule 25](psychology.md)).
   journey that is still open, or was ended early, has none.
 - While it is **maintained** it is followed exactly as before (§1 to §3):
   due days and completions count from the day the last stage began to
-  count, across the day the journey was finished. The weekly question
-  goes on, once per ISO week, for this habit.
+  count, across the day the journey was finished, and its run goes on
+  (§3). The weekly question goes on, once per ISO week, for this habit.
 - Without a task that can be followed (the repeat was deleted or is of
   an unsupported kind) the habit is `unbound` or `unsupported-repeat`:
   nothing is asked, it cannot graduate, and the hosts offer to set up a
@@ -360,6 +371,8 @@ as long as they like.
   weekly, able to graduate anew. **Nothing is lost:** the days from
   graduation to that day are not due and count nothing (like the days
   of a step back, §4), so they never become gaps and the run stands.
+  The day of graduation itself was still followed until the user's
+  yes: a completion on it counts, and without one it is not due.
   If its repeat is gone, it waits for a task.
 - Completion cannot suggest bringing a habit back any more ("below
   60 % in the 2 weeks before", the rule until 2026-11-14): a graduated
@@ -381,6 +394,14 @@ asked; from 11 Nov the question is due. Answered "not really", the
 habit stays graduated and bringing it back is suggested. Brought back
 on 11 Nov, the days from 28 Oct to 10 Nov are not due: a run of 30
 before goes on with the next completion.
+
+**Example I.** The last stage began on 1 Sep and the journey was
+finished on 1 Oct; the task is done every day up to 11 Nov: the habit's
+run is 72, not 42. With 3 and 4 Nov missed the run ended at 63 and the
+current one is 7, the total 70. Graduated on 1 Oct and brought back on
+28 Oct, with 28 Oct to 11 Nov done: the run is 45 (30 and 15), whether
+or not the kept task was ticked off in between; 46 if it was also done
+on 1 Oct, the day it graduated.
 
 ## 7. Builds
 

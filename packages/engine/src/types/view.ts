@@ -104,6 +104,14 @@ export interface HabitView {
   /** The habit's weekly answers so far, once there is one. */
   readonly answers?: WeeklyAnswers;
   readonly graduated?: Graduated;
+  /**
+   * Maintained only: the run of the last stage's task, carried on past
+   * the journey's end (game rules §3 and §6). A graduated habit has
+   * none: it runs by itself.
+   */
+  readonly run?: StationRun;
+  /** Maintained only: the last 7 due (or paused) days, oldest first. */
+  readonly lastDays?: readonly DayMark[];
   /** Not graduated any more: the day the habit was last brought back. */
   readonly backDay?: string;
 }

@@ -169,6 +169,8 @@ try {
     `the habit stays again (${stays})`,
   );
   expect(!stays.includes('Running by themselves'), 'nothing runs by itself any more');
+  // The tick before graduation still counts; the one in between does not (#66).
+  expect(stays.includes('1 in total'), 'the run stands as it was before graduation');
   await name('6-back');
 } catch (error) {
   await shot('failed-', 'page').catch(() => undefined);

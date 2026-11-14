@@ -20,7 +20,9 @@ export const checkinScreen = (ctx: Context, runId?: string): Screen => {
   const target = targetOf(ctx.state, runId);
   if (!target) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   const { run, stage } = target;
-  const station = target.habit ? undefined : run.stations[target.index];
+  // The last due days and the run: the station's, or the habit's (#66).
+  const followed = target.habit ?? run.stations[target.index];
+  const counted = followed?.run;
   const answers = target.habit ? target.habit.answers : run.answers;
   const week = isoWeek(view.todayStr);
   const answer = (score: number) => async () => {
@@ -36,15 +38,15 @@ export const checkinScreen = (ctx: Context, runId?: string): Screen => {
     body: h(
       'div',
       { class: 'qa-stack' },
-      station?.lastDays?.length ? lastDaysRow(station.lastDays) : null,
-      station
+      followed?.lastDays?.length ? lastDaysRow(followed.lastDays) : null,
+      counted
         ? h(
             'p',
             { class: 'qa-muted' },
             t('ui.card.run', {
-              current: station.run.current,
-              best: station.run.best,
-              total: station.run.total,
+              current: counted.current,
+              best: counted.best,
+              total: counted.total,
             }),
           )
         : null,

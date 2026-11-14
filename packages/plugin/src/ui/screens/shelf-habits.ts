@@ -3,6 +3,7 @@ import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { habitsOf, type Habit } from '../habit';
 import { shortDate } from '../journey/format';
+import { lastDaysRow } from '../journey/last-days';
 import type { Context, Route } from '../screen';
 
 /**
@@ -13,11 +14,29 @@ import type { Context, Route } from '../screen';
  * Back". Nothing here is red, counted down or pushed.
  */
 
-const card = (ctx: Context, { run, stage }: Habit, lines: string[], actions: [string, Route][]) =>
+const card = (
+  ctx: Context,
+  { run, stage, habit }: Habit,
+  lines: string[],
+  actions: [string, Route][],
+) =>
   h(
     'li',
     { class: 'qa-card' },
     h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair)),
+    // A maintained habit's last due days and its run (#66): a gap is a
+    // gap, never a loss. A graduated habit has neither.
+    habit.lastDays?.length ? lastDaysRow(habit.lastDays) : null,
+    ...(habit.run
+      ? [
+          t('ui.card.run', {
+            current: habit.run.current,
+            best: habit.run.best,
+            total: habit.run.total,
+          }),
+        ]
+      : []
+    ).map((line) => h('p', { class: 'qa-muted qa-small' }, line)),
     ...lines.map((line) => h('p', { class: 'qa-muted qa-small' }, line)),
     ...actions.map(([label, route]) =>
       h(
