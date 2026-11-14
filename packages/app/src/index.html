@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Nothing leaves the page: no connections, files only from the app itself. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#6495ed" />
+    <title>QuestArc</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

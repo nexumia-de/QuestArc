@@ -15,6 +15,7 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 | `packages/engine`         | Pure game engine: snapshot in, game view out; builds `engine.mjs` and the gjs wrapper `engine-cli.mjs`                                              |
 | `packages/engine/vectors` | Test vectors (JSON input → expected output), run in Node and later in gjs                                                                           |
 | `packages/plugin`         | Super Productivity plugin: host entry `plugin.ts`, adapter `adapter/`, view `ui/`, shared `shared/`, preview `preview/`                             |
+| `packages/app`            | Spike, private and not released (#93): the plugin's adapter and screens as a standalone web app ([standalone app](#standalone-app-spike))           |
 | `content/`                | Journeys (`journeys/`, one self-contained file each, CC BY-SA 4.0 in `LICENSE`), pictures (`art/`), UI and message texts (`i18n/`), schema, example |
 | `scripts/`                | Maintenance scripts                                                                                                                                 |
 
@@ -30,7 +31,8 @@ npm run check
 `check` runs, in this order: `format:check` (Prettier), `lint` (ESLint;
 the engine has extra rules: no clock, no `Math.random`, no console, no
 host globals), `typecheck`, `test` (Vitest: engine, then the plugin's
-adapter against a fake plugin API in `packages/plugin/test/`), `build`.
+adapter against a fake plugin API in `packages/plugin/test/`, then the
+standalone app's store and host), `build`.
 
 `npm run journeys` runs only the journey files' schema check and the
 journey checker ([story format](story-format.md#the-journey-checker)).
@@ -41,7 +43,10 @@ journey checker ([story format](story-format.md#the-journey-checker)).
   pull request and push to `main` (job `check`, the required check in
   `.github/rulesets/main.json`; the owner imports the ruleset) and keeps
   the plugin ZIP as an artifact. Job `real-app`, also required, tries the
-  ZIP in Super Productivity ([in the real app](#in-the-real-app)).
+  ZIP in Super Productivity ([in the real app](#in-the-real-app)). Job
+  `standalone-app` (not required) walks the spike of the standalone app
+  and imports its export into the same Super Productivity
+  ([standalone app](#standalone-app-spike)).
 - `.github/workflows/release.yml` runs on tags `v<version>`: the tag must
   match `packages/plugin/src/manifest.json`; it runs the checks and
   attaches the ZIP and `SHA256SUMS` to a GitHub release (a tag with `-`
@@ -194,6 +199,50 @@ The image stays on the oldest supported version (`minSupVersion`
 ([decision](decisions/one-build-for-older-versions.md)), so Dependabot
 proposes only minor and patch updates. When the pinned version changes,
 check the [facts](super-productivity-facts.md) §10.
+
+## Standalone app (spike)
+
+`packages/app` (#93) is the plugin's adapter and screens on a second
+host: its own dataset in Super Productivity's backup format, kept in
+IndexedDB, with a Today screen, export and import. It imports the
+plugin's and the engine's sources and copies none. What it showed and
+what has to change before it becomes a product:
+[decision](decisions/standalone-app-spike.md). It is private and not
+released.
+
+```sh
+npm run build -w @questarc/app
+```
+
+writes `packages/app/dist/app/`: static files for any web server
+(`index.html`, `app.js`, `app.css`, the web manifest, the icon and the
+service worker `sw.js`, which keeps them and answers every request from
+its cache). It needs `http://localhost` or HTTPS; opened from a file it
+has no service worker.
+
+```sh
+npm run e2e -w @questarc/app
+```
+
+walks the built app at 360 × 720 and 1200 × 800 (`e2e/walk.mjs`, served
+by `e2e/serve.mjs` on a free port): a journey from start over three
+logical days, offline after the first day, export and import; it prints
+the start time with the CPU slowed four times. Screenshots and the
+exported backup go to `packages/app/dist/walk/`.
+
+```sh
+QUESTARC_SP_URL=http://localhost:8080/ npm run e2e:import -w @questarc/app
+```
+
+imports that backup into Super Productivity (the same image and variable
+as [in the real app](#in-the-real-app); without the variable the live web
+app) and fails on a validation failure, a repair or a dialog, then
+installs the plugin ZIP and compares the journey. It needs `npm run
+build` and the walk first. Where Playwright's own Chromium is not
+installed, `QUESTARC_CHROMIUM` names the binary for both scripts (in the
+cloud image
+`/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell`).
+Neither is part of `npm run check`.
 
 ## Plugin API types
 

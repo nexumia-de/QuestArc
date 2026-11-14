@@ -1,0 +1,22 @@
+{
+  "name": "@questarc/app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Spike (#93): QuestArc as a standalone web app on a dataset in Super Productivity's backup format",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "e2e": "node e2e/walk.mjs 360 720 && node e2e/walk.mjs 1200 800",
+    "e2e:import": "node e2e/sp-import.mjs"
+  },
+  "dependencies": {
+    "@questarc/engine": "*",
+    "@questarc/plugin": "*"
+  },
+  "devDependencies": {
+    "@super-productivity/plugin-api": "20.0.0"
+  }
+}

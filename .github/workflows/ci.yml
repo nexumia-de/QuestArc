@@ -6,7 +6,10 @@
 # and in gjs on an arm64 runner and writes the times and the CPU to the job
 # summary (issue #83). The job real-app installs the plugin in Super Productivity's web app at
 # a pinned version (packages/plugin/e2e/Dockerfile) and walks the first
-# stage of a journey in it, at phone and desktop size.
+# stage of a journey in it, at phone and desktop size. The job standalone-app
+# (issue #93, a spike, not a required check) walks the standalone web app
+# in a browser, offline after the first load, and imports its export into
+# the same Super Productivity.
 name: CI
 
 on:
@@ -93,4 +96,34 @@ jobs:
         with:
           name: real-app-screenshots
           path: packages/plugin/dist/real-app/
+          if-no-files-found: ignore
+
+  standalone-app:
+    name: standalone-app
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Walk the app (phone and desktop), offline after the first load
+        run: npm run e2e -w @questarc/app
+      - name: Start Super Productivity at the pinned version
+        run: |
+          docker build -t questarc-sp packages/plugin/e2e
+          docker run -d -p 8080:80 questarc-sp
+          timeout 60 bash -c 'until curl -sf -o /dev/null http://localhost:8080/; do sleep 2; done'
+      - name: Import the app's export, no repair, the plugin shows the same journey
+        run: npm run e2e:import -w @questarc/app
+        env:
+          QUESTARC_SP_URL: http://localhost:8080/
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: standalone-app-walk
+          path: packages/app/dist/walk/
           if-no-files-found: ignore
