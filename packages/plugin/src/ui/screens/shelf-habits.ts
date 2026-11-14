@@ -73,7 +73,12 @@ export const maintainedCards = (ctx: Context): Node[] => {
             ? [[t('ui.graduate.title'), { name: 'graduate', runId }] as [string, Route]]
             : []),
           ...(habit.checkinDue
-            ? [[t('ui.checkin.title'), { name: 'checkin', runId }] as [string, Route]]
+            ? [
+                [
+                  t(habit.fourWeekly ? 'ui.checkin.title-4' : 'ui.checkin.title'),
+                  { name: 'checkin', runId },
+                ] as [string, Route],
+              ]
             : []),
         ],
       );

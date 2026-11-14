@@ -130,7 +130,8 @@ its moment is the user's), the home with several moments
 and for
 the habit a finished journey leaves (`preview/demo-habits.ts`, #22):
 `habit` (maintained, the weekly question due, answers of eight weeks),
-`graduate` (it can graduate), `graduated` (the question after two
+`graduate` (it can graduate), `graduate-later` (the same after "Not
+Now": the offer is quiet), `graduated` (the question after two
 weeks is due), `not-really` (answered so) and `brought-back` (back,
 its repeat gone). After a colon come the buttons or menu items to
 click first, in order, separated by `>`:
@@ -194,7 +195,8 @@ welcome back. `e2e/real-app-graduation.mjs` walks graduation (#22) with
 prepared data: a real recurring task ticked once, then the records of a
 finished journey and three high weekly answers written through the
 view's own message to plugin.js (`questarc:write`, so they pass
-`guardWrite`); the offer, the page with its two choices, "Runs by
+`guardWrite`); the offer, **Not Now** as a choice record with the
+shelf keeping **Let It Graduate**, the page with its two choices, "Runs by
 itself" with **Open the task**, the shelf, no message when the task is
 ticked afterwards, no question after 13 days, the question after 14,
 **Not Really**, **Bring It Back** and the habit on the shelf again.

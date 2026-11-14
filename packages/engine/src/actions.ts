@@ -324,6 +324,16 @@ export const graduate = (run: RunView, today: string, choice: 'end' | 'keep'): R
 };
 
 /**
+ * "Not Now" to the offer to graduate (game rules §6): the offer is quiet
+ * for four weeks and comes back if the habit still can. One record per
+ * habit, rewritten; only while the view says it can graduate.
+ */
+export const graduateLater = (run: RunView, today: string): RecordChanges => {
+  if (!run.habit?.canGraduate) return {};
+  return { [`graduation-later:${run.runId}:${run.habit.stageId}`]: { day: today } };
+};
+
+/**
  * Answer "does it still run by itself?" for a graduated habit, while the
  * view says the question is due (`habit.graduated.checkDue`, which names
  * the record). "Not really" (`still: false`) changes nothing by itself:
@@ -425,6 +435,7 @@ export const actions = {
   reminderSeen,
   answerCheckin,
   graduate,
+  graduateLater,
   answerStill,
   bringBack,
   chooseBuild,

@@ -197,6 +197,13 @@ export interface HabitView {
   readonly checkinDue: boolean;
   /** Maintained: the habit can graduate now (game rules §6). */
   readonly canGraduate: boolean;
+  /**
+   * It can graduate, and the user answered the offer with "Not Now": the
+   * offer is quiet before this day. The quiet way to it stays.
+   */
+  readonly offerQuietUntil?: string;
+  /** Not graduated: the question is asked every four weeks now, no longer weekly. */
+  readonly fourWeekly?: true;
   /** The habit's weekly answers so far, once there is one. */
   readonly answers?: WeeklyAnswers;
   readonly graduated?: Graduated;

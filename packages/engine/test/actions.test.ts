@@ -14,6 +14,7 @@ import {
   endJourney,
   evaluate,
   graduate,
+  graduateLater,
   nameAnchor,
   pairStage,
   reminderSeen,
@@ -58,6 +59,7 @@ describe('actions', () => {
       'continueJourney',
       'endJourney',
       'graduate',
+      'graduateLater',
       'nameAnchor',
       'pairStage',
       'pauseJourney',
@@ -160,6 +162,19 @@ describe('actions', () => {
     expect(removeAnchor(view, 'm1')).toEqual({});
     expect(removeAnchor(view, 'm2')).toEqual({});
     expect(removeAnchor(view, 'm0')).toEqual({});
+  });
+
+  it('keep the offer to graduate quiet with "Not Now", only while the habit can graduate', () => {
+    const finished = (file: string) => {
+      const vector = loadVectors().find((v) => v.file === file);
+      return evaluate((vector as { input: Snapshot }).input).finished[0] as NonNullable<
+        ReturnType<typeof evaluate>['active']
+      >;
+    };
+    expect(graduateLater(finished('graduation-qualifies.json'), '2026-11-11')).toEqual({
+      'graduation-later:r1:c': { day: '2026-11-11' },
+    });
+    expect(graduateLater(finished('graduation-not-low-answer.json'), '2026-11-11')).toEqual({});
   });
 
   it('record what a host saw of a reminder, one record per stage', () => {

@@ -69,8 +69,9 @@ punishment and comparison often backfire.
    enjoys only while doing the habit (a podcast only while walking). It
    is the user's own words, asked once when the stage's task is set up,
    never required and never rewarded (rule 8); it is shown as the end of
-   the plan sentence and goes along to the next stage, where it can be
-   changed or removed. The effect is small (about 10–12 % more workouts
+   the plan sentence and goes along to the next stage on Continue
+   (confirmed by the owner on 2026-11-14), where it can be changed or
+   removed. The effect is small (about 10–12 % more workouts
    in the large replication, [research](research.md)).
 
 ## Progress and feedback
@@ -87,7 +88,9 @@ punishment and comparison often backfire.
    same" when that is so, and nothing when the answer is lower: no
    target line and no number to reach (rule 12). After a journey the
    question goes on for the habit it leaves, until that graduates
-   (rule 25).
+   (rule 25): weekly for eight weeks, then every four weeks (decided
+   2026-11-14), so that a habit which takes long is not asked 52 times
+   a year.
 10. **Misses count against the user's own schedule.** A day is missed only
     if the recurring task was due that day. A task done late for yesterday
     (within a short backfill window) counts for yesterday.
@@ -113,7 +116,9 @@ punishment and comparison often backfire.
     gaps and a hint: it greets the user with one calm card, their own
     reason and three equal choices: carry on, call the gap a pause, or
     start smaller with the stage before. None is suggested; the user
-    decides. Starting smaller takes nothing away (rule 16): what was
+    decides. At a station that is met the card waits: there only the
+    offer to continue or stay stands, one question at a time (decided
+    2026-11-14). Starting smaller takes nothing away (rule 16): what was
     built stays, and the larger stage waits and is offered again. The 14
     days are a design choice; no study defines them.
 15. **Kind words only.** All texts are autonomy-supportive ("you could"),
@@ -177,11 +182,14 @@ more and the evidence for them is contested or indirect.
     that keeps the tasks itself (the standalone app) only for a repeat
     it created.
 25. **Graduation by automaticity, not days.** A habit can graduate when
-    the weekly answer stays high (6 or 7 for three weeks in a row) and
+    the weekly answer stays high (6 or 7 to three questions in a row) and
     completion is steady (four of five planned days over four weeks,
     with no drop in the last two, in which the task had no reminder
     as far as QuestArc saw; one it never saw counts as never set). Graduation is offered once it holds, never pushed
-    and never announced before: no progress towards it is shown. A
+    and never announced before: no progress towards it is shown. "Not
+    now" is respected for four weeks on every device, after which the
+    offer may come back; the quiet way to it stays (decided
+    2026-11-14). A
     graduated habit is **no longer ticked off** (rule 28). The user
     decides what happens to the task: end its repeat
     themselves, or keep it repeating quietly, where it counts for

@@ -34,7 +34,7 @@ export const checkinScreen = (ctx: Context, runId?: string): Screen => {
     ctx.back();
   };
   return {
-    title: t('ui.checkin.title'),
+    title: t(target.habit?.fourWeekly ? 'ui.checkin.title-4' : 'ui.checkin.title'),
     body: h(
       'div',
       { class: 'qa-stack' },

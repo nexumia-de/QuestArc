@@ -140,6 +140,13 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through
   `engine-cli.mjs` and show the read-only page (follow-up issue in
   Pensum).
+- "Not Now" to the offer to graduate (`graduation-later`, decided
+  2026-11-14) only quiets an offer, like `stay`, and carries no
+  number. The questions every four weeks after eight weeks and the
+  card that waits at a met station change what a newer engine asks and
+  shows for the same records, not what the records mean: an older
+  engine asks weekly and shows the card, and both write the same
+  answers. No number.
 - What a host saw of a reminder (`reminder-seen`, #60) carries no
   number: an engine that does not know it treats every reminder as
   never set, which is what every engine did before, so it may offer

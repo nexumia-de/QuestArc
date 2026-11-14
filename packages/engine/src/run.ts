@@ -119,7 +119,14 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     // neither due nor missed (game rules §2).
     const countFrom =
       bindingRecord?.day && bindingRecord.day > acceptedDay ? bindingRecord.day : acceptedDay;
-    if (binding.kind === 'unbound') {
+    // The earlier task of a stage walked again counts as gone when its
+    // repeat has ended by its end date, like a deleted one (game rules §4).
+    const endedRepeat =
+      stepBack !== undefined &&
+      binding.kind === 'bound' &&
+      binding.cfg.repeatUntilDay !== undefined &&
+      binding.cfg.repeatUntilDay < today;
+    if (binding.kind === 'unbound' || endedRepeat) {
       progress = 0;
       return { ...base, state: 'unbound', progress: 0, run: EMPTY_RUN };
     }
@@ -158,7 +165,11 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     if (!ended)
       reminder = reminderView(binding.cfg, answersOf(choices, run.runId, stage.id), today);
     const before = journey.stages[index - 1];
-    if (!ended && !cfgPaused && lastPause?.action !== 'pause') {
+    // At a met station only the offer to continue or stay stands; the
+    // card comes once the user has chosen to stay, or the stage is no
+    // longer met (game rules §5).
+    const offered = condition.met && !choices.stays.has(key(stage.id));
+    if (!ended && !cfgPaused && lastPause?.action !== 'pause' && !offered) {
       comeBack = comeBackOf({
         today,
         countFrom,

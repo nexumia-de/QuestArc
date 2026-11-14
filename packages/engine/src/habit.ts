@@ -1,10 +1,10 @@
-import { answersOf, weeklyAnswers } from './answers';
+import { answeredNow, answersOf, slowFrom, weeklyAnswers } from './answers';
 import { resolveBinding } from './binding';
 import type { Choices, RunRecord } from './choices';
 import { awayBy } from './comeback';
 import { creditedDays } from './completions';
-import { daysBetween, isoWeek } from './days';
-import { graduatedView, openGraduation, qualifies } from './graduation';
+import { addDays, daysBetween } from './days';
+import { graduatedView, OFFER_QUIET_DAYS, openGraduation, qualifies } from './graduation';
 import { reminderQuiet, reminderView } from './reminder';
 import { isSupported } from './schedule';
 import { buildTimeline } from './timeline';
@@ -60,7 +60,15 @@ export const habitOf = (
     .map((g) => g.until)
     .sort()
     .at(-1);
-  const maintained = { ...base, ...(backDay !== undefined ? { backDay } : {}) };
+  // Asked weekly for eight weeks after the journey's end, or after the
+  // habit was last brought back; then every four weeks (game rules §6).
+  const since = backDay ?? choices.runEnds.get(run.runId) ?? today;
+  const slow = slowFrom(since);
+  const maintained = {
+    ...base,
+    ...(backDay !== undefined ? { backDay } : {}),
+    ...(today >= slow ? { fourWeekly: true as const } : {}),
+  };
 
   const bindingRecord = choices.bindings.get(key);
   const binding = resolveBinding(bindingRecord, ctx.tasks, ctx.repeatCfgs);
@@ -101,18 +109,25 @@ export const habitOf = (
     pauses: choices.pauses.get(run.runId) ?? [],
     away,
   });
+  // Steady without a reminder: one that is set, or was in the last two
+  // weeks as far as a host saw, waits (game rules §6).
+  const canGraduate =
+    qualifies({ today, answers, slow, dueDays: timeline.dueDays, credited }) &&
+    reminderQuiet(binding.cfg, choices.reminders.get(key), today);
+  const later = choices.graduationLaters.get(key);
   return {
     ...maintained,
     state: 'maintained',
-    checkinDue: daysBetween(acceptedDay, today) >= 7 && !answers.has(isoWeek(today)),
-    // Steady without a reminder: one that is set, or was in the last two
-    // weeks as far as a host saw, waits (game rules §6).
-    canGraduate:
-      qualifies({ today, answers, dueDays: timeline.dueDays, credited }) &&
-      reminderQuiet(binding.cfg, choices.reminders.get(key), today),
+    checkinDue: daysBetween(acceptedDay, today) >= 7 && !answeredNow(answers, today, slow),
+    canGraduate,
+    // "Not Now" keeps the offer quiet for four weeks; the habit can
+    // graduate all the same (game rules §6).
+    ...(canGraduate && later !== undefined && addDays(later, OFFER_QUIET_DAYS) > today
+      ? { offerQuietUntil: addDays(later, OFFER_QUIET_DAYS) }
+      : {}),
     // The run of the last stage, carried on past the journey's end (#66).
     run: timeline.run,
     lastDays: timeline.lastDays,
-    reminder: reminderView(binding.cfg, answers, today),
+    reminder: reminderView(binding.cfg, answers, today, slow),
   };
 };

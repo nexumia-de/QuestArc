@@ -1,4 +1,4 @@
-import { weeksBack } from './answers';
+import { asked } from './answers';
 import { daysBetween } from './days';
 import type { SnapshotRepeatCfg } from './types/snapshot';
 import type { ReminderView } from './types/view';
@@ -68,9 +68,11 @@ export const reminderView = (
   cfg: SnapshotRepeatCfg,
   answers: ReadonlyMap<string, number>,
   today: string,
+  /** The Monday from which a habit is asked every four weeks, if it is. */
+  slow?: string,
 ): ReminderView => {
   if (!hasReminder(cfg)) return { set: false };
-  const back = weeksBack(answers, today);
+  const back = asked(answers, today, slow);
   const latest = back.findIndex((entry) => entry.score !== undefined);
   const row = latest === -1 || latest > 1 ? [] : back.slice(latest, latest + FADE_ANSWERS);
   const risen =

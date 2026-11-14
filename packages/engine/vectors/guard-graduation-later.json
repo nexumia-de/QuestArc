@@ -1,0 +1,93 @@
+{
+  "name": "\"Not Now\" to the offer to graduate is a kind this engine writes; never into a run of a newer QuestArc",
+  "rule": "data model §2",
+  "kind": "guard",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "run:r2": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "run-end:r2": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "graduation:r2:c:2026-11-01": {
+        "choice": "end",
+        "dataFormat": 99
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "writes": [
+    {
+      "graduation-later:r1:c": {
+        "day": "2026-11-11"
+      }
+    },
+    {
+      "graduation-later:r2:c": {
+        "day": "2026-11-11"
+      }
+    }
+  ],
+  "expect": [
+    {
+      "changes": {
+        "graduation-later:r1:c": {
+          "day": "2026-11-11"
+        }
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "graduation-later:r2:c": null
+      },
+      "refused": ["graduation-later:r2:c"]
+    }
+  ]
+}

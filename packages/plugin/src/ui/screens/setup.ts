@@ -7,7 +7,7 @@ import { targetOf } from '../habit';
 import { weekdayOfId } from '../journey/format';
 import { pairField } from '../journey/pair';
 import { reminderQuestion } from '../reminder';
-import { scheduleText, taskOfCfg } from '../repeat';
+import { hasEnded, scheduleText, taskOfCfg } from '../repeat';
 import type { Context, Screen } from '../screen';
 
 /**
@@ -86,7 +86,15 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
     message = t('ui.setup.waiting', { schedule: suggested });
     actions = [btn(t('ui.setup.open'), open(task.id), true), btn(t('ui.setup.other'), pick)];
   } else {
-    message = binding && app && !task ? t('ui.setup.gone') : t('ui.setup.choose');
+    const ended = hasEnded(
+      binding?.repeatCfgId ? app?.taskRepeatCfgs[binding.repeatCfgId] : undefined,
+      view.todayStr,
+    );
+    message = ended
+      ? t('ui.setup.ended')
+      : binding && app && !task
+        ? t('ui.setup.gone')
+        : t('ui.setup.choose');
     actions = [
       btn(t('ui.setup.create'), () => void create(), true),
       btn(t('ui.setup.existing'), pick),

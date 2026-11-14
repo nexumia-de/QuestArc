@@ -1,4 +1,4 @@
-import { weeksBack } from './answers';
+import { asked } from './answers';
 import type { Graduation, StillCheck } from './choices';
 import { addDays } from './days';
 import type { Graduated } from './types/view';
@@ -22,6 +22,9 @@ export const STEADY_DAYS = 28;
  * task had no reminder (reminder.ts, game rules §6).
  */
 export const RECENT_DAYS = 14;
+
+/** Days the offer to graduate stays quiet after "Not Now" (game rules §6). */
+export const OFFER_QUIET_DAYS = 28;
 
 /** Days after graduation QuestArc asks whether the habit still runs by itself. */
 export const CHECK_AFTER_DAYS: readonly number[] = [14, 42];
@@ -67,12 +70,15 @@ export const qualifies = (input: {
   today: string;
   /** The habit's weekly answers by ISO week. */
   answers: ReadonlyMap<string, number>;
+  /** The Monday from which the habit is asked every four weeks, if it is. */
+  slow?: string;
   dueDays: readonly string[];
   credited: ReadonlySet<string>;
 }): boolean => {
   const { today, answers, dueDays, credited } = input;
-  // Three weeks in a row, the last of them this week or the one before.
-  const back = weeksBack(answers, today);
+  // Three questions in a row, the last of them the current one or the
+  // one before: weeks, and four weeks each once the habit is asked so.
+  const back = asked(answers, today, input.slow);
   const latest = back.findIndex((entry) => entry.score !== undefined);
   if (latest === -1 || latest > 1) return false;
   const last = back.slice(latest, latest + HIGH_ANSWERS);

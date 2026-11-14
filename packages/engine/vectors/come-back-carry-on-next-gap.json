@@ -1,5 +1,5 @@
 {
-  "name": "Carry on closes the card for one gap only: after a completion and another 14 days it is due again",
+  "name": "Carry on closes the card for one gap only: after a completion and another 14 days it is due again (the user stays at the met station, so the card rule applies)",
   "rule": "game-rules §5, coming back after a long break",
   "kind": "evaluate",
   "input": {
@@ -116,6 +116,9 @@
       },
       "carry-on:r1:b": {
         "day": "2026-10-22"
+      },
+      "stay:r1:b": {
+        "day": "2026-10-23"
       }
     },
     "journeys": ["$test-daily"]

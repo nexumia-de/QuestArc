@@ -3,6 +3,7 @@
 // a finished journey through the view's own message to plugin.js (the
 // stages' checkpoints, the journey's end, the last stage bound to that
 // task, three high weekly answers). The habit can graduate: the banner,
+// "Not Now" (a choice record: quiet for four weeks, the shelf keeps the way),
 // the page with its two choices, "Runs by itself", the shelf. Two weeks
 // later (Playwright's clock) the question is due; "Not Really" offers to
 // bring the habit back, and the shelf shows it as one that stays.
@@ -115,7 +116,24 @@ try {
   const banner = await view().locator('.qa-banner').first().innerText();
   expect(banner.includes('seems to run by itself'), `the banner offers graduation (${banner})`);
   await name('0-offer');
-  await view().getByRole('button', { name: 'Have a Look' }).click();
+  // "Not Now" is a choice: the offer is quiet for four weeks on every
+  // device, and the shelf keeps the quiet way to it.
+  await view().getByRole('button', { name: 'Not Now' }).click();
+  await page.waitForTimeout(1500);
+  expect((await view().locator('.qa-banner').count()) === 0, 'Not Now puts the offer away');
+  const later = await request({ type: 'questarc:get' });
+  expect(
+    Boolean(later.records[`graduation-later:${runId}:${LAST}`]?.day) &&
+      Boolean(later.view.finished[0]?.habit?.offerQuietUntil),
+    `Not Now is a choice record with the day (${JSON.stringify(later.view.finished[0]?.habit)})`,
+  );
+  await questArc();
+  expect(
+    (await view().locator('.qa-banner').count()) === 0,
+    'the offer stays quiet after a reload',
+  );
+  expect((await shelf()).includes('Let It Graduate'), 'the shelf keeps the way to graduation');
+  await view().getByRole('button', { name: 'Let It Graduate' }).click();
   const offer = await view().locator('.qa-main').innerText();
   for (const choice of ['I Will End Its Repeat', 'Keep It Repeating Quietly'])
     expect(offer.includes(choice), `the page offers "${choice}"`);

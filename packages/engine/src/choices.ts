@@ -45,6 +45,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'step-back',
   'run-anchor',
   'reminder-seen',
+  'graduation-later',
 ]);
 
 /**
@@ -131,6 +132,8 @@ export interface Choices {
   readonly graduations: ReadonlyMap<string, readonly Graduation[]>;
   /** `${runId}:${stageId}` → the answered check-ins after graduation, sorted by due day */
   readonly stillChecks: ReadonlyMap<string, readonly StillCheck[]>;
+  /** `${runId}:${stageId}` → the day the user answered the offer to graduate with "Not Now" */
+  readonly graduationLaters: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` → what a host saw of the stage's reminder */
   readonly reminders: ReadonlyMap<string, ReminderSeen>;
   /** anchor id → the user's anchor */
@@ -189,6 +192,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const stepBacks = new Map<string, StepBack[]>();
   const graduations = new Map<string, Graduation[]>();
   const stillChecks = new Map<string, StillCheck[]>();
+  const graduationLaters = new Map<string, string>();
   const reminders = new Map<string, ReminderSeen>();
   const anchors = new Map<string, AnchorRecord>();
   const runAnchors = new Map<string, { anchorId: string; after?: string }>();
@@ -295,6 +299,9 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         if (name) choice[field] = name;
       }
       builds.set(parts[1], choice);
+    } else if (kind === 'graduation-later' && parts.length === 3) {
+      if (isDay(value.day)) graduationLaters.set(`${parts[1]}:${parts[2]}`, value.day);
+      else bad();
     } else if (kind === 'reminder-seen' && parts.length === 3) {
       if (typeof value.on === 'boolean' && isDay(value.day))
         reminders.set(`${parts[1]}:${parts[2]}`, { on: value.on, day: value.day });
@@ -354,6 +361,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     stepBacks,
     graduations,
     stillChecks,
+    graduationLaters,
     reminders,
     anchors,
     runAnchors,

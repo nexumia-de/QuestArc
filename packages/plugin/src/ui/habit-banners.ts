@@ -1,26 +1,32 @@
-import { isoWeek } from '@questarc/engine';
+import { graduateLater, isoWeek } from '@questarc/engine';
 
 import { t } from '../shared/texts';
 import { h } from './dom';
 import { habitName, habitsOf } from './habit';
 import { reminderBanner } from './reminder';
 import type { Context, Route } from './screen';
-import { markSeen, wasSeen } from './seen';
+import { wasSeen } from './seen';
 
 /**
  * Banners for the habits finished journeys left (docs/behaviour.md,
  * flow F), at most one per habit: the question after graduation, the
  * offer to graduate, the weekly look back, or that its task's reminder
  * may not be needed any more (flow H). Each is said once and
- * leaves when it is answered or put aside on this device; the shelf
- * keeps the quiet way to all three.
+ * leaves when it is answered or put aside; "Not Now" to the offer to
+ * graduate is a choice (it comes back after four weeks), the others
+ * are put aside on this device. The shelf keeps the quiet way to all.
  */
 export const habitBanners = (ctx: Context): HTMLElement[] => {
   const week = isoWeek(ctx.state.view.todayStr);
   return habitsOf(ctx.state).flatMap(({ run, stage, habit }) => {
     const id = `${run.runId}:${stage.id}`;
     const name = habitName(stage, run.anchor);
-    const banner = (text: string, label: string, route: Route, seenKey?: string): HTMLElement[] => [
+    const banner = (
+      text: string,
+      label: string,
+      route: Route,
+      notNow?: () => void,
+    ): HTMLElement[] => [
       h(
         'div',
         { class: 'qa-banner', role: 'status' },
@@ -30,17 +36,10 @@ export const habitBanners = (ctx: Context): HTMLElement[] => {
           { class: 'qa-btn qa-btn-text', type: 'button', onclick: () => ctx.go(route) },
           label,
         ),
-        seenKey
+        notNow
           ? h(
               'button',
-              {
-                class: 'qa-btn qa-btn-text',
-                type: 'button',
-                onclick: () => {
-                  markSeen(seenKey);
-                  ctx.redraw();
-                },
-              },
+              { class: 'qa-btn qa-btn-text', type: 'button', onclick: notNow },
               t('ui.action.not-now'),
             )
           : null,
@@ -53,16 +52,19 @@ export const habitBanners = (ctx: Context): HTMLElement[] => {
         runId: run.runId,
       });
     }
-    if (habit.canGraduate && !wasSeen(`graduate:${id}`)) {
+    // "Not Now" is a choice record, so the offer is quiet on every
+    // device and comes back after four weeks (game rules §6).
+    if (habit.canGraduate && !habit.offerQuietUntil) {
       return banner(
         t('ui.banner.graduate', { habit: name }),
         t('ui.action.look'),
         { name: 'graduate', runId: run.runId },
-        `graduate:${id}`,
+        () => void ctx.write(graduateLater(run, ctx.state.view.todayStr)),
       );
     }
     if (habit.checkinDue && !wasSeen(`checkin:${id}:${week}`)) {
-      return banner(t('ui.banner.habit-checkin', { habit: name }), t('ui.action.answer'), {
+      const text = habit.fourWeekly ? 'ui.banner.habit-checkin-4' : 'ui.banner.habit-checkin';
+      return banner(t(text, { habit: name }), t('ui.action.answer'), {
         name: 'checkin',
         runId: run.runId,
       });

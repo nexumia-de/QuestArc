@@ -213,13 +213,16 @@ can start smaller, with a real step back.
   day makes the stage before it the current one again from that day. It
   is offered only when the stage before is finished (has a checkpoint):
   never on the first stage, and not after a skipped stage, which has
-  nothing to go back to. A step-back record without a finished stage
+  nothing to go back to (confirmed by the owner on 2026-11-14). A step-back record without a finished stage
   before is ignored.
 - **The smaller stage counts from the day of the step back** (and from
   the day its task is bound, if that is later): its condition, runs and
   marker start again; completions from its first walk are not counted
   twice. It uses the task it had if that still repeats; otherwise it
-  waits for a task (state `unbound`) and cannot be skipped. Weekly
+  waits for a task (state `unbound`) and cannot be skipped. A repeat
+  that still exists but **has ended by its end date** (`repeatUntilDay`
+  before today) counts as gone, like a deleted one (decided by the
+  owner on 2026-11-14): the user is led to set up a new task. Weekly
   answers from before the step back suggest nothing for the offer; the
   first completion is a welcome back (§5). The station keeps its
   `doneDay` and names the day in `stepBackDay`.
@@ -254,8 +257,9 @@ pause), 22 to 25 Oct are not due.
   gap, also when the gap ended a run.
 - So is a counting completion 14 or more days after the one before it
   (or after the day before the stage began to count), whatever lay
-  between, gaps or a pause, and the first completion of a stage the
-  user stepped back to (§4).
+  between, gaps or an ordinary pause (confirmed by the owner on
+  2026-11-14), and the first completion of a stage the user stepped
+  back to (§4).
 - It gives nothing and takes nothing; coming back is what is greeted.
 
 ### After a long break (issue #82)
@@ -271,6 +275,11 @@ Decided by the owner on 2026-11-12 ([design rule 14](psychology.md)).
   last day that counted or was paused is at least 14 logical days ago,
   the stage has a task with a supported repeat, and the journey is the
   active one, not paused and not ended. With 13 days there is no card.
+- **Not at a met station** (decided by the owner on 2026-11-14): while
+  the current stage is met and the user has not chosen to stay, only
+  the offer to continue or stay stands (§4) and there is no card. Once
+  the user stays (a `stay` record for the stage), or the stage is no
+  longer met, the rule above applies as before.
   While it is due the hosts show it instead of the hard-week hint.
 - Three choices; none is suggested:
   1. **Carry on:** a `carry-on` record for the stage with the day.
@@ -305,7 +314,14 @@ ticked off ([design rule 25](psychology.md)).
 - While it is **maintained** it is followed exactly as before (§1 to §3):
   due days and completions count from the day the last stage began to
   count, across the day the journey was finished, and its run goes on
-  (§3). The weekly question goes on, once per ISO week, for this habit.
+  (§3). The weekly question goes on for this habit: once per ISO week
+  in the week the journey was finished and the eight weeks after it,
+  then **once per four weeks** (decided by the owner on 2026-11-14;
+  `habit.fourWeekly`). The four weeks are counted from the Monday after
+  those eight weeks; a question is due from the start of its four weeks
+  until an answer falls into them, and an answer in any of their weeks
+  answers it. A habit that was brought back is asked weekly again for
+  eight weeks from that day.
 - Without a task that can be followed (the repeat was deleted or is of
   an unsupported kind) the habit is `unbound` or `unsupported-repeat`:
   nothing is asked, it cannot graduate, and the hosts offer to set up a
@@ -316,10 +332,16 @@ ticked off ([design rule 25](psychology.md)).
 A maintained habit **can graduate** (`habit.canGraduate`) when all of
 these hold:
 
-1. **Three high answers in a row:** the weekly answers ("… is something
-   I do automatically", 1–7) of 3 consecutive ISO weeks are each 6 or 7,
-   and the last of the three weeks is this week or the one before. A
-   skipped week breaks the row.
+1. **Three high answers in a row:** the answers ("… is something I do
+   automatically", 1–7) to 3 consecutive questions are each 6 or 7, and
+   the last of the three is the current question or the one before. A
+   question is that of one ISO week or, once the habit is asked every
+   four weeks, that of its four weeks (the latest answer in them
+   counts); a question that passed unanswered breaks the row. While
+   questions are weekly this is "3 consecutive ISO weeks"; afterwards
+   the row may begin in the weekly weeks and go on into the four-weekly
+   ones, so it stays earnable: two weekly answers and the first
+   four-weekly one, or three four-weekly ones.
 2. **Steady over four weeks:** completions on at least 80 % of the due
    days in the last 28 logical days (today included), or since the
    stage began to count if that is later. Only decided days are looked
@@ -343,7 +365,13 @@ these hold:
 
 It is offered, never pushed and never announced before it holds: no
 progress towards it is shown, and the user can leave the offer alone for
-as long as they like.
+as long as they like. **Not now** (decided by the owner on 2026-11-14)
+is a choice, stored as a `graduation-later` record with the day
+(`graduateLater`), so it holds on every device: the offer is quiet for
+28 days from that day (`habit.offerQuietUntil`, the first day it is
+back) and then returns if the habit still can graduate. `canGraduate`
+is not changed by it: the quiet way to graduation (the shelf) stays
+open all the time.
 
 ### Graduating
 
@@ -362,7 +390,9 @@ as long as they like.
 
 - QuestArc asks **once** whether the habit still runs by itself 14 and
   42 days after graduation, and then every 182 days (at most twice a
-  year). The question is due (`habit.graduated.checkDue`) from its date
+  year; the dates, the two answers and that a question which passed
+  unanswered is not asked again were confirmed by the owner on
+  2026-11-14). The question is due (`habit.graduated.checkDue`) from its date
   until it is answered; when a later date has come, only that one is
   due, so a question that passed unanswered is not asked again.
 - The answer is yes or "not really" (`answerStill`, a
@@ -383,7 +413,8 @@ as long as they like.
   habit is not ticked off, so there is nothing to count.
 
 The numbers (3 answers, 6 of 7, 80 %, 28 and 14 days, 14 days without
-a reminder, 14, 42 and 182 days) are design choices; no study defines them, and the texts say so.
+a reminder, 8 weeks of weekly questions and then every 4, 28 quiet days
+after "not now", 14, 42 and 182 days) are design choices; no study defines them, and the texts say so.
 
 **Example G.** A journey was finished on 1 Oct; its last stage's task
 is due daily and done every day. The answers of the weeks 44, 45 and 46
@@ -392,6 +423,17 @@ are 6, 7 and 6: on Wednesday of week 46 the habit can graduate. With a
 42 to 44 it cannot. With 6 misses between 15 and 28 Oct it cannot
 either (22 of 28, 79 %), with 5 it can (23 of 28). With 3 misses in
 the last 14 days it cannot (11 of 14), although 25 of 28 are done.
+
+**Example L.** The journey was finished on Thursday 1 Oct (week 40).
+Up to week 48 the habit is asked every week. From Monday 30 Nov one
+question covers weeks 49 to 52, the next week 53 to week 3, the next
+weeks 4 to 7. Answered in week 49, nothing is asked in weeks 50 to 52.
+Answers of 6, 6 and 7 in weeks 47, 48 and 50 are three questions in a
+row: the habit can graduate. So are 6, 7 and 6 in weeks 50, 1 and 5.
+Answers in weeks 47, 50 and 5 are not (the question of week 53 to
+week 3 passed), and neither are three answers in weeks 49, 50 and 51
+(one question). The user says "not now" on 20 Oct: the offer is quiet
+until 16 Nov and back on 17 Nov, if the habit still can graduate.
 
 **Example H.** The habit graduates on 28 Oct. On 10 Nov nothing is
 asked; from 11 Nov the question is due. Answered "not really", the

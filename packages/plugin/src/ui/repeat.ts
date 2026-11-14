@@ -55,6 +55,15 @@ export const taskOfBinding = (
   return cfgId ? taskOfCfg(tasks, cfgId) : undefined;
 };
 
+/**
+ * A repeat that has ended by its end date counts as gone for the earlier
+ * task of a station walked again (game rules §4, stepping back).
+ */
+export const hasEnded = (cfg: PluginTaskRepeatCfg | undefined, today: string): boolean => {
+  const until = (cfg as { repeatUntilDay?: string | null } | undefined)?.repeatUntilDay;
+  return typeof until === 'string' && until !== '' && until < today;
+};
+
 export const scheduleText = (schedule: Schedule, weekdayName: (d: string) => string): string => {
   if (schedule.type === 'daily') return t('ui.schedule.daily');
   if (schedule.type === 'everyNDays') return t('ui.schedule.every-n', { n: schedule.n });

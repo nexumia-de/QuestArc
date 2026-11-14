@@ -104,6 +104,7 @@ overwrite each other. Most records are written once and never changed.
 | `carry-on:<runId>:<stageId>`               | `{ day }`                                                                 | the user carries on after a long break (closes the card for this gap)                                |
 | `step-back:<runId>:<stageId>:<day>`        | `{ dataFormat: 4, until? }`; `stageId` is the stage left, `day` the day   | the user starts smaller after a long break; `until` is added when the stage left is taken up again   |
 | `graduation:<runId>:<stageId>:<day>`       | `{ choice: "end" \| "keep", until? }`; `day` is the day of graduation     | the user lets a finished journey's habit graduate; `until` is added when it is brought back          |
+| `graduation-later:<runId>:<stageId>`       | `{ day }`                                                                 | the user answers the offer to graduate with "Not Now" (quiet for 28 days)                            |
 | `graduation-check:<runId>:<stageId>:<due>` | `{ day, still: true \| false }`; `due` is the date the question was due   | the user answers "does it still run by itself?" after graduation                                     |
 | `reminder-seen:<runId>:<stageId>`          | `{ on: true \| false, day }`: a reminder seen on the task, or none since  | a host sees the reminder of a followed stage's task come or go                                       |
 | `journey:<journeyId>`                      | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
@@ -174,8 +175,12 @@ overwrite each other. Most records are written once and never changed.
   `answerStill` writes `graduation-check` under the date the question
   was due (`habit.graduated.checkDue`), so two devices answering the
   same question write the same key; it returns no changes while no
-  question is due. Both kinds are read only for the last stage of a
-  finished journey. Neither carries a data format
+  question is due. `graduateLater` writes `graduation-later`, one record
+  per habit, rewritten each time the user says "Not Now" to the offer;
+  it only quiets the offer for 28 days and changes nothing else, so it
+  is a record and not device memory: the offer is quiet on every
+  device. All three kinds are read only for the last stage of a
+  finished journey. None of them carries a data format
   ([decision](decisions/data-format.md)): an engine that does not know
   them computes nothing for a finished journey's habit. Anchors are their own records (below).
 - **What a host saw of a reminder** (`reminder-seen`,
@@ -384,7 +389,9 @@ interface HabitView {
   stageId: string; // the journey's last stage
   state: 'maintained' | 'graduated' | 'unbound' | 'unsupported-repeat';
   checkinDue: boolean; // maintained: weekly question not answered this ISO week
-  canGraduate: boolean; // maintained: the three conditions of game rules §6 hold
+  canGraduate: boolean; // maintained: the conditions of game rules §6 hold
+  offerQuietUntil?: string; // it can, and the user said "Not Now": the offer is quiet before this day
+  fourWeekly?: true; // not graduated: asked every four weeks now, no longer weekly
   answers?: WeeklyAnswers;
   graduated?: {
     day: string;
@@ -451,8 +458,8 @@ card after a long break writes `carryOn`, `callItAPause` or `stepBack`;
 each returns no changes while `comeBack` is absent, and `stepBack`
 also without `comeBack.smaller`. For the habit of a finished journey
 the weekly answer is the same `answerCheckin` with the last stage;
-`graduate`, `answerStill` and `bringBack` take the finished run and
-return no changes when its `habit` does not allow them. For anchors,
+`graduate`, `graduateLater`, `answerStill` and `bringBack` take the
+finished run and return no changes when its `habit` does not allow them. For anchors,
 `nameAnchor` returns no changes without usable words or a time,
 `confirmAnchor` without a group of journeys from before anchors, and
 `removeAnchor` while something stands at the anchor.

@@ -491,8 +491,9 @@ In Pensum, step 2 creates the repeat itself.
 
 1. The station's acceptance story and the next stage's plan sentence,
    with the pairing of the current stage: **Continue** takes it along to
-   the next stage (`continueJourney`), where flow B shows it in the
-   field to keep, change or remove.
+   the next stage (`continueJourney`; confirmed by the owner on
+   2026-11-14), where flow B shows it in the field to keep, change or
+   remove.
 2. Two equal choices (#81): **Continue** and **Stay Here a While**, with
    "Both are fine. Staying costs nothing: everything keeps counting, and
    you can continue whenever you like." The engine's suggestion
@@ -533,7 +534,9 @@ In Pensum, step 2 creates the repeat itself.
   they wrote one ("Your plan for the obstacle: …", screen 3b).
 - The next completion is welcomed back (flow A).
 - **After a long break** (#82, [game rules](game-rules.md) §5: nothing
-  counted for 14 days, the journey not paused): instead of the banners,
+  counted for 14 days, the journey not paused, and the station not
+  met, or met and the user stays: at a met station only **Continue**
+  stands, with its choice to stay, decided 2026-11-14): instead of the banners,
   one calm card on top of the station's card: "Good to see you." "Life
   happens. How would you like to go on?", the user's own reason, and
   three choices as equal outlined buttons, each with one line below
@@ -547,14 +550,19 @@ In Pensum, step 2 creates the repeat itself.
   - **Call It a Pause**: "The days since 27 Oct show as paused, not as
     gaps." Writes `callItAPause`; the days show as paused in the last
     days and the run stands.
-  - **Start Smaller** (only with a finished station before): "You go
+  - **Start Smaller** (only with a finished station before, not a
+    skipped one; confirmed by the owner on 2026-11-14): "You go
     back to the earlier step: drink a glass of water. What you built
     stays." Opens its own page: the smaller station's plan, "You could
     take up this smaller step again. What you have built stays as it
     is. The larger step waits for you and is offered again when this
     one is settled.", whether the earlier task still repeats ("It
     counts again from today.") or a task is set up next (flow B,
-    without **I Already Do This**), "The task of the larger step stays
+    without **I Already Do This**; also when the earlier task's repeat
+    still exists but has ended by its end date, decided 2026-11-14:
+    flow B then says "The repeat of your earlier task for this station
+    has ended. You could create a new task or use another recurring
+    task."), "The task of the larger step stays
     as it is. Afterwards you could pause or end its repeat in Super
     Productivity so you don't keep both." (afterwards, because pausing
     the current station's repeat pauses the journey), and a checkbox **Also call the days since 27 Oct a pause** (off; the two
@@ -583,14 +591,19 @@ counted down, and nothing is said before it holds.
 
 1. **Until then** the habit is followed as before: its task is ticked
    off in the task list, and once a week a banner says "Weekly look
-   back for "…": one question." with **Answer** (screen 6). The end of
+   back for "…": one question." with **Answer** (screen 6). After
+   eight weeks the question comes every four weeks ("A look back for
+   "…": one question, every four weeks now.", the page titled "Look
+   back"; decided 2026-11-14). The end of
    a journey says "Your habit stays: the recurring task keeps running
    as it is, and the weekly question goes on."
 2. **The offer.** When the engine says the habit can graduate
    (`habit.canGraduate`): banner "… seems to run by itself. You could
-   let it graduate." with **Have a Look** and **Not Now**. Not Now puts
-   the banner away on this device for good; the shelf keeps the quiet
-   action **Let It Graduate** for as long as the habit can.
+   let it graduate." with **Have a Look** and **Not Now**. Not Now is a
+   choice (`graduateLater`, decided 2026-11-14): the banner is put away
+   on every device and comes back four weeks later at the earliest, if
+   the habit still can graduate; the shelf keeps the quiet action
+   **Let It Graduate** for as long as the habit can.
 3. **Let It Graduate** (a page): the plan sentence; what graduation
    means ("QuestArc then stops following it, and there is nothing left
    to tick off for it"); that the thresholds are QuestArc's own choice,
@@ -616,7 +629,8 @@ counted down, and nothing is said before it holds.
    **Done** leads home. The habit stands on the shelf under "Running by
    themselves" and produces no messages any more.
 5. **One question** 2 and 6 weeks later, then at most twice a year
-   (`habit.graduated.checkDue`): banner "… graduated a while ago. One
+   (`habit.graduated.checkDue`; a question that passed unanswered is
+   not asked again; confirmed by the owner on 2026-11-14): banner "… graduated a while ago. One
    question, if you like." with **Answer**. The page asks "Does "…"
    still run by itself?" with **Yes, It Does**, **Not Really** and
    **Not Now** (put away on this device; the shelf keeps it). Yes closes

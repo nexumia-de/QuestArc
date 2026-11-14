@@ -10,6 +10,8 @@ import type { DemoData } from './demo';
  *
  * - habit: maintained, the weekly question is due; answers of eight weeks
  * - graduate: the last three answers are high: it can graduate
+ * - graduate-later: the same, and the user said "Not Now" five days ago:
+ *   the offer is quiet, the shelf keeps "Let It Graduate"
  * - graduated: it graduated 15 days ago (the user ends the repeat): the
  *   question after two weeks is due
  * - not-really: the same, answered with "not really"
@@ -19,6 +21,7 @@ import type { DemoData } from './demo';
 export const HABIT_SCENARIOS = [
   'habit',
   'graduate',
+  'graduate-later',
   'graduated',
   'not-really',
   'brought-back',
@@ -72,6 +75,7 @@ export const habitDemo = (scenario: HabitScenario, today: string): DemoData => {
       ...(scenario === 'brought-back' ? { until: day(3) } : {}),
     });
   }
+  if (scenario === 'graduate-later') record(`graduation-later:demo:${LAST}`, { day: day(5) });
   if (scenario === 'not-really') {
     record(`graduation-check:demo:${LAST}:${day(1)}`, { day: today, still: false });
   }

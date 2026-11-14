@@ -5,7 +5,7 @@ import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
 import { shortDate } from '../journey/format';
-import { taskOfCfg } from '../repeat';
+import { hasEnded, taskOfCfg } from '../repeat';
 import type { Context, Screen } from '../screen';
 
 /**
@@ -28,7 +28,13 @@ export const smallerScreen = (ctx: Context): Screen => {
   const tasks = app ? Object.values(app.tasks) : [];
   const binding = records[`binding:${run.runId}:${stage.id}`] as
     { repeatCfgId?: string } | undefined;
-  const earlier = binding?.repeatCfgId ? taskOfCfg(tasks, binding.repeatCfgId) : undefined;
+  // The earlier task still counts only while its repeat goes on: a deleted
+  // one, or one that ended by its end date, is gone (game rules §4).
+  const cfgId = binding?.repeatCfgId;
+  const earlier =
+    cfgId && !hasEnded(app?.taskRepeatCfgs[cfgId], view.todayStr)
+      ? taskOfCfg(tasks, cfgId)
+      : undefined;
   const start = async () => {
     await ctx.write(stepBack(run, view.todayStr, { pause: ctx.draft.pause === true }));
     ctx.reset({ name: 'journey' });

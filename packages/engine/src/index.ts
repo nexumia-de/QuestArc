@@ -40,6 +40,7 @@ export {
   continueJourney,
   endJourney,
   graduate,
+  graduateLater,
   nameAnchor,
   pairStage,
   pauseJourney,
