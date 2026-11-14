@@ -10,7 +10,7 @@
 // Screenshots go to dist/real-app/graduation-*.
 //
 //   node e2e/real-app-graduation.mjs [width height]
-import { BASE, expect, install, makeRecurring, open, start, tick } from './sp.mjs';
+import { BASE, expect, install, makeRecurring, open, reopen, start, tick } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const DAY_MS = 86_400_000;
@@ -33,9 +33,7 @@ const isoWeek = (date) => {
 };
 
 const questArc = async () => {
-  await page.goto(`${BASE}#/plugins/questarc/index`);
-  await view().locator('.qa-header').first().waitFor();
-  await page.waitForTimeout(2000);
+  await reopen(page, view);
 };
 const onDay = async (day) => {
   await page.clock.setSystemTime(new Date(first.getTime() + day * DAY_MS));

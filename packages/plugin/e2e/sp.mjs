@@ -68,6 +68,19 @@ export const install = async (page) => {
 };
 
 /**
+ * Opens QuestArc's page from another page, as a user who comes back to
+ * it does. Going to the route QuestArc is already on keeps the view where
+ * it was (for example on the journey screen), so the tests leave first.
+ */
+export const reopen = async (page, view) => {
+  await page.goto(`${BASE}#/tag/TODAY/tasks`);
+  await page.waitForTimeout(500);
+  await page.goto(`${BASE}#/plugins/questarc/index`);
+  await view().locator('.qa-header').first().waitFor();
+  await page.waitForTimeout(2000);
+};
+
+/**
  * Opens the journey from the home: the view's home is the user's moments
  * (#96), and the growing step there opens its journey.
  */

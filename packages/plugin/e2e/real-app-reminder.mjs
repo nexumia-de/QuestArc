@@ -9,7 +9,7 @@
 // Screenshots go to dist/real-app/reminder-*.
 //
 //   node e2e/real-app-reminder.mjs [width height]
-import { BASE, expect, install, journey, makeRecurring, open, start } from './sp.mjs';
+import { BASE, expect, install, journey, makeRecurring, open, reopen, start } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const DAY_MS = 86_400_000;
@@ -27,9 +27,7 @@ const isoWeek = (date) => {
   return `${year}-W${String(week).padStart(2, '0')}`;
 };
 const questArc = async () => {
-  await page.goto(`${BASE}#/plugins/questarc/index`);
-  await view().locator('.qa-header').first().waitFor();
-  await page.waitForTimeout(2000);
+  await reopen(page, view);
 };
 /** Sends a request to plugin.js from inside the view, as the view does. */
 const request = (message) =>
@@ -64,6 +62,11 @@ try {
     .click();
   await view().getByRole('button', { name: 'Start this journey' }).click();
   await view().getByRole('button', { name: 'Start', exact: true }).click();
+  // Wait for the set-up screen: the start screen can still be showing.
+  await view()
+    .getByRole('button', { name: 'Create the task' })
+    .waitFor()
+    .catch(() => {});
   const setUp = await view().locator('.qa-main').innerText();
   expect(
     setUp.includes('Would a reminder at the time of your moment help for the first weeks?') &&

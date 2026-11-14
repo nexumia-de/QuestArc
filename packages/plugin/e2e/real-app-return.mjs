@@ -7,7 +7,7 @@
 // Screenshots go to dist/real-app/return-*.
 //
 //   node e2e/real-app-return.mjs [width height]
-import { BASE, expect, install, journey, makeRecurring, open, start, tick } from './sp.mjs';
+import { BASE, expect, install, journey, makeRecurring, open, reopen, start, tick } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const DAY_MS = 86_400_000;
@@ -20,9 +20,7 @@ const SMALL = /drink a glass of water(?! and)/;
 const LARGER = /stretch for one minute/;
 const label = () => view().locator('.qa-build svg.qa-art').first().getAttribute('aria-label');
 const questArc = async () => {
-  await page.goto(`${BASE}#/plugins/questarc/index`);
-  await view().locator('.qa-header').first().waitFor();
-  await page.waitForTimeout(2000);
+  await reopen(page, view);
   // The home is the moments (#96); the growing step opens the journey.
   await journey(view);
 };
