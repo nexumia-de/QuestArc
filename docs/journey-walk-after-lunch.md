@@ -70,14 +70,18 @@ the view, not for this file.
   complexity predicted exercise habit[^kaushal]; hence one simple
   action, every day, with room for misses.
 - **Why after a meal:** in a meta-analysis of small crossover trials,
-  exercise (mostly walking) after a meal lowered the rise of blood
-  glucose more than exercise before it, and more the sooner it
-  began[^engeroff]. Light walking breaks lowered glucose after meals
+  exercise (mostly walking at moderate intensity for 20 to 60 minutes)
+  after a meal lowered the rise of blood glucose more than exercise
+  before it, and more the sooner it began[^engeroff]. Light walking breaks lowered glucose after meals
   more than standing or sitting on[^buffey]. Ten minutes after each main
   meal did more for glucose after meals than 30 minutes at one time, in
   adults with type 2 diabetes[^reynolds]. These are acute measurements,
   not health outcomes; one nugget (`walk-10`) says only that, as "in
-  small studies".
+  small studies", and of "a walk", not "an easy walk", because the
+  trials did not test an easy pace or a walk under 20 minutes. The
+  meta-analyses and the guideline were read in full on 2026-11-14; the
+  other studies in their abstracts
+  ([what was checked where](research.md#movement-evidence-for-the-journey-a-walk-after-lunch)).
 - **Minutes are a ramp, not a dose:** 5, 10 and 20 minutes are small
   steps the user may change. The guideline's message is that some
   activity is better than none[^who]; the journey names no step count,

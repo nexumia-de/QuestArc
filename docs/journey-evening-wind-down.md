@@ -9,6 +9,12 @@ sources:
   - id: hartstein2024
     title: "The impact of screen use on sleep health across the lifespan: A National Sleep Foundation consensus statement"
     url: https://doi.org/10.1016/j.sleh.2024.05.001
+  - id: chang2015
+    title: "Evening use of light-emitting eReaders negatively affects sleep, circadian timing, and next-morning alertness"
+    url: https://doi.org/10.1073/pnas.1418490112
+  - id: gronli2016
+    title: "Reading from an iPad or from a book in bed: the impact on human sleep. A randomized controlled crossover trial"
+    url: https://doi.org/10.1016/j.sleep.2016.02.006
   - id: he2020
     title: "Effect of restricting bedtime mobile phone use on sleep, arousal, mood, and working memory: A randomized pilot trial"
     url: https://doi.org/10.1371/journal.pone.0228756
@@ -68,7 +74,11 @@ covered bridge for the night. Home is what the morning journey builds.
 - **No sleep promise** (rule 26, guide rule 9): for adults, an expert
   panel did not reach consensus that screen use before bed impairs
   sleep[^hartstein2024]; the one trial of putting the phone away is a
-  pilot with 38 students and self-reported sleep[^he2020]. The texts
+  pilot with 38 students and self-reported sleep[^he2020]. The lab
+  study behind "screens delay sleep" had twelve young adults read on a
+  tablet at full brightness for about four hours[^chang2015]; with 30
+  minutes of reading in bed at home, the time to fall asleep did not
+  differ between a tablet and a book[^gronli2016]. The texts
   therefore speak of a calmer end of the day and give the phone a place;
   they do not mention light, melatonin, sleep quality or energy.
 - **The calm thing is the user's choice** (rule 15): the examples in the
@@ -100,6 +110,10 @@ is ineffective against insomnia[^irish2015]; the texts make no such
 claim.
 
 [^hartstein2024]: Hartstein et al. 2024, Sleep Health 10(4), 373–384, DOI 10.1016/j.sleh.2024.05.001; full text PMC13181348.
+
+[^chang2015]: Chang, Aeschbach, Duffy & Czeisler 2015, PNAS 112(4), 1232–1237, DOI 10.1073/pnas.1418490112; full text PMC4313820.
+
+[^gronli2016]: Grønli et al. 2016, Sleep Medicine 21, 86–92, DOI 10.1016/j.sleep.2016.02.006; PubMed abstract 27448477, full text not read.
 
 [^he2020]: He, Tu, Xiao, Su & Tang 2020, PLOS ONE 15(2), e0228756, DOI 10.1371/journal.pone.0228756; full text PMC7010281.
 

@@ -12,6 +12,9 @@ sources:
   - id: saxbe2010
     title: "No Place Like Home: Home Tours Correlate With Daily Patterns of Mood and Cortisol"
     url: https://doi.org/10.1177/0146167209352864
+  - id: swanson2022
+    title: "Older Adults and Clutter: Age Differences in Clutter Impact, Psychological Home, and Subjective Well-Being"
+    url: https://doi.org/10.3390/bs12050132
   - id: vohs2013
     title: "Physical Order Produces Healthy Choices, Generosity, and Conventionality, Whereas Disorder Produces Creativity"
     url: https://doi.org/10.1177/0956797613480186
@@ -60,7 +63,7 @@ place.
   nugget). No study of time-limited tidying was found; the five minutes
   are a design choice that keeps the step small.
 - **No well-being promise** (rule 26, guide rule 9): that a cluttered
-  home goes with stress is correlational[^saxbe2010], and lab studies of
+  home goes with stress or lower well-being is correlational[^saxbe2010][^swanson2022], and lab studies of
   orderly rooms cut both ways[^vohs2013]. The texts speak of things
   having a place and of a few clear spots, not of a clean home, mood or
   stress; the reason is the user's own (`why`, rule 5).
@@ -82,8 +85,10 @@ Other anchors (after breakfast, on coming home) and a weekly, larger
 round are possible journeys of their own; this one keeps one anchor and
 one length.
 
-[^judah2013]: Judah, Gardner & Aunger 2013, British Journal of Health Psychology 18(2), 338–353, DOI 10.1111/j.2044-8287.2012.02086.x; abstract via Crossref.
+[^judah2013]: Judah, Gardner & Aunger 2013, British Journal of Health Psychology 18(2), 338–353, DOI 10.1111/j.2044-8287.2012.02086.x; abstract via Crossref and PubMed (22989272), no open full text (checked 2026-11-14).
 
-[^saxbe2010]: Saxbe & Repetti 2010, Personality and Social Psychology Bulletin 36(1), 71–81, DOI 10.1177/0146167209352864; abstract via Crossref.
+[^saxbe2010]: Saxbe & Repetti 2010, Personality and Social Psychology Bulletin 36(1), 71–81, DOI 10.1177/0146167209352864; abstract via Crossref and PubMed (19934011), no open full text (checked 2026-11-14).
 
-[^vohs2013]: Vohs, Redden & Rahinel 2013, Psychological Science 24(9), 1860–1867, DOI 10.1177/0956797613480186; abstract via Crossref.
+[^swanson2022]: Swanson & Ferrari 2022, Behavioral Sciences 12(5), 132, DOI 10.3390/bs12050132; full text PMC9137741.
+
+[^vohs2013]: Vohs, Redden & Rahinel 2013, Psychological Science 24(9), 1860–1867, DOI 10.1177/0956797613480186; abstract via Crossref and PubMed (23907542), no open full text (checked 2026-11-14).

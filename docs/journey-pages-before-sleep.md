@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: 'Journey: A few pages before sleep'
-description: The built-in journey for reading; every day after getting into bed, from one page of a book to 20 minutes of reading in four stages, building a Home with its own version names; based on the evidence on reading a book in bed and on habits placed after a routine.
+description: The built-in journey for reading; every day after getting into bed, from one page of a book to 20 minutes of reading in four stages, building a Home with its own version names; based on the evidence on reading a book in bed and on habits placed after a routine; the texts make no claim about screens and sleep.
 tags: [content, journey, reading, evening]
 resource: ../content/journeys/pages-before-sleep.json
 generated: { by: claude-code/2.1.318, at: 2026-11-13 }
@@ -9,6 +9,8 @@ sources:
   - '[^37]: https://github.com/nexumia-de/quest-arc/issues/37'
   - '[^finucane]: https://doi.org/10.1186/s13063-021-05831-3'
   - '[^chang]: https://doi.org/10.1073/pnas.1418490112'
+  - '[^gronli]: https://doi.org/10.1016/j.sleep.2016.02.006'
+  - '[^hartstein]: https://doi.org/10.1016/j.sleh.2024.05.001'
   - '[^rizzolo]: https://doi.org/10.19030/tlc.v6i8.1117'
   - '[^bavishi]: https://doi.org/10.1016/j.socscimed.2016.07.014'
   - '[^judah]: https://doi.org/10.1111/j.2044-8287.2012.02086.x'
@@ -72,11 +74,18 @@ names with whatever ladder the user picks (see
   improved than people who did not read in bed[^finucane]. The outcome
   is self-rated and nobody could be blinded, so the texts make no
   promise about sleep.
-- **A printed book:** in a lab study, people who read on a
-  light-emitting screen before bedtime took longer to fall asleep than
-  when they read a printed book[^chang]. One nugget (`read-10`) says
-  that, as "in a lab study", and suggests leaving the phone out of
-  reach.
+- **A printed book, without a sleep claim:** in a lab study, twelve
+  young adults who read on a light-emitting tablet at full brightness
+  for about four hours before bedtime took about ten minutes longer to
+  fall asleep than with a printed book[^chang]. With 30 minutes of
+  reading in bed at home, the time to fall asleep did not differ between
+  a tablet and a book[^gronli], and an expert panel reached no consensus
+  that screens before sleep impair adults' sleep[^hartstein]. The texts
+  therefore say nothing about screens and sleep, as in
+  [Evening wind-down](journey-evening-wind-down.md). The nugget of
+  `read-10` suggests a printed book because it has nothing else to open,
+  and leaving the phone out of reach. Until 2026-11-14 it quoted the lab
+  study without its limits.
 - **Calm, not gains:** one 30-minute reading session lowered blood
   pressure and heart rate in 22 students as much as yoga or humour, with
   no change in the stress questionnaire[^rizzolo]; book readers lived
