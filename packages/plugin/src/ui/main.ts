@@ -3,9 +3,12 @@
 // a change, when the window comes back, and every few seconds as a fallback.
 import type { Hooks } from '@super-productivity/plugin-api';
 
+import startTexts from 'virtual:questarc-start-texts';
+
+import { addTexts } from '../shared/texts';
 import { createApp } from './app';
-import { setArt } from './art-store';
 import { createClient } from './client';
+import { applyContent } from './content';
 import { loadErrorText } from './load-error';
 
 const POLL_MS = 5000;
@@ -17,11 +20,11 @@ const root = document.getElementById('app') ?? document.body;
 const client = createClient();
 const app = createApp(root, client);
 
-// The ladders' pictures once (#100); without them the path is shown.
-const artReady = client
-  .art()
-  .then(setArt)
-  .catch(() => undefined);
+// The view carries only the texts of its start state; the others, the
+// style and the ladders' pictures come from plugin.js once, before the
+// first screen (docs/decisions/one-build-for-older-versions.md).
+addTexts(startTexts);
+let hasContent = false;
 
 let loading = false;
 let failingSince: number | undefined;
@@ -30,9 +33,11 @@ const load = async (): Promise<void> => {
   if (loading) return;
   loading = true;
   try {
-    const state = await client.get();
-    await artReady;
-    app.update(state);
+    if (!hasContent) {
+      applyContent(await client.content());
+      hasContent = true;
+    }
+    app.update(await client.get());
     failingSince = undefined;
   } catch (error) {
     failingSince ??= Date.now();

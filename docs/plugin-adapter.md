@@ -81,6 +81,49 @@ asks again 300 ms after a hook fires in the view (so plugin.js has marked
 its data stale first), when the page becomes visible, and every 5 s as a
 fallback; it redraws only when the revision changed.
 
+### What the view carries, and what plugin.js sends
+
+Super Productivity 19.3 installs an `index.html` of at most 102,400 bytes
+([decision](decisions/one-build-for-older-versions.md)), so `index.html`
+holds the view's code and its start state only; data travels in
+`plugin.js`:
+
+| What                                                       | Where it is                                 | How it reaches the view            |
+| ---------------------------------------------------------- | ------------------------------------------- | ---------------------------------- |
+| The screens' code                                          | `index.html`                                | –                                  |
+| The page and the first message (`src/ui/start.css`)        | `index.html`                                | –                                  |
+| The four texts of the start state (`ui.error.starting`, …) | `index.html`, taken from `en.json` at build | –                                  |
+| All UI and event texts (`content/i18n/en.json`)            | `plugin.js` (`shared/english.ts`)           | once, `questarc:content` → `texts` |
+| The style of the screens (`src/ui/style.css`)              | `plugin.js` (`virtual:questarc-style`)      | once, `questarc:content` → `style` |
+| The ladders' pictures, ladders, palette and markers (#100) | `plugin.js` (`adapter/art-pack.ts`)         | once, `questarc:content` → `art`   |
+| The journeys and their texts                               | `plugin.js` (`shared/content.ts`)           | with every state (`journeys`)      |
+
+The view's first request is `questarc:content` (`adapter/content-pack.ts`
+answers it, `ui/content.ts` takes it in: texts into `shared/texts.ts`,
+one `<style>` element after the inlined one, the pictures into
+`ui/art-store.ts`). Only then it asks for the state and draws the first
+screen, so no screen is ever drawn without its texts or its style. While
+plugin.js does not answer, the view shows "QuestArc is starting" and
+then "is not running" from what it carries itself, and asks again
+(`ui/load-error.ts`); the content is asked for until it has come once.
+
+Rules for new screens:
+
+- A text is a key in `content/i18n/en.json`; a style rule goes into
+  `style.css`. Neither costs room in `index.html`.
+- `start.css` and the start texts (`START_TEXT_KEYS` in
+  `packages/plugin/view-content.mjs`) grow only for what is shown
+  before plugin.js answers.
+- No module under `src/ui/` imports `shared/english.ts` or
+  `shared/content.ts`: `build.mjs` fails when UI texts are found in
+  `index.html`.
+- Long static pages ("How QuestArc motivates you") are texts like any
+  other: a list of keys in the screen, the words in `en.json`.
+
+The standalone app (`packages/app`) is one page without messages: its
+bundle has the texts, its `app.css` has `start.css` and `style.css`, and
+its client answers `content` with the pictures only.
+
 ## Settings button of the plugin list
 
 `registerConfigHandler` (plugin.js only; present in 19.3.0 and 20.0.0,

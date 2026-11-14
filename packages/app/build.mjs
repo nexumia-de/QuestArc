@@ -38,6 +38,7 @@ const { themeCss } = await import(
 const style = [
   themeCss('light'),
   `@media (prefers-color-scheme: dark){${themeCss('dark')}}`,
+  readFileSync(join('..', 'plugin', 'src', 'ui', 'start.css'), 'utf8'),
   readFileSync(join('..', 'plugin', 'src', 'ui', 'style.css'), 'utf8'),
   readFileSync(join('src', 'app.css'), 'utf8'),
 ].join('\n');

@@ -70,11 +70,22 @@ journey checker ([story format](story-format.md#the-journey-checker)).
 
 - `plugin.js` as a classic script (IIFE): Super Productivity runs it with
   `new Function`, so it must not contain `import`.
-- `index.html` with the view's script and `style.css` inlined: iframe
+- `index.html` with the view's script and `start.css` inlined: iframe
   plugins get no other files from the ZIP. Both are built without
   whitespace (`minifyWhitespace`; names stay readable), because
   Super Productivity 19.3 installs an `index.html` of at most 100 KB; the
   build fails above it. `plugin.js` stays as it is (limit 5 MB).
+- What is data and not code is not in `index.html`: the UI texts
+  (`content/i18n/en.json`), the screens' style (`src/ui/style.css`) and
+  the ladders' pictures are in `plugin.js` and reach the view once by
+  message ([plugin adapter](plugin-adapter.md), "What the view carries").
+  `packages/plugin/view-content.mjs` builds two modules for this (esbuild
+  and Vitest): `virtual:questarc-style`, the style without whitespace as
+  a text for `plugin.js`, and `virtual:questarc-start-texts`, the four
+  texts the view shows before `plugin.js` answers. The build fails when
+  it finds other UI texts in `index.html`. Measured on 2026-11-14:
+  `index.html` 64,127 of 102,400 bytes (89,774 before, #102); a new text
+  or style rule no longer adds to it.
 - `dist/questarc-<version>.zip` with `manifest.json`, `plugin.js`,
   and `index.html`, packed with fflate. No `icon.svg`: the manifest's
   `"icon": "route"` is a Material icon name.
@@ -84,13 +95,13 @@ Use test data, not real tasks.
 
 The plugin's files, one job each:
 
-| Path            | Job                                                                                                                                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                               |
-| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `messages`, `host` (API subset)                                             |
-| `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n), `plan` (sentences), `content` (built-in journeys)                                                                                            |
-| `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `dom`, `screen` (types), `screens/` (one file per screen), `style.css` |
-| `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                        |
+| Path            | Job                                                                                                                                                                                                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                                                                                                                     |
+| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                                                                          |
+| `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n, holds no texts itself), `plan` (sentences); plugin.js only: `english` (the UI texts), `content` (built-in journeys)                                                                                                                 |
+| `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `content` (takes in what plugin.js sends), `dom`, `screen` (types), `screens/` (one file per screen), `start.css` (inlined), `style.css` (sent by plugin.js) |
+| `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                                                                                                              |
 
 ## Preview and screenshots
 

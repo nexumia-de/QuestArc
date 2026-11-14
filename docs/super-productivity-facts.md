@@ -98,8 +98,9 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   cannot load a second script, a JSON or an SVG file of the plugin. What
   the view needs beyond its own `index.html` must come from `plugin.js`
   by message. QuestArc's view is built without whitespace (#103), gets
-  the journeys' texts with each state and the ladders' pictures once
-  (`questarc:art`) from `plugin.js` (#100); `build.mjs` fails above
+  the journeys' texts with each state and the UI texts, the style and
+  the ladders' pictures once (`questarc:content`) from `plugin.js`
+  (#100, #102); `build.mjs` fails above
   102,400 bytes[^sp].
 - Uploaded plugin code is cached per device in IndexedDB `SUPPluginCache`
   (`plugin-cache.service.ts`); enabled plugins are activated at startup

@@ -363,7 +363,7 @@ stations list and Settings with the side panel switch:
   palette. Pictures no screen draws yet stay preview-only
   (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
   travel in `plugin.js` and reach the view once at start (message
-  `questarc:art`); until they arrive the screen shows only the card. The
+  `questarc:content`, with the texts and the style, #102). The
   view's `index.html` is limited to 102,400 bytes by Super Productivity
   19.3.1, and the view may load no other file of the plugin
   ([facts](super-productivity-facts.md) §1), so the view also takes the

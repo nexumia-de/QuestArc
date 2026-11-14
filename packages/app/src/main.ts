@@ -5,7 +5,7 @@
 import type { Schedule } from '@questarc/engine';
 import { createBrain, type Brain } from '@questarc/plugin/src/adapter/brain';
 import { registerHooks } from '@questarc/plugin/src/adapter/hooks';
-import { artPack } from '@questarc/plugin/src/adapter/messages';
+import { artPack } from '@questarc/plugin/src/adapter/art-pack';
 import { messageFor } from '@questarc/plugin/src/adapter/snacks';
 import { builtInJourneys } from '@questarc/plugin/src/shared/content';
 import { t } from '@questarc/plugin/src/shared/texts';
@@ -70,7 +70,8 @@ const start = async (root: HTMLElement): Promise<void> => {
     get: () => game.state(),
     write: (records) => game.write(records),
     sidePanel: () => game.state(),
-    art: async () => artPack,
+    // texts and style are part of the app itself (app.js, app.css)
+    content: async () => ({ texts: {}, style: '', art: artPack }),
   };
   const journey = createApp(shell.views.journey, client);
 

@@ -1,6 +1,7 @@
 import type { Stage } from '@questarc/engine';
 import { describe, expect, it } from 'vitest';
 
+import '../src/shared/english';
 import { planSentence } from '../src/shared/plan';
 import { addJourneyTexts } from '../src/shared/texts';
 

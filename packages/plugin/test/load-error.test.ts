@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import startTexts from 'virtual:questarc-start-texts';
+
+import { addTexts } from '../src/shared/texts';
 import { loadErrorText, loadProblem, NOT_RUNNING_AFTER_MS } from '../src/ui/load-error';
+
+// Only the texts the view carries itself: these messages are shown before
+// plugin.js has sent the others (docs/plugin-adapter.md).
+addTexts(startTexts);
 
 // Super Productivity's answers while plugin.js is not running
 // (plugin-runner.ts, plugin-api.ts at c5eb3f6) and the view's own timeout.
