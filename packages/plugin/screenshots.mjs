@@ -48,9 +48,20 @@ for (const demo of shots) {
         .locator(art ? 'svg.qa-art' : '.qa-header')
         .first()
         .waitFor();
-      if (route && !art) await frame.getByRole('button', { name: route }).first().click();
+      // `demo:Menu>Shelf` clicks the button or menu item of each name in turn.
+      for (const click of route && !art ? route.split('>') : []) {
+        await frame
+          .getByRole('button', { name: click })
+          .or(frame.getByRole('menuitem', { name: click }))
+          .first()
+          .click();
+        await tab.waitForTimeout(100);
+      }
       await tab.waitForTimeout(200);
-      const file = join(out, `${demo.replace(/[:@]/g, '-')}-${theme}-${name}.png`);
+      const file = join(
+        out,
+        `${demo.replace(/[:@>]/g, '-').replaceAll(' ', '_')}-${theme}-${name}.png`,
+      );
       await tab.screenshot({ path: file, fullPage: ladderPage });
       const overflow = await frame.locator('body').evaluate((b) => b.scrollWidth > b.clientWidth);
       console.log(`${file}${overflow ? '  HORIZONTAL OVERFLOW' : ''}`);

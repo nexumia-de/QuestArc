@@ -35,6 +35,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'build',
   'checkin',
   'graduation',
+  'graduation-check',
   'stay',
   'skip',
   'pair',
@@ -68,6 +69,20 @@ export interface StepBack {
   readonly until?: string;
 }
 
+/** A habit runs by itself from `day` (game rules §6); `until` is the day it was brought back. */
+export interface Graduation {
+  readonly day: string;
+  /** What the user chose for the task: end its repeat themselves, or keep it repeating quietly. */
+  readonly choice: 'end' | 'keep';
+  readonly until?: string;
+}
+
+/** The answer to "does it still run by itself?", asked on or after the day `due`. */
+export interface StillCheck {
+  readonly due: string;
+  readonly still: boolean;
+}
+
 export interface Choices {
   readonly runs: readonly RunRecord[];
   /** runId → end day */
@@ -94,6 +109,10 @@ export interface Choices {
   readonly carryOns: ReadonlyMap<string, string>;
   /** `${runId}:${stageId}` (the stage left behind) → its step backs sorted by day */
   readonly stepBacks: ReadonlyMap<string, readonly StepBack[]>;
+  /** `${runId}:${stageId}` → the times the habit graduated, sorted by day */
+  readonly graduations: ReadonlyMap<string, readonly Graduation[]>;
+  /** `${runId}:${stageId}` → the answered check-ins after graduation, sorted by due day */
+  readonly stillChecks: ReadonlyMap<string, readonly StillCheck[]>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -144,6 +163,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const planChecks = new Map<string, PlanCheck>();
   const carryOns = new Map<string, string>();
   const stepBacks = new Map<string, StepBack[]>();
+  const graduations = new Map<string, Graduation[]>();
+  const stillChecks = new Map<string, StillCheck[]>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -248,8 +269,23 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
       builds.set(parts[1], choice);
     } else if (kind === 'journey' && parts.length === 2) {
       userJourneys.push(value as unknown as Journey);
-    } else if (kind === 'graduation') {
-      // Graduation is evaluated with the More journeys milestone (#22).
+    } else if (kind === 'graduation' && parts.length === 4 && isDay(parts[3])) {
+      const { choice, until } = value;
+      if (
+        (choice === 'end' || choice === 'keep') &&
+        (until === undefined || (isDay(until) && until >= parts[3]))
+      ) {
+        const list = graduations.get(`${parts[1]}:${parts[2]}`) ?? [];
+        // Keys are sorted, so the list is sorted by day.
+        list.push({ day: parts[3], choice, ...(until !== undefined ? { until } : {}) });
+        graduations.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
+    } else if (kind === 'graduation-check' && parts.length === 4 && isDay(parts[3])) {
+      if (typeof value.still === 'boolean') {
+        const list = stillChecks.get(`${parts[1]}:${parts[2]}`) ?? [];
+        list.push({ due: parts[3], still: value.still });
+        stillChecks.set(`${parts[1]}:${parts[2]}`, list);
+      } else bad();
     } else if (!tooNew) {
       problems.push(`record ${key}: unexpected key`);
     }
@@ -270,6 +306,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     planChecks,
     carryOns,
     stepBacks,
+    graduations,
+    stillChecks,
     builds,
     userJourneys,
     newer,

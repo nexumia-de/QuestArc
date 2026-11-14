@@ -3,6 +3,7 @@ import { capitalise } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
+import { targetOf } from '../habit';
 import { weekdayOfId } from '../journey/format';
 import { pairField } from '../journey/pair';
 import { scheduleText, taskOfCfg } from '../repeat';
@@ -15,21 +16,19 @@ import type { Context, Screen } from '../screen';
  * has. It also handles a task that does not repeat yet, a repeat journeys
  * cannot follow, and a task that is gone. A stage the user already does
  * can be passed with "I Already Do This" (never the last one). The
- * optional "pair it with" field is asked here (design rule 7).
+ * optional "pair it with" field is asked here (design rule 7). With
+ * `runId` the task is for the habit a finished journey left, when its
+ * repeat is gone (a habit brought back, flow F).
  */
-export const setupScreen = (ctx: Context): Screen => {
-  const { view, journeys, records } = ctx.state;
-  const run = view.active;
-  const journey = run && journeys.find((j) => j.id === run.journeyId);
-  const index = run?.position.stage ?? 0;
-  const station = run?.stations[index];
-  const stage = journey?.stages[index];
-  if (!run || !journey || !station || !stage) {
-    return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
-  }
+export const setupScreen = (ctx: Context, runId?: string): Screen => {
+  const { view, records } = ctx.state;
+  const target = targetOf(ctx.state, runId);
+  if (!target) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
+  const { run, journey, index, stage } = target;
+  const station = { state: target.state };
   if (station.state !== 'unbound' && station.state !== 'unsupported-repeat') {
-    // Bound in the meantime (the repeat was set): back to the journey.
-    queueMicrotask(() => ctx.reset({ name: 'home' }));
+    // Bound in the meantime (the repeat was set): back to where it shows.
+    queueMicrotask(() => ctx.reset({ name: target.habit ? 'shelf' : 'home' }));
   }
 
   const app = appState(ctx);
@@ -67,7 +66,7 @@ export const setupScreen = (ctx: Context): Screen => {
       },
       label,
     );
-  const pick = () => ctx.go({ name: 'pick-task' });
+  const pick = () => ctx.go({ name: 'pick-task', ...(runId ? { runId } : {}) });
   // The same screen then offers the next stage.
   const skip = skipStage(run, journey, view.todayStr);
 
@@ -106,7 +105,7 @@ export const setupScreen = (ctx: Context): Screen => {
       ),
       h('p', {}, message),
       pairField(ctx, run, stage, plan),
-      prevTask && station.state === 'unbound' && !task
+      prevTask && !target.habit && station.state === 'unbound' && !task
         ? h(
             'div',
             { class: 'qa-stack' },

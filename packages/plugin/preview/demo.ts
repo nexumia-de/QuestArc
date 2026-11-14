@@ -1,5 +1,7 @@
 import type { Task } from '@super-productivity/plugin-api';
 
+import { habitDemo, isHabitScenario, type HabitScenario } from './demo-habits';
+
 /**
  * Demo datasets for the preview and screenshots (never real tasks). Days
  * are relative to `today`, so pictures look the same on any date.
@@ -20,6 +22,8 @@ import type { Task } from '@super-productivity/plugin-api';
  * - build-ready: stage 3 met: every pennant on
  * - build-crossing: stage 3 under way, the user picked the
  *   Crossing with lanterns in sand
+ * - habit, graduate, graduated, not-really, brought-back: the habit a
+ *   finished journey leaves (demo-habits.ts, flow F)
  */
 
 export type Scenario =
@@ -37,7 +41,8 @@ export type Scenario =
   | 'newer'
   | 'build'
   | 'build-ready'
-  | 'build-crossing';
+  | 'build-crossing'
+  | HabitScenario;
 
 const DAY_MS = 86_400_000;
 const STAGES = ['water', 'stretch-1', 'stretch-5', 'plan-day'];
@@ -53,6 +58,7 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const tasks: DemoData['tasks'] = {};
   const repeatCfgs: DemoData['repeatCfgs'] = {};
   if (scenario === 'welcome') return { tasks, repeatCfgs, data };
+  if (isHabitScenario(scenario)) return habitDemo(scenario, today);
   const build = scenario.startsWith('build');
 
   const todayMs = Date.parse(`${today}T12:00:00Z`);

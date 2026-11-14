@@ -170,8 +170,11 @@ page only. They are never written into a task and never sent anywhere.
 - A banner on top of the card when needed: paused (with **Resume**, or a
   note that the repeat is paused in Super Productivity), a hard week
   (flow D, with the user's reason and their plan for the obstacle), weekly look back due (**Answer**), the
-  station's learning nugget once on arrival (**Got it**), habit can
-  graduate (later, #22). Dismissing a banner and skipping the weekly
+  station's learning nugget once on arrival (**Got it**), and, for the
+  habit a finished journey left (flow F), at most one each: the
+  question after graduation, the offer to graduate, or its weekly look
+  back. The same habit banners stand above the empty state when no
+  journey is active. Dismissing a banner and skipping the weekly
   question are remembered on the device only; they are not choices.
 - The card also shows the user's own reason, if they gave one. While
   the user stays at a met station it says "You are staying here a
@@ -220,16 +223,32 @@ page only. They are never written into a task and never sent anywhere.
   is at least 7 days old; never as a notification.
 - The last 7 due days as marks: done, gap, not due, paused (shape and
   label, not only colour); current and best run.
+- The answers so far as a row of seven-step marks, week by week, the
+  latest twelve weeks at most; a skipped week is an empty mark. Under
+  it "Easier than four weeks ago." or "About the same as four weeks
+  ago." when the engine says so (`answers.trend`), and nothing when the
+  answer is lower. No target line, no number to reach. Each mark has a
+  text ("Week 45: 5 of 7", "Week 44: no answer").
 - One question, the habit filled in: "**Walking after lunch** is
   something I do automatically" with 1 (not at all) to 7 (completely).
 - Actions: the seven answers, **Skip**.
+- The same screen asks about the habit a finished journey left (flow
+  F), reached from its banner or from the shelf.
 
 ### 7. Shelf
 
+- Waiting journeys, with **Resume**.
+- **Habits that stay**: the habits of finished journeys that are still
+  followed: plan sentence, "Keeps repeating as a normal task.", and
+  quiet actions when they apply: **Let It Graduate**, **Weekly look
+  back**. A habit whose task no longer repeats says so and offers
+  **Set up the task** (flow B for that habit); one that was brought
+  back says "Back with you since 11 Nov. Nothing was lost."
+- **Running by themselves**: graduated habits: plan sentence, "Runs by
+  itself since 28 Oct.", and one action: **Answer One Question** while
+  the question is due, else **Bring It Back**; both open the same page
+  (flow F). After "not really" the entry says so, without blame.
 - Finished journeys: title, start and end day.
-- Maintained habits: habits of finished journeys that keep repeating,
-  with their current run.
-- Graduated habits: plan sentence, graduation day, "Bring it back".
 
 ### 8. Settings
 
@@ -264,8 +283,15 @@ never end the journey; welcome back after a gap; after a long break
 (nothing counted for two weeks) QuestArc asks how to go on: carry on,
 call the time a pause, or take up the smaller step before again,
 nothing built is taken away, and the two weeks are QuestArc's choice,
-not a number from a study; the weekly question;
-graduation when a habit runs by itself; every journey builds something
+not a number from a study; the weekly question, with the answers so
+far and no number to reach; what runs by itself needs no ticking: the
+task stays the user's, the habit of a finished journey can graduate
+when the answers stay high and it was done on four of five planned
+days, QuestArc then stops following it and the list gets shorter, the
+user ends the repeat or keeps it quietly, QuestArc asks after two and
+six weeks and then at most twice a year, the habit can be brought back
+without a loss, and the numbers are QuestArc's choice, not a research
+result; every journey builds something
 that grows with real progress. What QuestArc does not do:
 random rewards, rankings, punishment, collecting data. "Success is your
 habit, not how often you open QuestArc."
@@ -421,13 +447,56 @@ same effect.
 
 ### F. Graduation
 
-- When the habit qualifies ([game rules](game-rules.md) §6): banner "This
-  habit seems to run by itself. You could let it graduate." with
-  **Graduate** and **Not now**.
-- Graduate: "Keep it repeating quietly" (default) or "End the repeat"
-  (opens the task in Super Productivity). The habit moves to the shelf.
-- Check-ins 2 and 6 weeks later ask the weekly question once; a low
-  answer offers **Bring it back**.
+For the habit a finished journey left ([game rules](game-rules.md) §6,
+[design rule 25](psychology.md)). Nothing here is pushed, red or
+counted down, and nothing is said before it holds.
+
+1. **Until then** the habit is followed as before: its task is ticked
+   off in the task list, and once a week a banner says "Weekly look
+   back for "…": one question." with **Answer** (screen 6). The end of
+   a journey says "Your habit stays: the recurring task keeps running
+   as it is, and the weekly question goes on."
+2. **The offer.** When the engine says the habit can graduate
+   (`habit.canGraduate`): banner "… seems to run by itself. You could
+   let it graduate." with **Have a Look** and **Not Now**. Not Now puts
+   the banner away on this device for good; the shelf keeps the quiet
+   action **Let It Graduate** for as long as the habit can.
+3. **Let It Graduate** (a page): the plan sentence; what graduation
+   means ("QuestArc then stops following it, and there is nothing left
+   to tick off for it"); that the thresholds are QuestArc's own choice,
+   not a research result, and that staying is just as fine; then
+   "What happens to its task?" with two equal choices, none suggested:
+   - **I Will End Its Repeat**: "QuestArc never changes your tasks. On
+     the next page you can open the task and remove its repeat
+     yourself." (`graduate` with `end`)
+   - **Keep It Repeating Quietly**: "The task stays in your list as it
+     is. Ticking it off no longer counts for anything in QuestArc."
+     (`graduate` with `keep`)
+
+   Back changes nothing. There is no main action in the bottom bar: the
+   choice is the yes.
+
+4. **Runs by itself** (the same page afterwards): what happens now, and
+   for the first choice how to end the repeat ("open the task, choose
+   Schedule Task, then Repeat, and remove the repeat. QuestArc does not
+   do this for you.") with **Open the task** while the repeat exists.
+   **Done** leads home. The habit stands on the shelf under "Running by
+   themselves" and produces no messages any more.
+5. **One question** 2 and 6 weeks later, then at most twice a year
+   (`habit.graduated.checkDue`): banner "… graduated a while ago. One
+   question, if you like." with **Answer**. The page asks "Does "…"
+   still run by itself?" with **Yes, It Does**, **Not Really** and
+   **Not Now** (put away on this device; the shelf keeps it). Yes closes
+   the page.
+6. **Bring it back** (the page after Not Really, and from the shelf at
+   any time): "You could bring this habit back. QuestArc then follows
+   it again from today, with the weekly question. The time it ran by
+   itself stays as it was: no gaps, and nothing is lost." with **Bring
+   It Back** and **Leave It as It Is**. It is a page, not a one-tap
+   button, because bringing back cannot be undone with one tap: the
+   habit would have to earn its graduation again. Afterwards the shelf
+   shows the habit under "Habits that stay"; if its repeat is gone,
+   with **Set up the task**.
 
 ### G. Problems
 

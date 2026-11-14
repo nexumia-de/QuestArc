@@ -41,6 +41,20 @@ export const taskOfCfg = (tasks: readonly Task[], cfgId: string): Task | undefin
     .filter((task) => task.repeatCfgId === cfgId)
     .sort((a, b) => Number(a.isDone) - Number(b.isDone) || (b.created ?? 0) - (a.created ?? 0))[0];
 
+/**
+ * A live task of a binding's repeat to open. A binding written before
+ * its task repeated names no config: the bound task's own is used, as
+ * the engine does.
+ */
+export const taskOfBinding = (
+  tasks: readonly Task[],
+  binding: { taskId?: string; repeatCfgId?: string } | undefined,
+): Task | undefined => {
+  const cfgId =
+    binding?.repeatCfgId ?? tasks.find((task) => task.id === binding?.taskId)?.repeatCfgId;
+  return cfgId ? taskOfCfg(tasks, cfgId) : undefined;
+};
+
 export const scheduleText = (schedule: Schedule, weekdayName: (d: string) => string): string => {
   if (schedule.type === 'daily') return t('ui.schedule.daily');
   if (schedule.type === 'everyNDays') return t('ui.schedule.every-n', { n: schedule.n });

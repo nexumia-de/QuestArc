@@ -218,6 +218,51 @@ export const answerCheckin = (
 ): RecordChanges => ({ [`checkin:${runId}:${stageId}:${isoWeek}`]: { score } });
 
 /**
+ * Let a habit graduate (game rules §6, design rule 25): from today it
+ * runs by itself and is not followed any more. Only while the view says
+ * it can (`habit.canGraduate`). `choice` is what the user does with the
+ * task: `end` its repeat themselves (QuestArc never ends one), or `keep`
+ * it repeating quietly; either way its completions count for nothing.
+ */
+export const graduate = (run: RunView, today: string, choice: 'end' | 'keep'): RecordChanges => {
+  if (!run.habit?.canGraduate || (choice !== 'end' && choice !== 'keep')) return {};
+  return { [`graduation:${run.runId}:${run.habit.stageId}:${today}`]: { choice } };
+};
+
+/**
+ * Answer "does it still run by itself?" for a graduated habit, while the
+ * view says the question is due (`habit.graduated.checkDue`, which names
+ * the record). "Not really" (`still: false`) changes nothing by itself:
+ * the hosts then offer to bring the habit back.
+ */
+export const answerStill = (run: RunView, today: string, still: boolean): RecordChanges => {
+  const graduated = run.habit?.graduated;
+  if (!run.habit || !graduated?.checkDue || typeof still !== 'boolean') return {};
+  return {
+    [`graduation-check:${run.runId}:${run.habit.stageId}:${graduated.checkDue}`]: {
+      day: today,
+      still,
+    },
+  };
+};
+
+/**
+ * Bring a graduated habit back: from today it is followed again like any
+ * maintained habit. The record stays and gets `until`, so the days it
+ * ran by itself never turn into gaps and nothing it counted is lost.
+ */
+export const bringBack = (run: RunView, today: string): RecordChanges => {
+  const graduated = run.habit?.graduated;
+  if (!run.habit || !graduated) return {};
+  return {
+    [`graduation:${run.runId}:${run.habit.stageId}:${graduated.day}`]: {
+      choice: graduated.choice,
+      until: today,
+    },
+  };
+};
+
+/**
  * The user's choice of what a run builds, what hangs on its marker and
  * its hue (game rules §7), one record per run; names come from
  * content/art/. Choosing nothing withdraws the record, so the
@@ -280,6 +325,9 @@ export const actions = {
   endJourney,
   repeatPause,
   answerCheckin,
+  graduate,
+  answerStill,
+  bringBack,
   chooseBuild,
   checkPlan,
   pairStage,

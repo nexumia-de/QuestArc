@@ -55,6 +55,73 @@ export interface RunView {
   readonly comeBack?: ComeBack;
   /** What the journey builds (docs/game-rules.md §7). */
   readonly build: BuildView;
+  /** The current stage's weekly answers so far, once there is one (design rule 9). */
+  readonly answers?: WeeklyAnswers;
+  /**
+   * A finished journey only: the habit it leaves, its last stage's
+   * (game rules §6). Absent while the journey is open and after it was
+   * ended early.
+   */
+  readonly habit?: HabitView;
+}
+
+/**
+ * The weekly answers of a stage as a row, week by week, and what they
+ * say in words. Nothing is said when the latest answer is lower.
+ */
+export interface WeeklyAnswers {
+  /**
+   * The latest 12 ISO weeks at most, oldest first, from the first
+   * answered week to the latest answered one; a skipped week has no score.
+   */
+  readonly weeks: readonly { readonly week: string; readonly score?: number }[];
+  /**
+   * The latest answer against the latest one four or more weeks before
+   * it: higher is `easier`, equal is `same`; absent when lower or when
+   * there is no such answer.
+   */
+  readonly trend?: 'easier' | 'same';
+}
+
+/**
+ * The habit of a finished journey (design rules 24 and 25). While it is
+ * `maintained` its task is followed as before and the weekly question
+ * goes on; once `graduated` it runs by itself and nothing is followed.
+ */
+export interface HabitView {
+  /** The journey's last stage. */
+  readonly stageId: string;
+  /**
+   * `maintained`: followed through its recurring task; `graduated`: runs
+   * by itself, not followed; `unbound` and `unsupported-repeat`: not
+   * graduated, and no task that can be followed.
+   */
+  readonly state: 'maintained' | 'graduated' | 'unbound' | 'unsupported-repeat';
+  /** Maintained: the weekly question is not answered this ISO week. */
+  readonly checkinDue: boolean;
+  /** Maintained: the habit can graduate now (game rules §6). */
+  readonly canGraduate: boolean;
+  /** The habit's weekly answers so far, once there is one. */
+  readonly answers?: WeeklyAnswers;
+  readonly graduated?: Graduated;
+  /** Not graduated any more: the day the habit was last brought back. */
+  readonly backDay?: string;
+}
+
+/** A graduated habit: it is not ticked off and nothing counts for it. */
+export interface Graduated {
+  /** The day it graduated. */
+  readonly day: string;
+  /** What the user chose for its task: end the repeat themselves, or keep it repeating quietly. */
+  readonly choice: 'end' | 'keep';
+  /**
+   * "Does it still run by itself?" is due: the date it is asked for (2
+   * and 6 weeks after graduation, then every 26 weeks), which names the
+   * answer's record.
+   */
+  readonly checkDue?: string;
+  /** The latest answer to that question was "not really". */
+  readonly suggestBack?: true;
 }
 
 /**

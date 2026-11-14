@@ -74,8 +74,7 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   lost `xp` and `damage`, which an engine before 3.3 requires, so it
   carries `dataFormat: 2` and `DATA_FORMAT` is 2. A run continued with
   3.3 is read-only on an older QuestArc until that is updated; old
-  checkpoints are still read. Graduation (#22) will take the next
-  number if it needs one.
+  checkpoints are still read. Graduation (#22) did not need one (below).
 - The second is the skip record (#81): an engine that does not know skipping (3.3 and older) would keep
   working on a skipped stage, so `skip` carries `dataFormat: 3` and
   `DATA_FORMAT` is 3. A record carries the format that first gave it its
@@ -97,6 +96,21 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   days in between are not due for that stage; such a run stays
   read-only on a host with an older engine. `carry-on` only closes a card and carries
   no format; "call it a pause" writes ordinary pause records.
+- Graduation (#22) needs **no new number**; `DATA_FORMAT` stays 4. The
+  `graduation` and `graduation-check` records belong to the habit of a
+  finished journey, and an engine that does not know them computes
+  nothing for such a habit: no run, no due days, no weekly question. So
+  it cannot show wrong progress, which is what the number guards
+  against; it shows the finished journey as before and the habit as one
+  that stays. It cannot write or withdraw the records either
+  (`guardWrite`: `graduation` was a kind no engine wrote, and
+  `graduation-check` is unknown to it) and keeps them untouched. A
+  number would only make finished journeys read-only on the older host
+  for no gain. Two things would change this, and then that change
+  raises the number: an engine released with the run of a maintained
+  habit (#66) but without graduation, which does not exist because both
+  come in one release; and a graduated step inside an open journey
+  (anchors, #96), which an engine of today would keep working on.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through

@@ -281,18 +281,106 @@ real progress ("4 of 5 days"); nothing is announced before it is done.
 
 ## 6. Graduation
 
-A habit **qualifies** for graduation when all of these hold:
+Issue #22; what a graduated habit is was decided by the owner on
+2026-11-12 together with the anchors (#96, point 4): it is no longer
+ticked off ([design rule 25](psychology.md)).
 
-- the last 3 weekly automaticity answers ("… is something I do
-  automatically", 1–7) are each 6 or 7, from 3 consecutive weeks;
-- completions on at least 80 % of due days over the last 28 logical days;
-- reminders have been off (or never set) for at least 14 days, and
-  completion did not fall below 80 % in that time.
+### The habit of a finished journey
 
-The user then chooses: keep the task repeating quietly, or end the
-repeat in Super Productivity. QuestArc asks the weekly question again 2
-and 6 weeks after graduation; an answer of 4 or less, or completion below
-60 % in the 2 weeks before, suggests bringing the habit back (one tap).
+- A journey that was finished (its last stage has a checkpoint) leaves
+  **one habit**: its last stage's, with that stage's recurring task. A
+  journey that is still open, or was ended early, has none.
+- While it is **maintained** it is followed exactly as before (§1 to §3):
+  due days and completions count from the day the last stage began to
+  count, across the day the journey was finished. The weekly question
+  goes on, once per ISO week, for this habit.
+- Without a task that can be followed (the repeat was deleted or is of
+  an unsupported kind) the habit is `unbound` or `unsupported-repeat`:
+  nothing is asked, it cannot graduate, and the hosts offer to set up a
+  task for it.
+
+### When it can graduate
+
+A maintained habit **can graduate** (`habit.canGraduate`) when all of
+these hold:
+
+1. **Three high answers in a row:** the weekly answers ("… is something
+   I do automatically", 1–7) of 3 consecutive ISO weeks are each 6 or 7,
+   and the last of the three weeks is this week or the one before. A
+   skipped week breaks the row.
+2. **Steady over four weeks:** completions on at least 80 % of the due
+   days in the last 28 logical days (today included), or since the
+   stage began to count if that is later. Only decided days are looked
+   at: a due day with a completion, or one whose backfill window has
+   passed (§2). Today and yesterday without a completion are still open
+   and are left out; with no decided day the habit is not steady.
+3. **No drop in the last two weeks:** the same 80 % over the last 14
+   logical days. This is what remains of "reminders have been off or
+   never set for at least 14 days, and completion did not fall in that
+   time": the engine **cannot know** since when a task has no reminder.
+   Its snapshot holds no reminder field, and Super Productivity's data
+   has none with a date: a repeat config carries only its present
+   `remindAt` and `startTime`
+   ([facts](super-productivity-facts.md) §5), and what a plugin can
+   read of them is still to be recorded (#60). So a reminder counts as
+   **never set**, and no data is invented. When QuestArc suggests a
+   reminder itself (#60), that issue adds what this rule needs.
+
+It is offered, never pushed and never announced before it holds: no
+progress towards it is shown, and the user can leave the offer alone for
+as long as they like.
+
+### Graduating
+
+- The user's yes writes a `graduation` record with the day and what
+  they do with the task (`graduate`): **end** its repeat themselves, or
+  **keep** it repeating quietly. Neither is suggested. QuestArc never
+  ends a repeat (the plugin API cannot, and the task is the user's):
+  the hosts lead to the task.
+- From that day the habit is **graduated**: it runs by itself. Nothing
+  is followed: no due days, no runs, no weekly question, no messages,
+  whatever the task does. With **keep**, ticking the task off counts for
+  nothing. What the view shows of a graduated habit comes from its
+  records alone, so it stays when the task is ended or deleted.
+
+### Afterwards
+
+- QuestArc asks **once** whether the habit still runs by itself 14 and
+  42 days after graduation, and then every 182 days (at most twice a
+  year). The question is due (`habit.graduated.checkDue`) from its date
+  until it is answered; when a later date has come, only that one is
+  due, so a question that passed unanswered is not asked again.
+- The answer is yes or "not really" (`answerStill`, a
+  `graduation-check` record under the date it was due). Yes changes
+  nothing. "Not really" changes nothing either: the view says so
+  (`suggestBack`) and the hosts offer to bring the habit back.
+- **Bringing it back** (`bringBack`, at any time, not only after the
+  question) closes the graduation record with `until`. From that day
+  the habit is maintained again, as a growing step: followed, asked
+  weekly, able to graduate anew. **Nothing is lost:** the days from
+  graduation to that day are not due and count nothing (like the days
+  of a step back, §4), so they never become gaps and the run stands.
+  If its repeat is gone, it waits for a task.
+- Completion cannot suggest bringing a habit back any more ("below
+  60 % in the 2 weeks before", the rule until 2026-11-14): a graduated
+  habit is not ticked off, so there is nothing to count.
+
+The numbers (3 answers, 6 of 7, 80 %, 28 and 14 days, 14, 42 and 182
+days) are design choices; no study defines them, and the texts say so.
+
+**Example G.** A journey was finished on 1 Oct; its last stage's task
+is due daily and done every day. The answers of the weeks 44, 45 and 46
+are 6, 7 and 6: on Wednesday of week 46 the habit can graduate. With a
+5 in week 45, with week 45 skipped, or with the three answers in weeks
+42 to 44 it cannot. With 6 misses between 15 and 28 Oct it cannot
+either (22 of 28, 79 %), with 5 it can (23 of 28). With 3 misses in
+the last 14 days it cannot (11 of 14), although 25 of 28 are done.
+
+**Example H.** The habit graduates on 28 Oct. On 10 Nov nothing is
+asked; from 11 Nov the question is due. Answered "not really", the
+habit stays graduated and bringing it back is suggested. Brought back
+on 11 Nov, the days from 28 Oct to 10 Nov are not due: a run of 30
+before goes on with the next completion.
 
 ## 7. Builds
 

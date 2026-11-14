@@ -1,9 +1,11 @@
+import { answersOf, weeklyAnswers } from './answers';
 import { resolveBinding } from './binding';
 import type { Choices, RunRecord } from './choices';
 import { awayBy, comeBackOf, openStepBack } from './comeback';
 import { creditedDays, minutesTracked } from './completions';
 import { bestProgress, conditionProgress } from './conditions';
 import { daysBetween, isoWeek } from './days';
+import { habitOf } from './habit';
 import { resolveBuild } from './ladders';
 import { continueOffer } from './offer';
 import { isSupported } from './schedule';
@@ -202,6 +204,11 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     markerProgress: ended ? 0 : markerProgress,
     ready: !ended && current?.state === 'met',
   };
+  const answers =
+    !ended && current
+      ? weeklyAnswers(answersOf(choices, run.runId, current.stageId), today)
+      : undefined;
+  const habit = habitOf(run, journey, ctx);
   return {
     runId: run.runId,
     journeyId: journey.id,
@@ -229,5 +236,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
       : {}),
     ...(comeBack ? { comeBack } : {}),
     build,
+    ...(answers ? { answers } : {}),
+    ...(habit ? { habit } : {}),
   };
 };

@@ -2,6 +2,7 @@ import { endJourney, pauseJourney, resumeJourney, withdraw } from '@questarc/eng
 import { t } from '../../shared/texts';
 import { banners } from '../banners';
 import { h } from '../dom';
+import { habitBanners } from '../habit-banners';
 import { buildSection } from '../journey/build';
 import { stationCard } from '../journey/card';
 import type { Context, MenuItem, Screen } from '../screen';
@@ -49,6 +50,7 @@ export const homeScreen = (ctx: Context): Screen => {
               ),
             )
           : null,
+        ...habitBanners(ctx),
         h(
           'div',
           { class: 'qa-empty' },
@@ -134,6 +136,8 @@ export const homeScreen = (ctx: Context): Screen => {
         'div',
         { class: 'qa-card-area' },
         ...banners(ctx, run, journey),
+        // The card after a long break stands alone.
+        ...(run.comeBack ? [] : habitBanners(ctx)),
         stationCard(run, journey, view.todayStr) ?? null,
       ),
     ),

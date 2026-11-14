@@ -71,6 +71,12 @@ punishment and comparison often backfire.
    total and best runs, and asks one question,
    the validated single item of the automaticity index with the habit filled
    in: "Walking after lunch is something I do automatically" (1–7). The answers drive graduation and reminder fading.
+   The look back shows the answers so far as a row of seven-step marks,
+   week by week, and says "easier than four weeks ago" or "about the
+   same" when that is so, and nothing when the answer is lower: no
+   target line and no number to reach (rule 12). After a journey the
+   question goes on for the habit it leaves, until that graduates
+   (rule 25).
 10. **Misses count against the user's own schedule.** A day is missed only
     if the recurring task was due that day. A task done late for yesterday
     (within a short backfill window) counts for yesterday.
@@ -143,13 +149,27 @@ more and the evidence for them is contested or indirect.
 
 24. **Habits stay.** The recurring task is the user's; QuestArc never
     deletes or ends it. After a journey, its last habit keeps running as a
-    normal task and appears on the shelf as maintained.
+    normal task and appears on the shelf as maintained, with the weekly
+    question going on. A task ends only with the user's yes and by the
+    user's hand: where QuestArc cannot end a repeat, it leads to the
+    task.
 25. **Graduation by automaticity, not days.** A habit can graduate when
-    the weekly answer stays high (for example 6 of 7 for three weeks in a
-    row), completion is steady and reminders are already off without a
-    drop. The user decides: keep it repeating quietly or end it. QuestArc
-    checks in two and six weeks later, and one tap brings it back. The
-    threshold is a design choice; no study defines it.
+    the weekly answer stays high (6 or 7 for three weeks in a row) and
+    completion is steady (four of five planned days over four weeks,
+    with no drop in the last two; a reminder QuestArc cannot see counts
+    as never set). Graduation is offered once it holds, never pushed
+    and never announced before: no progress towards it is shown. A
+    graduated habit is **no longer ticked off** (decided 2026-11-12
+    with the anchors, #96): what has become automatic is not tracked,
+    because ticking it is only work, and the list gets shorter, not
+    longer. The user decides what happens to the task: end its repeat
+    themselves, or keep it repeating quietly, where it counts for
+    nothing. QuestArc asks once, two and six weeks later and then at
+    most twice a year, whether it still runs by itself; "not really"
+    offers to bring it back as a growing step, and bringing it back
+    takes nothing away (rule 16): the time it ran by itself never
+    becomes gaps. The thresholds and the dates are design choices; no
+    study defines them, and the texts say so.
 
 ## Honesty and privacy
 

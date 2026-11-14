@@ -116,7 +116,8 @@ The exact rules and numbers are in [game rules](game-rules.md) (decided
 over due days with a one-day backfill window, a greeting on coming back,
 no player HP (D3), no XP, levels or guardians since 3.3 (#110), a build
 that grows with the stages, graduation by three
-high weekly answers, 80 % completion and reminders already off. Not
+high weekly answers and 80 % completion over four and over two weeks
+(a graduated habit is no longer ticked off, #22). Not
 planned: gold and shop, random rewards, login bonuses, leaderboards,
 money commitments.
 

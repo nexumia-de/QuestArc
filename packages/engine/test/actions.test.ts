@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   actions,
   answerCheckin,
+  answerStill,
+  bringBack,
   checkPlan,
   callItAPause,
   carryOn,
@@ -9,6 +11,7 @@ import {
   continueJourney,
   endJourney,
   evaluate,
+  graduate,
   pairStage,
   resumeJourney,
   skipStage,
@@ -37,13 +40,16 @@ describe('actions', () => {
   it('are callable by name for engine-cli.mjs', () => {
     expect(Object.keys(actions).sort()).toEqual([
       'answerCheckin',
+      'answerStill',
       'bindStage',
+      'bringBack',
       'callItAPause',
       'carryOn',
       'checkPlan',
       'chooseBuild',
       'continueJourney',
       'endJourney',
+      'graduate',
       'pairStage',
       'pauseJourney',
       'repeatPause',
@@ -223,5 +229,83 @@ describe('actions', () => {
     const gone = fromVector('step-back-task-gone.json');
     expect(gone.run.stations[0]?.state).toBe('unbound');
     expect(skipStage(gone.run, gone.journey, '2026-10-22')).toEqual({});
+  });
+
+  /** The finished run of a vector's input, and the snapshot to go on from. */
+  const finishedOf = (file: string) => {
+    const vector = loadVectors().find((v) => v.file === file);
+    if (!vector || vector.kind !== 'evaluate') throw new Error(file);
+    const snapshot = vector.input as Snapshot;
+    const run = evaluate(snapshot).finished[0];
+    if (!run) throw new Error(file);
+    return { run, snapshot };
+  };
+
+  it('let a habit graduate only while it can, with what the user does with the task', () => {
+    const { run } = finishedOf('graduation-qualifies.json');
+    expect(graduate(run, '2026-11-11', 'end')).toEqual({
+      'graduation:r1:c:2026-11-11': { choice: 'end' },
+    });
+    expect(graduate(run, '2026-11-11', 'keep')).toEqual({
+      'graduation:r1:c:2026-11-11': { choice: 'keep' },
+    });
+    expect(graduate(run, '2026-11-11', 'other' as never)).toEqual({});
+    expect(graduate(finishedOf('graduation-not-low-answer.json').run, '2026-11-11', 'end')).toEqual(
+      {},
+    );
+    expect(graduate(finishedOf('graduated-not-followed.json').run, '2026-11-11', 'end')).toEqual(
+      {},
+    );
+  });
+
+  it('a graduated habit is graduated in the next view, whatever its task does', () => {
+    const { run, snapshot } = finishedOf('graduation-qualifies.json');
+    const after = evaluate({
+      ...snapshot,
+      choices: { ...snapshot.choices, ...graduate(run, '2026-11-11', 'keep') },
+    }).finished[0];
+    expect(after?.habit).toMatchObject({
+      state: 'graduated',
+      canGraduate: false,
+      checkinDue: false,
+      graduated: { day: '2026-11-11', choice: 'keep' },
+    });
+  });
+
+  it('answer the question after graduation under the date it was due', () => {
+    const due = finishedOf('graduated-check-asked-once.json');
+    expect(answerStill(due.run, '2026-11-11', true)).toEqual({
+      'graduation-check:r1:c:2026-11-01': { day: '2026-11-11', still: true },
+    });
+    const no = answerStill(due.run, '2026-11-11', false);
+    expect(no).toEqual({
+      'graduation-check:r1:c:2026-11-01': { day: '2026-11-11', still: false },
+    });
+    const after = evaluate({
+      ...due.snapshot,
+      choices: { ...due.snapshot.choices, ...no },
+    }).finished[0];
+    expect(after?.habit?.graduated).toEqual({
+      day: '2026-09-20',
+      choice: 'end',
+      suggestBack: true,
+    });
+    // Nothing is due: nothing is written.
+    expect(answerStill(finishedOf('graduated-check-not-yet.json').run, '2026-11-11', true)).toEqual(
+      {},
+    );
+    expect(answerStill(finishedOf('graduation-qualifies.json').run, '2026-11-11', true)).toEqual(
+      {},
+    );
+  });
+
+  it('bring a graduated habit back by closing its record, never by withdrawing it', () => {
+    const { run, snapshot } = finishedOf('graduated-kept-repeating.json');
+    const back = bringBack(run, '2026-11-11');
+    expect(back).toEqual({ 'graduation:r1:c:2026-11-01': { choice: 'keep', until: '2026-11-11' } });
+    const after = evaluate({ ...snapshot, choices: { ...snapshot.choices, ...back } }).finished[0];
+    expect(after?.habit).toMatchObject({ state: 'maintained', backDay: '2026-11-11' });
+    expect(after?.habit?.graduated).toBeUndefined();
+    expect(bringBack(finishedOf('graduation-qualifies.json').run, '2026-11-11')).toEqual({});
   });
 });

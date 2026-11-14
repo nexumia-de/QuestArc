@@ -580,6 +580,37 @@
   margin-top: var(--s-half, 4px);
 }
 
+/* The weekly answers so far: one seven-step mark per week (screen 6). */
+.qa-answers-block > p {
+  margin: var(--s-half, 4px) 0 0;
+}
+
+.qa-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-half, 4px) var(--s, 8px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qa-answers > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-color-muted, rgba(44, 44, 44, 0.66));
+  font-size: var(--font-size-xs, 11px);
+}
+
+.qa-step {
+  fill: var(--divider-color, rgba(0, 0, 0, 0.12));
+}
+
+.qa-step-on {
+  fill: var(--c-primary, #6495ed);
+}
+
 .qa-prose section > p {
   margin: var(--s-half, 4px) 0 0;
 }

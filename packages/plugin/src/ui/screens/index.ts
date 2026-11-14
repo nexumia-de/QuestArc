@@ -4,6 +4,7 @@ import { checkinScreen } from './checkin';
 import { chooseScreen } from './choose';
 import { continueScreen } from './continue';
 import { finishedScreen } from './finished';
+import { graduateScreen } from './graduate';
 import { homeScreen } from './home';
 import { motivatesScreen } from './motivates';
 import { pickTaskScreen } from './pick-task';
@@ -16,6 +17,7 @@ import { smallerScreen } from './smaller';
 import { startScreen } from './start';
 import { stationsScreen } from './stations';
 import { stationScreen } from './station';
+import { stillScreen } from './still';
 import { welcomeScreen } from './welcome';
 
 /** The screen for a route (docs/behaviour.md, screens). */
@@ -36,9 +38,9 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
     case 'start':
       return startScreen(ctx, route.journeyId);
     case 'setup':
-      return setupScreen(ctx);
+      return setupScreen(ctx, route.runId);
     case 'pick-task':
-      return pickTaskScreen(ctx);
+      return pickTaskScreen(ctx, route.runId);
     case 'continue':
       return continueScreen(ctx);
     case 'smaller':
@@ -46,7 +48,11 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
     case 'finished':
       return finishedScreen(ctx, route.journeyId);
     case 'checkin':
-      return checkinScreen(ctx);
+      return checkinScreen(ctx, route.runId);
+    case 'graduate':
+      return graduateScreen(ctx, route.runId);
+    case 'still':
+      return stillScreen(ctx, route.runId);
     case 'shelf':
       return shelfScreen(ctx);
     case 'motivates':

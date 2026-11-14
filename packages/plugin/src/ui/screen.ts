@@ -10,12 +10,14 @@ export type Route =
   | { readonly name: 'settings' }
   | { readonly name: 'station'; readonly index: number }
   | { readonly name: 'start'; readonly journeyId: string }
-  | { readonly name: 'setup' }
-  | { readonly name: 'pick-task' }
+  | { readonly name: 'setup'; readonly runId?: string }
+  | { readonly name: 'pick-task'; readonly runId?: string }
   | { readonly name: 'continue' }
   | { readonly name: 'smaller' }
   | { readonly name: 'finished'; readonly journeyId: string }
-  | { readonly name: 'checkin' }
+  | { readonly name: 'checkin'; readonly runId?: string }
+  | { readonly name: 'graduate'; readonly runId: string }
+  | { readonly name: 'still'; readonly runId: string }
   | { readonly name: 'shelf' }
   | { readonly name: 'motivates' }
   | { readonly name: 'build' }

@@ -86,24 +86,25 @@ it as the entity `questarc:<key>` and resolves sync conflicts per key
 (last writer wins), so records written on different devices never
 overwrite each other. Most records are written once and never changed.
 
-| Key                                   | Value                                                                     | Written when                                                                                         |
-| ------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `run:<runId>`                         | `{ journeyId, journeyVersion, startDay, why? }`                           | a journey is started (with the user's own "why")                                                     |
-| `run-end:<runId>`                     | `{ day, reason: "finished" \| "abandoned" }`                              | the last stage is done, or the user ends the journey                                                 |
-| `stage:<runId>:<stageId>`             | `{ acceptedDay }`                                                         | the user accepts a stage                                                                             |
-| `binding:<runId>:<stageId>`           | `{ taskId, repeatCfgId?, day }`; `day`: due days start then at the latest | a recurring task is bound or rebound; `repeatCfgId` is missing while a new task waits for its repeat |
-| `stage-done:<runId>:<stageId>`        | `{ day, dataFormat: 2 }`                                                  | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
-| `pause:<runId>:<day>`                 | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }`         | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                   |
-| `checkin:<runId>:<stageId>:<isoWeek>` | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
-| `stay:<runId>:<stageId>`              | `{ day }`                                                                 | the user stays a while at a met station (quiets the offer for 7 days)                                |
-| `skip:<runId>:<stageId>`              | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
-| `plan-check:<runId>`                  | `{ wish?, outcome?, obstacle?, plan? }`: the user's own words             | a journey is started with the optional plan check, or the user saves it later                        |
-| `pair:<runId>:<stageId>`              | `{ text }`: the user's own words, at most 60 characters                   | the user names what they pair the stage with, or continues from a stage that has one                 |
-| `carry-on:<runId>:<stageId>`          | `{ day }`                                                                 | the user carries on after a long break (closes the card for this gap)                                |
-| `step-back:<runId>:<stageId>:<day>`   | `{ dataFormat: 4, until? }`; `stageId` is the stage left, `day` the day   | the user starts smaller after a long break; `until` is added when the stage left is taken up again   |
-| `graduation:<runId>:<stageId>`        | `{ day, choice: "keep" \| "end" }`                                        | the user graduates a habit                                                                           |
-| `journey:<journeyId>`                 | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
-| `build:<runId>`                       | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
+| Key                                        | Value                                                                     | Written when                                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `run:<runId>`                              | `{ journeyId, journeyVersion, startDay, why? }`                           | a journey is started (with the user's own "why")                                                     |
+| `run-end:<runId>`                          | `{ day, reason: "finished" \| "abandoned" }`                              | the last stage is done, or the user ends the journey                                                 |
+| `stage:<runId>:<stageId>`                  | `{ acceptedDay }`                                                         | the user accepts a stage                                                                             |
+| `binding:<runId>:<stageId>`                | `{ taskId, repeatCfgId?, day }`; `day`: due days start then at the latest | a recurring task is bound or rebound; `repeatCfgId` is missing while a new task waits for its repeat |
+| `stage-done:<runId>:<stageId>`             | `{ day, dataFormat: 2 }`                                                  | the next stage is accepted, or the journey ends ([deleted history](decisions/deleted-history.md))    |
+| `pause:<runId>:<day>`                      | `{ action: "pause" \| "resume", source: "user" \| "repeat-cfg" }`         | the user pauses or resumes; a host sees the bound repeat config paused or unpaused                   |
+| `checkin:<runId>:<stageId>:<isoWeek>`      | `{ score: 1..7 }`                                                         | the weekly question is answered                                                                      |
+| `stay:<runId>:<stageId>`                   | `{ day }`                                                                 | the user stays a while at a met station (quiets the offer for 7 days)                                |
+| `skip:<runId>:<stageId>`                   | `{ day, dataFormat: 3 }`                                                  | the user passes an offered stage with "I already do this"                                            |
+| `plan-check:<runId>`                       | `{ wish?, outcome?, obstacle?, plan? }`: the user's own words             | a journey is started with the optional plan check, or the user saves it later                        |
+| `pair:<runId>:<stageId>`                   | `{ text }`: the user's own words, at most 60 characters                   | the user names what they pair the stage with, or continues from a stage that has one                 |
+| `carry-on:<runId>:<stageId>`               | `{ day }`                                                                 | the user carries on after a long break (closes the card for this gap)                                |
+| `step-back:<runId>:<stageId>:<day>`        | `{ dataFormat: 4, until? }`; `stageId` is the stage left, `day` the day   | the user starts smaller after a long break; `until` is added when the stage left is taken up again   |
+| `graduation:<runId>:<stageId>:<day>`       | `{ choice: "end" \| "keep", until? }`; `day` is the day of graduation     | the user lets a finished journey's habit graduate; `until` is added when it is brought back          |
+| `graduation-check:<runId>:<stageId>:<due>` | `{ day, still: true \| false }`; `due` is the date the question was due   | the user answers "does it still run by itself?" after graduation                                     |
+| `journey:<journeyId>`                      | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
+| `build:<runId>`                            | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
 - **No settings record.** QuestArc before 3.3 wrote `settings`
   (`{ mode: "calm" | "rpg" }`); the mode is gone (#110), the engine
@@ -158,6 +159,22 @@ overwrite each other. Most records are written once and never changed.
   carries `dataFormat: 4`: there the run is read-only until that host
   is updated (below). The record stays after `until`, because the days
   in between must stay not due for the stage left.
+- **Graduation** ([game rules](game-rules.md) §6). `graduate` writes
+  one `graduation` record per graduation, keyed by its day, with what
+  the user does with the task (`choice`); it returns no changes unless
+  the view says the habit can graduate. `bringBack` rewrites that
+  record with `until`, the day the habit is followed again, and never
+  withdraws it: the days in between must stay not due, as with a step
+  back. A habit that graduates again gets a second record.
+  `answerStill` writes `graduation-check` under the date the question
+  was due (`habit.graduated.checkDue`), so two devices answering the
+  same question write the same key; it returns no changes while no
+  question is due. Both kinds are read only for the last stage of a
+  finished journey. Neither carries a data format
+  ([decision](decisions/data-format.md)): an engine that does not know
+  them computes nothing for a finished journey's habit. Nothing about
+  anchors (#96) is stored yet; a later `anchor` record and a run's
+  anchor are additions these records do not stand in the way of.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -177,8 +194,8 @@ overwrite each other. Most records are written once and never changed.
   record for the active one, so a waiting journey's days are never
   misses. If two devices start different journeys before syncing, both
   stay open and one is active; nothing is lost.
-- **Withdrawing a record** (undo an acceptance, bring a graduated habit
-  back, remove an imported journey): write an empty string to its key.
+- **Withdrawing a record** (undo an acceptance, remove an imported
+  journey): write an empty string to its key.
   `listSyncedDataKeys` lists only non-empty keys, and the engine ignores
   empty ones; there is no API to delete a single key.
 - **Reading:** the plugin lists its keys with `listSyncedDataKeys()` and
@@ -209,7 +226,7 @@ engine than the other on the same records
   `2`, so a run without a skip stays usable on a 3.3 host. A run-scoped
   record may carry `dataFormat: <n>`; a record without it is format 1. A newer engine writes `dataFormat` only on a
   record that changes what an older engine would compute for its run
-  (a checkpoint, graduation, a real step back), and only then raises
+  (a checkpoint, a skip, a real step back), and only then raises
   `DATA_FORMAT`.
   Everything else (new optional fields, new kinds an older engine may
   ignore) keeps its format. Withdrawing such a record lowers the run's
@@ -272,6 +289,32 @@ interface RunView {
   offer?: ContinueOffer; // while the current stage is met (game rules §4)
   comeBack?: ComeBack; // the card after a long break is due (game rules §5)
   build: BuildView; // what the journey builds (game rules §7)
+  answers?: WeeklyAnswers; // the current stage's weekly answers so far
+  habit?: HabitView; // a finished journey only: the habit it leaves (game rules §6)
+}
+
+interface WeeklyAnswers {
+  // the latest 12 ISO weeks at most, oldest first, from the first
+  // answered week to the latest answered one; a skipped week has no score
+  weeks: { week: string; score?: number }[];
+  // the latest answer against the latest one four or more weeks before
+  // it: higher 'easier', equal 'same', absent when lower or without one
+  trend?: 'easier' | 'same';
+}
+
+interface HabitView {
+  stageId: string; // the journey's last stage
+  state: 'maintained' | 'graduated' | 'unbound' | 'unsupported-repeat';
+  checkinDue: boolean; // maintained: weekly question not answered this ISO week
+  canGraduate: boolean; // maintained: the three conditions of game rules §6 hold
+  answers?: WeeklyAnswers;
+  graduated?: {
+    day: string;
+    choice: 'end' | 'keep'; // what the user does with the task
+    checkDue?: string; // "does it still run by itself?" is due: its date
+    suggestBack?: true; // the latest answer was "not really"
+  };
+  backDay?: string; // not graduated any more: the day it was last brought back
 }
 
 interface ContinueOffer {
@@ -323,7 +366,10 @@ no changes when the view does not allow the action (not met, a stage
 with a task, the last stage, a skip that is no longer undoable). The
 card after a long break writes `carryOn`, `callItAPause` or `stepBack`;
 each returns no changes while `comeBack` is absent, and `stepBack`
-also without `comeBack.smaller`.
+also without `comeBack.smaller`. For the habit of a finished journey
+the weekly answer is the same `answerCheckin` with the last stage;
+`graduate`, `answerStill` and `bringBack` take the finished run and
+return no changes when its `habit` does not allow them.
 
 `diff(before, after)` returns events `{ key, params }` for toasts:
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more
@@ -331,7 +377,8 @@ than one new completion at once, e.g. after a sync),
 `event.station-reached`, `event.fallback-offered`,
 `event.build-element` (`{ from, to }`: the marker
 progress rose) and `event.build-version` (`{ version }`).
-Graduation follows with issue #22. All numbers follow the
+The habit of a finished journey has no events: that it can graduate is
+shown in the view only, and a graduated habit produces no messages. All numbers follow the
 [game rules](game-rules.md).
 
 ## 4. Pensum

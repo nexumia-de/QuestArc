@@ -122,9 +122,16 @@ at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
 `journey`, `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
 (the card after a long break, #82), `smaller` (after starting smaller),
-`unbound`, `newer`, `build`, `build-ready`, `build-crossing`;
-`empty:Settings` clicks the
-button named "Settings" first. In the browser console,
+`unbound`, `newer`, `build`, `build-ready`, `build-crossing`, and for
+the habit a finished journey leaves (`preview/demo-habits.ts`, #22):
+`habit` (maintained, the weekly question due, answers of eight weeks),
+`graduate` (it can graduate), `graduated` (the question after two
+weeks is due), `not-really` (answered so) and `brought-back` (back,
+its repeat gone). After a colon come the buttons or menu items to
+click first, in order, separated by `>`:
+`empty:Menu>Settings`, `graduate:Have a Look`,
+`habit:Menu>Shelf` (a name with a comma cannot be given; spaces need
+quotes in the shell). In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes
 the view's requests fail as they do while plugin.js is not loaded
 (`preview.failMessages(null)` ends it; any other text shows the "could
@@ -177,7 +184,15 @@ version, then pass the next stage with **I Already Do This** (#81).
 the second station ticked once, no card after 13 days, the card after
 14, **Start Smaller** with the gap called a pause, the first station
 current again with the version standing, and the first tick as a
-welcome back. `e2e/real-app-panel.mjs` checks
+welcome back. `e2e/real-app-graduation.mjs` walks graduation (#22) with
+prepared data: a real recurring task ticked once, then the records of a
+finished journey and three high weekly answers written through the
+view's own message to plugin.js (`questarc:write`, so they pass
+`guardWrite`); the offer, the page with its two choices, "Runs by
+itself" with **Open the task**, the shelf, no message when the task is
+ticked afterwards, no question after 13 days, the question after 14,
+**Not Really**, **Bring It Back** and the habit on the shelf again.
+`e2e/real-app-panel.mjs` checks
 the side panel setting: no button by default, the button after turning
 it on, QuestArc in the right panel (320 px wide at 1200 px). They share
 the app steps in `e2e/sp.mjs`. Screenshots go to
