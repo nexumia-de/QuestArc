@@ -86,7 +86,7 @@ app as "Written by …". Guide: [Writing a journey](docs/authoring-journeys.md).
 ## Documents
 
 - [Roadmap](docs/roadmap.md): goals, their order and the releases.
-- [Architecture](docs/architecture.md): one engine, two hosts, decisions.
+- [Architecture](docs/architecture.md): one engine, three hosts, decisions.
 - [Psychology](docs/psychology.md): what helps people build habits, and
   the design rules that follow.
 - [Super Productivity facts](docs/super-productivity-facts.md): the plugin

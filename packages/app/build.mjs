@@ -1,14 +1,14 @@
 // Builds the standalone app (#93, a spike) into dist/app/: static files
-// for any web server. app.js bundles the engine, the plugin's adapter and
+// for any web server. app.js bundles the engine, the shared adapter and
 // screens, the journeys and the ladders' pictures; app.css is the theme
-// (light and dark after the system), the plugin's style and the app's
+// (light and dark after the system), the shared style and the app's
 // own; sw.js is the service worker with the list of all files.
 import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build, transform } from 'esbuild';
-import { esbuildLadderArt } from '../plugin/art.mjs';
-import { esbuildJourneys } from '../plugin/journeys.mjs';
+import { esbuildLadderArt } from '../ui/art.mjs';
+import { esbuildJourneys } from '../ui/journeys.mjs';
 
 const out = join('dist', 'app');
 rmSync('dist', { recursive: true, force: true });
@@ -25,9 +25,9 @@ await build({
 });
 
 // The theme variables Super Productivity sets in plugin views, which the
-// screens' style reads; the plugin's preview has them (preview/theme.ts).
+// screens' style reads; the plugin's preview has them too (packages/ui/src/ui/theme.ts).
 const theme = await build({
-  entryPoints: [join('..', 'plugin', 'preview', 'theme.ts')],
+  entryPoints: [join('..', 'ui', 'src', 'ui', 'theme.ts')],
   bundle: true,
   format: 'esm',
   write: false,
@@ -38,8 +38,8 @@ const { themeCss } = await import(
 const style = [
   themeCss('light'),
   `@media (prefers-color-scheme: dark){${themeCss('dark')}}`,
-  readFileSync(join('..', 'plugin', 'src', 'ui', 'start.css'), 'utf8'),
-  readFileSync(join('..', 'plugin', 'src', 'ui', 'style.css'), 'utf8'),
+  readFileSync(join('..', 'ui', 'src', 'ui', 'start.css'), 'utf8'),
+  readFileSync(join('..', 'ui', 'src', 'ui', 'style.css'), 'utf8'),
   readFileSync(join('src', 'app.css'), 'utf8'),
 ].join('\n');
 const { code: css } = await transform(style, { loader: 'css', minify: true });

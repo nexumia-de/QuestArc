@@ -53,7 +53,7 @@ checker has no warning. The versions have the journey's own names
 The names start with "A" so the line of state reads "A log to balance
 across stands". They describe the Crossing's pictures. The view shows a
 journey's names with whatever ladder the user picks
-(`versionName` in `packages/plugin/src/ui/ladder.ts`), so a user who
+(`versionName` in `packages/ui/src/ui/ladder.ts`), so a user who
 changes to the Home sees these names under a hut; that is a question for
 the view, not for this file.
 

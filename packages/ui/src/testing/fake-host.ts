@@ -1,6 +1,6 @@
 import type { Hooks } from '@super-productivity/plugin-api';
 
-import type { HostApi } from '../src/adapter/host';
+import type { HostApi } from '../adapter/host';
 
 /**
  * An in-memory stand-in for Super Productivity's plugin API: tasks, repeat

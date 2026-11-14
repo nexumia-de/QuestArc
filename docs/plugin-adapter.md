@@ -18,8 +18,15 @@ Issue #28. The plugin has two parts
 - **The view** (`index.html`, an iframe) only draws. It asks plugin.js
   for the state and sends the choices the user makes back to it.
 
-Code: `packages/plugin/src/adapter/` (one file per job),
-`src/shared/protocol.ts` (the messages), `src/plugin.ts` (wiring).
+Code: the host-independent core in `packages/ui/src/adapter/` (brain,
+records, hooks, day, messages in words; one file per job) and
+`packages/ui/src/shared/protocol.ts` (the messages), shared with the
+standalone app ([decision](decisions/standalone-app.md)); what only
+Super Productivity has in `packages/plugin/src/adapter/` (language,
+messages to the view, side panel, settings entry, context menu) and
+`packages/plugin/src/plugin.ts` (wiring). The view's transport is
+`packages/plugin/src/ui/client.ts`; its host for the screens
+(`view-host.ts`) wraps the global `PluginAPI`.
 
 ## Evaluating
 

@@ -7,6 +7,7 @@
   "type": "module",
   "workspaces": [
     "packages/engine",
+    "packages/ui",
     "packages/plugin",
     "packages/app"
   ],
@@ -15,8 +16,8 @@
   },
   "scripts": {
     "build": "npm run build -w @questarc/engine && npm run build -w @questarc/plugin && npm run build -w @questarc/app",
-    "test": "npm test -w @questarc/engine && npm test -w @questarc/plugin && npm test -w @questarc/app",
-    "typecheck": "npm run typecheck -w @questarc/engine && npm run typecheck -w @questarc/plugin && npm run typecheck -w @questarc/app",
+    "test": "npm test -w @questarc/engine && npm test -w @questarc/ui && npm test -w @questarc/plugin && npm test -w @questarc/app",
+    "typecheck": "npm run typecheck -w @questarc/engine && npm run typecheck -w @questarc/ui && npm run typecheck -w @questarc/plugin && npm run typecheck -w @questarc/app",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

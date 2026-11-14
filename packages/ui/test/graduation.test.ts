@@ -5,7 +5,7 @@ import { createBrain } from '../src/adapter/brain';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
 import { habitsOf, targetOf } from '../src/ui/habit';
-import { createFakeHost, dailyHabit, noon } from './fake-host';
+import { createFakeHost, dailyHabit, noon } from '../src/testing/fake-host';
 
 // Flow F with the real adapter (docs/behaviour.md): "A gentle morning"
 // was finished on 1 October; its last habit kept repeating. Today is

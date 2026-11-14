@@ -2,13 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
-    "types": ["node", "@super-productivity/plugin-api/global"],
+    "types": ["node"],
     "resolveJsonModule": true
   },
-  "include": [
-    "src",
-    "test",
-    "../plugin/src/virtual-art.d.ts",
-    "../plugin/src/virtual-journeys.d.ts"
-  ]
+  "include": ["src", "test", "../ui/src/virtual-art.d.ts", "../ui/src/virtual-journeys.d.ts"]
 }

@@ -1,7 +1,7 @@
 import type { Journey } from '@questarc/engine';
 import type { Hooks, LanguageChangePayload, PluginAPI } from '@super-productivity/plugin-api';
 
-import { useLanguage } from '../shared/languages';
+import { useLanguage } from '@questarc/ui/shared/languages';
 
 /**
  * The part of the plugin API that tells Super Productivity's language

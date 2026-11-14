@@ -49,7 +49,7 @@ export const graduateScreen = (ctx: Context, runId: string): Screen => {
               {
                 class: 'qa-btn qa-btn-secondary',
                 type: 'button',
-                onclick: () => void PluginAPI.selectTask(task.id),
+                onclick: () => void ctx.host.selectTask(task.id),
               },
               t('ui.setup.open'),
             )

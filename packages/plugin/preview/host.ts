@@ -5,18 +5,18 @@
 // &lang=de|en (the language Super Productivity would report, issue #39).
 import type { Hooks } from '@super-productivity/plugin-api';
 
-import { createBrain } from '../src/adapter/brain';
-import { localDay } from '../src/adapter/day';
-import { registerHooks } from '../src/adapter/hooks';
+import { createBrain } from '@questarc/ui/adapter/brain';
+import { localDay } from '@questarc/ui/adapter/day';
+import { registerHooks } from '@questarc/ui/adapter/hooks';
 import { followLanguage } from '../src/adapter/language';
-import type { HostApi } from '../src/adapter/host';
+import type { HostApi } from '@questarc/ui/adapter/host';
 import { handleMessage } from '../src/adapter/messages';
 import { createSidePanel } from '../src/adapter/side-panel';
-import { messageFor } from '../src/adapter/snacks';
-import { builtInJourneys } from '../src/shared/content';
+import { messageFor } from '@questarc/ui/adapter/snacks';
+import { builtInJourneys } from '@questarc/ui/shared/content';
 import { demoData, type Scenario } from './demo';
 import { own, previewLanguage } from './demo-words';
-import { themeCss } from './theme';
+import { themeCss } from '@questarc/ui/ui/theme';
 
 declare const VIEW_HTML: string;
 

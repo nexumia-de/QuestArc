@@ -1,7 +1,7 @@
 ---
 type: Plan
 title: Roadmap
-description: Goals, their order and exit criteria on the way to one engine with two hosts (Super Productivity plugin, Pensum); the work items are GitHub issues.
+description: Goals, their order and exit criteria on the way to one engine with three hosts (Super Productivity plugin, Pensum, standalone app); the work items are GitHub issues.
 tags: [plan, roadmap, milestones]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -183,9 +183,13 @@ journey form, later the editor (#89).
 **Goal**: QuestArc for people without Super Productivity, on the same
 data format.
 
-**Exit criteria**: the spike answers whether the plugin's screens run on
-a local store with little new code (#93); then the owner decides the
-open points of the plan (#91).
+**Exit criteria**: the spike answered that the plugin's screens run on a
+local store with little new code (#93); the owner decided to go on, in
+this repository ([decision](decisions/standalone-app.md)). Then, as the
+plan lists (#91): the screens and the adapter core in one shared
+package with the plugin unchanged for users; the store proven against a
+real Super Productivity; Today by moments and the PWA on GitHub Pages;
+the APK with reminders.
 
 # Backlog
 

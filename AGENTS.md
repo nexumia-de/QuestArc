@@ -3,14 +3,16 @@
 # QuestArc
 
 Habits as journeys: a habit grows in small stages, and every journey
-builds one thing that grows with it. One pure game engine, two hosts: a
-plugin for [Super Productivity](https://super-productivity.com) and a
+builds one thing that grows with it. One pure game engine, three hosts: a
+plugin for [Super Productivity](https://super-productivity.com), a
 game page in [Pensum](https://github.com/nexumia-de/pensum), the native
-Phosh app on the same data. Knowledge of this repository:
-[docs/index.md](docs/index.md).
+Phosh app on the same data, and a standalone web app (`packages/app`,
+[decision](docs/decisions/standalone-app.md)). Plugin and app share
+their screens and adapter core in `packages/ui`. Knowledge of this
+repository: [docs/index.md](docs/index.md).
 
-QuestArc is a Super Productivity plugin and an engine, not a GTK app
-(decision D6 in [docs/architecture.md](docs/architecture.md)). The UI
+QuestArc is an engine, a Super Productivity plugin and a web app, not a
+GTK app (decision D6 in [docs/architecture.md](docs/architecture.md)). The UI
 rules for 360 px, touch targets and accessibility are in
 [docs/behaviour.md](docs/behaviour.md).
 

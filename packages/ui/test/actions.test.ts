@@ -1,13 +1,10 @@
 import { evaluate } from '@questarc/engine';
 import { describe, expect, it } from 'vitest';
 
-import { useForCurrentStation } from '../src/adapter/context-menu';
-import { createBrain } from '../src/adapter/brain';
 import { bindStage, continueJourney, startJourney } from '@questarc/engine';
 
 import { newRunId } from '../src/shared/run-id';
 import { builtInJourneys } from '../src/shared/content';
-import { createFakeHost } from './fake-host';
 
 const journey = builtInJourneys.find((j) => j.id === 'gentle-morning');
 if (!journey) throw new Error('no built-in journey');
@@ -100,37 +97,5 @@ describe('records written by user actions', () => {
     });
     // The last stage needs 8 of 10 days: not met yet, so nothing is written.
     expect(atEnd.active && continueJourney(atEnd.active, journey, '2026-11-10')).toEqual({});
-  });
-});
-
-describe('task context menu', () => {
-  it('binds the chosen task to the current stage', async () => {
-    const { api, host } = createFakeHost();
-    host.today = '2026-11-10';
-    host.tasks.t1 = { id: 't1', isDone: false, repeatCfgId: 'c1' };
-    host.repeatCfgs.c1 = { id: 'c1', isPaused: false, repeatCycle: 'DAILY', repeatEvery: 1 };
-    Object.assign(host.data, {
-      'run:r': JSON.stringify({
-        journeyId: 'gentle-morning',
-        journeyVersion: 1,
-        startDay: '2026-11-10',
-      }),
-      'stage:r:water': JSON.stringify({ acceptedDay: '2026-11-10' }),
-    });
-    const brain = createBrain({ api, journeys: builtInJourneys, onEvents: () => undefined });
-    const msg = await useForCurrentStation(api, brain, 't1');
-    expect(msg).toBe('QuestArc follows this task for "Drink a glass of water".');
-    expect(JSON.parse(host.data['binding:r:water'] ?? '')).toEqual({
-      taskId: 't1',
-      repeatCfgId: 'c1',
-      day: '2026-11-10',
-    });
-    expect((await brain.state()).view.active?.stations[0]?.state).toBe('current');
-  });
-
-  it('says so when no journey runs', async () => {
-    const { api } = createFakeHost();
-    const brain = createBrain({ api, journeys: builtInJourneys, onEvents: () => undefined });
-    expect(await useForCurrentStation(api, brain, 't1')).toBe('Start a journey in QuestArc first.');
   });
 });

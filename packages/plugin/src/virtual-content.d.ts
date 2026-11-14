@@ -1,6 +1,6 @@
 // Built by view-content.mjs.
 declare module 'virtual:questarc-style' {
-  /** src/ui/style.css without whitespace. */
+  /** packages/ui/src/ui/style.css without whitespace. */
   const style: string;
   export default style;
 }

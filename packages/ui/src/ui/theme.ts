@@ -1,6 +1,6 @@
 /**
  * Theme variables as Super Productivity sets them in plugin views, for the
- * preview only. Values transcribed from Super Productivity's
+ * plugin's preview and the standalone app (the shared default theme). Values transcribed from Super Productivity's
  * src/styles/_css-variables.scss at c5eb3f6 (MIT, © Johannes Millan); the
  * primary colour is the default of the Today context (#6495ED).
  */

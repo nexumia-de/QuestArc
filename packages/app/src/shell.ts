@@ -1,4 +1,4 @@
-import { h } from '@questarc/plugin/src/ui/dom';
+import { h } from '@questarc/ui/ui/dom';
 
 import { at } from './texts';
 

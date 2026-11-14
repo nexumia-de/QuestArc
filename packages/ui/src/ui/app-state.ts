@@ -11,7 +11,8 @@ export const appState = (ctx: Context): PluginAppState | undefined => {
   const { draft, state } = ctx;
   if (draft.appRevision !== state.revision && draft.appLoading !== state.revision) {
     draft.appLoading = state.revision;
-    void PluginAPI.getAppState()
+    void ctx.host
+      .getAppState()
       .then((app) => {
         draft.app = app;
         draft.appRevision = state.revision;

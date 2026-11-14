@@ -5,11 +5,12 @@ import type { Hooks } from '@super-productivity/plugin-api';
 
 import startTexts from 'virtual:questarc-start-texts';
 
-import { addTexts, language } from '../shared/texts';
-import { createApp } from './app';
+import { addTexts, language } from '@questarc/ui/shared/texts';
+import { createApp } from '@questarc/ui/ui/app';
 import { createClient } from './client';
 import { applyContent } from './content';
 import { loadErrorText } from './load-error';
+import { createViewHost } from './view-host';
 
 const POLL_MS = 5000;
 const HOOK_DELAY_MS = 300;
@@ -18,7 +19,7 @@ const STARTING_RETRY_MS = 1000;
 
 const root = document.getElementById('app') ?? document.body;
 const client = createClient();
-const app = createApp(root, client);
+const app = createApp(root, client, createViewHost());
 
 // The view carries only the texts of its start state; the others, the
 // style and the ladders' pictures come from plugin.js once, before the
@@ -92,11 +93,4 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') void load();
 });
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') app.back();
-});
-document.addEventListener('click', (event) => {
-  if (!(event.target as Element | null)?.closest('.qa-menu-wrap')) app.closeMenu();
-});
-
 void load();

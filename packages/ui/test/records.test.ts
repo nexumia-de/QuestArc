@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadRecords } from '../src/adapter/records';
 import { buildSnapshot } from '@questarc/engine';
-import { createFakeHost } from './fake-host';
+import { createFakeHost } from '../src/testing/fake-host';
 
 describe('choice records', () => {
   it('parses JSON values and passes malformed ones on as text', async () => {

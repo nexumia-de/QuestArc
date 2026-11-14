@@ -1,8 +1,8 @@
 import { bindStage } from '@questarc/engine';
-import { capitalise } from '../shared/plan';
-import { t } from '../shared/texts';
-import type { Brain } from './brain';
-import type { HostApi } from './host';
+import { capitalise } from '@questarc/ui/shared/plan';
+import { t } from '@questarc/ui/shared/texts';
+import type { Brain } from '@questarc/ui/adapter/brain';
+import type { HostApi } from '@questarc/ui/adapter/host';
 
 /**
  * The task context menu entry "Use for current QuestArc station"

@@ -4,22 +4,22 @@ import { afterEach, describe, expect, it } from 'vitest';
 import german from '../../../content/i18n/de.json';
 import english from '../../../content/i18n/en.json';
 import crossingFile from '../../../content/art/crossing.ladder.json';
-import { artPack, artPackIn } from '../src/adapter/art-pack';
-import { createBrain } from '../src/adapter/brain';
+import { artPack, artPackIn } from '@questarc/ui/adapter/art-pack';
+import { createBrain } from '@questarc/ui/adapter/brain';
 import { contentPack } from '../src/adapter/content-pack';
 import { followLanguage } from '../src/adapter/language';
 import { handleMessage } from '../src/adapter/messages';
-import { builtInJourneys } from '../src/shared/content';
-import { useLanguage } from '../src/shared/languages';
-import { anchorLabel, planAnchor, planSentence, taskAnchor } from '../src/shared/plan';
-import type { State } from '../src/shared/protocol';
-import { language, t } from '../src/shared/texts';
-import { habitName } from '../src/ui/habit';
-import { shortDate, weekdayOfId } from '../src/ui/journey/format';
-import { buildSummary } from '../src/ui/journey/build-choice';
-import { buildLabel, buildWords, type Ladder } from '../src/ui/ladder';
-import { setArt } from '../src/ui/art-store';
-import { createFakeHost } from './fake-host';
+import { builtInJourneys } from '@questarc/ui/shared/content';
+import { useLanguage } from '@questarc/ui/shared/languages';
+import { anchorLabel, planAnchor, planSentence, taskAnchor } from '@questarc/ui/shared/plan';
+import type { State } from '@questarc/ui/shared/protocol';
+import { language, t } from '@questarc/ui/shared/texts';
+import { habitName } from '@questarc/ui/ui/habit';
+import { shortDate, weekdayOfId } from '@questarc/ui/ui/journey/format';
+import { buildSummary } from '@questarc/ui/ui/journey/build-choice';
+import { buildLabel, buildWords, type Ladder } from '@questarc/ui/ui/ladder';
+import { setArt } from '@questarc/ui/ui/art-store';
+import { createFakeHost } from '@questarc/ui/testing/fake-host';
 
 // German texts (issue #39): the language follows Super Productivity's,
 // English stands for any other language, and the sentences that take

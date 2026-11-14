@@ -4,18 +4,21 @@ import type { Client } from './client';
 import { h, icon, ICONS } from './dom';
 import type { Context, MenuItem, Route, Screen } from './screen';
 import { screenFor } from './screens';
+import type { ViewHost } from './view-host';
 
 /**
  * The view's shell (issue #30): header with back, title and settings; the
  * screen in the middle, scrolling vertically; the main actions at the
- * bottom. A stack of routes gives back navigation (button, Escape).
+ * bottom. A stack of routes gives back navigation (button, Escape, which
+ * the shell listens for on the document).
  */
-export const createApp = (root: HTMLElement, client: Client) => {
+export const createApp = (root: HTMLElement, client: Client, host: ViewHost) => {
   let state: State | undefined;
   let stack: { route: Route; draft: Record<string, unknown> }[] = [];
   let error: { text: string; detail?: string } | undefined;
   let menuOpen = false;
 
+  const setSidePanel = client.sidePanel?.bind(client);
   const entry = (route: Route) => ({ route, draft: {} });
   const firstRoute = (s: State): Route =>
     Object.keys(s.records).length > 0 ? { name: 'home' } : { name: 'welcome' };
@@ -46,14 +49,19 @@ export const createApp = (root: HTMLElement, client: Client) => {
         render(false);
       }
     },
-    sidePanel: async (on) => {
-      try {
-        update(await client.sidePanel(on));
-      } catch {
-        error = { text: t('ui.error.write') };
-        render(false);
-      }
-    },
+    ...(setSidePanel
+      ? {
+          sidePanel: async (on: boolean) => {
+            try {
+              update(await setSidePanel(on));
+            } catch {
+              error = { text: t('ui.error.write') };
+              render(false);
+            }
+          },
+        }
+      : {}),
+    host,
   });
 
   const settingsButton = (screen: Screen, ctx: Context): Node =>
@@ -221,7 +229,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
     if (changed) render(first);
   };
 
-  return {
+  const app = {
     update,
     /** Opens the journey on top of the home, for a host that shows the view itself. */
     openJourney: () => {
@@ -246,4 +254,14 @@ export const createApp = (root: HTMLElement, client: Client) => {
       render(false);
     },
   };
+
+  // Escape goes back; a tap outside the header menu closes it.
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') app.back();
+  });
+  document.addEventListener('click', (event) => {
+    if (!(event.target as Element | null)?.closest('.qa-menu-wrap')) app.closeMenu();
+  });
+
+  return app;
 };

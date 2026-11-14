@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import startTexts from 'virtual:questarc-start-texts';
 
-import { addTexts } from '../src/shared/texts';
+import { addTexts } from '@questarc/ui/shared/texts';
 import { loadErrorText, loadProblem, NOT_RUNNING_AFTER_MS } from '../src/ui/load-error';
 
 // Only the texts the view carries itself: these messages are shown before

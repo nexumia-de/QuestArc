@@ -1,4 +1,4 @@
-import { localDay } from '@questarc/plugin/src/adapter/day';
+import { localDay } from '@questarc/ui/adapter/day';
 
 import type { Dataset } from './store/dataset';
 

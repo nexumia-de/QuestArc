@@ -229,7 +229,7 @@ stronger); a third strength was not needed.
 ## Not tested here
 
 - The plugin page in Super Productivity itself (the preview page uses the
-  transcribed theme variables, `packages/plugin/preview/theme.ts`).
+  transcribed theme variables, `packages/ui/src/ui/theme.ts`).
 - Day Planner as a Flatpak: the pictures arrive with the first QuestArc
   release after 3.1.0; until then its tests are skipped with the pinned
   archive. The spike's scene test ran inside the GNOME 51 runtime with

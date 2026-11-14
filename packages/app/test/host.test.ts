@@ -1,9 +1,9 @@
 import { gzipSync } from 'node:zlib';
 
-import { bindStage, startJourney, type Schedule } from '@questarc/engine';
-import { createBrain } from '@questarc/plugin/src/adapter/brain';
-import { registerHooks } from '@questarc/plugin/src/adapter/hooks';
-import { builtInJourneys } from '@questarc/plugin/src/shared/content';
+import { bindStage, startJourney } from '@questarc/engine';
+import { createBrain } from '@questarc/ui/adapter/brain';
+import { registerHooks } from '@questarc/ui/adapter/hooks';
+import { builtInJourneys } from '@questarc/ui/shared/content';
 import { describe, expect, it } from 'vitest';
 
 import { createHost } from '../src/host';
@@ -17,7 +17,7 @@ const stage = journey.stages[0];
 if (!stage) throw new Error('no stage');
 const DAY = '2026-03-02';
 
-const setup = async (schedule?: Schedule) => {
+const setup = async () => {
   const kept = memory();
   const store = await openStore(kept, freshDataset);
   const shown: string[] = [];
@@ -25,7 +25,6 @@ const setup = async (schedule?: Schedule) => {
   const host = createHost({
     store,
     now: () => new Date(`${DAY}T08:00:00Z`),
-    schedule: async () => schedule,
     showSnack: ({ msg }) => shown.push(msg),
     selectTask: (taskId) => void shown.push(`selected ${taskId}`),
     newId: () => `cfg${(ids += 1)}`,
@@ -57,20 +56,23 @@ describe('the standalone host', () => {
     });
     const host = createHost({
       store: await openStore(kept, freshDataset),
-      schedule: async () => undefined,
       showSnack: () => undefined,
       selectTask: () => undefined,
     });
     expect(await host.api.loadSyncedData('run:r')).toBe(text);
   });
 
-  it('creates the recurring task itself, with the stage’s schedule', async () => {
-    const { host, store, shown } = await setup({ type: 'everyNDays', n: 2 });
+  it('creates the recurring task itself, with the schedule it is given', async () => {
+    const { host, store, shown } = await setup();
     const changes: string[] = [];
     host.api.registerHook('dataChanged' as never, () => void changes.push('hook'));
     host.onChange(() => changes.push('listener'));
-    const taskId = await host.api.addTask({ title: 'Water' });
-    expect(taskId).toBe(`rpt_cfg1_${DAY}`);
+    const made = await host.view.createHabit?.({
+      title: 'Water',
+      schedule: { type: 'everyNDays', n: 2 },
+    });
+    expect(made).toEqual({ taskId: `rpt_cfg1_${DAY}`, repeatCfgId: 'cfg1' });
+    const taskId = made?.taskId ?? '';
     expect(store.data.taskRepeatCfg.entities.cfg1).toMatchObject({
       title: 'Water',
       repeatCycle: 'DAILY',
@@ -78,12 +80,12 @@ describe('the standalone host', () => {
       startDate: DAY,
     });
     expect(changes).toEqual(['hook', 'listener']);
-    await host.api.selectTask(taskId);
+    await host.view.selectTask(taskId);
     expect(shown).toEqual([`selected ${taskId}`]);
   });
 
   it('runs the plugin’s adapter: a tick moves the journey and gives the message’s events', async () => {
-    const { host, store } = await setup(stage.schedule);
+    const { host, store } = await setup();
     const events: string[] = [];
     const brain = createBrain({
       api: host.api,
@@ -93,12 +95,15 @@ describe('the standalone host', () => {
     });
     registerHooks(host.api, brain.refresh);
     await brain.write(startJourney({ runId: 'r', journey, startDay: DAY }));
-    const taskId = await host.api.addTask({ title: 'Water' });
-    const bound = await brain.write(bindStage({ runId: 'r', stageId: stage.id, taskId, day: DAY }));
+    const { taskId, repeatCfgId } =
+      (await host.view.createHabit?.({ title: 'Water', schedule: stage.schedule })) ?? {};
+    const bound = await brain.write(
+      bindStage({ runId: 'r', stageId: stage.id, taskId: taskId ?? '', repeatCfgId, day: DAY }),
+    );
     expect(bound.view.active?.stations[0]?.state).not.toBe('unbound');
     expect(bound.view.active?.stations[0]?.progress).toBe(0);
 
-    await store.update((data) => setDone(data, taskId, true, Date.parse(`${DAY}T08:00:00Z`)));
+    await store.update((data) => setDone(data, taskId ?? '', true, Date.parse(`${DAY}T08:00:00Z`)));
     host.emit('dataChanged');
     const ticked = await brain.state();
     expect(ticked.view.active?.stations[0]?.progress).toBeGreaterThan(0);

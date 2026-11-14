@@ -217,10 +217,10 @@ To add a language (for example `fr`):
 3. Add the language's controlling, blaming and day-promising words to
    `BANNED` in `packages/engine/src/wording.ts`, with tests in
    `packages/engine/test/content-check.test.ts`.
-4. Register the table in `packages/plugin/src/shared/languages.ts`
+4. Register the table in `packages/ui/src/shared/languages.ts`
    (`UI_TEXTS`), the start texts' language in `START_LANGUAGES`
    (`packages/plugin/view-content.mjs`), the date locale in
-   `packages/plugin/src/ui/journey/format.ts`, and the new language in
+   `packages/ui/src/ui/journey/format.ts`, and the new language in
    the test that lists the tables (`packages/engine/test/content.test.ts`).
 5. Check the screens with `node screenshots.mjs <demos> 1 fr`
    ([development](development.md)): no cut-off text, no horizontal

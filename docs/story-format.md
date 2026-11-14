@@ -13,7 +13,7 @@ A journey is **one self-contained JSON file** with its own texts
 `content/schema/journey.schema.json` (JSON Schema 2020-12); a complete
 example is `content/examples/example-walking.json`. Built-in journeys
 are the files in `content/journeys/`, named `<id>.json`; the plugin
-finds every file there (`packages/plugin/journeys.mjs`), so a new
+finds every file there (`packages/ui/journeys.mjs`), so a new
 journey is one new file. CI checks every file against the schema and
 with the journey checker (below). How to write and publish one:
 [Writing a journey](authoring-journeys.md).

@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest';
 
 import german from '../../../content/i18n/de.json';
 import english from '../../../content/i18n/en.json';
-import { artPack } from '../src/adapter/art-pack';
+import { artPack } from '@questarc/ui/adapter/art-pack';
 import { contentPack } from '../src/adapter/content-pack';
-import { createBrain } from '../src/adapter/brain';
+import { createBrain } from '@questarc/ui/adapter/brain';
 import { handleMessage } from '../src/adapter/messages';
-import { builtInJourneys } from '../src/shared/content';
-import { hasText, language, t } from '../src/shared/texts';
+import { builtInJourneys } from '@questarc/ui/shared/content';
+import { hasText, language, t } from '@questarc/ui/shared/texts';
 import { applyContent } from '../src/ui/content';
-import { art } from '../src/ui/art-store';
-import { createFakeHost } from './fake-host';
+import { art } from '@questarc/ui/ui/art-store';
+import { createFakeHost } from '@questarc/ui/testing/fake-host';
 
 // What the view does not carry itself comes from plugin.js once
 // (docs/decisions/one-build-for-older-versions.md, docs/plugin-adapter.md).

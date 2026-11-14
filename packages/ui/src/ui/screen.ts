@@ -1,4 +1,5 @@
 import type { State } from '../shared/protocol';
+import type { ViewHost } from './view-host';
 
 /** What every screen gets and returns (docs/behaviour.md, screens). */
 
@@ -45,8 +46,10 @@ export interface Context {
   redraw(): void;
   /** Writes choice records through plugin.js; the view redraws with the result. */
   write(records: Record<string, unknown>): Promise<void>;
-  /** Turns the side panel setting of this device on or off (plugin.js keeps it). */
-  sidePanel(on: boolean): Promise<void>;
+  /** Turns the side panel setting of this device on or off (plugin.js keeps it); only the plugin has one. */
+  sidePanel?(on: boolean): Promise<void>;
+  /** The host that shows the screens: tasks to list, show and create. */
+  readonly host: ViewHost;
 }
 
 export interface MenuItem {

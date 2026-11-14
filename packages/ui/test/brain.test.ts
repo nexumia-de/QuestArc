@@ -3,11 +3,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createBrain } from '../src/adapter/brain';
 import { registerHooks } from '../src/adapter/hooks';
-import { handleMessage } from '../src/adapter/messages';
-import type { State } from '../src/shared/protocol';
 import { messageFor } from '../src/adapter/snacks';
 import { builtInJourneys } from '../src/shared/content';
-import { createFakeHost, dailyHabit, noon } from './fake-host';
+import { createFakeHost, dailyHabit, noon } from '../src/testing/fake-host';
 
 const RUN = 'run-1';
 
@@ -155,18 +153,6 @@ describe('brain', () => {
     expect((await brain.state()).view.active?.paused).toBe(true);
   });
 
-  it('writes records and answers with a state that includes them', async () => {
-    const { brain, host } = setUp([]);
-    await brain.state();
-    const state = (await handleMessage(brain, {
-      type: 'questarc:write',
-      records: { 'pause:run-1:2026-10-27': { action: 'pause', source: 'user' } },
-    })) as State;
-    expect(host.data['pause:run-1:2026-10-27']).toBe('{"action":"pause","source":"user"}');
-    expect(state.view.active?.paused).toBe(true);
-    expect(state.records['pause:run-1:2026-10-27']).toEqual({ action: 'pause', source: 'user' });
-  });
-
   it('withdraws a record by writing an empty string', async () => {
     const { brain, host } = setUp(['2026-10-26']);
     const state = await brain.write({ [`run:${RUN}`]: '' });
@@ -215,11 +201,6 @@ describe('brain', () => {
     brain.refresh('tasks');
     await settle();
     expect(messages).toEqual(['Welcome back. Your run goes on.']);
-  });
-
-  it('rejects unknown requests', async () => {
-    const { brain } = setUp([]);
-    await expect(handleMessage(brain, { type: 'other' })).rejects.toThrow();
   });
 
   it('falls back to the local date without getDayContext', async () => {
