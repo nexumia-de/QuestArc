@@ -26,6 +26,7 @@ plugin ZIP.
 - **Coming back after a long break.** After two weeks without a
   completion, one calm card lets you carry on, call the time a pause, or
   start again with the smaller step before. What you built stays.
+- **QuestArc speaks German** when Super Productivity is set to German.
 - **Four new journeys:** _Evening wind-down_, _Tidy a little_, _A walk
   after lunch_ and _A few pages before sleep_.
 - **Pair a step with something you enjoy**, like a podcast; it becomes
