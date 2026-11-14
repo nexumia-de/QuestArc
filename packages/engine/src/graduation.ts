@@ -18,9 +18,8 @@ export const HIGH_SCORE = 6;
 export const STEADY_RATE = 0.8;
 export const STEADY_DAYS = 28;
 /**
- * The days the reminder rule looks at. What the engine gets carries no
- * date for a reminder, so a reminder counts as never set and only "no
- * drop in that time" is checked (game rules §6).
+ * The days "no drop" looks at: the same two weeks in which the habit's
+ * task had no reminder (reminder.ts, game rules §6).
  */
 export const RECENT_DAYS = 14;
 

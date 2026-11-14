@@ -92,6 +92,7 @@ export const graduateScreen = (ctx: Context, runId: string): Screen => {
       plan,
       h('p', {}, t('ui.graduate.text')),
       h('p', { class: 'qa-muted' }, t('ui.graduate.own')),
+      h('p', { class: 'qa-muted' }, t('ui.graduate.reminder')),
       h('h2', { class: 'qa-section-title' }, t('ui.graduate.task')),
       choice('end'),
       choice('keep'),

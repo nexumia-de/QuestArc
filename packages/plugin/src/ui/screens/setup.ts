@@ -6,6 +6,7 @@ import { h } from '../dom';
 import { targetOf } from '../habit';
 import { weekdayOfId } from '../journey/format';
 import { pairField } from '../journey/pair';
+import { reminderQuestion } from '../reminder';
 import { scheduleText, taskOfCfg } from '../repeat';
 import type { Context, Screen } from '../screen';
 
@@ -16,7 +17,8 @@ import type { Context, Screen } from '../screen';
  * has. It also handles a task that does not repeat yet, a repeat journeys
  * cannot follow, and a task that is gone. A stage the user already does
  * can be passed with "I Already Do This" (never the last one). The
- * optional "pair it with" field is asked here (design rule 7). With
+ * optional "pair it with" field is asked here (design rule 7), and a
+ * reminder on the task is suggested for the first weeks (rule 23). With
  * `runId` the task is for the habit a finished journey left, when its
  * repeat is gone (a habit brought back, flow F).
  */
@@ -104,6 +106,10 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
         h('p', { class: 'qa-muted' }, t('ui.setup.suggested', { schedule: suggested })),
       ),
       h('p', {}, message),
+      // The host's own reminder, for the first weeks (design rule 23).
+      station.state === 'unbound'
+        ? h('p', { class: 'qa-muted' }, reminderQuestion(run, 'ui.setup.reminder'))
+        : null,
       pairField(ctx, run, stage, plan),
       prevTask && !target.habit && station.state === 'unbound' && !task
         ? h(

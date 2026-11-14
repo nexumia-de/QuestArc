@@ -300,6 +300,35 @@ message}` to the parent; the host calls the handler `plugin.js` set with
   day. `deletedInstanceDates` is written only by "skip instance" in the repeat
   dialog (`dialog-edit-task-repeat-cfg.component.ts`,
   `deleteTaskRepeatCfgInstance`)[^sp].
+- **Reminders** (checked at `v20.0.0`, commit `4db0e112`, for #60). A
+  repeat config has `startTime?` (`H:MM`, checked with
+  `isValidSplitTime`: two numbers, hours 0 to 24, minutes 0 to 59) and
+  `remindAt?`, a `TaskReminderOptionId` (`task.model.ts`: `DoNotRemind`,
+  `AtStart`, `m5`, `m10`, `m15`, `m30`, `h1`, and the long leads `d1`,
+  `d3`, `w1`, which are not offered where the id itself is stored, as in
+  a repeat config). It carries them to its instances: when an instance
+  is created and `startTime` is valid and `remindAt` is set, the
+  instance is scheduled with `dueWithTime` and a `remindAt` timestamp
+  from `remindOptionToMilliseconds`, which gives none for `DoNotRemind`
+  (`task-repeat-cfg.service.ts`, `_getActionsForTaskRepeatCfg`;
+  `tasks/util/remind-option-to-milliseconds.ts`). So a repeat's
+  instances have a reminder exactly when the config has a valid
+  `startTime` and a `remindAt` other than `DoNotRemind`. In the repeat
+  dialog the "Start date" field opens the schedule dialog, where date,
+  time and "Remind at" are picked together; the Schedule Task dialog
+  has the same Time and Remind fields beside "Repeat"
+  (`dialog-edit-task-repeat-cfg.component.html`,
+  `planner/dialog-schedule-task/dialog-schedule-task.component.html`,
+  `ui/datetime-picker/datetime-picker.component.html`)[^sp20].
+- **What a plugin reads of it:** `getAppState()` returns the repeat
+  configs' entities as stored, so `startTime` and `remindAt` are there
+  (`plugin-bridge.service.ts`, `getAppState`; `PluginTaskRepeatCfg` in
+  `packages/plugin-api/src/types.ts` types `remindAt?: string` and
+  `startTime?: string`), and a live task has `remindAt` (ms) and
+  `dueWithTime`. Neither carries a date for when the reminder was set
+  or removed, and no hook reports a change of a repeat config (§3), so
+  a reminder's history is not in the data. A plugin cannot set or
+  remove one: no API method changes a repeat config (§6)[^sp20].
 - Deleting a repeat config clears `repeatCfgId` on all live tasks
   (`src/app/root-store/meta/task-shared-meta-reducers/task-repeat-cfg-shared.reducer.ts`)
   **and** on archived tasks

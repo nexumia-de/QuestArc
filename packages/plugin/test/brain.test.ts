@@ -285,4 +285,35 @@ describe('repeat paused in Super Productivity', () => {
     await brain.state();
     expect(Object.keys(host.data).some((key) => key.startsWith('pause:'))).toBe(false);
   });
+
+  it('records a reminder it sees on the task, also when the host reports its own write at once', async () => {
+    const { brain, host, api } = setUp(['2026-11-01']);
+    registerHooks(api, brain.refresh);
+    // Super Productivity fires persistedDataChanged for a plugin's own writes too.
+    const persist = api.persistDataSynced;
+    api.persistDataSynced = async (value, key) => {
+      await persist(value, key);
+      host.hooks.get('persistedDataChanged')?.();
+    };
+    Object.assign(host.repeatCfgs.cfg1 as object, { startTime: '7:00', remindAt: 'AtStart' });
+    const state = await brain.state();
+    expect(JSON.parse(host.data[`reminder-seen:${RUN}:water`] ?? '')).toEqual({
+      on: true,
+      day: '2026-11-02',
+    });
+    // The evaluation went on with every record, not only the one it wrote.
+    expect(state.view.active?.runId).toBe(RUN);
+    expect(state.view.active?.reminder).toEqual({ set: true, time: '7:00' });
+    expect(Object.keys(state.records)).toContain(`run:${RUN}`);
+
+    host.today = '2026-11-05';
+    Object.assign(host.repeatCfgs.cfg1 as object, { remindAt: 'DoNotRemind' });
+    brain.refresh('tasks');
+    await settle();
+    expect(JSON.parse(host.data[`reminder-seen:${RUN}:water`] ?? '')).toEqual({
+      on: false,
+      day: '2026-11-05',
+    });
+    expect((await brain.state()).view.active?.reminder).toEqual({ set: false });
+  });
 });

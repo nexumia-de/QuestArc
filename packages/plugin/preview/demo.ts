@@ -1,5 +1,7 @@
 import type { Task } from '@super-productivity/plugin-api';
 
+import { isoWeek } from '@questarc/engine';
+
 import { habitDemo, isHabitScenario, type HabitScenario } from './demo-habits';
 import { isMomentScenario, momentsDemo, type MomentScenario } from './demo-moments';
 
@@ -15,6 +17,8 @@ import { isMomentScenario, momentsDemo, type MomentScenario } from './demo-momen
  * - before-anchors: the same journey as QuestArc before anchors left it,
  *   without a moment: the home asks once whether it is the user's
  * - moments, moments-chain, moments-rest: several moments (demo-moments.ts)
+ * - reminder: the same journey with a reminder on its task and two
+ *   weekly answers of 5 or more: it may not be needed any more (#60)
  * - paired: the same journey, the stage paired with something the user enjoys (#58)
  * - hard-week: two missed days in a row, with the user's plan check (#59)
  * - met: the current stage's condition is met
@@ -37,6 +41,7 @@ export type Scenario =
   | 'welcome'
   | 'empty'
   | 'journey'
+  | 'reminder'
   | 'before-anchors'
   | MomentScenario
   | 'paired'
@@ -186,6 +191,11 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     repeatCfgId: 'demo',
     day: accepted,
   });
+  if (scenario === 'reminder') {
+    Object.assign(repeatCfgs.demo as object, { startTime: '7:00', remindAt: 'AtStart' });
+    record(`checkin:demo:${stage}:${isoWeek(day(7))}`, { score: 5 });
+    record(`checkin:demo:${stage}:${isoWeek(today)}`, { score: 6 });
+  }
   if (scenario === 'paired') record(`pair:demo:${stage}`, { text: 'my morning playlist' });
   if (scenario === 'hard-week')
     record('plan-check:demo', {

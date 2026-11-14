@@ -1,0 +1,85 @@
+{
+  "name": "A skipped week between two high answers breaks the row, and so do answers that are two weeks old",
+  "rule": "game rules §9; design rule 23",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01",
+        "startTime": "12:30",
+        "remindAt": "m10"
+      }
+    ],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA",
+        "day": "2026-11-02"
+      },
+      "checkin:r1:a:2026-W43": {
+        "score": 6
+      },
+      "checkin:r1:a:2026-W45": {
+        "score": 6
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "reminder": {
+        "set": true,
+        "fade": null
+      },
+      "stations": [
+        {
+          "state": "current",
+          "completions": 3,
+          "progress": 0.6
+        },
+        {},
+        {}
+      ]
+    },
+    "problems": []
+  }
+}

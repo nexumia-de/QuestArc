@@ -38,6 +38,10 @@ export const weekdayOfId = (id: string): string => weekdayName(WEEK[id] ?? WEEK.
 export const addDays = (day: string, n: number): string =>
   new Date(Date.parse(`${day}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 
+/** Whole days from one YYYY-MM-DD date to another. */
+export const daysApart = (from: string, to: string): number =>
+  Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / 86_400_000);
+
 /** The next Monday after `day`. */
 export const nextMonday = (day: string): string => {
   const weekday = new Date(`${day}T12:00:00Z`).getUTCDay();

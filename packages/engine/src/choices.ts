@@ -1,5 +1,6 @@
 import { isDay } from './days';
 import type { BuildChoice } from './ladders';
+import type { ReminderSeen } from './reminder';
 import type { Journey } from './types/journey';
 import type { AnchorWords, PlanCheck } from './types/view';
 import { PLAN_CHECK_FIELDS } from './words';
@@ -43,6 +44,7 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'carry-on',
   'step-back',
   'run-anchor',
+  'reminder-seen',
 ]);
 
 /**
@@ -129,6 +131,8 @@ export interface Choices {
   readonly graduations: ReadonlyMap<string, readonly Graduation[]>;
   /** `${runId}:${stageId}` → the answered check-ins after graduation, sorted by due day */
   readonly stillChecks: ReadonlyMap<string, readonly StillCheck[]>;
+  /** `${runId}:${stageId}` → what a host saw of the stage's reminder */
+  readonly reminders: ReadonlyMap<string, ReminderSeen>;
   /** anchor id → the user's anchor */
   readonly anchors: ReadonlyMap<string, AnchorRecord>;
   /** runId → the anchor the run starts from, and the run of the step it follows */
@@ -185,6 +189,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const stepBacks = new Map<string, StepBack[]>();
   const graduations = new Map<string, Graduation[]>();
   const stillChecks = new Map<string, StillCheck[]>();
+  const reminders = new Map<string, ReminderSeen>();
   const anchors = new Map<string, AnchorRecord>();
   const runAnchors = new Map<string, { anchorId: string; after?: string }>();
   const builds = new Map<string, BuildChoice>();
@@ -290,6 +295,10 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         if (name) choice[field] = name;
       }
       builds.set(parts[1], choice);
+    } else if (kind === 'reminder-seen' && parts.length === 3) {
+      if (typeof value.on === 'boolean' && isDay(value.day))
+        reminders.set(`${parts[1]}:${parts[2]}`, { on: value.on, day: value.day });
+      else bad();
     } else if (kind === 'anchor' && parts.length === 2 && parts[1]) {
       const words = str(value.words);
       const name = str(value.name);
@@ -345,6 +354,7 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     stepBacks,
     graduations,
     stillChecks,
+    reminders,
     anchors,
     runAnchors,
     builds,

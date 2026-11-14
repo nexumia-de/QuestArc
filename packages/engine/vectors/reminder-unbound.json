@@ -1,0 +1,65 @@
+{
+  "name": "A station without a task that repeats has no reminder to speak of",
+  "rule": "game rules §9",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      }
+    ],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r1:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA",
+        "day": "2026-11-02"
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "expect": {
+    "active": {
+      "reminder": null,
+      "stations": [
+        {
+          "state": "unbound"
+        },
+        {},
+        {}
+      ]
+    },
+    "problems": []
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "name": "What a host saw of a reminder is a kind this engine writes; never into a run of a newer QuestArc",
+  "rule": "data model §2, data format and unknown data",
+  "kind": "guard",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "run:r9": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r9:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "pause:r9:2026-11-09": {
+        "action": "pause",
+        "source": "user"
+      },
+      "skip:r9:a": {
+        "day": "2026-11-02",
+        "dataFormat": 99
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "writes": [
+    {
+      "reminder-seen:r1:a": {
+        "on": true,
+        "day": "2026-11-11"
+      }
+    },
+    {
+      "reminder-seen:r9:a": {
+        "on": true,
+        "day": "2026-11-11"
+      }
+    }
+  ],
+  "expect": [
+    {
+      "changes": {
+        "reminder-seen:r1:a": {
+          "on": true,
+          "day": "2026-11-11"
+        }
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "reminder-seen:r9:a": null
+      },
+      "refused": ["reminder-seen:r9:a"]
+    }
+  ]
+}

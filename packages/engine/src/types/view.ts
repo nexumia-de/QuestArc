@@ -137,12 +137,28 @@ export interface RunView {
   readonly build: BuildView;
   /** The current stage's weekly answers so far, once there is one (design rule 9). */
   readonly answers?: WeeklyAnswers;
+  /** The reminder of the current stage's task, while the stage is followed (game rules §9). */
+  readonly reminder?: ReminderView;
   /**
    * A finished journey only: the habit it leaves, its last stage's
    * (game rules §6). Absent while the journey is open and after it was
    * ended early.
    */
   readonly habit?: HabitView;
+}
+
+/**
+ * The reminder of a followed stage's recurring task (design rule 23):
+ * the host's own, set by the user on the task. QuestArc reads it and
+ * never changes it.
+ */
+export interface ReminderView {
+  /** The bound repeat config gives its instances a reminder now. */
+  readonly set: boolean;
+  /** With a reminder: the time of day the instances are scheduled for. */
+  readonly time?: string;
+  /** With a reminder: the weekly answers have risen; it may not be needed any more. */
+  readonly fade?: true;
 }
 
 /**
@@ -192,6 +208,8 @@ export interface HabitView {
   readonly run?: StationRun;
   /** Maintained only: the last 7 due (or paused) days, oldest first. */
   readonly lastDays?: readonly DayMark[];
+  /** Maintained only: the reminder of the habit's task (game rules §9). */
+  readonly reminder?: ReminderView;
   /** Not graduated any more: the day the habit was last brought back. */
   readonly backDay?: string;
 }

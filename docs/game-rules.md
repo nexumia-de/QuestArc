@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation, the build of a journey (ladder, version, marker progress, ready) and anchors, with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation, the build of a journey (ladder, version, marker progress, ready), anchors and reminders, with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -327,16 +327,19 @@ these hold:
    passed (§2). Today and yesterday without a completion are still open
    and are left out; with no decided day the habit is not steady.
 3. **No drop in the last two weeks:** the same 80 % over the last 14
-   logical days. This is what remains of "reminders have been off or
-   never set for at least 14 days, and completion did not fall in that
-   time": the engine **cannot know** since when a task has no reminder.
-   Its snapshot holds no reminder field, and Super Productivity's data
-   has none with a date: a repeat config carries only its present
-   `remindAt` and `startTime`
-   ([facts](super-productivity-facts.md) §5), and what a plugin can
-   read of them is still to be recorded (#60). So a reminder counts as
-   **never set**, and no data is invented. When QuestArc suggests a
-   reminder itself (#60), that issue adds what this rule needs.
+   logical days.
+4. **No reminder in those two weeks** (#60, §9): the habit's repeat
+   has no reminder now, and no host saw one on it in the last 14
+   logical days. Super Productivity's data says only whether a repeat
+   has a reminder at present, never since when
+   ([facts](super-productivity-facts.md) §5). So a host records the
+   day it sees one come or go (`reminder-seen`, §9), and the engine
+   reads that: with a record "off since" a day, that day is 14 or more
+   days ago; with a record that still says "on" while the repeat has
+   none, it went off today at the earliest, so the habit waits; with
+   **no record at all** a reminder counts as **never set**, and no
+   data is invented. A reminder outside the task (a phone alarm) is
+   not known to QuestArc; the graduation page says so.
 
 It is offered, never pushed and never announced before it holds: no
 progress towards it is shown, and the user can leave the offer alone for
@@ -379,8 +382,8 @@ as long as they like.
   60 % in the 2 weeks before", the rule until 2026-11-14): a graduated
   habit is not ticked off, so there is nothing to count.
 
-The numbers (3 answers, 6 of 7, 80 %, 28 and 14 days, 14, 42 and 182
-days) are design choices; no study defines them, and the texts say so.
+The numbers (3 answers, 6 of 7, 80 %, 28 and 14 days, 14 days without
+a reminder, 14, 42 and 182 days) are design choices; no study defines them, and the texts say so.
 
 **Example G.** A journey was finished on 1 Oct; its last stage's task
 is due daily and done every day. The answers of the weeks 44, 45 and 46
@@ -580,3 +583,41 @@ plan reads "After I …" and the numbers are the same. A third journey
 started from "lunch" on 9 Nov makes "getting up" `resting`: the second
 journey waits there, and on 11 Nov the first step's question "does it
 still run by itself?" is due there.
+
+## 9. Reminders
+
+Issue #60, decided by the owner on 2026-11-12
+([design rule 23](psychology.md)). QuestArc sends no notifications. A
+reminder is the host's own: the user sets it on the stage's recurring
+task, and QuestArc only reads it.
+
+- **Set or not** (`reminder.set`, on the active run for its current
+  stage and on a maintained habit, while the stage has a task with a
+  supported repeat): the bound repeat config gives its instances a
+  reminder now. In Super Productivity's data that is a valid
+  `startTime` together with a `remindAt` other than `DoNotRemind`
+  ([facts](super-productivity-facts.md) §5); `reminder.time` is that
+  start time. A snapshot without these fields reads as no reminder.
+- **What a host saw** (`reminder-seen`, one record per stage): the data
+  has no date for a reminder, so a host writes the day it sees one that
+  no record knows (`on`), and the day it sees none where the record
+  says `on` (`off`, since that day). It writes nothing while what it
+  sees is what is recorded, and nothing for a stage that never had a
+  reminder. Graduation reads it (§6, condition 4).
+- **Fading is a suggestion** (`reminder.fade`): with a reminder set,
+  when the stage's weekly answers have risen: the answers of 2
+  consecutive ISO weeks are each 5 or more, and the later of the two is
+  this week or the one before. A skipped week breaks the row. The hosts
+  then say that the reminder may not be needed any more and lead to
+  the task. Nothing that is counted changes, nothing is announced as
+  an event, and QuestArc never removes a reminder: when the user turns
+  it off, the suggestion is gone.
+- The 2 answers and the 5 are design choices; no study defines them.
+
+**Example K.** The task of the growing step has the start time 12:30
+and "10 minutes before". The answers of weeks 44 and 45 are 5 and 6: on
+Thursday of week 45 the reminder may not be needed any more. With 4 and
+6, with weeks 43 and 45, or with only week 45 answered, nothing is
+said. Example G's habit with a reminder on its task cannot graduate.
+The user turns it off on 28 Oct, and a host sees that the same day: on
+10 Nov (13 days) the habit still waits, on 11 Nov it can graduate.

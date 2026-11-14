@@ -12,6 +12,7 @@ const PARAGRAPHS = [
   'break',
   'reason',
   'weekly',
+  'reminders',
   'graduation',
   'game',
   'not',

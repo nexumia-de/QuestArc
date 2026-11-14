@@ -8,11 +8,12 @@ import { daysBetween, isoWeek } from './days';
 import { habitOf } from './habit';
 import { resolveBuild } from './ladders';
 import { continueOffer } from './offer';
+import { reminderView } from './reminder';
 import { isSupported } from './schedule';
 import { buildTimeline } from './timeline';
 import type { Journey } from './types/journey';
 import type { SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
-import type { BuildView, ComeBack, RunView, StationView } from './types/view';
+import type { BuildView, ComeBack, ReminderView, RunView, StationView } from './types/view';
 
 /**
  * One walk through a journey (docs/game-rules.md, docs/data-model.md):
@@ -59,6 +60,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
   let progress = 1;
   let markerProgress = 0;
   let comeBack: ComeBack | undefined;
+  let reminder: ReminderView | undefined;
 
   const stations: StationView[] = journey.stages.map((stage, index) => {
     const checkpoint = choices.checkpoints.get(key(stage.id));
@@ -153,6 +155,8 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     markerProgress = bestProgress(stage.condition, conditionInput);
     offerFallback = timeline.offerFallback;
     cfgPaused = binding.cfg.isPaused === true;
+    if (!ended)
+      reminder = reminderView(binding.cfg, answersOf(choices, run.runId, stage.id), today);
     const before = journey.stages[index - 1];
     if (!ended && !cfgPaused && lastPause?.action !== 'pause') {
       comeBack = comeBackOf({
@@ -237,6 +241,7 @@ export const buildRun = (run: RunRecord, journey: Journey, ctx: RunContext): Run
     ...(comeBack ? { comeBack } : {}),
     build,
     ...(answers ? { answers } : {}),
+    ...(reminder ? { reminder } : {}),
     ...(habit ? { habit } : {}),
   };
 };

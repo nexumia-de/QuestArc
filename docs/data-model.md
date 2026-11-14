@@ -54,6 +54,8 @@ interface SnapshotRepeatCfg {
   repeatCycle: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   repeatEvery: number;
   startDate?: string; // YYYY-MM-DD
+  startTime?: string; // "H:MM"; with remindAt, instances get a reminder (game rules §9)
+  remindAt?: string; // Super Productivity's reminder option, e.g. "AtStart", "DoNotRemind"
   repeatUntilDay?: string;
   monday?: boolean; // … sunday
   deletedInstanceDates?: string[];
@@ -103,6 +105,7 @@ overwrite each other. Most records are written once and never changed.
 | `step-back:<runId>:<stageId>:<day>`        | `{ dataFormat: 4, until? }`; `stageId` is the stage left, `day` the day   | the user starts smaller after a long break; `until` is added when the stage left is taken up again   |
 | `graduation:<runId>:<stageId>:<day>`       | `{ choice: "end" \| "keep", until? }`; `day` is the day of graduation     | the user lets a finished journey's habit graduate; `until` is added when it is brought back          |
 | `graduation-check:<runId>:<stageId>:<due>` | `{ day, still: true \| false }`; `due` is the date the question was due   | the user answers "does it still run by itself?" after graduation                                     |
+| `reminder-seen:<runId>:<stageId>`          | `{ on: true \| false, day }`: a reminder seen on the task, or none since  | a host sees the reminder of a followed stage's task come or go                                       |
 | `journey:<journeyId>`                      | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
 | `anchor:<anchorId>`                        | `{ kind: "routine", words, name? }` or `{ kind: "time", time, name? }`    | the user names a moment in their day, changes its words or time, or gives it a name                  |
 | `run-anchor:<runId>`                       | `{ anchorId, after? }`; `after` is the run of the step it follows         | a journey is started from an anchor, or the user confirms the anchor of an earlier journey           |
@@ -175,6 +178,17 @@ overwrite each other. Most records are written once and never changed.
   finished journey. Neither carries a data format
   ([decision](decisions/data-format.md)): an engine that does not know
   them computes nothing for a finished journey's habit. Anchors are their own records (below).
+- **What a host saw of a reminder** (`reminder-seen`,
+  [game rules](game-rules.md) §9). Like a paused repeat, a task's
+  reminder carries no dates, so the host records the day
+  (`reminderSeen`, written by the adapter, not by a user action): `on`
+  when it sees a reminder no record knows, `off` with the day when the
+  record says `on` and the task has none. One record per stage,
+  rewritten; two devices that see the same change on the same day
+  write the same value. It is an observation, not something derived
+  from the tasks: the tasks do not hold it. The engine reads it only
+  for graduation (game rules §6); no record means "never set". It
+  carries no data format ([decision](decisions/data-format.md)).
 - **Anchors** ([game rules](game-rules.md) §8, design rule 2).
   `nameAnchor` writes one `anchor` record per anchor, rewritten as a
   whole (last writer wins): a routine in the user's words that
@@ -347,6 +361,7 @@ interface RunView {
   comeBack?: ComeBack; // the card after a long break is due (game rules §5)
   build: BuildView; // what the journey builds (game rules §7)
   answers?: WeeklyAnswers; // the current stage's weekly answers so far
+  reminder?: ReminderView; // the current stage's task reminder, while it is followed
   habit?: HabitView; // a finished journey only: the habit it leaves (game rules §6)
 }
 
@@ -357,6 +372,12 @@ interface WeeklyAnswers {
   // the latest answer against the latest one four or more weeks before
   // it: higher 'easier', equal 'same', absent when lower or without one
   trend?: 'easier' | 'same';
+}
+
+interface ReminderView {
+  set: boolean; // the bound repeat gives its instances a reminder now
+  time?: string; // with a reminder: the repeat's start time
+  fade?: true; // with a reminder: two weekly answers of 5 or more in a row (game rules §9)
 }
 
 interface HabitView {
@@ -376,6 +397,7 @@ interface HabitView {
   // journey's end, and its last 7 due or paused days, oldest first
   run?: { current: number; best: number; total: number; gap: boolean };
   lastDays?: { day: string; mark: 'done' | 'gap' | 'open' | 'paused' }[];
+  reminder?: ReminderView; // maintained only: the reminder of the habit's task
 }
 
 interface ContinueOffer {

@@ -98,7 +98,7 @@ The plugin's files, one job each:
 | Path            | Job                                                                                                                                                                                                                                                                                            |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                                                                                                                     |
-| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `show-journey` (the message's Show), `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                                     |
+| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `show-journey` (the message's Show), `reminder-seen`, `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                    |
 | `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n, holds no texts itself), `plan` (sentences); plugin.js only: `english` (the UI texts), `content` (built-in journeys)                                                                                                                 |
 | `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `content` (takes in what plugin.js sends), `dom`, `screen` (types), `screens/` (one file per screen), `start.css` (inlined), `style.css` (sent by plugin.js) |
 | `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                                                                                                              |
@@ -120,7 +120,8 @@ npm run screenshots -w @questarc/plugin
 This writes `packages/plugin/dist/screenshots/<demo>-<theme>-<size>.png`
 at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
-`journey`, `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
+`journey`, `reminder` (a reminder on the task and two weekly answers
+of 5 or more, #60), `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
 (the card after a long break, #82), `smaller` (after starting smaller),
 `unbound`, `newer`, `build`, `build-ready`, `build-crossing`,
 `before-anchors` (a journey from before #96: the home asks once whether
@@ -203,6 +204,13 @@ home with that moment, its growing step and no box to tick, a name for
 the moment; then, with prepared data, the finished journey's step in
 "Runs by itself", **Extend This Moment** with the new journey tied to
 that step (a chain), and a journey from before anchors confirmed once.
+`e2e/real-app-reminder.mjs` walks reminders (#60): the suggestion at
+set-up, a start time and a reminder set on the repeat in Super
+Productivity's own dialogs (`makeRecurring` with `time` in
+`e2e/sp.mjs`), QuestArc reading it (`reminder.set`, the `reminder-seen`
+record), and, with two weekly answers of 5 or more written through
+plugin.js, the banner "You may not need the reminder any more" with
+**Open the task**.
 `e2e/real-app-panel.mjs` checks
 the side panel setting: no button by default, the button after turning
 it on, QuestArc in the right panel (320 px wide at 1200 px). They share

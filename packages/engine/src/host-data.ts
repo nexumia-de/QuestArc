@@ -30,6 +30,8 @@ export interface HostRepeatCfg {
   readonly repeatCycle: SnapshotRepeatCfg['repeatCycle'];
   readonly repeatEvery: number;
   readonly startDate?: string | null;
+  readonly startTime?: string | null;
+  readonly remindAt?: string | null;
   readonly repeatUntilDay?: string | null;
   readonly deletedInstanceDates?: readonly string[];
   readonly repeatFromCompletionDate?: boolean;
@@ -58,6 +60,8 @@ export const toRepeatCfg = (c: HostRepeatCfg): SnapshotRepeatCfg => {
     repeatCycle: c.repeatCycle,
     repeatEvery: c.repeatEvery,
     ...(c.startDate ? { startDate: c.startDate } : {}),
+    ...(c.startTime ? { startTime: c.startTime } : {}),
+    ...(c.remindAt ? { remindAt: c.remindAt } : {}),
     ...(c.repeatUntilDay ? { repeatUntilDay: c.repeatUntilDay } : {}),
     ...Object.fromEntries(days.map((d) => [d, Boolean(c[d])])),
     ...(c.deletedInstanceDates ? { deletedInstanceDates: [...c.deletedInstanceDates] } : {}),

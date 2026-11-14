@@ -16,6 +16,7 @@ import {
   graduate,
   nameAnchor,
   pairStage,
+  reminderSeen,
   removeAnchor,
   resumeJourney,
   skipStage,
@@ -60,6 +61,7 @@ describe('actions', () => {
       'nameAnchor',
       'pairStage',
       'pauseJourney',
+      'reminderSeen',
       'removeAnchor',
       'repeatPause',
       'resumeJourney',
@@ -158,6 +160,12 @@ describe('actions', () => {
     expect(removeAnchor(view, 'm1')).toEqual({});
     expect(removeAnchor(view, 'm2')).toEqual({});
     expect(removeAnchor(view, 'm0')).toEqual({});
+  });
+
+  it('record what a host saw of a reminder, one record per stage', () => {
+    expect(reminderSeen('r', 'walk', '2026-11-14', false)).toEqual({
+      'reminder-seen:r:walk': { on: false, day: '2026-11-14' },
+    });
   });
 
   it('write the weekly answer and withdrawals', () => {

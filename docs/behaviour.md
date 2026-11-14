@@ -276,7 +276,8 @@ Opened from the growing step of a moment (screen 0); back leads there.
 - A banner on top of the card when needed: paused (with **Resume**, or a
   note that the repeat is paused in Super Productivity), a hard week
   (flow D, with the user's reason and their plan for the obstacle), weekly look back due (**Answer**), the
-  station's learning nugget once on arrival (**Got it**), and, for the
+  station's learning nugget once on arrival (**Got it**), the task's
+  reminder when nothing else is said (flow H), and, for the
   habit a finished journey left (flow F), at most one each: the
   question after graduation, the offer to graduate, or its weekly look
   back. The same habit banners stand on the home (screen 0). Dismissing a banner and skipping the weekly
@@ -399,10 +400,13 @@ never end the journey; welcome back after a gap; after a long break
 call the time a pause, or take up the smaller step before again,
 nothing built is taken away, and the two weeks are QuestArc's choice,
 not a number from a study; the weekly question, with the answers so
-far and no number to reach; what runs by itself needs no ticking: the
+far and no number to reach; reminders are the user's: QuestArc sends
+no notifications, asks once whether a reminder on the task would help
+for the first weeks, says when it may not be needed any more and never
+turns one off; what runs by itself needs no ticking: the
 task stays the user's, the habit of a finished journey can graduate
-when the answers stay high and it was done on four of five planned
-days, QuestArc then stops following it and the list gets shorter, the
+when the answers stay high, it was done on four of five planned
+days and its task has no reminder, QuestArc then stops following it and the list gets shorter, the
 user ends the repeat or keeps it quietly, QuestArc asks after two and
 six weeks and then at most twice a year, the habit can be brought back
 without a loss, and the numbers are QuestArc's choice, not a research
@@ -476,6 +480,12 @@ In Pensum, step 2 creates the repeat itself.
    field withdraws it. At most 60 characters. Nothing is shown, counted
    or built for filling it in, and nothing asks for it again. It is
    never written into the task's title or notes and never sent anywhere.
+7. **A reminder for the first weeks** (#60, flow H), one muted
+   sentence below the choices while the station has no task: "Would a
+   reminder at the time of your moment help for the first weeks?
+   QuestArc sends none itself. You could set a time and a reminder in
+   the task's repeat." With a fixed-time moment it names the time
+   ("… a reminder at 21:30 …").
 
 ### C. Continue to the next stage
 
@@ -584,8 +594,11 @@ counted down, and nothing is said before it holds.
 3. **Let It Graduate** (a page): the plan sentence; what graduation
    means ("QuestArc then stops following it, and there is nothing left
    to tick off for it"); that the thresholds are QuestArc's own choice,
-   not a research result, and that staying is just as fine; then
-   "What happens to its task?" with two equal choices, none suggested:
+   not a research result (among them: no reminder on the task for two
+   weeks), and that staying is just as fine; "If something else still
+   reminds you of it, you could wait until you no longer need that.";
+   then "What happens to its task?" with two equal choices, none
+   suggested:
    - **I Will End Its Repeat**: "QuestArc never changes your tasks. On
      the next page you can open the task and remove its repeat
      yourself." (`graduate` with `end`)
@@ -617,6 +630,37 @@ counted down, and nothing is said before it holds.
    habit would have to earn its graduation again. Afterwards the shelf
    shows the habit under "Habits that stay"; if its repeat is gone,
    with **Set up the task**.
+
+### H. Reminders
+
+Issue #60, [design rule 23](psychology.md), [game rules](game-rules.md)
+§9. QuestArc sends no notifications: a plugin only runs while Super
+Productivity is open, and the reminder belongs to the user's task. It
+suggests, reads and leads to the task; it never sets or removes a
+reminder.
+
+- **At set-up** (flow B, step 7) the sentence above. The task QuestArc
+  creates is titled with the plan in short, so the host's reminder
+  restates the plan; the title of an existing task is never changed.
+- **In a station's first two weeks**, while its task has no reminder
+  and no other banner stands on the journey: "Would a reminder at the
+  time of your moment help for the first weeks? You could set one on
+  the task." with **Open the task** and **Not Now** (put away on this
+  device; it is not asked again for this station).
+- **Fading** (`reminder.fade`: a reminder is set and two weekly answers
+  in a row are 5 or more): "You may not need the reminder any more. You
+  could turn it off on the task; QuestArc never does." with **Open the
+  task** and **Not Now** (put away for this week on this device). For
+  the habit a finished journey left the same banner names the habit, on
+  the home, when nothing else is asked about it. When the user turns
+  the reminder off, the banner is gone.
+- **Graduation** waits while the task has a reminder or had one in the
+  last 14 days as far as QuestArc saw (flow F). Both hosts can read the
+  reminder of a repeat, so no extra question is asked; what QuestArc
+  cannot see (a phone alarm) is left to the user in one sentence on
+  the graduation page.
+- Day Planner shows the plan sentence only until it has reminders while
+  the app is closed (nexumia-de/pensum#13).
 
 ### G. Problems
 

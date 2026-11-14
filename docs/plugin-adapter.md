@@ -152,6 +152,20 @@ binds the chosen task to the active journey's current stage
 (`adapter/context-menu.ts`). A task that does not repeat yet is bound too;
 the stage waits until the user sets its repeat.
 
+## Reminders
+
+QuestArc sends no notifications and changes no task
+([game rules](game-rules.md) §9). The snapshot carries the repeat
+configs' `startTime` and `remindAt` as `getAppState()` returns them.
+After each evaluation `adapter/reminder-seen.ts` compares the view's
+`reminder.set` of the followed stages (the active run's current stage,
+the habits of finished journeys) with their `reminder-seen` records and
+writes the day a reminder came or went, in the same step as a paused
+repeat (below); then it evaluates again. Super Productivity reports a
+plugin's own write with `persistedDataChanged`, which marks the cached
+records stale: an evaluation therefore works on the records it loaded,
+and the refresh that follows reads them again.
+
 ## Paused repeats
 
 When the active stage's bound repeat config changes between paused and

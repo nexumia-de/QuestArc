@@ -14,6 +14,7 @@ import type { State } from '../shared/protocol';
 import { readDay } from './day';
 import type { HostApi } from './host';
 import { loadRecords, writeRecords, type Records } from './records';
+import { reminderSeenChanges } from './reminder-seen';
 import { repeatPauseChanges } from './repeat-pause';
 
 /**
@@ -70,10 +71,13 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
   const pauseSeen = new Map<string, boolean>();
 
   const evaluateOnce = async (): Promise<State> => {
-    records ??= await loadRecords(api);
+    // A hook may mark the records stale while this evaluation waits (the
+    // host fires `persistedDataChanged` for its own writes too), so it
+    // works on what it loaded; the refresh that follows reads them again.
+    let loaded = (records ??= await loadRecords(api));
     const [app, day] = await Promise.all([api.getAppState(), readDay(api)]);
     const live = Object.values(app.tasks).map(toTask);
-    const ids = relevantIds(records, live);
+    const ids = relevantIds(loaded, live);
     const nowRelevant = new Set(live.filter((task) => isRelevant(task, ids)).map((t) => t.id));
     // A bound task that left the live list was archived (or deleted): read
     // the archive again so its completion does not vanish.
@@ -91,16 +95,22 @@ export const createBrain = ({ api, journeys, onEvents, debounceMs = 750 }: Brain
         records: choices,
         journeys,
       });
-    let view = evaluate(snapshotOf(records));
-    const pauses = repeatPauseChanges(pauseSeen, view, records, repeatCfgs);
-    if (Object.keys(pauses).length > 0) {
-      await writeRecords(api, pauses);
-      records = { ...records, ...pauses };
-      view = evaluate(snapshotOf(records));
+    let view = evaluate(snapshotOf(loaded));
+    // What the host sees and the data carries no date for: a paused
+    // repeat, and a reminder that came or went (game rules §2 and §9).
+    const seen = {
+      ...repeatPauseChanges(pauseSeen, view, loaded, repeatCfgs),
+      ...reminderSeenChanges(view, loaded),
+    };
+    if (Object.keys(seen).length > 0) {
+      await writeRecords(api, seen);
+      loaded = { ...loaded, ...seen };
+      if (records !== undefined) records = loaded;
+      view = evaluate(snapshotOf(loaded));
     }
     const before = current?.view;
     revision += 1;
-    current = { revision, view, journeys, records };
+    current = { revision, view, journeys, records: loaded };
     if (before && !stopped) {
       const events = diff(before, view);
       if (events.length > 0) onEvents(events, view, journeys);

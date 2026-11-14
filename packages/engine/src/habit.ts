@@ -5,6 +5,7 @@ import { awayBy } from './comeback';
 import { creditedDays } from './completions';
 import { daysBetween, isoWeek } from './days';
 import { graduatedView, openGraduation, qualifies } from './graduation';
+import { reminderQuiet, reminderView } from './reminder';
 import { isSupported } from './schedule';
 import { buildTimeline } from './timeline';
 import type { Journey } from './types/journey';
@@ -104,9 +105,14 @@ export const habitOf = (
     ...maintained,
     state: 'maintained',
     checkinDue: daysBetween(acceptedDay, today) >= 7 && !answers.has(isoWeek(today)),
-    canGraduate: qualifies({ today, answers, dueDays: timeline.dueDays, credited }),
+    // Steady without a reminder: one that is set, or was in the last two
+    // weeks as far as a host saw, waits (game rules §6).
+    canGraduate:
+      qualifies({ today, answers, dueDays: timeline.dueDays, credited }) &&
+      reminderQuiet(binding.cfg, choices.reminders.get(key), today),
     // The run of the last stage, carried on past the journey's end (#66).
     run: timeline.run,
     lastDays: timeline.lastDays,
+    reminder: reminderView(binding.cfg, answers, today),
   };
 };

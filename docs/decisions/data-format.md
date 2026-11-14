@@ -140,8 +140,13 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through
   `engine-cli.mjs` and show the read-only page (follow-up issue in
   Pensum).
+- What a host saw of a reminder (`reminder-seen`, #60) carries no
+  number: an engine that does not know it treats every reminder as
+  never set, which is what every engine did before, so it may offer
+  graduation up to two weeks earlier than a newer one. That is an
+  offer the user can leave alone, not wrong progress.
 - The vectors `unknown-records-kept`, `newer-format-read-only`,
-  `journey-version-missing`, `guard-write` and `guard-anchor` hold the
-  rule.
+  `journey-version-missing`, `guard-write`, `guard-anchor` and
+  `guard-reminder` hold the rule.
 
 [^issue]: <https://github.com/nexumia-de/QuestArc/issues/85>

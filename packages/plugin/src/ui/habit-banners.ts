@@ -3,13 +3,15 @@ import { isoWeek } from '@questarc/engine';
 import { t } from '../shared/texts';
 import { h } from './dom';
 import { habitName, habitsOf } from './habit';
+import { reminderBanner } from './reminder';
 import type { Context, Route } from './screen';
 import { markSeen, wasSeen } from './seen';
 
 /**
  * Banners for the habits finished journeys left (docs/behaviour.md,
  * flow F), at most one per habit: the question after graduation, the
- * offer to graduate, or the weekly look back. Each is said once and
+ * offer to graduate, the weekly look back, or that its task's reminder
+ * may not be needed any more (flow H). Each is said once and
  * leaves when it is answered or put aside on this device; the shelf
  * keeps the quiet way to all three.
  */
@@ -65,6 +67,15 @@ export const habitBanners = (ctx: Context): HTMLElement[] => {
         runId: run.runId,
       });
     }
-    return [];
+    return reminderBanner(
+      ctx,
+      {
+        runId: run.runId,
+        stageId: stage.id,
+        reminder: habit.reminder,
+        texts: { fade: t('ui.banner.habit-fade', { habit: name }) },
+      },
+      week,
+    );
   });
 };

@@ -151,10 +151,18 @@ more and the evidence for them is contested or indirect.
     smaller, planning for a hard day, why one miss is fine). Shown in the
     app when the user arrives at a station, never as a push message, and
     never the same one twice.
-23. **Reminders restate the plan and fade.** A reminder repeats the user's
-    own plan ("after lunch: walk 15 minutes"). As the weekly answers rise,
-    reminders go from daily to weekly to off, and QuestArc says so ("you
-    won't need me for this one").
+23. **Reminders restate the plan and fade.** Reminders help repetition
+    but can keep the phone as the cue instead of the user's routine
+    ([research](research.md)). So QuestArc sends no notifications of its
+    own (decided 2026-11-12, #60): the reminder is the host's own task
+    reminder, which the user sets on their task, and the task's title
+    restates the plan in short ("After lunch: walk 15 minutes").
+    QuestArc suggests one at set-up, for the first weeks. As the weekly
+    answers rise (two in a row of 5 or more) it says "you may not need
+    the reminder any more" and leads to the task; it never sets or
+    removes one. A habit graduates only without a reminder (rule 25).
+    The two answers and the 5 are design choices; no study defines
+    them.
 
 ## When a habit is done
 
@@ -171,8 +179,8 @@ more and the evidence for them is contested or indirect.
 25. **Graduation by automaticity, not days.** A habit can graduate when
     the weekly answer stays high (6 or 7 for three weeks in a row) and
     completion is steady (four of five planned days over four weeks,
-    with no drop in the last two; a reminder QuestArc cannot see counts
-    as never set). Graduation is offered once it holds, never pushed
+    with no drop in the last two, in which the task had no reminder
+    as far as QuestArc saw; one it never saw counts as never set). Graduation is offered once it holds, never pushed
     and never announced before: no progress towards it is shown. A
     graduated habit is **no longer ticked off** (rule 28). The user
     decides what happens to the task: end its repeat

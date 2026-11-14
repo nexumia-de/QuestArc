@@ -291,6 +291,18 @@ export const repeatPause = (runId: string, today: string, paused: boolean): Reco
   [`pause:${runId}:${today}`]: { action: paused ? 'pause' : 'resume', source: 'repeat-cfg' },
 });
 
+/**
+ * A host saw the reminder of a followed stage's task change (game rules
+ * §9): on, or off since `day`. Like a paused repeat, a reminder carries
+ * no dates, so the day is recorded; one record per stage, rewritten.
+ */
+export const reminderSeen = (
+  runId: string,
+  stageId: string,
+  day: string,
+  on: boolean,
+): RecordChanges => ({ [`reminder-seen:${runId}:${stageId}`]: { on, day } });
+
 /** Answer the weekly look back (design rule 9): the automaticity score 1–7. */
 export const answerCheckin = (
   runId: string,
@@ -410,6 +422,7 @@ export const actions = {
   resumeJourney,
   endJourney,
   repeatPause,
+  reminderSeen,
   answerCheckin,
   graduate,
   answerStill,
