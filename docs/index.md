@@ -29,7 +29,7 @@ links. Change history is in [log.md](log.md).
 - [Game rules](game-rules.md) - Exact rules and numbers: what counts, due days, never miss twice, stage conditions, welcome back, graduation, the build of a journey (ladder, version, marker progress, ready), with worked examples.
 
 - [Habit app psychology evidence](research.md) - Evidence review with strength ratings: what to use, add or avoid; quotes and learning nuggets; focused work; changes to the design rules; open gaps.
-- [Design rules from habit psychology](psychology.md) - 27 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
+- [Design rules from habit psychology](psychology.md) - 28 binding rules for the habit, progress, missed days, game layer, learning nuggets, reminders, graduation and privacy, each backed by the evidence review.
 
 # Super Productivity
 

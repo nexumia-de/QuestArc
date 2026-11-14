@@ -20,6 +20,15 @@ rules come from [psychology](psychology.md).
 Every goal ends with something that works and green CI, so a pause never
 leaves a broken state.
 
+# Releases
+
+Decided by the owner on 2026-11-14:
+
+- **4.0.0**: _Habits that last_ and _More journeys_ below, complete with
+  the German texts (#39).
+- **4.1.0**: _The Valley_ and _Private journeys_.
+- The _Standalone app_ goes on next to them and is released on its own.
+
 # The journey
 
 The heart of QuestArc 3.0. A **journey** is one habit that grows in
