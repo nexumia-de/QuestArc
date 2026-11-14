@@ -28,7 +28,7 @@ export const stillScreen = (ctx: Context, runId: string): Screen => {
   const plan = h(
     'section',
     { class: 'qa-card' },
-    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair)),
+    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair, run.anchor)),
     h('p', { class: 'qa-muted qa-small' }, t('ui.shelf.since', { date: shortDate(graduated.day) })),
   );
   const button = (label: string, onclick: () => void, primary = false) =>
@@ -50,7 +50,11 @@ export const stillScreen = (ctx: Context, runId: string): Screen => {
         'div',
         { class: 'qa-stack' },
         plan,
-        h('p', { class: 'qa-plan' }, t('ui.still.question', { habit: habitName(stage) })),
+        h(
+          'p',
+          { class: 'qa-plan' },
+          t('ui.still.question', { habit: habitName(stage, run.anchor) }),
+        ),
         h('p', { class: 'qa-muted' }, t('ui.still.text')),
       ),
       actions: [

@@ -2,7 +2,7 @@
 // browser profile with throwaway data (docs/development.md, real app):
 // install and enable the ZIP, start "A gentle morning", create the task,
 // make it recurring in Super Productivity's own dialog, tick it off, and
-// check the message and the journey. Screenshots go to
+// check the message, the home with its moment and the journey. Screenshots go to
 // dist/real-app/.
 //
 //   node e2e/real-app.mjs [width height]
@@ -11,7 +11,7 @@
 // Super Productivity's Docker image at a pinned digest on localhost
 // (.github/workflows/ci.yml). The live app goes through HTTPS_PROXY when
 // it is set; a local app never does (e2e/sp.mjs).
-import { BASE, expect, install, makeRecurring, open, start, tick } from './sp.mjs';
+import { BASE, expect, install, journey, makeRecurring, open, start, tick } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const { browser, page, view, shot } = await open(width, height);
@@ -54,6 +54,14 @@ try {
 
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await page.waitForTimeout(3000);
+  // The home is the moments (#96); the growing step opens the journey.
+  const moment = await view().locator('.qa-anchor').first().innerText();
+  expect(
+    moment.includes('After getting up') && moment.includes('1 of 5 days'),
+    `the home shows the moment with its growing step (${moment})`,
+  );
+  await shot('', '3a-home');
+  await journey(view);
   const card = await view().locator('.qa-station-card').innerText();
   expect(
     card.includes('1 of 5 days') && card.includes('Calmer mornings'),

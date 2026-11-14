@@ -21,7 +21,7 @@ export const continueScreen = (ctx: Context): Screen => {
   const station = run?.stations[index];
   const stage = journey?.stages[index];
   if (!run || !journey || !stage || station?.state !== 'met') {
-    queueMicrotask(() => ctx.reset({ name: 'home' }));
+    queueMicrotask(() => ctx.reset({ name: 'journey' }));
     return { title: t('ui.app.name'), body: h('p', {}) };
   }
   const next = journey.stages[index + 1];
@@ -30,14 +30,15 @@ export const continueScreen = (ctx: Context): Screen => {
   const again = station.stepBackDay !== undefined;
   const go = async () => {
     await ctx.write(continueJourney(run, journey, view.todayStr));
-    ctx.reset({ name: 'home' });
+    // A finished journey's habit stands at its moment: back leads home.
+    ctx.reset({ name: next ? 'journey' : 'home' });
     if (again) return;
     if (next) ctx.go({ name: 'setup' });
     else ctx.go({ name: 'finished', journeyId: journey.id });
   };
   const stay = async () => {
     await ctx.write(stayHere(run, view.todayStr));
-    ctx.reset({ name: 'home' });
+    ctx.reset({ name: 'journey' });
   };
   const suggest = run.offer?.suggest ?? 'none';
   const hint =
@@ -78,6 +79,7 @@ export const continueScreen = (ctx: Context): Screen => {
               planSentence(
                 next,
                 run.stations[index + 1]?.pair ?? (again ? undefined : station.pair),
+                run.anchor,
               ),
             ),
           )

@@ -2,7 +2,7 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "tidy-a-little",
-  "version": 1,
+  "version": 2,
   "title": "tidy-a-little.title",
   "description": "tidy-a-little.description",
   "why": "tidy-a-little.why",
@@ -15,6 +15,10 @@
       "tidy-a-little.build.v4",
       "tidy-a-little.build.v5"
     ]
+  },
+  "anchor": {
+    "moment": "tidy-a-little.moment",
+    "example": "tidy-a-little.anchor"
   },
   "stages": [
     {
@@ -107,6 +111,7 @@
       "tidy-a-little.description": "From putting one thing back after dinner to five minutes that keep a few spots of your home clear, one area at a time.",
       "tidy-a-little.why": "Why do you want a tidier home? In your own words.",
       "tidy-a-little.anchor": "dinner",
+      "tidy-a-little.moment": "a moment after a meal at home",
       "tidy-a-little.build.v1": "A fire to come home to",
       "tidy-a-little.build.v2": "A tent with everything in reach",
       "tidy-a-little.build.v3": "A hut with a clear table",

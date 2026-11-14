@@ -28,7 +28,7 @@ export const pairField = (
     'aria-describedby': 'qa-pair-hint',
     oninput: () => {
       ctx.draft[draft] = input.value;
-      plan.textContent = planSentence(stage, pairWords(input.value));
+      plan.textContent = planSentence(stage, pairWords(input.value), run.anchor);
     },
     onchange: () => {
       ctx.draft[draft] = undefined;
@@ -37,7 +37,7 @@ export const pairField = (
     },
   }) as HTMLInputElement;
   input.value = (ctx.draft[draft] as string | undefined) ?? stored;
-  plan.textContent = planSentence(stage, pairWords(input.value));
+  plan.textContent = planSentence(stage, pairWords(input.value), run.anchor);
   return h(
     'div',
     { class: 'qa-field' },

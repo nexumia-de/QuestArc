@@ -98,7 +98,7 @@ The plugin's files, one job each:
 | Path            | Job                                                                                                                                                                                                                                                                                            |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/plugin.ts` | Wiring in plugin.js: brain, hooks, messages, header button                                                                                                                                                                                                                                     |
-| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                                                                          |
+| `src/adapter/`  | The [plugin adapter](plugin-adapter.md): `brain` (evaluate, cache, events), `snapshot`, `records`, `day`, `hooks`, `snacks`, `show-journey` (the message's Show), `messages`, `content-pack` and `art-pack` (what the view gets once), `host` (API subset)                                     |
 | `src/shared/`   | Used by plugin.js and the view: `protocol`, `texts` (i18n, holds no texts itself), `plan` (sentences); plugin.js only: `english` (the UI texts), `content` (built-in journeys)                                                                                                                 |
 | `src/ui/`       | The view ([no framework](decisions/plugin-ui-without-framework.md)): `app` (shell, navigation), `client` (messages to plugin.js), `content` (takes in what plugin.js sends), `dom`, `screen` (types), `screens/` (one file per screen), `start.css` (inlined), `style.css` (sent by plugin.js) |
 | `preview/`      | Preview page with a fake plugin API and demo data                                                                                                                                                                                                                                              |
@@ -122,14 +122,19 @@ at 360 × 720 and 1000 × 700, light and dark, and prints a warning for any
 horizontal overflow. Demos (`preview/demo.ts`): `welcome`, `empty`,
 `journey`, `paired`, `hard-week`, `met`, `stayed`, `skipped`, `comeback`
 (the card after a long break, #82), `smaller` (after starting smaller),
-`unbound`, `newer`, `build`, `build-ready`, `build-crossing`, and for
+`unbound`, `newer`, `build`, `build-ready`, `build-crossing`,
+`before-anchors` (a journey from before #96: the home asks once whether
+its moment is the user's), the home with several moments
+(`preview/demo-moments.ts`: `moments`, `moments-chain`, `moments-rest`),
+and for
 the habit a finished journey leaves (`preview/demo-habits.ts`, #22):
 `habit` (maintained, the weekly question due, answers of eight weeks),
 `graduate` (it can graduate), `graduated` (the question after two
 weeks is due), `not-really` (answered so) and `brought-back` (back,
 its repeat gone). After a colon come the buttons or menu items to
 click first, in order, separated by `>`:
-`empty:Menu>Settings`, `graduate:Have a Look`,
+`empty:Menu>Settings`, `graduate:Have a Look`, `journey:Station` (the
+growing step on the home, which opens the journey screen),
 `habit:Menu>Shelf` (a name with a comma cannot be given; spaces need
 quotes in the shell). In the browser console,
 `preview.failMessages('Plugin questarc not found or not loaded')` makes
@@ -192,6 +197,12 @@ view's own message to plugin.js (`questarc:write`, so they pass
 itself" with **Open the task**, the shelf, no message when the task is
 ticked afterwards, no question after 13 days, the question after 14,
 **Not Really**, **Bring It Back** and the habit on the shelf again.
+`e2e/real-app-moments.mjs` walks the moments (#96): a journey started
+from a moment in the user's own words, the task titled with them, the
+home with that moment, its growing step and no box to tick, a name for
+the moment; then, with prepared data, the finished journey's step in
+"Runs by itself", **Extend This Moment** with the new journey tied to
+that step (a chain), and a journey from before anchors confirmed once.
 `e2e/real-app-panel.mjs` checks
 the side panel setting: no button by default, the button after turning
 it on, QuestArc in the right panel (320 px wide at 1200 px). They share

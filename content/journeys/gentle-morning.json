@@ -2,12 +2,16 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "gentle-morning",
-  "version": 3,
+  "version": 4,
   "title": "gentle-morning.title",
   "description": "gentle-morning.description",
   "why": "gentle-morning.why",
   "build": {
     "ladder": "home"
+  },
+  "anchor": {
+    "moment": "gentle-morning.moment",
+    "example": "gentle-morning.anchor"
   },
   "stages": [
     {
@@ -101,6 +105,7 @@
       "gentle-morning.description": "From one glass of water to a short morning routine that starts by itself, one small step at a time.",
       "gentle-morning.why": "Why do you want a calmer start to your day? In your own words.",
       "gentle-morning.anchor": "getting up",
+      "gentle-morning.moment": "a moment in your morning",
       "gentle-morning.water.action": "drink a glass of water",
       "gentle-morning.water.place": "in the kitchen",
       "gentle-morning.water.arrival": "It starts in your kitchen, with one glass of water.",

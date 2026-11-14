@@ -2,7 +2,7 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "walk-after-lunch",
-  "version": 1,
+  "version": 2,
   "title": "walk-after-lunch.title",
   "description": "walk-after-lunch.description",
   "why": "walk-after-lunch.why",
@@ -15,6 +15,10 @@
       "walk-after-lunch.build.v4",
       "walk-after-lunch.build.v5"
     ]
+  },
+  "anchor": {
+    "moment": "walk-after-lunch.moment",
+    "example": "walk-after-lunch.anchor"
   },
   "stages": [
     {
@@ -106,6 +110,7 @@
       "walk-after-lunch.description": "From one step outside the door after lunch to a daily walk that grows by a few minutes at a time.",
       "walk-after-lunch.why": "Why do you want to move more in the middle of your day? In your own words.",
       "walk-after-lunch.anchor": "lunch",
+      "walk-after-lunch.moment": "a moment around midday",
       "walk-after-lunch.build.v1": "A row of stepping stones",
       "walk-after-lunch.build.v2": "A log to balance across",
       "walk-after-lunch.build.v3": "A plank bridge for short rounds",

@@ -21,7 +21,7 @@ export const smallerScreen = (ctx: Context): Screen => {
   const index = (run?.position.stage ?? 0) - 1;
   const stage = journey?.stages[index];
   if (!run || !journey || !stage || run.comeBack?.smaller !== stage.id) {
-    queueMicrotask(() => ctx.reset({ name: 'home' }));
+    queueMicrotask(() => ctx.reset({ name: 'journey' }));
     return { title: t('ui.app.name'), body: h('p', {}) };
   }
   const app = appState(ctx);
@@ -31,7 +31,7 @@ export const smallerScreen = (ctx: Context): Screen => {
   const earlier = binding?.repeatCfgId ? taskOfCfg(tasks, binding.repeatCfgId) : undefined;
   const start = async () => {
     await ctx.write(stepBack(run, view.todayStr, { pause: ctx.draft.pause === true }));
-    ctx.reset({ name: 'home' });
+    ctx.reset({ name: 'journey' });
     if (app && !earlier) ctx.go({ name: 'setup' });
   };
   return {
@@ -47,7 +47,7 @@ export const smallerScreen = (ctx: Context): Screen => {
           { class: 'qa-overline' },
           t('ui.station.of', { n: index + 1, total: journey.stages.length }),
         ),
-        h('p', { class: 'qa-plan' }, planSentence(stage, run.stations[index]?.pair)),
+        h('p', { class: 'qa-plan' }, planSentence(stage, run.stations[index]?.pair, run.anchor)),
       ),
       h('p', {}, t('ui.smaller.text')),
       app ? h('p', {}, t(earlier ? 'ui.smaller.task-earlier' : 'ui.smaller.task-new')) : null,

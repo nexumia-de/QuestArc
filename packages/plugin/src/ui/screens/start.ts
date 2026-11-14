@@ -5,11 +5,14 @@ import { t } from '../../shared/texts';
 import { h } from '../dom';
 import { buildChooser, buildSummary, firstVersion } from '../journey/build-choice';
 import { firstOfNextMonth, nextMonday, shortDate } from '../journey/format';
+import { chosenMoment, momentPart } from '../journey/moment';
 import { planCheckFields } from '../journey/plan-check';
 import type { Context, Screen } from '../screen';
 
 /**
- * Screen 3, start a journey (issue #52): the user's own reason, optional
+ * Screen 3, start a journey (issue #52): the moment it starts from, one
+ * of the user's or a new one in their words (design rule 2, #96), the
+ * user's own reason, optional
  * and never focused on open (design rule 5), a self-chosen start day, the
  * optional plan check, collapsed (design rule 6), and what the journey
  * builds (screen 3a in place, #100).
@@ -17,7 +20,7 @@ import type { Context, Screen } from '../screen';
 
 type StartChoice = 'today' | 'monday' | 'month' | 'date';
 
-export const startScreen = (ctx: Context, journeyId: string): Screen => {
+export const startScreen = (ctx: Context, journeyId: string, anchorId?: string): Screen => {
   const { view, journeys } = ctx.state;
   const journey = journeys.find((j) => j.id === journeyId);
   if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
@@ -53,10 +56,13 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
   const check = (ctx.draft.check ??= {}) as Record<string, string | undefined>;
 
   const start = async () => {
+    const moment = chosenMoment(ctx, anchorId);
+    if (!moment) return;
     const runId = newRunId();
     const chosen = Object.keys(build).length > 0 ? chooseBuild(runId, build) : {};
     const planned = checkPlan(runId, check);
     await ctx.write({
+      ...moment.records,
       ...startJourney({
         runId,
         journey,
@@ -64,11 +70,12 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
         today,
         why: (ctx.draft.why as string | undefined) ?? '',
         ...(view.active ? { activeRunId: view.active.runId } : {}),
+        anchor: moment.anchor,
       }),
       ...chosen,
       ...(Object.values(planned)[0] ? planned : {}),
     });
-    ctx.reset({ name: 'home' });
+    ctx.reset({ name: 'journey' });
     ctx.go({ name: 'setup' });
   };
 
@@ -87,6 +94,7 @@ export const startScreen = (ctx: Context, journeyId: string): Screen => {
     body: h(
       'div',
       { class: 'qa-stack' },
+      momentPart(ctx, journey, anchorId),
       h(
         'div',
         { class: 'qa-field' },

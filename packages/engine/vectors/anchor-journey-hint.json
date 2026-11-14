@@ -1,0 +1,100 @@
+{
+  "name": "A journey may say what kind of moment it starts from; a fixed time in the hint suggests a time anchor for a run from before anchors, and a hint that is malformed makes the journey unusable",
+  "rule": "story format, Anchor; game rules §8",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-time",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-09"
+      }
+    },
+    "journeys": [
+      "$test-time",
+      {
+        "format": 3,
+        "id": "test-bad",
+        "version": 1,
+        "title": "test-daily.title",
+        "description": "test-daily.description",
+        "stages": [
+          {
+            "id": "a",
+            "plan": {
+              "anchor": "test-daily.a.anchor",
+              "action": "test-daily.a.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "days",
+              "n": 5,
+              "of": 7
+            }
+          },
+          {
+            "id": "b",
+            "plan": {
+              "anchor": "test-daily.b.anchor",
+              "action": "test-daily.b.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "count",
+              "n": 3
+            }
+          },
+          {
+            "id": "c",
+            "plan": {
+              "anchor": "test-daily.c.anchor",
+              "action": "test-daily.c.action"
+            },
+            "schedule": {
+              "type": "daily"
+            },
+            "condition": {
+              "type": "time_spent",
+              "minutes": 30
+            }
+          }
+        ],
+        "anchor": {
+          "moment": "test-bad.moment",
+          "example": "test-bad.anchor",
+          "time": "7 am"
+        }
+      }
+    ]
+  },
+  "expect": {
+    "active": {
+      "runId": "r1",
+      "anchor": null
+    },
+    "anchors": [
+      {
+        "id": null,
+        "suggest": "test-time",
+        "kind": "time",
+        "time": "07:00",
+        "state": "growing"
+      }
+    ],
+    "problems": ["journey test-bad: anchor: invalid"]
+  }
+}

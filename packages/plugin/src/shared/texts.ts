@@ -17,6 +17,8 @@ import type { Journey } from '@questarc/engine';
 export type TextParams = Readonly<Record<string, string | number>>;
 
 const texts: Record<string, string> = {};
+/** `<journeyId>:<stageId>` → the text key of the stage's action, for a chained plan (#96). */
+const actions: Record<string, string> = {};
 
 /** Adds texts by key. */
 export const addTexts = (more: Readonly<Record<string, string>>): void => {
@@ -25,7 +27,16 @@ export const addTexts = (more: Readonly<Record<string, string>>): void => {
 
 /** Adds the journeys' own texts. */
 export const addJourneyTexts = (journeys: readonly Journey[]): void => {
-  for (const journey of journeys) addTexts(journey.texts?.en ?? {});
+  for (const journey of journeys) {
+    addTexts(journey.texts?.en ?? {});
+    for (const stage of journey.stages) actions[`${journey.id}:${stage.id}`] = stage.plan.action;
+  }
+};
+
+/** The action of a journey's stage in words, if the journey is known. */
+export const stageAction = (journeyId: string, stageId: string): string | undefined => {
+  const key = actions[`${journeyId}:${stageId}`];
+  return key === undefined ? undefined : t(key);
 };
 
 export const hasText = (key: string): boolean => Object.hasOwn(texts, key);

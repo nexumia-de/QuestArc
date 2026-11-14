@@ -25,7 +25,7 @@ export const graduateScreen = (ctx: Context, runId: string): Screen => {
   const plan = h(
     'section',
     { class: 'qa-card' },
-    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair)),
+    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair, run.anchor)),
   );
 
   if (habit.graduated) {

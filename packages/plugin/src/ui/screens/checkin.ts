@@ -54,7 +54,11 @@ export const checkinScreen = (ctx: Context, runId?: string): Screen => {
       h(
         'fieldset',
         { class: 'qa-fieldset' },
-        h('legend', { class: 'qa-plan' }, t('ui.checkin.question', { habit: habitName(stage) })),
+        h(
+          'legend',
+          { class: 'qa-plan' },
+          t('ui.checkin.question', { habit: habitName(stage, run.anchor) }),
+        ),
         h(
           'div',
           { class: 'qa-scale' },

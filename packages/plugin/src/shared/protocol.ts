@@ -21,6 +21,8 @@ export interface State {
   readonly sidePanel?: boolean;
   /** Once, after the settings button in Super Productivity's plugin list (#67). */
   readonly openSettings?: boolean;
+  /** Once, after the action Show of a message: the journey, on top of the home (#96). */
+  readonly openJourney?: boolean;
 }
 
 /** The ladders' pictures for the view (#100), part of the content pack. */

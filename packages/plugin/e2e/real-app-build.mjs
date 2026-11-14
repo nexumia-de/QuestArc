@@ -8,7 +8,7 @@
 // Screenshots go to dist/real-app/build-*.
 //
 //   node e2e/real-app-build.mjs [width height]
-import { BASE, expect, install, makeRecurring, open, start, tick } from './sp.mjs';
+import { BASE, expect, install, journey, makeRecurring, open, start, tick } from './sp.mjs';
 
 const [width = 1200, height = 800] = process.argv.slice(2).map(Number);
 const DAY_MS = 86_400_000;
@@ -22,6 +22,8 @@ const questArc = async () => {
   await page.goto(`${BASE}#/plugins/questarc/index`);
   await view().locator('.qa-header').first().waitFor();
   await page.waitForTimeout(2000);
+  // The home is the moments (#96); the growing step opens the journey.
+  await journey(view);
 };
 
 try {

@@ -23,6 +23,7 @@ export const TEXT_LIMITS = {
   description: 160,
   why: 120,
   anchor: 40,
+  moment: 60,
   action: 120,
   place: 40,
   arrival: 200,
@@ -73,6 +74,10 @@ const uses = (journey: Journey): Use[] => {
     { key: journey.description, field: 'description', at: 'description' },
   ];
   if (journey.why) list.push({ key: journey.why, field: 'why', at: 'why' });
+  if (journey.anchor) {
+    list.push({ key: journey.anchor.moment, field: 'moment', at: 'anchor.moment' });
+    list.push({ key: journey.anchor.example, field: 'anchor', at: 'anchor.example' });
+  }
   journey.stages.forEach((stage: Stage, i) => {
     const at = `stages[${i}]`;
     list.push({ key: stage.plan.anchor, field: 'anchor', at: `${at}.plan.anchor` });
@@ -189,9 +194,14 @@ const stageProblems = (journey: Journey): Problem[] => {
 
   journey.stages.forEach((stage, i) => {
     const at = `stages[${i}]`;
+    // The user names the anchor and their words stand in every plan
+    // sentence (#96); the stages' own words are only the suggestion.
     if (first && anchor(stage) !== anchor(first))
       problems.push(
-        error(`${at}.plan.anchor`, 'every stage keeps the anchor of the first stage (rule 2)'),
+        warning(
+          `${at}.plan.anchor`,
+          'names another anchor than the first stage; a journey starts from one moment (rule 2)',
+        ),
       );
     if ('guardian' in stage)
       problems.push(error(`${at}.guardian`, 'journeys have no guardians any more (issue #110)'));
@@ -266,6 +276,9 @@ export const journeyProblems = (value: unknown): Problem[] => {
     ...stageProblems(journey),
     ...buildProblems(journey),
     ...(journey.why ? [] : [warning('why', "asking for the user's own reason helps (rule 5)")]),
+    ...(journey.anchor
+      ? []
+      : [warning('anchor', 'say what kind of moment the journey starts from (rule 2, issue #96)')]),
   ];
   return [
     ...problems.filter((p) => p.level === 'error'),

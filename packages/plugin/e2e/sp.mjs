@@ -1,5 +1,5 @@
 // Steps in Super Productivity's web app shared by the real-app tests
-// (real-app.mjs, real-app-build.mjs, real-app-return.mjs, real-app-graduation.mjs; docs/development.md, real app): open
+// (real-app.mjs, real-app-build.mjs, real-app-return.mjs, real-app-graduation.mjs, real-app-moments.mjs; docs/development.md, real app): open
 // the app, install and enable the built ZIP, make the open task recurring,
 // tick a task off and collect the messages. Uses the Playwright of the
 // environment.
@@ -65,6 +65,17 @@ export const install = async (page) => {
     .click();
   await page.waitForTimeout(2000);
   return settingsText.match(/\d+\.\d+\.\d+/)?.[0];
+};
+
+/**
+ * Opens the journey from the home: the view's home is the user's moments
+ * (#96), and the growing step there opens its journey.
+ */
+export const journey = async (view) => {
+  await view().locator('.qa-growing, .qa-station-card').first().waitFor();
+  if ((await view().locator('.qa-growing').count()) > 0)
+    await view().locator('.qa-growing').click();
+  await view().locator('.qa-station-card').waitFor();
 };
 
 /** Makes the open task recurring, as the user would: Schedule Task → Repeat → Save. */

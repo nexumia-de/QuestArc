@@ -104,6 +104,8 @@ overwrite each other. Most records are written once and never changed.
 | `graduation:<runId>:<stageId>:<day>`       | `{ choice: "end" \| "keep", until? }`; `day` is the day of graduation     | the user lets a finished journey's habit graduate; `until` is added when it is brought back          |
 | `graduation-check:<runId>:<stageId>:<due>` | `{ day, still: true \| false }`; `due` is the date the question was due   | the user answers "does it still run by itself?" after graduation                                     |
 | `journey:<journeyId>`                      | a story-format-3 journey                                                  | the user imports or writes a journey                                                                 |
+| `anchor:<anchorId>`                        | `{ kind: "routine", words, name? }` or `{ kind: "time", time, name? }`    | the user names a moment in their day, changes its words or time, or gives it a name                  |
+| `run-anchor:<runId>`                       | `{ anchorId, after? }`; `after` is the run of the step it follows         | a journey is started from an anchor, or the user confirms the anchor of an earlier journey           |
 | `build:<runId>`                            | `{ ladder?, marker?, hue? }`: names of the ladders in `content/art/`      | the user chooses what the run builds, what hangs on its marker or its hue (when starting or later)   |
 
 - **No settings record.** QuestArc before 3.3 wrote `settings`
@@ -172,9 +174,33 @@ overwrite each other. Most records are written once and never changed.
   question is due. Both kinds are read only for the last stage of a
   finished journey. Neither carries a data format
   ([decision](decisions/data-format.md)): an engine that does not know
-  them computes nothing for a finished journey's habit. Nothing about
-  anchors (#96) is stored yet; a later `anchor` record and a run's
-  anchor are additions these records do not stand in the way of.
+  them computes nothing for a finished journey's habit. Anchors are their own records (below).
+- **Anchors** ([game rules](game-rules.md) §8, design rule 2).
+  `nameAnchor` writes one `anchor` record per anchor, rewritten as a
+  whole (last writer wins): a routine in the user's words that
+  completes "After …", or a fixed time `HH:MM` (24 hours), and
+  optionally the name the user gives its place. Hosts write one line
+  each: white space collapsed, at most 40 characters (`ANCHOR_LIMIT`),
+  no final full stop (`anchorWords`). The id is made by the host, like
+  a run id. The record belongs to no run: it is the one kind besides
+  `journey` that is not run-scoped, and it changes nothing an older
+  engine computes. `removeAnchor` withdraws it while nothing stands
+  there. The words are own words: never in a task's title or notes
+  unless the user sets the task up with them (the suggested title of
+  a new task), never in a log, never sent anywhere. Fields a later
+  engine adds (the kind of region, #114) are ignored and kept.
+- **A run's anchor** (`run-anchor:<runId>`) is its own record, not a
+  field of `run`, because journeys from before anchors get it later
+  and `run` is the record a run is found by. `startJourney` writes it
+  with the run; `anchorRun` rewrites it (with or without `after`, the
+  run of the step it follows); `confirmAnchor` writes it for every run
+  of a journey from before anchors. A record that names an anchor
+  which does not exist, or a step that does not stand at the same
+  anchor, is not a problem: the run then has no anchor, or no chain.
+  Neither record carries a data format
+  ([decision](decisions/data-format.md)): an engine that does not know
+  them computes the same stations, runs and habits and shows the plan
+  with the journey's own words.
 - **Build choices** (`build:<runId>`, [game rules](game-rules.md) §7)
   are one record per run, rewritten as a whole when the user changes
   them (last writer wins); withdrawing it gives the journey's
@@ -214,7 +240,7 @@ The plugin and Pensum are released separately, so one may run a newer
 engine than the other on the same records
 ([decision](decisions/data-format.md)).
 
-- **Run-scoped keys:** every key except `journey:<id>` (and the old `settings`)
+- **Run-scoped keys:** every key except `journey:<id>`, `anchor:<id>` (and the old `settings`)
   names its run in the second part (`<kind>:<runId>:…`). Record kinds
   added later follow this, or are global and must not change what an
   older engine computes.
@@ -265,6 +291,7 @@ interface GameView {
   paused: RunView[]; // other open runs
   finished: RunView[]; // runs with a run-end record (the shelf)
   readOnly: ReadOnlyRun[]; // runs this engine cannot compute (§2)
+  anchors: AnchorView[]; // the user's anchors with what stands at each (game rules §8)
   problems: string[]; // records and journeys the engine could not use
 }
 
@@ -275,11 +302,41 @@ interface ReadOnlyRun {
   state: 'active' | 'paused' | 'finished'; // its place among the runs
 }
 
+interface AnchorView {
+  id?: string; // the anchor record; absent for journeys from before anchors
+  kind: 'routine' | 'time';
+  words?: string; // a routine, in the user's words: "getting up"
+  time?: string; // a fixed time, "HH:MM"
+  name?: string; // the name the user gave its place
+  suggest?: string; // without id: the journey whose plan sentence suggests the words
+  state: 'growing' | 'resting'; // growing: the active journey starts from here
+  growing?: AnchorStep; // the active journey's current stage
+  resting: AnchorStep[]; // open journeys that wait here
+  steps: (AnchorStep & { state: HabitView['state'] })[]; // habits of finished journeys
+  due: { runId: string; stageId: string; ask: 'weekly' | 'still' }[]; // questions due here
+}
+
+interface AnchorStep {
+  runId: string;
+  journeyId: string;
+  stageId: string;
+  after?: string; // the run of the step this one follows (a chain)
+}
+
 interface RunView {
   runId: string;
   journeyId: string;
   startDay: string;
   why?: string;
+  // the anchor the run starts from, absent until the user has named one;
+  // `after`: the step it follows instead of the anchor itself
+  anchor?: {
+    id: string;
+    kind: 'routine' | 'time';
+    words?: string;
+    time?: string;
+    after?: { runId: string; journeyId: string; stageId: string };
+  };
   planCheck?: { wish?: string; outcome?: string; obstacle?: string; plan?: string };
   stations: StationView[];
   position: { stage: number; progress: number }; // current station, 0..1
@@ -373,7 +430,10 @@ each returns no changes while `comeBack` is absent, and `stepBack`
 also without `comeBack.smaller`. For the habit of a finished journey
 the weekly answer is the same `answerCheckin` with the last stage;
 `graduate`, `answerStill` and `bringBack` take the finished run and
-return no changes when its `habit` does not allow them.
+return no changes when its `habit` does not allow them. For anchors,
+`nameAnchor` returns no changes without usable words or a time,
+`confirmAnchor` without a group of journeys from before anchors, and
+`removeAnchor` while something stands at the anchor.
 
 `diff(before, after)` returns events `{ key, params }` for toasts:
 `event.completion`, `event.welcome-back`, `event.progress-summary` (more

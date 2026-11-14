@@ -28,7 +28,7 @@ export const stationScreen = (ctx: Context, index: number): Screen => {
     return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   }
   const reached = station.state !== 'ahead';
-  const plan = h('p', { class: 'qa-plan' }, planSentence(stage, station.pair));
+  const plan = h('p', { class: 'qa-plan' }, planSentence(stage, station.pair, run.anchor));
   const condition = stage.condition;
   const conditionRule =
     condition.type === 'days'

@@ -4,7 +4,7 @@ import { h } from '../dom';
 import type { Context, Screen } from '../screen';
 
 /** Screen 2, preview: every station of a journey as a plan sentence. */
-export const previewScreen = (ctx: Context, journeyId: string): Screen => {
+export const previewScreen = (ctx: Context, journeyId: string, anchorId?: string): Screen => {
   const journey = ctx.state.journeys.find((j) => j.id === journeyId);
   if (!journey) return { title: t('ui.app.name'), body: h('p', {}, t('ui.error.gone')) };
   return {
@@ -29,7 +29,8 @@ export const previewScreen = (ctx: Context, journeyId: string): Screen => {
         {
           class: 'qa-btn qa-btn-primary',
           type: 'button',
-          onclick: () => ctx.go({ name: 'start', journeyId: journey.id }),
+          onclick: () =>
+            ctx.go({ name: 'start', journeyId: journey.id, ...(anchorId ? { anchorId } : {}) }),
         },
         t('ui.preview.start'),
       ),

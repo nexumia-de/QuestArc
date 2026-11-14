@@ -30,12 +30,102 @@ the journey is in [journey design](journey-design.md).
   the parts as it needs; no sentence is glued together from pieces. The
   pairing is the user's text as stored, one line without a final full
   stop, and is not translated.
+- **The user's anchor stands in the plan** (#96, design rule 2). For a
+  run that has one, the sentence starts with the user's words instead
+  of the journey's suggestion: a routine ("After my first coffee, I
+  will …", `ui.plan.sentence…`), a fixed time ("At 21:30, I will …",
+  `ui.plan.at…`) or, in a chain, the step it follows ("After I drink a
+  glass of water, I will …", `ui.plan.then…`); each again in the four
+  forms with place and pairing. The question of the weekly look back
+  names the habit the same way ("… after my first coffee", "… at
+  21:30"). A moment is named as "After getting up" or "At 21:30"
+  (`ui.anchor.after`, `ui.anchor.at`), or by the name the user gave it.
+  To the user an anchor is a **moment**; German follows with #39 and
+  uses "Moment" ("Ein neuer Moment", "Diesen Moment erweitern"), with
+  the routine completing "Nach …" as it completes "After …" here.
 - There is one look and no mode: no XP, no levels, no guardians and no
   game words (#110). Every journey shows what it builds.
 - Texts are autonomy-supportive ("you could"), never controlling or
   blaming, and never promise a number of days.
 
 ## Screens
+
+### 0. Home: your moments
+
+Issue #96, [design rule 28](psychology.md): the home of QuestArc is the
+user's moments, not a list of habits. Drawn from the engine's `anchors`
+([game rules](game-rules.md) §8); the Valley (#114) will draw the same
+data as regions.
+
+| ![Phone](screenshots/moments-phone-light.png) | ![Phone, dark](screenshots/moments-phone-dark.png) |
+| --------------------------------------------- | -------------------------------------------------- |
+
+![Desktop](screenshots/moments-desktop-light.png)
+
+_Screenshots from demo data._
+
+- One card per moment, the growing one first. Its title is the name
+  the user gave it, else "After getting up" or "At 21:30"; a pencil
+  button, **Change this moment**, opens screen 0a.
+- **What runs by itself** is one line of words, without boxes: "Runs by
+  itself: Drink a glass of water · Read for 20 minutes in my book".
+  Nothing is ticked, counted or shown as due for it.
+- A finished journey's habit that has not graduated yet is named in
+  the line "Still followed: …": it is ticked off in the task list, and
+  its weekly question, its offer to graduate and its details stay
+  where they were (the banners below, the shelf).
+- **The growing step** (at most one, on the moment the active journey
+  starts from) is a card that opens the journey (screen 4): "Growing
+  here · Station 2 of 4", the plan sentence, the condition in words
+  ("4 of 5 days in the last 7 due days") and one line of state: "Today:
+  done." or "Today: still open. Tick off the task in your task list as
+  usual." on a due day, "You reached this station. You can continue
+  whenever you like.", "This station needs a recurring task.",
+  "Paused. Paused days don't count.", or "Good to see you." when the
+  card after a long break waits on the journey (flow D). In Super
+  Productivity the tick itself stays in the task list (flow A).
+- Journeys that wait at a moment are named in "Waiting: …" (resumed
+  from the shelf); a moment where nothing stands yet says so.
+- **Extend This Moment** on every moment without the growing step
+  opens screen 2 for that moment. Main action at the bottom: **A New
+  Moment** (screen 2; an outlined button while a journey is active).
+- Banners, below the growing moment: the undo after ending a journey,
+  and for the habits finished journeys left (flow F) at most one each:
+  the question after graduation, the offer to graduate, or the weekly
+  look back.
+- **A journey from before anchors** (started before this change) shows
+  as a moment with the words of its plan sentence and asks once, in
+  its card: "QuestArc now starts from moments in your day. Your
+  journey began with this one. Is it still yours?" with **Yes, That Is
+  It** (`confirmAnchor` with the suggested words) and **Change the
+  Words** (screen 0a, which confirms with what the user writes).
+  Nothing depends on the answer and nothing is asked again: until then
+  everything works with the journey's words.
+- No moment yet: "No moment yet" and "QuestArc starts from a moment
+  that already exists in your day, like getting up or lunch. A journey
+  adds one small step to it. You keep using your normal tasks."
+- The menu has Shelf and Settings. When the active journey is
+  read-only, its calm page stands here instead (screen 4).
+
+### 0a. A moment
+
+- **When it is**: two options, **After …** with a text field for the
+  routine in the user's words (at most 40 characters, not focused;
+  "What you already do right before. Only you see this.") and **At a
+  fixed time** with a time field. A fixed time differs from a routine
+  only in words: its title and plan say "At 21:30" instead of "After
+  …", the time is written as the host's language writes times (24
+  hours here), and where QuestArc suggests a reminder for the task
+  (flow B) it names that time. Nothing else is different: no clock
+  icon, no other colour, and nothing is counted by the clock.
+- **A name for this moment** (optional, "like "Morning"").
+- "Your tasks keep the titles you gave them; QuestArc changes none."
+- Main action: **Save** (`nameAnchor`; for a journey from before
+  anchors `confirmAnchor`). Without words or a time: "A moment needs a
+  few words or a time." A leading "after" the user typed is not
+  doubled.
+- **Remove This Moment** only while nothing stands there ("Nothing
+  stands here yet, so nothing is lost.", `removeAnchor`).
 
 ### 1. Welcome (first start)
 
@@ -57,9 +147,23 @@ the journey is in [journey design](journey-design.md).
 - Main action in the preview: **Start this journey**.
 - Only one journey runs at a time; if one is active, starting another
   pauses it after a confirmation that says so (it can be resumed).
+- Opened by **A New Moment** or, for one moment, by **Extend This
+  Moment** (screen 0); the moment is then chosen already on screen 3.
 
 ### 3. Start a journey
 
+- **Your moment** (#96), first: "This journey starts from a moment in
+  your morning: something that already happens in your day. You could
+  name it in your own words." (the journey's `anchor` hint). The
+  user's moments as options, then **A new moment** with the two fields
+  of screen 0a, filled with the journey's example words, which the
+  user changes or keeps. Coming from **Extend This Moment** that
+  moment is chosen. At a moment where a habit stands, a second choice
+  **Tie the new step to**: "The moment itself" (chosen) or one of the
+  steps there ("After I drink a glass of water"), with "A chain is
+  your choice. If the earlier step slips one day, what follows it
+  slips too." **Start** writes the new moment (`nameAnchor`) and the
+  run's anchor with the run.
 - **Your reason** (optional): the journey's `why` prompt and a text
   field, not focused. "Only you see this."
 - **When to start**: Today (default), Next Monday, The 1st of next month,
@@ -122,7 +226,9 @@ put it down", in the hard-week hint (flow D) and in the details of
 every reached station (screen 5). The other answers are shown on this
 page only. They are never written into a task and never sent anywhere.
 
-### 4. Journey (home)
+### 4. Journey
+
+Opened from the growing step of a moment (screen 0); back leads there.
 
 - Top: journey title; menu (Pause or Resume, End journey, **What you
   build** (screen 3a), **Plan check** (screen 3b), **Stations**, Shelf,
@@ -173,8 +279,7 @@ page only. They are never written into a task and never sent anywhere.
   station's learning nugget once on arrival (**Got it**), and, for the
   habit a finished journey left (flow F), at most one each: the
   question after graduation, the offer to graduate, or its weekly look
-  back. The same habit banners stand above the empty state when no
-  journey is active. Dismissing a banner and skipping the weekly
+  back. The same habit banners stand on the home (screen 0). Dismissing a banner and skipping the weekly
   question are remembered on the device only; they are not choices.
 - The card also shows the user's own reason, if they gave one. While
   the user stays at a met station it says "You are staying here a
@@ -194,7 +299,8 @@ page only. They are never written into a task and never sent anywhere.
   "This journey is not available here. Update QuestArc here to go on
   with it; nothing is lost." No progress, no main action, no Pause or
   End journey; the menu keeps Shelf and Settings. Nothing is written for
-  it.
+  it. It stands at no moment, and while it is the active journey its
+  page takes the place of the home.
 
 ### 5. Station details
 
@@ -282,7 +388,12 @@ Plain words, one paragraph each: small steps that grow (reaching a
 station is not the same as the step feeling easy, so staying is always
 possible and the weekly answer suggests when to go on; a step the user
 already does can be passed and counts nothing); one plan "after
-X, I will Y"; one missed day is fine, two in a row start a new run but
+X, I will Y"; the user's moments, not a list of habits: a moment that
+already exists in their day, in their words, one step growing at a
+time and only that one ticked off, what runs by itself standing at its
+moment in one line without a box, so the list gets shorter, and the
+next step starting from the same moment or, by choice, from a step
+that already runs there; one missed day is fine, two in a row start a new run but
 never end the journey; welcome back after a gap; after a long break
 (nothing counted for two weeks) QuestArc asks how to go on: carry on,
 call the time a pause, or take up the smaller step before again,
@@ -318,7 +429,8 @@ Messages say the real progress in words; they never say what was added
 to the build and never give points (#110).
 
 The message carries
-the action **Show**, which opens QuestArc's page at the build (Super
+the action **Show**, which opens QuestArc's page at the build: the
+journey on top of the home, so back leads to the moments (Super
 Productivity keeps a message with an action visible longer). Marker
 elements and new versions get no words of their own (Amir & Ariely
 2008, [research](research.md)): the picture shows them.
@@ -336,7 +448,10 @@ words.
 Per [recurring-task setup](decisions/recurring-task-setup.md):
 
 1. "Your plan: After lunch, I will walk for 5 minutes. Suggested: daily."
-2. **Create the task**: QuestArc creates the task and opens it. "Open
+2. **Create the task**: QuestArc creates the task, titled with the
+   plan in short and in the user's words ("My first coffee: drink a
+   glass of water"; the title of an existing task is never changed),
+   and opens it. "Open
    the task, choose Schedule Task, then Repeat, and set it to: Every day.
    QuestArc picks it up by itself." The station waits until the task
    repeats.
@@ -394,7 +509,8 @@ In Pensum, step 2 creates the repeat itself.
    you don't keep both." with **Open the earlier task**; QuestArc never
    ends it itself.
 5. Last stage: the ending story, the journey moves to the shelf, the
-   habit stays as a maintained habit.
+   habit stays as a maintained habit and stands at its moment; **Done**
+   leads to the home (screen 0).
 
 ### D. Hard days
 
@@ -509,7 +625,7 @@ counted down, and nothing is said before it holds.
 | the bound repeat was deleted                               | Station unbound: "The task for this station is gone." **Set up the task**                                                                                 |
 | Super Productivity older than the plugin needs             | "QuestArc needs Super Productivity 19.3 or newer."                                                                                                        |
 | journey definition changed while walking                   | Nothing, unless the current stage was removed: "This journey was updated; you continue at …"                                                              |
-| no journey yet                                             | Empty state with **Choose a journey**                                                                                                                     |
+| no moment yet                                              | Empty state with **A New Moment**                                                                                                                         |
 | plugin.js not running yet (app start, update, switched on) | "QuestArc is starting. This page updates by itself in a moment." The view retries every second                                                            |
 | plugin.js still not answering after 20 s                   | "QuestArc is not running. Check that it is switched on in Settings → Plugins, then reload Super Productivity."                                            |
 | plugin.js answers with an error                            | "QuestArc could not read your data. It tries again every few seconds. If this message stays, reload Super Productivity." and "Details: …" with the reason |
@@ -523,7 +639,7 @@ the first answer, also when the data did not change in between.
 | Part               | Super Productivity plugin                                                         | Pensum                                       |
 | ------------------ | --------------------------------------------------------------------------------- | -------------------------------------------- |
 | Entry              | header button with the route icon                                                 | header bar of the main window                |
-| Journey (home)     | plugin view (`showIndexHtmlAsView`)                                               | sidebar page; details pushed with swipe back |
+| Home and journey   | plugin view (`showIndexHtmlAsView`): the moments, the journey pushed on top       | sidebar page; details pushed with swipe back |
 | Station details    | page inside the view                                                              | pushed page                                  |
 | Bound task actions | task context menu "Use for current station"                                       | row menu "Use for current station"           |
 | Messages           | snack (`showSnack`) with the action **Show** (opens the view)                     | toast                                        |

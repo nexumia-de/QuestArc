@@ -52,13 +52,14 @@ const start = async (root: HTMLElement): Promise<void> => {
   // The screens call the plugin API by its global name.
   (globalThis as { PluginAPI?: unknown }).PluginAPI = host.api;
 
+  let showJourney = (): void => shell.show('journey');
   const game = createBrain({
     api: host.api,
     journeys: builtInJourneys,
     onEvents: (events, view, journeys) => {
       const msg = messageFor(events, view, journeys);
       if (msg) {
-        shell.message(msg, { label: t('ui.snack.show'), run: () => shell.show('journey') });
+        shell.message(msg, { label: t('ui.snack.show'), run: () => showJourney() });
       }
     },
   });
@@ -74,6 +75,11 @@ const start = async (root: HTMLElement): Promise<void> => {
     content: async () => ({ texts: {}, style: '', art: artPack }),
   };
   const journey = createApp(shell.views.journey, client);
+  // The view's home is the moments (#96); a message's Show leads to the journey.
+  showJourney = () => {
+    shell.show('journey');
+    journey.openJourney();
+  };
 
   // Today's instances, made once per logical day.
   let day = '';

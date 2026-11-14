@@ -53,7 +53,8 @@ rules for 360 px, touch targets and accessibility are in
 
 ## Design rules
 
-The 27 [design rules](docs/psychology.md) are binding, among them: one calm
+The 28 [design rules](docs/psychology.md) are binding, among them: the
+anchor is the user's, in their words; what runs by itself is not tracked; one calm
 look without points, levels or opponents; what grows follows fixed
 rules and is never announced before it is earned; no random rewards, login bonuses or rankings; a missed day is a
 neutral gap, never red, never blamed; autonomy-supportive texts; no

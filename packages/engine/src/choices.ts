@@ -1,7 +1,7 @@
 import { isDay } from './days';
 import type { BuildChoice } from './ladders';
 import type { Journey } from './types/journey';
-import type { PlanCheck } from './types/view';
+import type { AnchorWords, PlanCheck } from './types/view';
 import { PLAN_CHECK_FIELDS } from './words';
 
 /**
@@ -42,7 +42,23 @@ export const RUN_KINDS: ReadonlySet<string> = new Set([
   'plan-check',
   'carry-on',
   'step-back',
+  'run-anchor',
 ]);
+
+/**
+ * Kinds that belong to no run and change nothing an older engine
+ * computes: an anchor is the user's words for a moment in their day (#96).
+ */
+export const GLOBAL_KINDS: ReadonlySet<string> = new Set(['anchor']);
+
+/** A fixed time of day, "HH:MM" in 24 hours. */
+export const isTime = (value: unknown): value is string =>
+  typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+
+/** An anchor record: the user's words, and the name they gave its place. */
+export interface AnchorRecord extends AnchorWords {
+  readonly name?: string;
+}
 
 /** Kinds every engine reads, also for a run in a newer format: they place the run among the others. */
 const PLACING_KINDS: ReadonlySet<string> = new Set(['run', 'run-end', 'pause']);
@@ -113,6 +129,10 @@ export interface Choices {
   readonly graduations: ReadonlyMap<string, readonly Graduation[]>;
   /** `${runId}:${stageId}` → the answered check-ins after graduation, sorted by due day */
   readonly stillChecks: ReadonlyMap<string, readonly StillCheck[]>;
+  /** anchor id → the user's anchor */
+  readonly anchors: ReadonlyMap<string, AnchorRecord>;
+  /** runId → the anchor the run starts from, and the run of the step it follows */
+  readonly runAnchors: ReadonlyMap<string, { anchorId: string; after?: string }>;
   /** runId → the user's build choices (names are checked when used) */
   readonly builds: ReadonlyMap<string, BuildChoice>;
   readonly userJourneys: readonly unknown[];
@@ -165,6 +185,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
   const stepBacks = new Map<string, StepBack[]>();
   const graduations = new Map<string, Graduation[]>();
   const stillChecks = new Map<string, StillCheck[]>();
+  const anchors = new Map<string, AnchorRecord>();
+  const runAnchors = new Map<string, { anchorId: string; after?: string }>();
   const builds = new Map<string, BuildChoice>();
   const userJourneys: unknown[] = [];
   const problems: string[] = [];
@@ -176,7 +198,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     const parts = key.split(':');
     const kind = parts[0] ?? '';
     // Kinds of a newer engine are its own: ignored, never reported.
-    if (kind !== 'settings' && kind !== 'journey' && !RUN_KINDS.has(kind)) continue;
+    if (!['settings', 'journey'].includes(kind) && !RUN_KINDS.has(kind) && !GLOBAL_KINDS.has(kind))
+      continue;
     const runId = runOf(key);
     const tooNew = runId !== undefined && newer.has(runId);
     if (tooNew && !PLACING_KINDS.has(kind)) continue;
@@ -267,6 +290,20 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
         if (name) choice[field] = name;
       }
       builds.set(parts[1], choice);
+    } else if (kind === 'anchor' && parts.length === 2 && parts[1]) {
+      const words = str(value.words);
+      const name = str(value.name);
+      const naming = name ? { name } : {};
+      if (value.kind === 'time' && isTime(value.time))
+        anchors.set(parts[1], { kind: 'time', time: value.time, ...naming });
+      else if (value.kind === 'routine' && words)
+        anchors.set(parts[1], { kind: 'routine', words, ...naming });
+      else bad();
+    } else if (kind === 'run-anchor' && parts.length === 2 && parts[1]) {
+      const anchorId = str(value.anchorId);
+      const after = str(value.after);
+      if (anchorId) runAnchors.set(parts[1], { anchorId, ...(after ? { after } : {}) });
+      else bad();
     } else if (kind === 'journey' && parts.length === 2) {
       userJourneys.push(value as unknown as Journey);
     } else if (kind === 'graduation' && parts.length === 4 && isDay(parts[3])) {
@@ -308,6 +345,8 @@ export const parseChoices = (records: Readonly<Record<string, unknown>>): Choice
     stepBacks,
     graduations,
     stillChecks,
+    anchors,
+    runAnchors,
     builds,
     userJourneys,
     newer,

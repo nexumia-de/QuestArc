@@ -1,3 +1,4 @@
+import { anchorViews, runAnchorOf } from './anchors';
 import { parseChoices, type RunRecord } from './choices';
 import { makeLogicalDay } from './days';
 import { buildRun } from './run';
@@ -84,7 +85,9 @@ export const evaluate = (snapshot: Snapshot): GameView => {
       continue;
     }
     const view = buildRun(run, journey as Journey, ctx);
-    (ended ? finished : open).push(view);
+    // The anchor the run starts from (game rules §8): the user's words, never evaluated.
+    const anchor = runAnchorOf(run.runId, choices, journeys);
+    (ended ? finished : open).push(anchor ? { ...view, anchor } : view);
   }
   for (const [runId, format] of choices.newer) {
     if (!choices.runs.some((run) => run.runId === runId)) {
@@ -100,12 +103,18 @@ export const evaluate = (snapshot: Snapshot): GameView => {
   const active = activeReadOnly === undefined ? first : undefined;
   const paused = activeReadOnly === undefined ? rest : open;
 
+  // A waiting journey gets no card for a long break.
+  const resting = paused.map((run) => waiting(run));
   return {
     todayStr: today,
     ...(active ? { active } : {}),
-    // A waiting journey gets no card for a long break.
-    paused: paused.map((run) => waiting(run)),
+    paused: resting,
     finished,
+    anchors: anchorViews(choices, journeys, {
+      ...(active ? { active } : {}),
+      paused: resting,
+      finished,
+    }),
     readOnly: readOnly.map(({ ended, ...run }) => ({
       ...run,
       state: ended ? 'finished' : run.runId === activeReadOnly ? 'active' : 'paused',

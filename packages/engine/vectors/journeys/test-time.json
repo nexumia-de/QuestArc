@@ -1,0 +1,57 @@
+{
+  "format": 3,
+  "id": "test-time",
+  "version": 1,
+  "title": "test-time.title",
+  "description": "test-time.description",
+  "stages": [
+    {
+      "id": "a",
+      "plan": {
+        "anchor": "test-time.anchor",
+        "action": "test-time.a.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "days",
+        "n": 5,
+        "of": 7
+      }
+    },
+    {
+      "id": "b",
+      "plan": {
+        "anchor": "test-time.anchor",
+        "action": "test-time.b.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "count",
+        "n": 3
+      }
+    },
+    {
+      "id": "c",
+      "plan": {
+        "anchor": "test-time.anchor",
+        "action": "test-time.c.action"
+      },
+      "schedule": {
+        "type": "daily"
+      },
+      "condition": {
+        "type": "time_spent",
+        "minutes": 30
+      }
+    }
+  ],
+  "anchor": {
+    "moment": "test-time.moment",
+    "example": "test-time.anchor",
+    "time": "07:00"
+  }
+}

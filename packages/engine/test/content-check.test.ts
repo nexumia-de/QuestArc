@@ -11,6 +11,11 @@ const good = () => ({
   title: 'tea.title',
   description: 'tea.description',
   why: 'tea.why',
+  anchor: { moment: 'tea.moment', example: 'tea.anchor' } as {
+    moment: string;
+    example: string;
+    time?: string;
+  },
   build: { ladder: 'home', names: ['tea.build.tent'] } as {
     ladder: string;
     marker?: string;
@@ -38,6 +43,7 @@ const good = () => ({
       'tea.description': 'From one cup to a calm tea break.',
       'tea.why': 'Why do you want a tea break? In your own words.',
       'tea.anchor': 'lunch',
+      'tea.moment': 'a moment around midday',
       'tea.cup.action': 'make a cup of tea',
       'tea.cup.nugget': 'You could put the kettle where you see it.',
       'tea.pot.action': 'make a pot of tea',
@@ -94,13 +100,28 @@ describe('journey checker', () => {
     );
   });
 
-  it('requires the same anchor in every stage', () => {
-    expect(
-      errors((j) => {
-        stage(j, 1).plan.anchor = 'tea.other';
-        en(j)['tea.other'] = 'getting up';
-      })[0]?.message,
-    ).toContain('rule 2');
+  it('warns when the stages name different anchors (#96)', () => {
+    const journey = good() as Draft;
+    stage(journey, 1).plan.anchor = 'tea.other';
+    en(journey)['tea.other'] = 'getting up';
+    expect(journeyProblems(journey)).toEqual([
+      expect.objectContaining({ level: 'warning', at: 'stages[1].plan.anchor' }),
+    ]);
+  });
+
+  it('warns when the journey does not say what kind of moment it starts from (#96)', () => {
+    const journey = good() as Draft;
+    delete (journey as Record<string, unknown>).anchor;
+    delete en(journey)['tea.moment'];
+    expect(journeyProblems(journey)).toEqual([
+      expect.objectContaining({ level: 'warning', at: 'anchor' }),
+    ]);
+  });
+
+  it('checks the anchor hint: its texts and a time of day', () => {
+    expect(errors((j) => delete en(j)['tea.moment'])[0]?.at).toBe('anchor.moment');
+    expect(errors((j) => (j.anchor.time = '25:00'))[0]?.message).toBe('anchor: invalid');
+    expect(errors((j) => (j.anchor.time = '21:30'))).toEqual([]);
   });
 
   it('limits text length for 360 px', () => {

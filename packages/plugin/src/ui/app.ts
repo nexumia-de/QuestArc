@@ -35,7 +35,7 @@ export const createApp = (root: HTMLElement, client: Client) => {
     redraw: () => render(false),
     reset: (route, draft = {}) => {
       menuOpen = false;
-      stack = [{ route, draft }];
+      stack = [...(route.name === 'journey' ? [entry({ name: 'home' })] : []), { route, draft }];
       render(true);
     },
     write: async (records) => {
@@ -203,7 +203,11 @@ export const createApp = (root: HTMLElement, client: Client) => {
         ...(stack.length > 0 ? stack : [entry(firstRoute(next))]),
         entry({ name: 'settings' }),
       ];
-    const changed = first || toSettings || next.revision !== state?.revision || error !== undefined;
+    // A message's Show (flow A) opens the journey on top of the home.
+    const toJourney = next.openJourney === true && next.view.active !== undefined;
+    if (toJourney) stack = [entry({ name: 'home' }), entry({ name: 'journey' })];
+    const changed =
+      first || toSettings || toJourney || next.revision !== state?.revision || error !== undefined;
     state = next;
     error = undefined;
     if (changed) render(first);
@@ -211,6 +215,12 @@ export const createApp = (root: HTMLElement, client: Client) => {
 
   return {
     update,
+    /** Opens the journey on top of the home, for a host that shows the view itself. */
+    openJourney: () => {
+      if (!state?.view.active) return;
+      stack = [entry({ name: 'home' }), entry({ name: 'journey' })];
+      render(true);
+    },
     showError: (text: string, detail?: string) => {
       error = { text, ...(detail ? { detail } : {}) };
       if (state) render(false);

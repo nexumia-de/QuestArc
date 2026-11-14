@@ -2,7 +2,7 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "pages-before-sleep",
-  "version": 1,
+  "version": 2,
   "title": "pages-before-sleep.title",
   "description": "pages-before-sleep.description",
   "why": "pages-before-sleep.why",
@@ -15,6 +15,10 @@
       "pages-before-sleep.build.v4",
       "pages-before-sleep.build.v5"
     ]
+  },
+  "anchor": {
+    "moment": "pages-before-sleep.moment",
+    "example": "pages-before-sleep.anchor"
   },
   "stages": [
     {
@@ -106,6 +110,7 @@
       "pages-before-sleep.description": "From one page of a book in bed to a quiet stretch of reading on most evenings, a few minutes more at a time.",
       "pages-before-sleep.why": "Why do you want to read more? In your own words.",
       "pages-before-sleep.anchor": "getting into bed",
+      "pages-before-sleep.moment": "the moment you go to bed",
       "pages-before-sleep.build.v1": "A fire to read by",
       "pages-before-sleep.build.v2": "A tent for one more page",
       "pages-before-sleep.build.v3": "A hut for quiet evenings",

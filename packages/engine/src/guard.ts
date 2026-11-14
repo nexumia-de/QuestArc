@@ -1,4 +1,4 @@
-import { RUN_KINDS } from './choices';
+import { GLOBAL_KINDS, RUN_KINDS } from './choices';
 import type { RecordChanges } from './actions';
 import type { GameView } from './types/view';
 
@@ -12,9 +12,15 @@ import type { GameView } from './types/view';
 
 /**
  * Kinds this engine writes; `journey` is an imported journey, `settings`
- * a record of QuestArc before 3.3 that a host may still withdraw.
+ * a record of QuestArc before 3.3 that a host may still withdraw, and
+ * an `anchor` belongs to no run.
  */
-const WRITTEN_KINDS: ReadonlySet<string> = new Set(['settings', 'journey', ...RUN_KINDS]);
+const WRITTEN_KINDS: ReadonlySet<string> = new Set([
+  'settings',
+  'journey',
+  ...GLOBAL_KINDS,
+  ...RUN_KINDS,
+]);
 
 export interface GuardedChanges {
   /** The changes to write: all of them, or none when one key is refused. */

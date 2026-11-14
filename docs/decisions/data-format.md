@@ -109,14 +109,39 @@ Option 5, with the engine constant `DATA_FORMAT = 1`:
   for no gain. Two things would change this, and then that change
   raises the number: an engine released with the run of a maintained
   habit (#66) but without graduation, which does not exist because both
-  come in one release; and a graduated step inside an open journey
-  (anchors, #96), which an engine of today would keep working on.
+  come in one release; and a graduated step inside an open journey,
+  as anchors (#96) were first sketched, which an engine of today would
+  keep working on. Anchors were built without that case (next point).
+- Anchors (#96) need **no new number** either; `DATA_FORMAT` stays 4.
+  The case named above does not exist: a step at an anchor is the
+  habit of one journey, a graduated step is always that of a finished
+  journey, and the next step at the same anchor is a new run, never a
+  further stage of an open one. The `anchor` record belongs to no run
+  and holds only the user's words; `run-anchor` names the anchor of a
+  run and, for a chain, the step it follows. An engine that does not
+  know them computes the same stations, due days, runs, conditions and
+  habits for every run: it shows the plan with the journey's own words
+  instead of the user's and has no grouping by anchor. That is a
+  missing addition, like the pairing, not wrong progress, which is what
+  the number guards against. The older host cannot write or withdraw
+  either record (`guardWrite`) and keeps them untouched. A number
+  would make every journey started from an anchor read-only on an
+  older host for no gain. `run-anchor` is its own record and not a
+  field of `run`, so confirming the anchor of an earlier journey never
+  rewrites the record every engine places a run by. What would change
+  this: a rule that counts differently by anchor (several steps of one
+  anchor followed through one task, a chain that pauses what follows).
+  The built-in journeys were raised by one version for their `anchor`
+  hint, so a run started with them is read-only on a host that still
+  has the older files until that host is updated (`journey-version`,
+  the rule above); runs started before are not affected.
 - A read-only run shows no progress on the older host until it is
   updated; the read-only page says to update.
 - Pensum must keep unknown `questarc:` entries, call `guardWrite` through
   `engine-cli.mjs` and show the read-only page (follow-up issue in
   Pensum).
 - The vectors `unknown-records-kept`, `newer-format-read-only`,
-  `journey-version-missing` and `guard-write` hold the rule.
+  `journey-version-missing`, `guard-write` and `guard-anchor` hold the
+  rule.
 
 [^issue]: <https://github.com/nexumia-de/QuestArc/issues/85>

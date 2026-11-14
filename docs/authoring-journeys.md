@@ -46,7 +46,11 @@ can, the reviewer checks the rest.
    user who already does the first stage can skip it, so keep the
    second one small too. _CI warns when it asks for more than 5 minutes._
 2. **One anchor for all stages.** Every stage starts with the same
-   "After …" (an existing routine or a fixed time). _CI checks this._
+   "After …". The anchor is the user's: they name the moment in their
+   own words when they start, or pick one they already have, and their
+   words stand in the plan. Your journey says what kind of moment it
+   starts from and gives example words (`anchor`, below). _CI warns
+   when stages name different anchors or the hint is missing._
 3. **Reachable conditions.** Use `days` with room for one miss (5 of 7,
    4 of 5, 8 of 10). Never require every day: one missed day changes
    nothing in QuestArc. _CI warns otherwise._
@@ -96,6 +100,11 @@ format is in [story format 3](story-format.md) and the JSON Schema
 - Anchors and actions are written to fit the plan sentence: anchor
   "sitting down at my desk", action "write down the one task that
   matters most today".
+- `anchor`: `moment` says what kind of moment the journey starts from,
+  to end the sentence "This journey starts from …" ("the moment your
+  work begins"); `example` is the words you suggest after "After …",
+  usually the same key your stages use. With `time` ("21:30") the
+  start screen suggests a fixed time instead.
 
 ### Template
 
@@ -109,6 +118,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
   "title": "my-journey.title",
   "description": "my-journey.description",
   "why": "my-journey.why",
+  "anchor": { "moment": "my-journey.moment", "example": "my-journey.anchor" },
   "build": { "ladder": "home" },
   "stages": [
     {
@@ -135,6 +145,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
       "my-journey.description": "One or two sentences: from the first tiny step to the habit.",
       "my-journey.why": "Why do you want this? In your own words.",
       "my-journey.anchor": "lunch",
+      "my-journey.moment": "a moment around midday",
       "my-journey.first.action": "do the tiny first step",
       "my-journey.first.arrival": "One sentence of story at the first station.",
       "my-journey.first.accept": "This became easy. You could try a little more.",
@@ -152,7 +163,7 @@ format is in [story format 3](story-format.md) and the JSON Schema
 ### Text lengths
 
 Texts must fit a 360 px phone. CI rejects longer ones (characters):
-title 40, description 160, why 120, anchor 40, action 120, place 40,
+title 40, description 160, why 120, anchor 40, moment 60, action 120, place 40,
 arrival 200, accept 200, nugget 240, ending 240.
 
 A stage's action is also the station's name in the list of stations,

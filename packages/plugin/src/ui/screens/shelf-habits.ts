@@ -23,7 +23,7 @@ const card = (
   h(
     'li',
     { class: 'qa-card' },
-    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair)),
+    h('p', { class: 'qa-plan' }, planSentence(stage, run.stations.at(-1)?.pair, run.anchor)),
     // A maintained habit's last due days and its run (#66): a gap is a
     // gap, never a loss. A graduated habit has neither.
     habit.lastDays?.length ? lastDaysRow(habit.lastDays) : null,

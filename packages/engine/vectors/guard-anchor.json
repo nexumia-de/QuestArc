@@ -1,0 +1,91 @@
+{
+  "name": "Anchors and the anchor of a run are kinds this engine writes and withdraws; never the anchor of a run of a newer QuestArc",
+  "rule": "data model §2, data format and unknown data",
+  "kind": "guard",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "run:r9": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r9:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "pause:r9:2026-11-09": {
+        "action": "pause",
+        "source": "user"
+      },
+      "skip:r9:a": {
+        "day": "2026-11-02",
+        "dataFormat": 99
+      }
+    },
+    "journeys": ["$test-daily"]
+  },
+  "writes": [
+    {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m1"
+      }
+    },
+    {
+      "anchor:m1": ""
+    },
+    {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run-anchor:r9": {
+        "anchorId": "m1"
+      }
+    }
+  ],
+  "expect": [
+    {
+      "changes": {
+        "anchor:m1": {
+          "kind": "routine",
+          "words": "getting up"
+        },
+        "run-anchor:r1": {
+          "anchorId": "m1"
+        }
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "anchor:m1": ""
+      },
+      "refused": []
+    },
+    {
+      "changes": {
+        "anchor:m1": null,
+        "run-anchor:r9": null
+      },
+      "refused": ["run-anchor:r9"]
+    }
+  ]
+}

@@ -34,6 +34,7 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `title`       | yes      | Text key                                                     |
 | `description` | yes      | Text key, one or two sentences                               |
 | `why`         | no       | Text key: the prompt asking for the user's own reason        |
+| `anchor`      | no       | The kind of moment the journey starts from (below)           |
 | `stages`      | yes      | 2 to 12 stages, in order                                     |
 | `ending`      | no       | `{ "story": <text key> }`, shown when the last stage is done |
 | `build`       | no       | What the journey builds (below)                              |
@@ -50,9 +51,34 @@ journey; how the engine uses it is in the [game rules](game-rules.md).
 | `story`     | no       | `arrival` (shown on reaching the station) and `accept` (shown when the next stage is offered) |
 | `nugget`    | no       | Text key: one short, concrete "try this" technique for this stage                             |
 
+The stages' `anchor` is the journey's suggestion. Once the user has
+named their anchor (below), its words stand in every plan sentence of
+the run instead; the suggestion shows in the list of journeys, in the
+preview and for a journey started before anchors.
+
 The schedule is a suggestion: the user sets the real repeat in Super
 Productivity, and only the supported kinds can be bound
 ([game rules](game-rules.md#due-days-issue-48)).
+
+## Anchor
+
+The kind of moment the journey starts from ([design rule 2](psychology.md),
+[game rules](game-rules.md) §8, issue #96). A hint for the start screen:
+the user names the anchor in their own words, or picks one they already
+have, and the journey never dictates the words.
+
+| Field     | Required | Meaning                                                                                                      |
+| --------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `moment`  | yes      | Text key: the kind of moment, to end "This journey starts from …": "a moment in your morning" (60 chars)     |
+| `example` | yes      | Text key: example words that complete "After …": "getting up"; usually the key the stages use as plan anchor |
+| `time`    | no       | `HH:MM` (24 hours): suggests a fixed time instead of a routine                                               |
+
+```json
+"anchor": { "moment": "gentle-morning.moment", "example": "gentle-morning.anchor" }
+```
+
+The field is optional; an engine that does not know it ignores it, so
+the format stays 3.
 
 ## Build
 
@@ -87,12 +113,16 @@ chosen ladder, so a host compares it with `build.ladder`).
   languages fall back to English key by key and may only use keys of
   the journey.
 - Anchors and actions are written to fit the plan sentence: anchor
-  "lunch", action "walk for 5 minutes". The user may end it with
+  "lunch", action "walk for 5 minutes". The user's own anchor takes
+  the anchor's place: their words ("After my noon break, …"), a fixed
+  time ("At 12:30, …") or, in a chain, the action of the step the run
+  follows ("After I drink a glass of water, …"), so an action reads
+  well after "I" and after "I will". The user may end it with
   something they pair the stage with (", with my podcast",
   [behaviour](behaviour.md), flow B), so an action does not name a
   treat of its own.
 - The longest texts per field (360 px): title 40, description 160, why
-  120, anchor 40, action 120, place 40, arrival 200,
+  120, anchor 40, moment 60, action 120, place 40, arrival 200,
   accept 200, nugget 240, ending 240, build name 40 characters. A station's action is
   also its name on the path, cut after two lines, so the part that
   differs from the previous stage comes early.
@@ -107,7 +137,6 @@ private journeys (#40) runs the same function.
 | Level   | Check                                                                                                                | Rule       |
 | ------- | -------------------------------------------------------------------------------------------------------------------- | ---------- |
 | error   | structure (`journeyErrors`); English texts present; keys start with the id; other languages' keys exist              | —          |
-| error   | the same anchor (English text) in every stage                                                                        | 2          |
 | error   | text lengths above                                                                                                   | —          |
 | error   | a number of days ("21 days")                                                                                         | 4          |
 | error   | quotes with an author                                                                                                | 5          |
@@ -117,6 +146,7 @@ private journeys (#40) runs the same function.
 | warning | a `days` condition without room for one miss, or looking back more than 14 days                                      | 1, 11      |
 | warning | a stage without a nugget, a journey without `why`; English texts no key uses                                         | 5, 22      |
 | warning | the second stage asks for more than 5 minutes (its `time_spent` condition or "n minutes" in its English action)      | 1          |
+| warning | stages that name different anchors (English text); a journey without the `anchor` hint                               | 2          |
 | error   | `build`: a ladder or marker not in `content/art/`; a land-only marker (`flowers`) on water; more names than versions | 42         |
 | warning | no `build`; more stages than the ladder has versions minus one (its last version gains fixed additions)              | 42         |
 
@@ -129,7 +159,8 @@ The [design rules](psychology.md) apply; the full guide for people and
 their agents is [Writing a journey](authoring-journeys.md). In short:
 
 - The first stage is too small to fail; each next stage is a slightly
-  harder version of the same habit, with the same anchor. A user who
+  harder version of the same habit, with the same anchor: one moment
+  for the whole journey, named in the `anchor` hint. A user who
   already does the first stage may skip it (#81), so the second one is
   still a small step.
 - Conditions are reachable: the default is `days` 5 of 7.

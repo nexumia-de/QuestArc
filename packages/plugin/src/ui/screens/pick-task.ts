@@ -37,7 +37,7 @@ export const pickTaskScreen = (ctx: Context, runId?: string): Screen => {
         day: view.todayStr,
       }),
     );
-    ctx.reset({ name: target.habit ? 'shelf' : 'home' });
+    ctx.reset({ name: target.habit ? 'shelf' : 'journey' });
   };
 
   return {

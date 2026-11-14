@@ -1,7 +1,7 @@
 import type { Journey } from './types/journey';
-import type { PlanCheck, RunView } from './types/view';
-import { CHECKPOINT_FORMAT, SKIP_FORMAT, STEP_BACK_FORMAT } from './choices';
-import { ownWords, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
+import type { AnchorWords, GameView, PlanCheck, RunView } from './types/view';
+import { CHECKPOINT_FORMAT, isTime, SKIP_FORMAT, STEP_BACK_FORMAT } from './choices';
+import { anchorWords, ownWords, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
 
 /**
  * The choice records each user action writes (docs/data-model.md §2), as
@@ -13,8 +13,88 @@ import { ownWords, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './word
 export type RecordChanges = Record<string, unknown>;
 
 /**
+ * Name an anchor (design rule 2): a moment that already exists in the
+ * user's day, in their own words: a routine that completes "After …", or
+ * a fixed time. One record per anchor, rewritten as a whole; `name` is
+ * what the user calls its place, if they like. The id comes from the
+ * host. Without usable words or time nothing is written.
+ */
+export const nameAnchor = (input: {
+  anchorId: string;
+  anchor: AnchorWords;
+  name?: string;
+}): RecordChanges => {
+  const { kind, time } = input.anchor;
+  const words = anchorWords(input.anchor.words);
+  const name = anchorWords(input.name);
+  const value =
+    kind === 'time' && isTime(time)
+      ? { kind, time }
+      : kind === 'routine' && words
+        ? { kind, words }
+        : undefined;
+  if (!value || !input.anchorId) return {};
+  return { [`anchor:${input.anchorId}`]: { ...value, ...(name ? { name } : {}) } };
+};
+
+/**
+ * Tie a run to an anchor: to the anchor itself, or with `after` to the
+ * step of a finished journey that stands there (a chain; the user's
+ * choice, never automatic, design rule 3). Rewritten as a whole, so
+ * leaving `after` out ties the run to the anchor itself again.
+ */
+export const anchorRun = (input: {
+  runId: string;
+  anchorId: string;
+  after?: string;
+}): RecordChanges => ({
+  [`run-anchor:${input.runId}`]: {
+    anchorId: input.anchorId,
+    ...(input.after ? { after: input.after } : {}),
+  },
+});
+
+/**
+ * Journeys from before anchors (the view's group with `suggest`): the
+ * user confirms the moment once, and every run of that journey is tied
+ * to it: to an anchor they already have, or with `anchor` to a new one
+ * in their words.
+ */
+export const confirmAnchor = (
+  view: GameView,
+  input: { journeyId: string; anchorId: string; anchor?: AnchorWords },
+): RecordChanges => {
+  const group = view.anchors.find((a) => a.id === undefined && a.suggest === input.journeyId);
+  if (!group) return {};
+  const named = input.anchor
+    ? nameAnchor({ anchorId: input.anchorId, anchor: input.anchor })
+    : undefined;
+  if (named ? Object.keys(named).length === 0 : !view.anchors.some((a) => a.id === input.anchorId))
+    return {};
+  const changes: RecordChanges = { ...named };
+  for (const { runId } of [
+    ...(group.growing ? [group.growing] : []),
+    ...group.resting,
+    ...group.steps,
+  ])
+    Object.assign(changes, anchorRun({ runId, anchorId: input.anchorId }));
+  return changes;
+};
+
+/**
+ * Remove an anchor where nothing stands: no growing step, no journey
+ * that waits and no habit. An anchor with any of these stays.
+ */
+export const removeAnchor = (view: GameView, anchorId: string): RecordChanges => {
+  const anchor = view.anchors.find((a) => a.id === anchorId);
+  if (!anchor || anchor.growing || anchor.resting.length > 0 || anchor.steps.length > 0) return {};
+  return { [`anchor:${anchorId}`]: '' };
+};
+
+/**
  * Start a journey: the run and the acceptance of its first stage. A
- * journey that was active waits from today (behaviour, screen 2).
+ * journey that was active waits from today (behaviour, screen 2). With
+ * `anchor` the run is tied to that anchor (`anchorRun`).
  */
 export const startJourney = (input: {
   runId: string;
@@ -23,6 +103,7 @@ export const startJourney = (input: {
   today?: string;
   why?: string;
   activeRunId?: string;
+  anchor?: { anchorId: string; after?: string };
 }): RecordChanges => {
   const first = input.journey.stages[0];
   const why = input.why?.trim();
@@ -42,6 +123,7 @@ export const startJourney = (input: {
       ...(why ? { why } : {}),
     },
     ...(first ? { [`stage:${input.runId}:${first.id}`]: { acceptedDay: input.startDay } } : {}),
+    ...(input.anchor ? anchorRun({ runId: input.runId, ...input.anchor }) : {}),
   };
 };
 
@@ -311,6 +393,10 @@ export const withdraw = (key: string): RecordChanges => ({ [key]: '' });
 
 /** The actions by name, for engine-cli.mjs. */
 export const actions = {
+  nameAnchor,
+  anchorRun,
+  confirmAnchor,
+  removeAnchor,
   startJourney,
   bindStage,
   continueJourney,

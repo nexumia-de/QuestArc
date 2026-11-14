@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   actions,
+  anchorRun,
   answerCheckin,
   answerStill,
   bringBack,
@@ -8,13 +9,17 @@ import {
   callItAPause,
   carryOn,
   chooseBuild,
+  confirmAnchor,
   continueJourney,
   endJourney,
   evaluate,
   graduate,
+  nameAnchor,
   pairStage,
+  removeAnchor,
   resumeJourney,
   skipStage,
+  startJourney,
   stayHere,
   stepBack,
   undoSkip,
@@ -39,6 +44,7 @@ const fromVector = (file: string) => {
 describe('actions', () => {
   it('are callable by name for engine-cli.mjs', () => {
     expect(Object.keys(actions).sort()).toEqual([
+      'anchorRun',
       'answerCheckin',
       'answerStill',
       'bindStage',
@@ -47,11 +53,14 @@ describe('actions', () => {
       'carryOn',
       'checkPlan',
       'chooseBuild',
+      'confirmAnchor',
       'continueJourney',
       'endJourney',
       'graduate',
+      'nameAnchor',
       'pairStage',
       'pauseJourney',
+      'removeAnchor',
       'repeatPause',
       'resumeJourney',
       'skipStage',
@@ -61,6 +70,94 @@ describe('actions', () => {
       'undoSkip',
       'withdraw',
     ]);
+  });
+
+  it("name an anchor in the user's words: a routine or a fixed time, one line, with its name", () => {
+    expect(
+      nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: '  getting   up. ' } }),
+    ).toEqual({ 'anchor:m1': { kind: 'routine', words: 'getting up' } });
+    expect(
+      nameAnchor({
+        anchorId: 'm2',
+        anchor: { kind: 'time', time: '21:00', words: 'ignored' },
+        name: ' Evening ',
+      }),
+    ).toEqual({ 'anchor:m2': { kind: 'time', time: '21:00', name: 'Evening' } });
+    expect(
+      nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: 'x'.repeat(50) } }),
+    ).toEqual({ 'anchor:m1': { kind: 'routine', words: 'x'.repeat(40) } });
+    // Without usable words or time nothing is written.
+    expect(nameAnchor({ anchorId: 'm1', anchor: { kind: 'routine', words: ' . ' } })).toEqual({});
+    expect(nameAnchor({ anchorId: 'm1', anchor: { kind: 'time', time: '9 pm' } })).toEqual({});
+  });
+
+  it('tie a run to an anchor, or to a step that stands there; starting a journey does the same', () => {
+    expect(anchorRun({ runId: 'r', anchorId: 'm1' })).toEqual({
+      'run-anchor:r': { anchorId: 'm1' },
+    });
+    expect(anchorRun({ runId: 'r', anchorId: 'm1', after: 'r0' })).toEqual({
+      'run-anchor:r': { anchorId: 'm1', after: 'r0' },
+    });
+    const journey = (loadVectors()[0] as { input: Snapshot }).input.journeys[0] as Journey;
+    const started = startJourney({
+      runId: 'r',
+      journey,
+      startDay: '2026-11-12',
+      anchor: { anchorId: 'm1', after: 'r0' },
+    });
+    expect(started['run-anchor:r']).toEqual({ anchorId: 'm1', after: 'r0' });
+    expect(Object.keys(startJourney({ runId: 'r', journey, startDay: '2026-11-12' }))).toEqual([
+      'run:r',
+      `stage:r:${journey.stages[0]?.id}`,
+    ]);
+  });
+
+  it('confirm the anchor of journeys from before anchors once, for every run of the journey', () => {
+    const vector = loadVectors().find((v) => v.file === 'anchor-before-anchors.json');
+    const view = evaluate((vector as { input: Snapshot }).input);
+    expect(
+      confirmAnchor(view, {
+        journeyId: 'test-daily',
+        anchorId: 'm1',
+        anchor: { kind: 'routine', words: 'getting up' },
+      }),
+    ).toEqual({
+      'anchor:m1': { kind: 'routine', words: 'getting up' },
+      'run-anchor:r2': { anchorId: 'm1' },
+      'run-anchor:r1': { anchorId: 'm1' },
+    });
+    // No such group, words that are none, or an anchor that does not exist: nothing.
+    expect(
+      confirmAnchor(view, {
+        journeyId: 'x',
+        anchorId: 'm1',
+        anchor: { kind: 'time', time: '07:00' },
+      }),
+    ).toEqual({});
+    expect(
+      confirmAnchor(view, { journeyId: 'test-daily', anchorId: 'm1', anchor: { kind: 'routine' } }),
+    ).toEqual({});
+    expect(confirmAnchor(view, { journeyId: 'test-daily', anchorId: 'm1' })).toEqual({});
+    // To an anchor the user already has: only the runs are tied.
+    const resting = loadVectors().find((v) => v.file === 'anchor-record-withdrawn.json');
+    expect(
+      confirmAnchor(evaluate((resting as { input: Snapshot }).input), {
+        journeyId: 'test-daily',
+        anchorId: 'm1',
+      }),
+    ).toEqual({ 'run-anchor:r2': { anchorId: 'm1' } });
+  });
+
+  it('remove an anchor only where nothing stands', () => {
+    const empty = loadVectors().find((v) => v.file === 'anchor-record-withdrawn.json');
+    expect(removeAnchor(evaluate((empty as { input: Snapshot }).input), 'm1')).toEqual({
+      'anchor:m1': '',
+    });
+    const used = loadVectors().find((v) => v.file === 'anchor-resting.json');
+    const view = evaluate((used as { input: Snapshot }).input);
+    expect(removeAnchor(view, 'm1')).toEqual({});
+    expect(removeAnchor(view, 'm2')).toEqual({});
+    expect(removeAnchor(view, 'm0')).toEqual({});
   });
 
   it('write the weekly answer and withdrawals', () => {

@@ -2,13 +2,17 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "example-walking",
-  "version": 3,
+  "version": 4,
   "title": "example-walking.title",
   "description": "example-walking.description",
   "why": "example-walking.why",
   "build": {
     "ladder": "home",
     "marker": "flowers"
+  },
+  "anchor": {
+    "moment": "example-walking.moment",
+    "example": "example-walking.anchor"
   },
   "stages": [
     {
@@ -83,6 +87,7 @@
       "example-walking.description": "From putting on your shoes after lunch to a daily walk, one small step at a time.",
       "example-walking.why": "Why do you want to walk more? In your own words.",
       "example-walking.anchor": "lunch",
+      "example-walking.moment": "a moment around midday",
       "example-walking.shoes.action": "put on my walking shoes",
       "example-walking.shoes.place": "at the door",
       "example-walking.shoes.arrival": "It starts at your own front door.",

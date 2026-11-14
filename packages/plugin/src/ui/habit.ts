@@ -1,6 +1,6 @@
-import type { HabitView, Journey, RunView, Stage, StationState } from '@questarc/engine';
+import type { HabitView, Journey, RunAnchor, RunView, Stage, StationState } from '@questarc/engine';
 
-import { capitalise } from '../shared/plan';
+import { capitalise, planAnchor } from '../shared/plan';
 import type { State } from '../shared/protocol';
 import { t } from '../shared/texts';
 
@@ -27,12 +27,17 @@ export const habitsOf = (state: State): Habit[] =>
 export const habitOf = (state: State, runId: string): Habit | undefined =>
   habitsOf(state).find((entry) => entry.run.runId === runId);
 
-/** The habit in words for a question: "Walk for 15 minutes after lunch", in quotes. */
-export const habitName = (stage: Stage): string =>
-  t('ui.checkin.habit', {
+/**
+ * The habit in words for a question: "Walk for 15 minutes after lunch",
+ * in quotes, with the run's anchor in the user's words.
+ */
+export const habitName = (stage: Stage, anchor?: RunAnchor): string => {
+  const own = planAnchor(anchor);
+  return t(`ui.checkin.habit${!own || own.form === 'after' ? '' : `-${own.form}`}`, {
     action: capitalise(t(stage.plan.action)),
-    anchor: t(stage.plan.anchor),
+    anchor: own?.text ?? t(stage.plan.anchor),
   });
+};
 
 export interface Target {
   readonly run: RunView;

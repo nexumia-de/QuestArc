@@ -135,6 +135,16 @@ handler calls `showIndexHtmlAsView()` and sets a one-shot flag; the next
 settings screen on its stack. The route takes no parameters, so the flag
 travels in the state. A version without the member loses only the button.
 
+## The action Show of a message
+
+The view's home is the user's moments (#96), and a message's **Show**
+leads to the build ([behaviour](behaviour.md), flow A). So the action
+(`adapter/show-journey.ts`) works like the settings button: it sets a
+one-shot flag and calls `showIndexHtmlAsView()`; the next
+`questarc:get` answer carries `openJourney: true`, and the view puts
+the journey on top of the home, so back leads to the moments. Opening
+QuestArc from its header button or the side panel starts at the home.
+
 ## Task context menu
 
 "Use for current QuestArc station" (Super Productivity 19.2.0 and newer)

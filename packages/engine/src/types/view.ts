@@ -7,6 +7,11 @@ export interface GameView {
   readonly finished: readonly RunView[];
   /** Runs this engine cannot compute (data model §2, data format). */
   readonly readOnly: readonly ReadOnlyRun[];
+  /**
+   * The user's anchors with what stands at each (game rules §8), oldest
+   * first; runs from before anchors come last, grouped by journey.
+   */
+  readonly anchors: readonly AnchorView[];
   /** Journeys and records the engine could not use, with the reason. */
   readonly problems: readonly string[];
 }
@@ -22,6 +27,79 @@ export interface ReadOnlyRun {
   readonly reason: 'newer-format' | 'journey-missing' | 'journey-version';
   /** Its place among the runs. */
   readonly state: 'active' | 'paused' | 'finished';
+}
+
+/**
+ * An anchor in the user's own words (design rule 2): a moment that
+ * already exists in their day. `routine` has `words` that complete
+ * "After …"; `time` has a fixed time of day.
+ */
+export interface AnchorWords {
+  readonly kind: 'routine' | 'time';
+  /** A routine in the user's words, e.g. "getting up". */
+  readonly words?: string;
+  /** A fixed time, "HH:MM" (24 hours). */
+  readonly time?: string;
+}
+
+/** The anchor of a run, and the step it follows if the user chained it (design rule 3). */
+export interface RunAnchor extends AnchorWords {
+  /** The `anchor:<id>` record. */
+  readonly id: string;
+  /**
+   * The user tied this run to a step that stands at the same anchor
+   * instead of to the anchor itself: that step's run, journey and stage.
+   * Words only; nothing is computed from it.
+   */
+  readonly after?: { readonly runId: string; readonly journeyId: string; readonly stageId: string };
+}
+
+/**
+ * One anchor with what stands there (game rules §8): the habits finished
+ * journeys left (`steps`), the one growing step if the active journey
+ * starts from here, journeys that wait, and the questions that are due.
+ * The hosts find each run in the view by its id.
+ */
+export interface AnchorView extends AnchorWords {
+  /**
+   * The `anchor:<id>` record; absent for runs from before anchors, which
+   * are grouped by journey until the user confirms their anchor.
+   */
+  readonly id?: string;
+  /** The name the user gave the anchor's place, if any. */
+  readonly name?: string;
+  /** Without `id`: the journey whose plan sentence suggests the words. */
+  readonly suggest?: string;
+  /** `growing`: the active journey starts from here; else the anchor rests. */
+  readonly state: 'growing' | 'resting';
+  /** The active journey's current stage. */
+  readonly growing?: AnchorStep;
+  /** Open journeys that wait here (paused), in the order of `paused`. */
+  readonly resting: readonly AnchorStep[];
+  /** The habits of finished journeys, oldest first; a journey ended early leaves none. */
+  readonly steps: readonly AnchorHabit[];
+  /** The questions that are due here: the weekly one and the one after graduation. */
+  readonly due: readonly AnchorDue[];
+}
+
+export interface AnchorStep {
+  readonly runId: string;
+  readonly journeyId: string;
+  readonly stageId: string;
+  /** The run of the step this one follows (a chain), if the user tied it so. */
+  readonly after?: string;
+}
+
+/** A habit at an anchor: followed until it graduates, then it only stands there. */
+export interface AnchorHabit extends AnchorStep {
+  readonly state: HabitView['state'];
+}
+
+export interface AnchorDue {
+  readonly runId: string;
+  readonly stageId: string;
+  /** `weekly`: the weekly look back; `still`: "does it still run by itself?". */
+  readonly ask: 'weekly' | 'still';
 }
 
 /**
@@ -41,6 +119,8 @@ export interface RunView {
   readonly journeyId: string;
   readonly startDay: string;
   readonly why?: string;
+  /** The anchor the run starts from (game rules §8); absent until the user has named one. */
+  readonly anchor?: RunAnchor;
   /** The user's plan check, if they filled in any of it (shown, never evaluated). */
   readonly planCheck?: PlanCheck;
   readonly stations: readonly StationView[];

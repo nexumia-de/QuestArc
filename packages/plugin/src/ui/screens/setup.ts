@@ -1,5 +1,5 @@
 import { bindStage, skipStage } from '@questarc/engine';
-import { capitalise } from '../../shared/plan';
+import { capitalise, planAnchor } from '../../shared/plan';
 import { t } from '../../shared/texts';
 import { appState } from '../app-state';
 import { h } from '../dom';
@@ -28,7 +28,7 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
   const station = { state: target.state };
   if (station.state !== 'unbound' && station.state !== 'unsupported-repeat') {
     // Bound in the meantime (the repeat was set): back to where it shows.
-    queueMicrotask(() => ctx.reset({ name: target.habit ? 'shelf' : 'home' }));
+    queueMicrotask(() => ctx.reset({ name: target.habit ? 'shelf' : 'journey' }));
   }
 
   const app = appState(ctx);
@@ -49,7 +49,7 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
   const open = (taskId: string) => () => void PluginAPI.selectTask(taskId);
   const create = async () => {
     const title = t('ui.setup.task-title', {
-      anchor: capitalise(t(stage.plan.anchor)),
+      anchor: capitalise(planAnchor(run.anchor)?.text ?? t(stage.plan.anchor)),
       action: t(stage.plan.action),
     });
     const taskId = await PluginAPI.addTask({ title, isIgnoreShortSyntax: true });

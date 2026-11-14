@@ -1,0 +1,150 @@
+{
+  "name": "A resting anchor: the active journey starts from another one; here a journey waits and a graduated step is asked its one question. A fixed time is an anchor too, with the name the user gave it",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-11",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [],
+    "repeatCfgs": [],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "anchor:m2": {
+        "kind": "time",
+        "time": "21:00",
+        "name": "Evening",
+        "region": "a field of a newer engine"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "graduation:r1:c:2026-10-28": {
+        "choice": "end"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m1"
+      },
+      "run:r2": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-09"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-09"
+      },
+      "run-anchor:r2": {
+        "anchorId": "m2"
+      },
+      "run:r3": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-01"
+      },
+      "stage:r3:a": {
+        "acceptedDay": "2026-11-01"
+      },
+      "pause:r3:2026-11-09": {
+        "action": "pause",
+        "source": "user"
+      },
+      "run-anchor:r3": {
+        "anchorId": "m1"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": {
+      "runId": "r2",
+      "anchor": {
+        "id": "m2",
+        "kind": "time",
+        "time": "21:00",
+        "words": null
+      }
+    },
+    "anchors": [
+      {
+        "id": "m1",
+        "kind": "routine",
+        "state": "resting",
+        "growing": null,
+        "resting": [
+          {
+            "runId": "r3",
+            "journeyId": "test-build",
+            "stageId": "a"
+          }
+        ],
+        "steps": [
+          {
+            "runId": "r1",
+            "state": "graduated"
+          }
+        ],
+        "due": [
+          {
+            "runId": "r1",
+            "stageId": "c",
+            "ask": "still"
+          }
+        ]
+      },
+      {
+        "id": "m2",
+        "kind": "time",
+        "time": "21:00",
+        "words": null,
+        "name": "Evening",
+        "region": null,
+        "state": "growing",
+        "growing": {
+          "runId": "r2",
+          "stageId": "a"
+        },
+        "resting": [],
+        "steps": [],
+        "due": []
+      }
+    ],
+    "problems": []
+  }
+}

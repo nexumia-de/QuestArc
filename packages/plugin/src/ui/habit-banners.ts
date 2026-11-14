@@ -17,7 +17,7 @@ export const habitBanners = (ctx: Context): HTMLElement[] => {
   const week = isoWeek(ctx.state.view.todayStr);
   return habitsOf(ctx.state).flatMap(({ run, stage, habit }) => {
     const id = `${run.runId}:${stage.id}`;
-    const name = habitName(stage);
+    const name = habitName(stage, run.anchor);
     const banner = (text: string, label: string, route: Route, seenKey?: string): HTMLElement[] => [
       h(
         'div',

@@ -6,6 +6,8 @@ import { continueScreen } from './continue';
 import { finishedScreen } from './finished';
 import { graduateScreen } from './graduate';
 import { homeScreen } from './home';
+import { journeyScreen } from './journey';
+import { momentScreen } from './moment';
 import { motivatesScreen } from './motivates';
 import { pickTaskScreen } from './pick-task';
 import { planCheckScreen } from './plan-check';
@@ -27,16 +29,20 @@ export const screenFor = (route: Route, ctx: Context): Screen => {
       return welcomeScreen(ctx);
     case 'home':
       return homeScreen(ctx);
+    case 'journey':
+      return journeyScreen(ctx);
+    case 'moment':
+      return momentScreen(ctx, route.anchorId, route.journeyId);
     case 'choose':
-      return chooseScreen(ctx);
+      return chooseScreen(ctx, route.anchorId);
     case 'preview':
-      return previewScreen(ctx, route.journeyId);
+      return previewScreen(ctx, route.journeyId, route.anchorId);
     case 'settings':
       return settingsScreen(ctx);
     case 'station':
       return stationScreen(ctx, route.index);
     case 'start':
-      return startScreen(ctx, route.journeyId);
+      return startScreen(ctx, route.journeyId, route.anchorId);
     case 'setup':
       return setupScreen(ctx, route.runId);
     case 'pick-task':

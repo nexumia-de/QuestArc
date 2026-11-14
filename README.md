@@ -17,10 +17,12 @@ _Screenshots from demo data._
 
 ## What it does
 
-- **One journey at a time.** Each station is one small habit step,
-  anchored to a moment ("After getting up, I will drink a glass of
-  water"). The first built-in journey, _A gentle morning_, has four
-  stations.
+- **Your moments, not a list of habits.** You name a moment that
+  already exists in your day ("after getting up", "at 21:30"), and a
+  journey adds one small step to it ("After getting up, I will drink a
+  glass of water"). One step grows at a time. What has become a habit
+  stands at its moment and is no longer ticked off, so the list gets
+  shorter, not longer.
 - **Your tasks stay yours.** A station is a normal recurring task in
   Super Productivity. You tick it off as usual; QuestArc computes the
   journey from your tasks and never writes into titles, notes or

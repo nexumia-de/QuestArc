@@ -50,6 +50,8 @@ export const habitDemo = (scenario: HabitScenario, today: string): DemoData => {
     record(`stage-done:demo:${stage}`, { day: day(i === 3 ? 40 : 85 - i * 15), dataFormat: 2 });
   });
   record('run-end:demo', { day: day(40), reason: 'finished' });
+  record('anchor:morning', { kind: 'routine', words: 'getting up' });
+  record('run-anchor:demo', { anchorId: 'morning' });
   record(`binding:demo:${LAST}`, {
     taskId: `rpt_demo_${day(55)}`,
     repeatCfgId: 'demo',

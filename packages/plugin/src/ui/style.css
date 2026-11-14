@@ -852,3 +852,45 @@
   padding: 0;
   list-style: none;
 }
+
+/* The home: the user's moments (docs/behaviour.md, screen 0). */
+.qa-anchor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s, 8px);
+}
+
+.qa-anchor-head > h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.qa-growing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-half, 4px);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--s2, 16px);
+  border: 1px solid var(--c-primary, #6495ed);
+  border-radius: var(--card-border-radius, 8px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.qa-growing:hover {
+  background: color-mix(in srgb, var(--c-primary, #6495ed) 8%, transparent);
+}
+
+.qa-growing:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, #6495ed);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
+.qa-sub {
+  margin-inline-start: var(--s2, 16px);
+}

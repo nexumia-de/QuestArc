@@ -1,6 +1,11 @@
 export type { DayContext, Snapshot, SnapshotRepeatCfg, SnapshotTask } from './types/snapshot';
 export type { Condition, Journey, Schedule, Stage, Texts, Weekday } from './types/journey';
 export type {
+  AnchorDue,
+  AnchorHabit,
+  AnchorStep,
+  AnchorView,
+  AnchorWords,
   BuildView,
   ComeBack,
   ContinueOffer,
@@ -10,6 +15,7 @@ export type {
   HabitView,
   PlanCheck,
   ReadOnlyRun,
+  RunAnchor,
   RunView,
   StationRun,
   StationState,
@@ -20,6 +26,7 @@ export type { GameEvent } from './diff';
 export { evaluate } from './evaluate';
 export {
   actions,
+  anchorRun,
   answerCheckin,
   answerStill,
   bindStage,
@@ -28,11 +35,14 @@ export {
   callItAPause,
   carryOn,
   chooseBuild,
+  confirmAnchor,
   continueJourney,
   endJourney,
   graduate,
+  nameAnchor,
   pairStage,
   pauseJourney,
+  removeAnchor,
   repeatPause,
   resumeJourney,
   skipStage,
@@ -46,7 +56,14 @@ export type { RecordChanges } from './actions';
 export { guardWrite } from './guard';
 export type { GuardedChanges } from './guard';
 export { DATA_FORMAT } from './choices';
-export { PAIR_LIMIT, pairWords, PLAN_CHECK_FIELDS, PLAN_CHECK_LIMIT } from './words';
+export {
+  ANCHOR_LIMIT,
+  anchorWords,
+  PAIR_LIMIT,
+  pairWords,
+  PLAN_CHECK_FIELDS,
+  PLAN_CHECK_LIMIT,
+} from './words';
 export {
   buildSnapshot,
   isRelevant,

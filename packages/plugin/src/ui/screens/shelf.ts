@@ -48,7 +48,7 @@ export const shelfScreen = (ctx: Context): Screen => {
             type: 'button',
             onclick: async () => {
               await ctx.write(resumeJourney(run.runId, view.todayStr, view.active?.runId));
-              ctx.reset({ name: 'home' });
+              ctx.reset({ name: 'journey' });
             },
           },
           t('ui.action.resume'),

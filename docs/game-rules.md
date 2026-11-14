@@ -1,7 +1,7 @@
 ---
 type: Concept
 title: Game rules
-description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation and the build of a journey (ladder, version, marker progress, ready), with worked examples.
+description: The exact rules and numbers the engine implements for both hosts: what counts, due days and misses, runs, stage conditions, staying, skipping and stepping back, welcome back and the card after a long break, graduation, the build of a journey (ladder, version, marker progress, ready) and anchors, with worked examples.
 tags: [game-rules, engine, numbers]
 generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 ---
@@ -23,6 +23,7 @@ and its test vectors together.
   Other tasks give nothing: progress shown is progress on the habit.
 - A task finished as "won't do" (`wontDoOn === doneOn`) does not count.
 - **One active journey** at a time; it can be paused to start another.
+  It is the one growing step; the other anchors rest (§8).
 
 ## 2. Days
 
@@ -475,3 +476,107 @@ to 8 missed, day 9 is today: the last 7 due days (3 to 9) hold 3
 completions, so progress is 0.6 and the stage is no longer met; marker
 progress stays 1, ready is false. Continue on day 5 instead: version 2,
 marker progress 0.
+
+## 8. Anchors
+
+Issue #96, decided by the owner on 2026-11-12
+([design rules 2, 3 and 28](psychology.md)): the user names an anchor,
+a moment that already exists in their day, and journeys start from it.
+
+### The records
+
+- An **anchor** is an `anchor` record ([data model](data-model.md) §2):
+  a routine in the user's words that completes "After …" ("getting
+  up"), or a fixed time of day (`HH:MM`), and optionally the name the
+  user gives its place. The words are the user's: the engine stores and
+  returns them and reads no meaning from them.
+- A **run names its anchor** with a `run-anchor` record. Starting a
+  journey writes it (`startJourney` with `anchor`); the anchor is an
+  existing one or a new one named in the same change.
+- **Nothing that is counted changes.** Due days, runs, conditions, the
+  build, the weekly question and graduation are computed exactly as
+  without anchors (§1 to §7). An anchor changes the words of the plan
+  and where a step stands, nothing else.
+
+### What stands at an anchor
+
+The view groups what the engine has computed by anchor (`anchors`), so
+a host can show the home and, later, the Valley (#114) from it:
+
+- **`steps`:** the habits finished journeys left there (§6), oldest
+  journey first, each with its state: `maintained` (still followed and
+  ticked off), `graduated` (runs by itself), `unbound` or
+  `unsupported-repeat` (waits for a task). A journey that was ended
+  early leaves no step.
+- **`growing`:** the current stage of the active journey, when that
+  journey starts from this anchor. The anchor's `state` is then
+  `growing`; every other anchor is `resting`. There is at most one
+  growing step (§1).
+- **`resting`:** open journeys that wait here (paused), with their
+  current stage.
+- **`due`:** the questions that are due here: `weekly` for the growing
+  step (not while its journey is paused) and for a maintained habit,
+  `still` for a graduated one (§6).
+- Anchors are listed by the earliest start day of a run that names
+  them, then by id, so the order does not change when another step
+  grows; an anchor where nothing stands yet comes after those and is
+  still listed, because it is the user's.
+- Runs this engine cannot compute (read-only, data model §2) stand at
+  no anchor.
+
+### A graduated step stands on its records
+
+Everything the view shows of a graduated step comes from choice
+records: its run, the checkpoints of its stages (so its build has all
+its versions), the end of its journey, its graduation and its anchor.
+None of it is read from a task. Ending the repeat, or deleting the task
+or its done instances later, therefore changes nothing that stands at
+the anchor: the step keeps its place, its state and its build. What a
+graduated step never shows is a run or its last days (§3), because
+those come from tasks. A habit that is not graduated and loses its
+repeat stays at its anchor too and waits for a task (`unbound`).
+
+### Chains
+
+- With `after`, a `run-anchor` record ties the run to a **step** that
+  stands at the same anchor instead of to the anchor itself. It is the
+  user's choice when they start the journey, never the default.
+- The chain holds (`anchor.after` on the run, `after` on its step)
+  while the run it names is another run, starts from the same anchor
+  and is a finished journey with a habit. Anything else (a step at
+  another anchor, an open journey, an unknown run) is ignored without
+  a problem, and the run is tied to the anchor itself.
+- A chain is words only: the plan reads "After I drink a glass of
+  water, I will …". Nothing is computed from it. If the step it
+  follows is brought back (§6), the chain stays and the hosts show
+  that step with its state; `anchorRun` without `after` ties the run to
+  the anchor itself again.
+
+### Journeys from before anchors
+
+- A run without a `run-anchor` record, or whose anchor record was
+  withdrawn, has **no anchor yet** (`anchor` is absent on the run).
+  Such runs are grouped by journey: one group per journey, without an
+  id, with `suggest` (the journey whose plan sentence suggests the
+  words) and, when the journey's hint names a time, that time. They
+  are listed after the user's anchors.
+- **Confirmed once:** `confirmAnchor` writes the anchor in the user's
+  words (the suggestion, or what they changed it to) and a
+  `run-anchor` record for every run of the group; or, with the id of
+  an anchor the user already has, only those records. Until then
+  everything works as before, with the journey's own words.
+- `removeAnchor` withdraws an anchor where nothing stands: no growing
+  step, no journey that waits, no habit. It returns no changes
+  otherwise.
+
+**Example J.** The user's anchor is "getting up". _A gentle morning_
+was finished on 1 Oct and graduated on 28 Oct; its task was ended and
+later deleted. On 2 Nov the user extends the moment with a second
+journey, done on 2, 3 and 4 Nov. On 5 Nov the anchor is `growing`, its
+step is the first journey's last stage, `graduated`, with all five
+versions standing, and the growing step has 3 of 5 days: exactly what
+it has without an anchor. Tied to the first journey's step instead, the
+plan reads "After I …" and the numbers are the same. A third journey
+started from "lunch" on 9 Nov makes "getting up" `resting`: the second
+journey waits there, and on 11 Nov the first step's question "does it
+still run by itself?" is due there.

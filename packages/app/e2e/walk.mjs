@@ -36,6 +36,17 @@ page.on('response', (response) => {
 const shot = (name) => page.screenshot({ path: join(OUT, `${width}-${name}.png`) });
 const tab = (name) => page.locator('.app-tabs').getByRole('button', { name, exact: true }).click();
 const journey = page.locator('.app-view').nth(1);
+/**
+ * The journey screen: the view's home is the user's moments (#96), and
+ * the growing step there opens the journey.
+ */
+const openJourney = async () => {
+  await tab('Journey');
+  await journey.locator('.qa-growing, .qa-station-card').first().waitFor();
+  if ((await journey.locator('.qa-growing').count()) > 0)
+    await journey.locator('.qa-growing').click();
+  await journey.locator('.qa-station-card').waitFor();
+};
 const habit = () => page.getByRole('checkbox', { name: TASK });
 const isTicked = (ticked) => page.locator(`.app-habit[aria-checked=${ticked}]`).waitFor();
 const message = () => page.locator('.app-message').innerText();
@@ -106,8 +117,7 @@ try {
   expect(one.startsWith('Drink a glass of water: done. 1 of 5 days.'), `day 1: ${one}`);
   await habit().click();
   await isTicked(false);
-  await tab('Journey');
-  await journey.locator('.qa-station-card').waitFor();
+  await openJourney();
   expect(
     (await journey.locator('.qa-station-card').innerText()).includes('0 of 5 days'),
     'a second tap undoes the tick, and the journey forgets it',
@@ -140,6 +150,14 @@ try {
   expect(three.includes('Welcome back'), `after a gap: ${three}`);
   await shot('4-today-welcome-back');
   await tab('Journey');
+  await journey.locator('.qa-growing').waitFor();
+  const moments = await journey.locator('.qa-main').innerText();
+  expect(
+    moments.includes('After getting up') && /growing here/i.test(moments),
+    'the home shows the moment with its growing step',
+  );
+  await shot('4a-moments');
+  await openJourney();
   await journey.getByRole('button', { name: 'Answer' }).click();
   expect(
     (await journey.locator('.qa-title').innerText()) === 'Weekly look back',
@@ -189,7 +207,7 @@ try {
     JSON.stringify(await stored()) === JSON.stringify(backup.data),
     'the imported dataset is the exported one',
   );
-  await tab('Journey');
+  await openJourney();
   expect(
     (await journey.locator('.qa-station-card').innerText()) === after,
     'the journey is as before the import',

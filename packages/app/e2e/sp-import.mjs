@@ -78,6 +78,8 @@ try {
   // The plugin on the imported data.
   await install(page);
   await page.goto(`${BASE}#/plugins/questarc/index`);
+  // The home is the moments (#96); the growing step opens the journey.
+  await view().locator('.qa-growing').click({ timeout: 30_000 });
   await view().locator('.qa-station-card').waitFor({ timeout: 30_000 });
   await page.waitForTimeout(2000);
   const title = await view().locator('.qa-title').innerText();

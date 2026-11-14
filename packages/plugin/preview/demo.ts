@@ -1,13 +1,20 @@
 import type { Task } from '@super-productivity/plugin-api';
 
 import { habitDemo, isHabitScenario, type HabitScenario } from './demo-habits';
+import { isMomentScenario, momentsDemo, type MomentScenario } from './demo-moments';
 
 /**
  * Demo datasets for the preview and screenshots (never real tasks). Days
  * are relative to `today`, so pictures look the same on any date.
  *
+ * Every journey starts from the moment "After getting up" (#96); the
+ * home shows it, and its growing step opens the journey.
+ *
  * - welcome: first start; empty: no journey (the last one was ended)
  * - journey: stage 2 of "A gentle morning" with one gap
+ * - before-anchors: the same journey as QuestArc before anchors left it,
+ *   without a moment: the home asks once whether it is the user's
+ * - moments, moments-chain, moments-rest: several moments (demo-moments.ts)
  * - paired: the same journey, the stage paired with something the user enjoys (#58)
  * - hard-week: two missed days in a row, with the user's plan check (#59)
  * - met: the current stage's condition is met
@@ -30,6 +37,8 @@ export type Scenario =
   | 'welcome'
   | 'empty'
   | 'journey'
+  | 'before-anchors'
+  | MomentScenario
   | 'paired'
   | 'hard-week'
   | 'met'
@@ -59,6 +68,7 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
   const repeatCfgs: DemoData['repeatCfgs'] = {};
   if (scenario === 'welcome') return { tasks, repeatCfgs, data };
   if (isHabitScenario(scenario)) return habitDemo(scenario, today);
+  if (isMomentScenario(scenario)) return momentsDemo(scenario, today);
   const build = scenario.startsWith('build');
 
   const todayMs = Date.parse(`${today}T12:00:00Z`);
@@ -79,6 +89,10 @@ export const demoData = (scenario: Scenario, today: string): DemoData => {
     startDay: start,
     ...(long ? { why: 'I want my mornings to start calmly.' } : {}),
   });
+  if (scenario !== 'before-anchors') {
+    record('anchor:morning', { kind: 'routine', words: 'getting up' });
+    record('run-anchor:demo', { anchorId: 'morning' });
+  }
   if (scenario === 'empty') {
     record('run-end:demo', { day: day(1) });
     return { tasks, repeatCfgs, data };

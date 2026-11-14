@@ -1,0 +1,149 @@
+{
+  "name": "A chain: the user tied the growing step to the step that runs by itself at the same anchor; the view names that step and counts as before",
+  "rule": "game rules §8; design rules 2, 3 and 28",
+  "kind": "evaluate",
+  "input": {
+    "day": {
+      "todayStr": "2026-11-05",
+      "startOfNextDayDiffMs": 0,
+      "timeZone": "Europe/Berlin"
+    },
+    "tasks": [
+      {
+        "id": "rpt_cfgA_2026-11-02",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793617200000,
+        "doneOn": 1793638800000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-03",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793703600000,
+        "doneOn": 1793725200000
+      },
+      {
+        "id": "rpt_cfgA_2026-11-04",
+        "isDone": true,
+        "repeatCfgId": "cfgA",
+        "created": 1793790000000,
+        "doneOn": 1793811600000
+      }
+    ],
+    "repeatCfgs": [
+      {
+        "id": "cfgA",
+        "repeatCycle": "DAILY",
+        "repeatEvery": 1,
+        "startDate": "2026-10-01"
+      }
+    ],
+    "choices": {
+      "anchor:m1": {
+        "kind": "routine",
+        "words": "getting up"
+      },
+      "run:r1": {
+        "journeyId": "test-daily",
+        "journeyVersion": 1,
+        "startDay": "2026-08-01"
+      },
+      "stage:r1:a": {
+        "acceptedDay": "2026-08-01"
+      },
+      "stage-done:r1:a": {
+        "day": "2026-08-15",
+        "dataFormat": 2
+      },
+      "stage:r1:b": {
+        "acceptedDay": "2026-08-15"
+      },
+      "stage-done:r1:b": {
+        "day": "2026-09-01",
+        "dataFormat": 2
+      },
+      "stage:r1:c": {
+        "acceptedDay": "2026-09-01"
+      },
+      "stage-done:r1:c": {
+        "day": "2026-10-01",
+        "dataFormat": 2
+      },
+      "run-end:r1": {
+        "day": "2026-10-01",
+        "reason": "finished"
+      },
+      "binding:r1:c": {
+        "taskId": "rpt_cfgC_2026-09-01",
+        "repeatCfgId": "cfgC",
+        "day": "2026-09-01"
+      },
+      "graduation:r1:c:2026-10-28": {
+        "choice": "end"
+      },
+      "run-anchor:r1": {
+        "anchorId": "m1"
+      },
+      "run:r2": {
+        "journeyId": "test-build",
+        "journeyVersion": 1,
+        "startDay": "2026-11-02"
+      },
+      "stage:r2:a": {
+        "acceptedDay": "2026-11-02"
+      },
+      "binding:r2:a": {
+        "taskId": "rpt_cfgA_2026-11-02",
+        "repeatCfgId": "cfgA",
+        "day": "2026-11-02"
+      },
+      "run-anchor:r2": {
+        "anchorId": "m1",
+        "after": "r1"
+      }
+    },
+    "journeys": ["$test-daily", "$test-build"]
+  },
+  "expect": {
+    "active": {
+      "anchor": {
+        "id": "m1",
+        "words": "getting up",
+        "after": {
+          "runId": "r1",
+          "journeyId": "test-daily",
+          "stageId": "c"
+        }
+      },
+      "stations": [
+        {
+          "state": "current",
+          "completions": 3,
+          "progress": 0.6
+        },
+        {},
+        {}
+      ]
+    },
+    "anchors": [
+      {
+        "id": "m1",
+        "state": "growing",
+        "growing": {
+          "runId": "r2",
+          "stageId": "a",
+          "after": "r1"
+        },
+        "steps": [
+          {
+            "runId": "r1",
+            "state": "graduated",
+            "after": null
+          }
+        ]
+      }
+    ],
+    "problems": []
+  }
+}

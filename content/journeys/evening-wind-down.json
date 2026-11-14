@@ -2,7 +2,7 @@
   "$schema": "../schema/journey.schema.json",
   "format": 3,
   "id": "evening-wind-down",
-  "version": 1,
+  "version": 2,
   "title": "evening-wind-down.title",
   "description": "evening-wind-down.description",
   "why": "evening-wind-down.why",
@@ -15,6 +15,10 @@
       "evening-wind-down.build.v4",
       "evening-wind-down.build.v5"
     ]
+  },
+  "anchor": {
+    "moment": "evening-wind-down.moment",
+    "example": "evening-wind-down.anchor"
   },
   "stages": [
     {
@@ -108,6 +112,7 @@
       "evening-wind-down.description": "From putting your phone on its charger to a short, calm routine that ends your day at about the same time each night.",
       "evening-wind-down.why": "Why do you want your evenings to end more calmly? In your own words.",
       "evening-wind-down.anchor": "brushing my teeth in the evening",
+      "evening-wind-down.moment": "a moment late in your evening",
       "evening-wind-down.build.v1": "Stepping stones at dusk",
       "evening-wind-down.build.v2": "A log over the quiet water",
       "evening-wind-down.build.v3": "A plank bridge into the evening",
