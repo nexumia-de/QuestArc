@@ -1,0 +1,21 @@
+{
+  "name": "@questarc/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "QuestArc's screens and the host-independent adapter, shared by the plugin and the standalone app",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@questarc/engine": "*"
+  },
+  "devDependencies": {
+    "@super-productivity/plugin-api": "20.0.0"
+  }
+}

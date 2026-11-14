@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { createBrain } from '../src/adapter/brain';
+import { createBrain } from '@questarc/ui/adapter/brain';
 import { handleMessage } from '../src/adapter/messages';
 import { registerSettingsEntry } from '../src/adapter/settings-entry';
-import type { State } from '../src/shared/protocol';
-import { builtInJourneys } from '../src/shared/content';
-import { createFakeHost } from './fake-host';
+import type { State } from '@questarc/ui/shared/protocol';
+import { builtInJourneys } from '@questarc/ui/shared/content';
+import { createFakeHost } from '@questarc/ui/testing/fake-host';
 
 // The settings button in Super Productivity's plugin list (#67).
 const setUp = (withHandler = true) => {

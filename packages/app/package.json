@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@questarc/engine": "*",
-    "@questarc/plugin": "*"
+    "@questarc/ui": "*"
   },
   "devDependencies": {
     "@super-productivity/plugin-api": "20.0.0"

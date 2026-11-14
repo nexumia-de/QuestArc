@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
-import { viteLadderArt } from './art.mjs';
-import { viteJourneys } from './journeys.mjs';
+import { viteLadderArt } from '../ui/art.mjs';
+import { viteJourneys } from '../ui/journeys.mjs';
 import { viteViewContent } from './view-content.mjs';
 
 // Super Productivity's runtime is a browser; the adapter's tests run in

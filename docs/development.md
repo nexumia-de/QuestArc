@@ -64,7 +64,7 @@ journey checker ([story format](story-format.md#the-journey-checker)).
 `packages/plugin/build.mjs` uses esbuild:
 
 - Journeys come from the module `virtual:questarc-journeys`, which
-  `packages/plugin/journeys.mjs` builds from every file in
+  `packages/ui/journeys.mjs` builds from every file in
   `content/journeys/` (for esbuild in `build.mjs` and `preview.mjs`, for
   Vitest in `vitest.config.ts`).
 
@@ -111,7 +111,8 @@ the real adapter on demo data (`preview/demo.ts`, never real tasks) with
 a fake plugin API, and loads the built view in an iframe that talks to it
 the way Super Productivity's bridge does, and registers the same hooks
 plugin.js does. Theme variables for light and
-dark are transcribed from Super Productivity's styles (`preview/theme.ts`).
+dark are transcribed from Super Productivity's styles
+(`packages/ui/src/ui/theme.ts`, the shared package's default theme).
 
 ```sh
 npm run screenshots -w @questarc/plugin
@@ -174,7 +175,7 @@ itself has the demos `build`, `build-ready` and `build-crossing`
 (`node screenshots.mjs build,build-ready,build-crossing 2`);
 `preview.tick()` in the console ticks today off, to see new marker
 elements grow in. The plugin bundles only the pictures of the ladders
-(`esbuildLadderArt` in `art.mjs`); the preview pages have all of them. The ladders' files
+(`esbuildLadderArt` in `packages/ui/art.mjs`); the preview pages have all of them. The ladders' files
 come from `node scripts/draw-ladders.mjs`. Day Planner's demo draws the same parts
 (`tests/art_demo.py sizes|sequence-<ladder>|journey-<ladder>|palette` in
 nexumia-de/pensum, through phosh-toolkit's `screenshot.sh -c light|dark`).
@@ -259,12 +260,29 @@ The image stays on the oldest supported version (`minSupVersion`
 proposes only minor and patch updates. When the pinned version changes,
 check the [facts](super-productivity-facts.md) §10.
 
-## Standalone app (spike)
+## Shared package
 
-`packages/app` (#93) is the plugin's adapter and screens on a second
-host: its own dataset in Super Productivity's backup format, kept in
-IndexedDB, with a Today screen, export and import. It imports the
-plugin's and the engine's sources and copies none. What it showed and
+`packages/ui` (`@questarc/ui`, [decision](decisions/standalone-app.md))
+holds what both hosts in this repository use: the screens with their
+style and default theme (`src/ui/`), the host-independent adapter core
+(`src/adapter/`: brain, records, hooks, day, messages in words, the
+pictures' pack), the texts and the protocol (`src/shared/`), a fake
+plugin API for tests (`src/testing/`) and the build's virtual modules
+for journeys and pictures (`journeys.mjs`, `art.mjs`). It is imported by
+path (`@questarc/ui/adapter/brain`), has no build of its own and never
+imports from `packages/plugin` or `packages/app`. The screens get their
+host passed in: `createApp(root, client, host)` with `ViewHost`
+(`src/ui/view-host.ts`); no shared code reads the global `PluginAPI`.
+
+## Standalone app
+
+`packages/app` (#91, spike #93) is the shared screens and adapter core
+on a second host: its own dataset in Super Productivity's backup format,
+kept in IndexedDB, with a Today screen, export and import. Its host
+offers `createHabit`, so "Create the task" makes the recurring task with
+the stage's schedule and binds it at once. Texts that name the host are
+replaced by the app's own (`src/host-texts.ts`; a test keeps keys and
+placeholders equal to `content/i18n`). What it showed and
 what has to change before it becomes a product:
 [decision](decisions/standalone-app-spike.md). It is private and not
 released.

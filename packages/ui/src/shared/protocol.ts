@@ -6,7 +6,7 @@ import type { Ladder } from '../ui/ladder';
 /**
  * Messages between the view (iframe) and plugin.js. The view posts
  * `PLUGIN_MESSAGE`; Super Productivity hands it to the handler plugin.js
- * set with `PluginAPI.onMessage` and returns its answer
+ * set with the plugin API's `onMessage` and returns its answer
  * (docs/super-productivity-facts.md §1).
  */
 

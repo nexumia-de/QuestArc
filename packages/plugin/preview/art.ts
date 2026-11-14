@@ -1,12 +1,12 @@
 // The pictures' page (#86, #42): every single picture at 48, 32 and
 // 24 px, and the ladders (preview/ladders.ts), drawn by src/ui/art.ts with
-// the theme variables of preview/theme.ts. Query: ?theme=light|dark&
+// the theme variables of packages/ui/src/ui/theme.ts. Query: ?theme=light|dark&
 // part=sizes|sequence-<ladder>|journey-<ladder>|palette[&hue=<palette name>]. Built
 // by preview.mjs into dist/preview/art.html; not part of the plugin.
 import { pictures } from 'virtual:questarc-art';
-import { picture } from '../src/ui/art';
+import { picture } from '@questarc/ui/ui/art';
 import { hues, journey, laddersCss, sequence } from './ladders';
-import { themeCss } from './theme';
+import { themeCss } from '@questarc/ui/ui/theme';
 
 const query = new URLSearchParams(location.search);
 const theme = query.get('theme') === 'dark' ? 'dark' : 'light';

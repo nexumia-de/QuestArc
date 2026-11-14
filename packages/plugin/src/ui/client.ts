@@ -1,4 +1,5 @@
-import type { ContentPack, Request, State } from '../shared/protocol';
+import type { Client } from '@questarc/ui/ui/client';
+import type { ContentPack, Request, State } from '@questarc/ui/shared/protocol';
 
 /**
  * Sends requests to plugin.js. Super Productivity forwards
@@ -14,7 +15,10 @@ interface Pending {
 
 const TIMEOUT_MS = 30_000;
 
-export const createClient = (target: Window = window.parent, source: Window = window) => {
+export const createClient = (
+  target: Window = window.parent,
+  source: Window = window,
+): Required<Client> => {
   const pending = new Map<string, Pending>();
   let next = 0;
 
@@ -54,5 +58,3 @@ export const createClient = (target: Window = window.parent, source: Window = wi
     content: () => request<ContentPack>({ type: 'questarc:content' }),
   };
 };
-
-export type Client = ReturnType<typeof createClient>;

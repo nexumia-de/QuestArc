@@ -52,4 +52,4 @@ Option 2.
   position, and screens that hold input (the reason text field, #52)
   must keep their value outside the redraw or redraw only on navigation.
 - If screens grow complex state later (forms with validation, animations),
-  this decision is revisited; a switch would be local to `packages/plugin/src/ui`.
+  this decision is revisited; a switch would be local to `packages/ui/src/ui`.

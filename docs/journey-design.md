@@ -372,7 +372,7 @@ stations list and Settings with the side panel switch:
   page draw: per ladder its setting, the lines of the marker, the
   versions; the three pictures of each marker kind; the lantern; the
   palette. Pictures no screen draws yet stay preview-only
-  (`ladderArt` in `packages/plugin/art.mjs`, checked by a test). They
+  (`ladderArt` in `packages/ui/art.mjs`, checked by a test). They
   travel in `plugin.js` and reach the view once at start (message
   `questarc:content`, with the texts and the style, #102). The
   view's `index.html` is limited to 102,400 bytes by Super Productivity

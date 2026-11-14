@@ -5,5 +5,11 @@
     "types": ["@super-productivity/plugin-api/global"],
     "resolveJsonModule": true
   },
-  "include": ["src", "test", "preview"]
+  "include": [
+    "src",
+    "test",
+    "preview",
+    "../ui/src/virtual-art.d.ts",
+    "../ui/src/virtual-journeys.d.ts"
+  ]
 }

@@ -9,7 +9,7 @@ export const settingsScreen = (ctx: Context): Screen => ({
   body: h(
     'div',
     { class: 'qa-stack' },
-    ctx.state.sidePanel !== undefined
+    ctx.sidePanel && ctx.state.sidePanel !== undefined
       ? h(
           'label',
           { class: 'qa-card qa-switch-row' },
@@ -18,7 +18,7 @@ export const settingsScreen = (ctx: Context): Screen => ({
             role: 'switch',
             checked: ctx.state.sidePanel,
             onchange: (event: Event) =>
-              void ctx.sidePanel((event.target as HTMLInputElement).checked),
+              void ctx.sidePanel?.((event.target as HTMLInputElement).checked),
           }),
           h(
             'span',

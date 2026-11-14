@@ -62,7 +62,7 @@ export const reminderBanner = (
       'div',
       { class: 'qa-banner', role: 'status' },
       h('p', {}, text),
-      task ? button(t('ui.setup.open'), () => void PluginAPI.selectTask(task.id)) : null,
+      task ? button(t('ui.setup.open'), () => void ctx.host.selectTask(task.id)) : null,
       button(t('ui.action.not-now'), () => {
         markSeen(seenKey);
         ctx.redraw();

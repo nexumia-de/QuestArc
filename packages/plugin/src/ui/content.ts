@@ -1,6 +1,6 @@
-import type { ContentPack } from '../shared/protocol';
-import { language, setLanguage } from '../shared/texts';
-import { setArt } from './art-store';
+import type { ContentPack } from '@questarc/ui/shared/protocol';
+import { language, setLanguage } from '@questarc/ui/shared/texts';
+import { setArt } from '@questarc/ui/ui/art-store';
 
 /**
  * Takes in what plugin.js sends once (`questarc:content`): the UI texts,

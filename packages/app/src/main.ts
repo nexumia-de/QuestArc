@@ -1,22 +1,22 @@
-// The standalone app (#93, a spike): the plugin's adapter and screens on
+// The standalone app (#93, a spike): the shared adapter and screens on
 // the app's own host. Where the plugin has plugin.js and a view in an
 // iframe with messages in between, the app is one page: the screens ask
 // the brain directly. Today and Data are the app's own screens.
-import type { Schedule } from '@questarc/engine';
-import { createBrain, type Brain } from '@questarc/plugin/src/adapter/brain';
-import { registerHooks } from '@questarc/plugin/src/adapter/hooks';
-import { artPackIn } from '@questarc/plugin/src/adapter/art-pack';
-import { messageFor } from '@questarc/plugin/src/adapter/snacks';
-import { builtInJourneys } from '@questarc/plugin/src/shared/content';
-import { useLanguage } from '@questarc/plugin/src/shared/languages';
-import { language, t } from '@questarc/plugin/src/shared/texts';
-import { createApp } from '@questarc/plugin/src/ui/app';
-import { setArt } from '@questarc/plugin/src/ui/art-store';
-import type { Client } from '@questarc/plugin/src/ui/client';
-import { h } from '@questarc/plugin/src/ui/dom';
+import { createBrain } from '@questarc/ui/adapter/brain';
+import { registerHooks } from '@questarc/ui/adapter/hooks';
+import { artPackIn } from '@questarc/ui/adapter/art-pack';
+import { messageFor } from '@questarc/ui/adapter/snacks';
+import { builtInJourneys } from '@questarc/ui/shared/content';
+import { useLanguage } from '@questarc/ui/shared/languages';
+import { language, t } from '@questarc/ui/shared/texts';
+import { createApp } from '@questarc/ui/ui/app';
+import { setArt } from '@questarc/ui/ui/art-store';
+import type { Client } from '@questarc/ui/ui/client';
+import { h } from '@questarc/ui/ui/dom';
 
 import { dayContext, dayStartTime, withDayStart } from './day';
 import { createHost } from './host';
+import { applyHostTexts } from './host-texts';
 import { renderData } from './screens/data';
 import { renderToday } from './screens/today';
 import { createShell } from './shell';
@@ -39,6 +39,7 @@ useLanguage(
   new URLSearchParams(location.search).get('lang') ?? navigator.language,
   builtInJourneys,
 );
+applyHostTexts();
 document.documentElement.lang = language();
 
 const start = async (root: HTMLElement): Promise<void> => {
@@ -46,23 +47,11 @@ const start = async (root: HTMLElement): Promise<void> => {
   const shell = createShell(root);
   const today = () => dayContext(store.data, new Date()).todayStr;
 
-  // The brain is made after the host it reads from; the host asks it
-  // only when a task is created.
-  const brain: { current?: Brain } = {};
-  const stageSchedule = async (): Promise<Schedule | undefined> => {
-    const state = await brain.current?.state();
-    const run = state?.view.active;
-    const journey = run && state.journeys.find((j) => j.id === run.journeyId);
-    return run && journey?.stages[run.position.stage]?.schedule;
-  };
   const host = createHost({
     store,
-    schedule: stageSchedule,
     showSnack: ({ msg }) => shell.message(msg),
     selectTask: () => shell.show('today'),
   });
-  // The screens call the plugin API by its global name.
-  (globalThis as { PluginAPI?: unknown }).PluginAPI = host.api;
 
   let showJourney = (): void => shell.show('journey');
   const game = createBrain({
@@ -75,7 +64,6 @@ const start = async (root: HTMLElement): Promise<void> => {
       }
     },
   });
-  brain.current = game;
   registerHooks(host.api, game.refresh);
 
   const art = artPackIn();
@@ -83,11 +71,10 @@ const start = async (root: HTMLElement): Promise<void> => {
   const client: Client = {
     get: () => game.state(),
     write: (records) => game.write(records),
-    sidePanel: () => game.state(),
     // texts and style are part of the app itself (app.js, app.css)
     content: async () => ({ language: language(), texts: {}, style: '', art }),
   };
-  const journey = createApp(shell.views.journey, client);
+  const journey = createApp(shell.views.journey, client, host.view);
   // The view's home is the moments (#96); a message's Show leads to the journey.
   showJourney = () => {
     shell.show('journey');
@@ -171,12 +158,6 @@ const start = async (root: HTMLElement): Promise<void> => {
   setInterval(() => void newDay(), DAY_CHECK_MS);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void newDay();
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') journey.back();
-  });
-  document.addEventListener('click', (event) => {
-    if (!(event.target as Element | null)?.closest('.qa-menu-wrap')) journey.closeMenu();
   });
 };
 

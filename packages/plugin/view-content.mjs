@@ -1,7 +1,7 @@
 // What the view does not carry itself (docs/decisions/one-build-for-older-versions.md):
 // Super Productivity 19.3 installs an index.html of at most 100 KB, so
 // the view holds only what it needs before plugin.js answers.
-// - `virtual:questarc-style`: src/ui/style.css without whitespace, as a
+// - `virtual:questarc-style`: packages/ui/src/ui/style.css without whitespace, as a
 //   text for plugin.js, which sends it to the view (`questarc:content`).
 // - `virtual:questarc-start-texts`: the few texts of content/i18n the
 //   view shows before that answer, in every language ({ en, de }), so
@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { transform } from 'esbuild';
 
-const stylePath = join(import.meta.dirname, 'src', 'ui', 'style.css');
+const stylePath = join(import.meta.dirname, '..', 'ui', 'src', 'ui', 'style.css');
 const i18n = join(import.meta.dirname, '..', '..', 'content', 'i18n');
 /** The languages of the view's start state (issue #39). */
 export const START_LANGUAGES = ['en', 'de'];

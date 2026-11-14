@@ -4,8 +4,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build } from 'esbuild';
-import { esbuildArt, esbuildLadderArt } from './art.mjs';
-import { esbuildJourneys } from './journeys.mjs';
+import { esbuildArt, esbuildLadderArt } from '../ui/art.mjs';
+import { esbuildJourneys } from '../ui/journeys.mjs';
 import { esbuildViewContent } from './view-content.mjs';
 
 const out = join('dist', 'preview');
@@ -38,7 +38,7 @@ const art = await build({
   plugins: [esbuildArt],
 });
 const style = ['start.css', 'style.css']
-  .map((file) => readFileSync(join('src', 'ui', file), 'utf8'))
+  .map((file) => readFileSync(join('..', 'ui', 'src', 'ui', file), 'utf8'))
   .join('\n');
 writeFileSync(
   join(out, 'art.html'),

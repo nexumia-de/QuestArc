@@ -1,5 +1,5 @@
-import { language } from '@questarc/plugin/src/shared/texts';
-import { h } from '@questarc/plugin/src/ui/dom';
+import { language } from '@questarc/ui/shared/texts';
+import { h } from '@questarc/ui/ui/dom';
 
 import type { StoredTask } from '../store/dataset';
 import { at } from '../texts';

@@ -1,4 +1,4 @@
-import { t } from '../shared/texts';
+import { t } from '@questarc/ui/shared/texts';
 
 /**
  * What the view says when it cannot get the game state from plugin.js

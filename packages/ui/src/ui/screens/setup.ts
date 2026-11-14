@@ -14,7 +14,8 @@ import type { Context, Screen } from '../screen';
  * Flow B, set up the task (docs/decisions/recurring-task-setup.md): the
  * plugin cannot create a repeat, so it creates the task and opens it for
  * the user to set the repeat, or binds a recurring task the user already
- * has. It also handles a task that does not repeat yet, a repeat journeys
+ * has. A host that can create a repeat (`host.createHabit`) makes the
+ * recurring task itself. It also handles a task that does not repeat yet, a repeat journeys
  * cannot follow, and a task that is gone. A stage the user already does
  * can be passed with "I Already Do This" (never the last one). The
  * optional "pair it with" field is asked here (design rule 7), and a
@@ -48,15 +49,21 @@ export const setupScreen = (ctx: Context, runId?: string): Screen => {
       ? taskOfCfg(Object.values(app.tasks), prevBinding.repeatCfgId)
       : undefined;
 
-  const open = (taskId: string) => () => void PluginAPI.selectTask(taskId);
+  const open = (taskId: string) => () => void ctx.host.selectTask(taskId);
   const create = async () => {
     const title = t('ui.setup.task-title', {
       anchor: taskAnchor(planAnchor(run.anchor), t(stage.plan.anchor)),
       action: t(stage.plan.action),
     });
-    const taskId = await PluginAPI.addTask({ title, isIgnoreShortSyntax: true });
-    await ctx.write(bindStage({ runId: run.runId, stageId: stage.id, taskId, day: view.todayStr }));
-    await PluginAPI.selectTask(taskId);
+    // A host that can create a repeat makes the recurring task, and the
+    // stage is bound to it at once; the others leave the repeat to the user.
+    const made = ctx.host.createHabit
+      ? await ctx.host.createHabit({ title, schedule: stage.schedule })
+      : { taskId: await ctx.host.addTask({ title }) };
+    await ctx.write(
+      bindStage({ runId: run.runId, stageId: stage.id, day: view.todayStr, ...made }),
+    );
+    await ctx.host.selectTask(made.taskId);
   };
   const btn = (label: string, onclick: () => void, primary = false) =>
     h(

@@ -10,11 +10,14 @@ generated: { by: claude-code/2.1.318, at: 2026-11-05 }
 
 QuestArc 3.0 is written from scratch. It turns habits into journeys
 ([roadmap](roadmap.md#the-journey)), following the rules in
-[psychology](psychology.md). The same game runs in two hosts:
+[psychology](psychology.md). The same game runs in three hosts:
 
 - as a plugin inside [Super Productivity](https://super-productivity.com);
 - as a game page inside Pensum, the native Phosh app that works on Super
-  Productivity's data.
+  Productivity's data;
+- as a standalone web app for people without Super Productivity, on a
+  small dataset in the same format
+  ([decision](decisions/standalone-app.md), in progress, #91).
 
 The milestones are in the [roadmap](roadmap.md); Super Productivity's
 plugin API and data are described in
@@ -42,6 +45,8 @@ commit `8ec9137`) and on Codeberg (GoVenture, HeroicRPG).
  │ content/   journeys (JSON), texts (i18n JSON) │
  │ packages/engine/  pure TypeScript game engine │
  │                   + shared test vectors       │
+ │ packages/ui/      screens + adapter core for  │
+ │                   the plugin and the app      │
  └──────────────┬──────────────────┬─────────────┘
                 │                  │
    Super Productivity plugin      Pensum  pensum/game/

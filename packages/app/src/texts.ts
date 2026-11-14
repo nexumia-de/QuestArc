@@ -1,4 +1,4 @@
-import { language } from '@questarc/plugin/src/shared/texts';
+import { language } from '@questarc/ui/shared/texts';
 
 /**
  * The texts only the standalone app has; the journeys' screens bring

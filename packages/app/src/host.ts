@@ -1,28 +1,25 @@
-import type { Schedule } from '@questarc/engine';
-import type { HostApi } from '@questarc/plugin/src/adapter/host';
-import type { Hooks, PluginAPI, SnackCfg } from '@super-productivity/plugin-api';
+import type { HostApi } from '@questarc/ui/adapter/host';
+import type { ViewHost } from '@questarc/ui/ui/view-host';
+import type { Hooks, SnackCfg } from '@super-productivity/plugin-api';
 
 import { dayContext } from './day';
 import { decodeData } from './store/codec';
 import { PLUGIN_ID, archivedTasks } from './store/dataset';
-import { createHabit } from './store/habits';
+import { createHabit as newHabit } from './store/habits';
 import type { Store } from './store/store';
 
 /**
  * The standalone host (#93): the part of Super Productivity's plugin API
  * that QuestArc's adapter and screens use, answered from the app's own
- * dataset. `addTask` differs on purpose: the app owns the habits, so it
- * creates the recurring task with the schedule of the stage it is for,
- * where the plugin has to leave the repeat to the user.
+ * dataset. The screens' side of it (`view`) differs on purpose: the app
+ * owns the habits, so it offers `createHabit` and the set-up screen makes
+ * the recurring task with the schedule of the stage, where the plugin has
+ * to leave the repeat to the user.
  */
-
-export type AppApi = HostApi & Pick<PluginAPI, 'addTask' | 'selectTask'>;
 
 export interface HostOptions {
   readonly store: Store;
   readonly now?: () => Date;
-  /** The schedule of the stage a new task is for; daily without one. */
-  readonly schedule: () => Promise<Schedule | undefined>;
   readonly showSnack: (snack: SnackCfg) => void;
   /** Shows a task to the user. */
   readonly selectTask: (taskId: string) => void;
@@ -31,7 +28,10 @@ export interface HostOptions {
 }
 
 export interface AppHost {
-  readonly api: AppApi;
+  /** What the brain reads: Super Productivity's plugin API, answered from the dataset. */
+  readonly api: HostApi;
+  /** What the screens use to list, show and create tasks. */
+  readonly view: ViewHost;
   /** Tells the adapter and the screens that the data changed. */
   emit(...hooks: string[]): void;
   /** Called after each change, when the adapter has heard of it. */
@@ -49,7 +49,6 @@ const dataId = (key = ''): string => (key ? `${PLUGIN_ID}:${key}` : PLUGIN_ID);
 export const createHost = ({
   store,
   now = () => new Date(),
-  schedule,
   showSnack,
   selectTask,
   newId = randomId,
@@ -61,7 +60,7 @@ export const createHost = ({
     for (const listener of listeners) listener();
   };
 
-  const api: AppApi = {
+  const api: HostApi = {
     getAppState: async () =>
       ({
         tasks: store.data.task.entities,
@@ -93,25 +92,30 @@ export const createHost = ({
     registerHook: (hook: Hooks, handler: (payload: never) => void) => {
       handlers.set(hook, [...(handlers.get(hook) ?? []), () => handler(undefined as never)]);
     },
-    addTask: async ({ title = '' }) => {
-      const stage = (await schedule()) ?? { type: 'daily' };
-      const { todayStr } = dayContext(store.data, now());
-      let taskId = '';
-      await store.update((data) => {
-        const habit = createHabit(data, {
-          cfgId: newId(),
-          title,
-          schedule: stage,
-          today: todayStr,
-        });
-        taskId = habit.taskId;
-        return habit.data;
-      });
-      emit('dataChanged');
-      return taskId;
-    },
-    selectTask: async (taskId: string) => selectTask(taskId),
   };
 
-  return { api, emit, onChange: (listener) => listeners.push(listener) };
+  const createHabit: NonNullable<ViewHost['createHabit']> = async ({ title, schedule }) => {
+    const { todayStr } = dayContext(store.data, now());
+    const repeatCfgId = newId();
+    let taskId = '';
+    await store.update((data) => {
+      const habit = newHabit(data, { cfgId: repeatCfgId, title, schedule, today: todayStr });
+      taskId = habit.taskId;
+      return habit.data;
+    });
+    emit('dataChanged');
+    return { taskId, repeatCfgId };
+  };
+
+  const view: ViewHost = {
+    getAppState: () => api.getAppState(),
+    selectTask: (taskId) => selectTask(taskId),
+    // Not used while `createHabit` is there: a task without a repeat is
+    // not something the app's habits have, so it is a daily one.
+    addTask: async ({ title }) =>
+      (await createHabit({ title, schedule: { type: 'daily' } })).taskId,
+    createHabit,
+  };
+
+  return { api, view, emit, onChange: (listener) => listeners.push(listener) };
 };

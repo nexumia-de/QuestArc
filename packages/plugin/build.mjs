@@ -7,8 +7,8 @@ import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'no
 import { join } from 'node:path';
 import { build, transform } from 'esbuild';
 import { zipSync } from 'fflate';
-import { esbuildLadderArt } from './art.mjs';
-import { esbuildJourneys } from './journeys.mjs';
+import { esbuildLadderArt } from '../ui/art.mjs';
+import { esbuildJourneys } from '../ui/journeys.mjs';
 import { esbuildViewContent, START_LANGUAGES, START_TEXT_KEYS } from './view-content.mjs';
 
 const out = 'dist';
@@ -38,10 +38,13 @@ const view = await build({
   minifyWhitespace: true,
 });
 const script = view.outputFiles[0].text.replaceAll('</script', '<\\/script');
-const { code: style } = await transform(readFileSync('src/ui/start.css', 'utf8'), {
-  loader: 'css',
-  minifyWhitespace: true,
-});
+const { code: style } = await transform(
+  readFileSync(join('..', 'ui', 'src', 'ui', 'start.css'), 'utf8'),
+  {
+    loader: 'css',
+    minifyWhitespace: true,
+  },
+);
 const html = readFileSync('src/ui/index.html', 'utf8')
   .replace('<!-- QUESTARC_STYLE -->', () => `<style>\n${style}</style>`)
   .replace('<!-- QUESTARC_SCRIPT -->', () => `<script>\n${script}</script>`);

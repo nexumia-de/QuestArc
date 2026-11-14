@@ -1,6 +1,6 @@
-import { isRequest, type ContentPack, type State } from '../shared/protocol';
-import { language } from '../shared/texts';
-import type { Brain } from './brain';
+import { isRequest, type ContentPack, type State } from '@questarc/ui/shared/protocol';
+import { language } from '@questarc/ui/shared/texts';
+import type { Brain } from '@questarc/ui/adapter/brain';
 import { contentPack } from './content-pack';
 import type { SettingsEntry } from './settings-entry';
 import type { ShowJourney } from './show-journey';
